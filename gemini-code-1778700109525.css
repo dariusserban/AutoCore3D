@@ -1,0 +1,11 @@
+body {
+    background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
+    background-size: 30px 30px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.glass-card:hover { border-color: #FF6700; box-shadow: 0 0 20px rgba(255, 103, 0, 0.2); }
