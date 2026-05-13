@@ -1,7 +1,0 @@
-{
-  "name": "autocore3d",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "mkdir -p public && cp index.html script.js style.css public/"
-  }
-}
