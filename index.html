@@ -510,10 +510,6 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   <button class="lang-opt" data-lang="en">EN</button>
 </div>
 <div id="toast"></div>
-<div id="syncStatus" style="position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,.95);border:1px solid var(--bdr);color:var(--muted);font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;padding:.45rem 1rem;z-index:150;display:flex;align-items:center;gap:.5rem;">
-  <span style="width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1s infinite;display:inline-block"></span>
-  SE SINCRONIZEAZĂ...
-</div>
 <div id="app">
 <header>
   <div class="hdr">
@@ -532,7 +528,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   <div class="hbar"></div>
 </header>
 <section class="hero">
-  <div class="hero-eyebrow" data-i18n="hero_eyebrow">// CATALOG PRODUSE 2025</div>
+  <div class="hero-eyebrow" data-i18n="hero_eyebrow">// PIESE AUTO · PRINTARE 3D · ROMÂNIA</div>
   <h1 data-i18n="hero_h1_html">PIESE AUTO<br><em>3D</em> PREMIUM</h1>
   <p class="hero-sub" data-i18n="hero_sub">Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț</p>
   <div class="stats">
@@ -566,7 +562,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
         <span class="footer-link" id="fpCookies">Cookies</span>
       </div>
     </div>
-    <div class="footer-bottom">© 2025 AUTOCORE3D · Inginerie Auto & Printare 3D · România · Transport și taxe incluse în toate prețurile afișate.</div>
+    <div class="footer-bottom">© 2026 AUTOCORE3D · Inginerie Auto & Printare 3D · România · Transport și taxe incluse în toate prețurile afișate.</div>
   </div>
 </footer>
 </div>
@@ -831,23 +827,21 @@ async function fbLoad(key){
   return null;
 }
 
-// Load from Firebase on startup, then re-render
+// Sync from Firebase silently on startup
 async function syncFromFirebase(){
   try{
     const keys=[LS_P,LS_C,LS_MAT,LS_POL];
     const results = await Promise.all(keys.map(k=>fbLoad(k)));
     let changed=false;
-    if(results[0]){products=results[0].map(p=>({...p,images:p.images||(p.imageUrl?[p.imageUrl]:[]) }));nextId=products.reduce((m,p)=>Math.max(m,p.id),0)+1;changed=true;}
-    if(results[1]){categories=results[1];changed=true;}
-    if(results[2]){materials=results[2];changed=true;}
+    if(results[0]&&results[0].length){products=results[0].map(p=>({...p,images:p.images||(p.imageUrl?[p.imageUrl]:[]) }));nextId=products.reduce((m,p)=>Math.max(m,p.id),0)+1;changed=true;}
+    if(results[1]&&results[1].length){categories=results[1];changed=true;}
+    if(results[2]&&results[2].length){materials=results[2];changed=true;}
     if(results[3]){policies=results[3];}
-    if(changed){renderFilters();renderGrid();}
-    $('syncStatus').style.display='none';
-  }catch(e){
-    console.warn('Sync error:',e);
-    $('syncStatus').style.display='none';
-  }
+    if(changed){renderFilters();renderGrid();populateCatSelect();populateMatSelect();}
+  }catch(e){ console.warn('Firebase sync error:',e); }
 }
+
+function defProds(){
   return [
     {id:1,name:"Suport Senzor Parcare",brand:"AutoCore OEM",category:"Piese Auto",material:"ABS/ASA",price:45,images:[],badges:["UV Resistant","Impact Proof"],description:"Suport 3D pentru senzori parcare OEM, rezistent UV și impact. Transport inclus.",stock:true},
     {id:2,name:"Canalizare Intercooler",brand:"CorePerformance",category:"Piese Auto",material:"Carbon Fiber",price:180,images:[],badges:["High Temp","Carbon Rigid"],description:"Conductă aer carbon compozit pentru intercooler. Transport inclus.",stock:true},
@@ -893,7 +887,7 @@ function hexSVG(s=68){return`<svg width="${s}" height="${s}" viewBox="0 0 80 80"
 function waSVG(){return`<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;}
 
 /* ══ I18N ══ */
-const T={ro:{hero_eyebrow:"// CATALOG PRODUSE 2025",hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț",nav_contact:"Contact",stat_products:"Produse",shipping_included:"Transport și taxe incluse în preț",prod_found:"PRODUSE GĂSITE",order_btn:"Comandă",unavailable:"Indisponibil",btn_wa:"Trimite pe WhatsApp",btn_direct:"Plasează comanda direct",btn_direct_note:"Vei fi contactat în cel mai scurt timp",btn_wa_only:"Pentru plata online contactați-ne pe WhatsApp",cancel:"Anulează",toast_order:"✓ Comandă plasată! Vei fi contactat în curând.",toast_saved:"✓ Salvat cu succes!",policy_privacy_title:"Politică de Confidențialitate",policy_terms_title:"Termeni și Condiții",policy_return_title:"Politică de Retur",policy_cookies_title:"Politică Cookies"},en:{hero_eyebrow:"// PRODUCT CATALOG 2025",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",nav_contact:"Contact",stat_products:"Products",shipping_included:"Shipping and taxes included in price",prod_found:"PRODUCTS FOUND",order_btn:"Order",unavailable:"Unavailable",btn_wa:"Send via WhatsApp",btn_direct:"Place order directly",btn_direct_note:"You will be contacted as soon as possible",btn_wa_only:"For online payment please contact us on WhatsApp",cancel:"Cancel",toast_order:"✓ Order placed! You will be contacted shortly.",toast_saved:"✓ Saved successfully!",policy_privacy_title:"Privacy Policy",policy_terms_title:"Terms & Conditions",policy_return_title:"Return Policy",policy_cookies_title:"Cookie Policy"}};
+const T={ro:{hero_eyebrow:"// PIESE AUTO · PRINTARE 3D · ROMÂNIA",hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț",nav_contact:"Contact",stat_products:"Produse",shipping_included:"Transport și taxe incluse în preț",prod_found:"PRODUSE GĂSITE",order_btn:"Comandă",unavailable:"Indisponibil",btn_wa:"Trimite pe WhatsApp",btn_direct:"Plasează comanda direct",btn_direct_note:"Vei fi contactat în cel mai scurt timp",btn_wa_only:"Pentru plata online contactați-ne pe WhatsApp",cancel:"Anulează",toast_order:"✓ Comandă plasată! Vei fi contactat în curând.",toast_saved:"✓ Salvat cu succes!",policy_privacy_title:"Politică de Confidențialitate",policy_terms_title:"Termeni și Condiții",policy_return_title:"Politică de Retur",policy_cookies_title:"Politică Cookies"},en:{hero_eyebrow:"// AUTO PARTS · 3D PRINTING · ROMANIA",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",nav_contact:"Contact",stat_products:"Products",shipping_included:"Shipping and taxes included in price",prod_found:"PRODUCTS FOUND",order_btn:"Order",unavailable:"Unavailable",btn_wa:"Send via WhatsApp",btn_direct:"Place order directly",btn_direct_note:"You will be contacted as soon as possible",btn_wa_only:"For online payment please contact us on WhatsApp",cancel:"Cancel",toast_order:"✓ Order placed! You will be contacted shortly.",toast_saved:"✓ Saved successfully!",policy_privacy_title:"Privacy Policy",policy_terms_title:"Terms & Conditions",policy_return_title:"Return Policy",policy_cookies_title:"Cookie Policy"}};
 const t = k => T[lang][k]||T.ro[k]||k;
 function applyI18n(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(k==='hero_h1_html')el.innerHTML=t(k);else el.textContent=t(k);});
