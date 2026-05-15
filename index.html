@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="ro" style="color-scheme:dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="color-scheme" content="dark"/>
+<title>AUTOCORE3D — Piese Auto & Printare 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── FORCE DARK — override ALL system/browser themes ── */
+:root{
+  color-scheme: dark !important;
+  --bg:#0a0a0a; --surf:#111; --card:#151515; --bdr:#262626;
+  --red:#E01A1A; --red-dim:rgba(224,26,26,.13); --red-glow:rgba(224,26,26,.07);
+  --text:#f0f0f0; --sub:#999; --muted:#555;
+  --green:#25D366; --err:#ef4444;
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Barlow Condensed',sans-serif;
+  --body:'Barlow',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+/* Neutralize any OS/browser light-mode overrides */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: dark !important;
+    --bg:#0a0a0a !important; --surf:#111 !important; --card:#151515 !important; --bdr:#262626 !important;
+    --text:#f0f0f0 !important; --sub:#999 !important; --muted:#555 !important;
+  }
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:#0a0a0a !important;}
+body{
+  background:#0a0a0a !important;
+  background-color:#0a0a0a !important;
+  color:#f0f0f0 !important;
+  font-family:var(--body);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  forced-color-adjust: none;
+}
+/* Force dark on ALL elements */
+*, *::before, *::after {
+  forced-color-adjust: none;
+}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,select,textarea{
+  font-family:inherit;
+  background:#0a0a0a !important;
+  color:#f0f0f0 !important;
+  color-scheme: dark !important;
+}
+/* Override browser autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #0a0a0a inset !important;
+  -webkit-text-fill-color: #f0f0f0 !important;
+  caret-color: #f0f0f0;
+}
+
+/* ── CURSOR GLOW ── */
+#cg{pointer-events:none;position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(224,26,26,.05) 0%,transparent 70%);transform:translate(-50%,-50%);z-index:0;}
+
+/* ── GRID BG ── */
+#gb{position:fixed;inset:0;background-image:linear-gradient(rgba(224,26,26,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(224,26,26,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+#gb::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(224,26,26,.04) 0%,transparent 70%);}
+
+#app{position:relative;z-index:2;}
+
+/* ── LANG SWITCHER (floating left) ── */
+#langBtn{position:fixed;left:1.1rem;top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;gap:.4rem;}
+.lang-opt{width:38px;height:38px;border:1px solid var(--bdr);background:var(--surf);color:var(--sub);font-family:var(--mono);font-size:.58rem;font-weight:700;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;transition:all .25s;cursor:pointer;}
+.lang-opt:hover{border-color:var(--red);color:var(--text);}
+.lang-opt.on{border-color:var(--red);background:var(--red);color:#fff;}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.95) !important;backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);}
+.hdr{max-width:1280px;margin:0 auto;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-hex{font-size:1.75rem;color:var(--red);line-height:1;animation:pulse-r 3s ease-in-out infinite;}
+@keyframes pulse-r{0%,100%{text-shadow:0 0 14px rgba(224,26,26,.5)}50%{text-shadow:0 0 28px rgba(224,26,26,.9),0 0 55px rgba(224,26,26,.25)}}
+.logo-name{font-family:var(--disp);font-size:1.4rem;font-weight:900;letter-spacing:.06em;color:var(--text);}
+.logo-name span{color:var(--red);}
+.logo-tag{font-family:var(--mono);font-size:.45rem;color:var(--muted);letter-spacing:.18em;margin-top:1px;}
+nav{display:flex;align-items:center;gap:1.4rem;}
+.nav-link{font-family:var(--mono);font-size:.63rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;transition:color .2s;position:relative;padding-bottom:2px;}
+.nav-link::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--red);transition:width .3s var(--ease);}
+.nav-link:hover{color:var(--text);}
+.nav-link:hover::after{width:100%;}
+.nav-admin{background:transparent;border:1px solid var(--bdr);color:var(--muted);width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .25s;}
+.nav-admin:hover{border-color:var(--red);color:var(--red);}
+.nav-cta{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.08em;padding:.44rem .95rem;transition:all .25s;position:relative;overflow:hidden;}
+.nav-cta::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
+.nav-cta:hover::before{transform:translateX(0);}
+.nav-cta:hover{box-shadow:0 0 20px rgba(37,211,102,.4);}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hbar{height:1px;background:linear-gradient(90deg,transparent,var(--red) 50%,transparent);animation:scan 4s ease-in-out infinite;}
+@keyframes scan{0%,100%{opacity:.3}50%{opacity:.85}}
+
+/* ── HERO ── */
+.hero{max-width:1280px;margin:0 auto;padding:3.5rem 1.5rem 2rem;}
+.hero-eyebrow{font-family:var(--mono);font-size:.65rem;color:var(--red);letter-spacing:.25em;margin-bottom:.9rem;opacity:0;animation:fadeUp .7s var(--ease) .1s forwards;}
+.hero h1{font-family:var(--disp);font-size:clamp(2.6rem,6.5vw,5rem);font-weight:900;text-transform:uppercase;line-height:.92;letter-spacing:.02em;margin-bottom:.9rem;opacity:0;animation:fadeUp .7s var(--ease) .25s forwards;color:var(--text);}
+.hero h1 em{font-style:normal;color:var(--red);position:relative;}
+.hero h1 em::after{content:'';position:absolute;bottom:2px;left:0;right:0;height:3px;background:var(--red);transform:scaleX(0);transform-origin:left;animation:grow 1s var(--ease) 1s forwards;}
+@keyframes grow{to{transform:scaleX(1)}}
+.hero-sub{font-family:var(--body);font-size:.95rem;color:var(--sub);line-height:1.6;margin-bottom:2.5rem;opacity:0;animation:fadeUp .7s var(--ease) .4s forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.stats{display:flex;opacity:0;animation:fadeUp .7s var(--ease) .55s forwards;}
+.stat-card{flex:1;padding:.85rem 1.2rem;border:1px solid var(--bdr);position:relative;overflow:hidden;transition:border-color .3s;}
+.stat-card+.stat-card{border-left:none;}
+.stat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(224,26,26,.06) 0%,transparent 60%);opacity:0;transition:opacity .3s;}
+.stat-card:hover{border-color:rgba(224,26,26,.3);}
+.stat-card:hover::before{opacity:1;}
+.stat-val{font-family:var(--disp);font-size:1.5rem;font-weight:800;color:var(--red);line-height:1;display:block;}
+.stat-lbl{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.14em;margin-top:3px;display:block;}
+
+/* ── TICKER ── */
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);background:var(--surf);padding:.45rem 0;}
+.ticker{display:flex;white-space:nowrap;animation:tick 30s linear infinite;}
+.ticker:hover{animation-play-state:paused;}
+.t-item{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;color:var(--muted);padding:0 2rem;}
+.t-item b{color:var(--red);margin-right:.4rem;font-weight:400;}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── FILTERS ── */
+.filters-wrap{max-width:1280px;margin:0 auto;padding:2rem 1.5rem 1.25rem;}
+.section-label{font-family:var(--mono);font-size:.6rem;color:var(--red);letter-spacing:.22em;margin-bottom:.75rem;}
+.fbar{display:flex;gap:.4rem;flex-wrap:wrap;}
+.fb{font-family:var(--mono);font-size:.63rem;letter-spacing:.09em;text-transform:uppercase;padding:.42rem 1.1rem;border:1px solid var(--bdr);background:transparent;color:var(--sub);transition:all .25s;position:relative;overflow:hidden;}
+.fb::before{content:'';position:absolute;inset:0;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease);z-index:-1;}
+.fb:hover{border-color:var(--red);color:var(--red);}
+.fb.on{border-color:var(--red);color:#fff;font-weight:700;}
+.fb.on::before{transform:scaleX(1);}
+
+/* ── PRODUCTS ── */
+.products-wrap{max-width:1280px;margin:0 auto;padding:0 1.5rem 4rem;}
+.prod-hdr{display:flex;align-items:center;gap:.8rem;margin-bottom:1.3rem;}
+.prod-count{font-family:var(--mono);font-size:.58rem;color:var(--muted);letter-spacing:.18em;white-space:nowrap;}
+.prod-line{flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:1.1rem;}
+.no-prod{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.1em;text-align:center;padding:4rem;border:1px dashed var(--bdr);}
+
+/* ── CARD ── */
+.card{position:relative;background:var(--card);border:1px solid var(--bdr);overflow:hidden;cursor:pointer;
+  opacity:0;transform:translateY(22px);
+  transition:opacity .5s var(--ease),transform .5s var(--ease),border-color .3s,box-shadow .3s;}
+.card.visible{opacity:1;transform:translateY(0);}
+.card.visible:hover{border-color:rgba(224,26,26,.4);transform:translateY(-4px) scale(1.01);box-shadow:0 18px 50px rgba(0,0,0,.7),0 0 0 1px rgba(224,26,26,.07),inset 0 1px 0 rgba(255,255,255,.03);}
+.card::before{content:'';position:absolute;top:-100%;left:0;right:0;height:50%;background:linear-gradient(transparent,rgba(224,26,26,.02),transparent);transition:top .65s var(--ease);z-index:1;pointer-events:none;}
+.card:hover::before{top:180%;}
+.card-img::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 38%,rgba(224,26,26,.04) 50%,transparent 62%);transform:translateX(-100%);transition:transform .65s;}
+.card:hover .card-img::after{transform:translateX(100%);}
+.card-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% -5%,rgba(224,26,26,.08) 0%,transparent 65%);opacity:0;transition:opacity .4s;pointer-events:none;}
+.card:hover .card-glow{opacity:1;}
+.corner{position:absolute;width:12px;height:12px;z-index:3;transition:all .3s var(--ease);}
+.c-tl{top:-1px;left:-1px;border-top:2px solid var(--muted);border-left:2px solid var(--muted);}
+.c-tr{top:-1px;right:-1px;border-top:2px solid var(--muted);border-right:2px solid var(--muted);}
+.c-bl{bottom:-1px;left:-1px;border-bottom:2px solid var(--muted);border-left:2px solid var(--muted);}
+.c-br{bottom:-1px;right:-1px;border-bottom:2px solid var(--muted);border-right:2px solid var(--muted);}
+.card:hover .corner{border-color:var(--red);width:15px;height:15px;}
+.card:hover .c-tl{top:-2px;left:-2px;}
+.card:hover .c-tr{top:-2px;right:-2px;}
+.card:hover .c-bl{bottom:-2px;left:-2px;}
+.card:hover .c-br{bottom:-2px;right:-2px;}
+.card-oos{opacity:.5;}
+.stock-badge{position:absolute;top:.85rem;left:50%;transform:translateX(-50%);background:#0d0d0d;border:1px solid #252525;color:#555;font-family:var(--mono);font-size:.52rem;letter-spacing:.22em;padding:.22rem .7rem;z-index:10;}
+.card-img{position:relative;height:160px;background:#0a0a0a;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .55s var(--ease);}
+.card:hover .card-img img{transform:scale(1.07);}
+.card-hex-wrap{display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+.card-hex-wrap svg{transition:transform .55s var(--ease),filter .4s;}
+.card:hover .card-hex-wrap svg{transform:rotate(30deg) scale(1.18);filter:drop-shadow(0 0 10px rgba(224,26,26,.7));}
+.hex-lbl{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.2em;}
+.mat-tag{position:absolute;bottom:.65rem;right:.65rem;font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;padding:.18rem .5rem;border:1px solid;background:rgba(10,10,10,.92);z-index:2;}
+.card-body{padding:1.1rem;display:flex;flex-direction:column;gap:.48rem;}
+.card-cat{font-family:var(--mono);font-size:.56rem;color:var(--red);letter-spacing:.16em;}
+.card-name{font-family:var(--disp);font-size:1.15rem;font-weight:800;line-height:1.05;color:var(--text);}
+.card-brand{font-family:var(--mono);font-size:.54rem;color:var(--muted);letter-spacing:.1em;}
+.card-desc{font-family:var(--body);font-size:.82rem;color:#aaa;line-height:1.5;}
+.badges{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.1rem;}
+.badge{display:inline-flex;align-items:center;gap:.25rem;font-family:var(--mono);font-size:.53rem;letter-spacing:.07em;padding:.18rem .48rem;border:1px solid;text-transform:uppercase;color:#ccc;}
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:.4rem;padding-top:.9rem;border-top:1px solid var(--bdr);}
+.price{font-family:var(--disp);font-size:1.4rem;font-weight:800;color:var(--red);line-height:1;}
+.price-sub{font-family:var(--mono);font-size:.52rem;color:#888;letter-spacing:.07em;margin-top:1px;}
+.order-btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.63rem;font-weight:700;letter-spacing:.06em;padding:.52rem .92rem;transition:all .25s;position:relative;overflow:hidden;}
+.order-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
+.order-btn:hover::before{transform:translateX(0);}
+.order-btn:hover{box-shadow:0 0 22px rgba(224,26,26,.5);transform:translateY(-1px);}
+.order-btn.dis{background:#1e1e1e;color:#444;cursor:default;}
+.order-btn.dis:hover{box-shadow:none;transform:none;}
+.order-btn.dis::before{display:none;}
+
+/* ── POLICY SECTION ── */
+.policy-section{max-width:1280px;margin:0 auto;padding:0 1.5rem 3rem;}
+.policy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-top:.75rem;}
+.policy-card{border:1px solid var(--bdr);padding:1.25rem;background:var(--surf);position:relative;overflow:hidden;}
+.policy-card::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;background:var(--red);opacity:.6;}
+.policy-title{font-family:var(--disp);font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.6rem;letter-spacing:.04em;}
+.policy-text{font-family:var(--body);font-size:.82rem;color:#999;line-height:1.7;}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--surf);}
+.footer-inner{max-width:1280px;margin:0 auto;}
+.footer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--bdr);}
+.f-logo{font-family:var(--disp);font-size:1.05rem;font-weight:900;letter-spacing:.07em;color:var(--text);}
+.f-logo span{color:var(--red);}
+.f-copy{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.1em;}
+.footer-links{display:flex;gap:1.5rem;}
+.footer-link{font-family:var(--mono);font-size:.58rem;color:var(--muted);letter-spacing:.1em;cursor:pointer;transition:color .2s;}
+.footer-link:hover{color:var(--red);}
+.footer-bottom{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.08em;line-height:1.8;}
+
+/* ── MODAL BASE ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-box{background:var(--surf);border:1px solid var(--bdr);width:100%;max-width:500px;max-height:92vh;overflow-y:auto;position:relative;transform:translateY(28px) scale(.96);transition:transform .38s var(--ease);}
+.modal-box::-webkit-scrollbar{width:3px;}
+.modal-box::-webkit-scrollbar-thumb{background:var(--bdr);}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.modal-close{position:absolute;top:.85rem;right:.85rem;background:transparent;border:1px solid var(--bdr);color:var(--muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .2s;z-index:5;}
+.modal-close:hover{border-color:var(--err);color:var(--err);}
+.modal-section{padding:1.4rem 1.5rem 0;}
+.modal-section:last-child{padding-bottom:1.5rem;}
+.modal-title{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.2em;margin-bottom:1rem;}
+
+/* ── CHECKOUT: product row ── */
+.co-prod-row{display:flex;align-items:center;gap:.9rem;padding-bottom:1.25rem;margin-bottom:0;border-bottom:1px solid var(--bdr);}
+.co-thumb{width:54px;height:54px;background:#0a0a0a;border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.co-thumb img{width:100%;height:100%;object-fit:cover;}
+.co-prod-name{font-family:var(--disp);font-size:1.05rem;font-weight:800;color:var(--text);line-height:1.1;}
+.co-prod-price{font-family:var(--mono);font-size:.65rem;color:var(--red);margin-top:3px;letter-spacing:.08em;}
+.co-shipping-note{font-family:var(--body);font-size:.8rem;color:#25D366;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);padding:.6rem .9rem;display:flex;align-items:center;gap:.5rem;margin-top:.9rem;}
+
+/* ── CHECKOUT: form fields ── */
+.co-fields{display:flex;flex-direction:column;gap:.65rem;}
+.co-row-2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+.co-field{display:flex;flex-direction:column;gap:.3rem;}
+.co-label{font-family:var(--mono);font-size:.58rem;color:#aaa;letter-spacing:.12em;text-transform:uppercase;}
+.co-input{background:#0a0a0a !important;border:1px solid var(--bdr);color:#f0f0f0 !important;font-family:var(--body);font-size:.9rem;padding:.58rem .85rem;outline:none;transition:border-color .2s;width:100%;}
+.co-input:focus{border-color:var(--red);}
+.co-input::placeholder{color:var(--muted);}
+.co-input.invalid{border-color:var(--err);}
+
+/* ── CHECKOUT: pay options ── */
+.pay-opts{display:flex;flex-direction:column;gap:.5rem;}
+.pay-opt{display:flex;align-items:center;gap:.9rem;border:1px solid var(--bdr);padding:.88rem 1rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+.pay-opt::before{content:'';position:absolute;inset:0;background:rgba(224,26,26,.05);opacity:0;transition:opacity .25s;}
+.pay-opt:hover{border-color:rgba(224,26,26,.3);}
+.pay-opt:hover::before{opacity:1;}
+.pay-opt.sel{border-color:var(--red);}
+.pay-opt.sel::before{opacity:1;}
+.pay-radio{width:18px;height:18px;border:2px solid var(--muted);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:border-color .25s;}
+.pay-opt.sel .pay-radio{border-color:var(--red);}
+.pay-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--red);opacity:0;transform:scale(0);transition:all .25s;}
+.pay-opt.sel .pay-radio::after{opacity:1;transform:scale(1);}
+.pay-opt-icon{font-size:1.2rem;flex-shrink:0;}
+.pay-opt-title{font-family:var(--disp);font-size:.98rem;font-weight:700;color:var(--text);}
+.pay-opt-desc{font-family:var(--body);font-size:.78rem;color:#999;margin-top:2px;}
+
+/* ── CHECKOUT: action buttons ── */
+.co-actions{display:flex;flex-direction:column;gap:.55rem;padding:1.25rem 1.5rem 1.5rem;}
+.co-info-note{font-family:var(--body);font-size:.78rem;color:#999;text-align:center;padding:.5rem 0;}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:.5rem;background:var(--green);color:#fff;font-family:var(--body);font-size:.92rem;font-weight:600;padding:.72rem;transition:all .25s;position:relative;overflow:hidden;width:100%;}
+.btn-wa::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
+.btn-wa:hover::before{transform:translateX(0);}
+.btn-wa:hover{box-shadow:0 0 22px rgba(37,211,102,.45);}
+.btn-direct{display:flex;align-items:center;justify-content:center;gap:.5rem;background:var(--red);color:#fff;font-family:var(--body);font-size:.92rem;font-weight:600;padding:.72rem;transition:all .25s;position:relative;overflow:hidden;width:100%;}
+.btn-direct::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
+.btn-direct:hover::before{transform:translateX(0);}
+.btn-direct:hover{box-shadow:0 0 22px rgba(224,26,26,.45);}
+.btn-outline-cancel{background:transparent;border:1px solid var(--bdr);color:#aaa;font-family:var(--body);font-size:.88rem;padding:.65rem;transition:all .2s;width:100%;}
+.btn-outline-cancel:hover{border-color:var(--text);color:var(--text);}
+
+/* ── SUCCESS TOAST ── */
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surf);border:1px solid rgba(37,211,102,.3);color:var(--green);font-family:var(--body);font-size:.88rem;padding:.75rem 1.5rem;z-index:500;opacity:0;transition:all .4s var(--ease);white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── PW OVERLAY ── */
+.pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);z-index:400;display:flex;align-items:center;justify-content:center;}
+.pw-box{background:var(--surf);border:1px solid var(--bdr);padding:2rem;width:320px;position:relative;overflow:hidden;}
+.pw-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.pw-lbl{font-family:var(--mono);font-size:.68rem;color:var(--red);letter-spacing:.22em;margin-bottom:1.25rem;}
+.pw-inp{width:100%;background:#0a0a0a !important;border:1px solid var(--bdr);color:#f0f0f0 !important;font-family:var(--mono);font-size:.8rem;padding:.6rem .9rem;outline:none;transition:border-color .2s;margin-bottom:.5rem;}
+.pw-inp:focus{border-color:var(--red);}
+.pw-inp.err{border-color:var(--err);animation:shake .3s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pw-err{font-family:var(--mono);font-size:.6rem;color:var(--err);letter-spacing:.1em;margin-bottom:.6rem;}
+.pw-btn{width:100%;background:var(--red);border:none;color:#fff;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:.62rem;margin-top:.4rem;transition:box-shadow .25s;cursor:pointer;}
+.pw-btn:hover{box-shadow:0 0 20px rgba(224,26,26,.4);}
+
+/* ── ADMIN PANEL ── */
+.ap-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:400;display:flex;justify-content:flex-end;}
+.ap-panel{width:520px;max-width:100vw;height:100vh;background:#0d0d0d;border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;animation:slideIn .3s var(--ease);}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.ap-hdr{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--bdr);flex-shrink:0;}
+.ap-hdr-l{display:flex;align-items:center;gap:.75rem;}
+.ap-ico{font-size:1.5rem;color:var(--red);animation:pulse-r 3s ease-in-out infinite;}
+.ap-title{font-family:var(--disp);font-size:1.1rem;font-weight:800;letter-spacing:.07em;color:var(--text);}
+.ap-sub{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.15em;}
+.ap-close{background:transparent;border:1px solid var(--bdr);color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;cursor:pointer;}
+.ap-close:hover{border-color:var(--err);color:var(--err);}
+.ap-tabs{display:flex;border-bottom:1px solid var(--bdr);flex-shrink:0;overflow-x:auto;}
+.ap-tab{flex:1;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;padding:.78rem .4rem;transition:color .2s,border-color .2s;text-transform:uppercase;white-space:nowrap;cursor:pointer;}
+.ap-tab:hover{color:var(--text);}
+.ap-tab.on{color:var(--red);border-bottom-color:var(--red);}
+.ap-ok{background:rgba(37,211,102,.07);border-bottom:1px solid rgba(37,211,102,.2);color:var(--green);font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;padding:.55rem 1.4rem;flex-shrink:0;}
+.ap-form{flex:1;overflow-y:auto;padding:1.2rem 1.4rem;display:flex;flex-direction:column;gap:.7rem;}
+.ap-form::-webkit-scrollbar{width:3px;}
+.ap-form::-webkit-scrollbar-thumb{background:var(--bdr);}
+.ap-sec{font-family:var(--mono);font-size:.57rem;color:var(--red);letter-spacing:.2em;padding-top:.5rem;border-top:1px solid var(--bdr);}
+.ap-sec.first{border-top:none;padding-top:0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;}
+.field{display:flex;flex-direction:column;gap:.3rem;}
+.field label{font-family:var(--mono);font-size:.57rem;color:#aaa;letter-spacing:.12em;text-transform:uppercase;}
+.finput,.fsel,.ftx{background:#0a0a0a !important;border:1px solid var(--bdr);color:#f0f0f0 !important;font-family:var(--body);font-size:.85rem;padding:.52rem .78rem;outline:none;transition:border-color .2s;width:100%;}
+.finput:focus,.fsel:focus,.ftx:focus{border-color:var(--red);}
+.fsel{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E") !important;background-repeat:no-repeat !important;background-position:right .72rem center !important;padding-right:1.9rem;}
+.ftx{resize:vertical;min-height:60px;}
+.img-tabs{display:flex;gap:.38rem;}
+.img-tab{background:transparent;border:1px solid var(--bdr);color:var(--muted);font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;padding:.32rem .78rem;transition:all .2s;cursor:pointer;}
+.img-tab:hover{border-color:var(--red);color:var(--red);}
+.img-tab.on{background:var(--red);border-color:var(--red);color:#fff;font-weight:700;}
+.dropzone{border:1px dashed var(--bdr);background:#0a0a0a;color:var(--muted);font-family:var(--mono);font-size:.63rem;padding:1.1rem;text-align:center;transition:all .2s;cursor:pointer;}
+.dropzone:hover{border-color:var(--red);color:var(--red);}
+.img-prev{border:1px solid var(--bdr);background:#0a0a0a;height:110px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.img-prev img{max-width:100%;max-height:110px;object-fit:contain;}
+.badge-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;}
+.badge-btn{display:flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--bdr);color:#aaa;font-family:var(--mono);font-size:.58rem;letter-spacing:.07em;padding:.42rem .65rem;transition:all .2s;text-transform:uppercase;cursor:pointer;}
+.badge-btn:hover{border-color:var(--red);color:var(--red);}
+.badge-btn.on{background:rgba(224,26,26,.1);border-color:var(--red);color:var(--red);}
+.stock-row{display:flex;gap:.4rem;}
+.stock-btn{flex:1;background:transparent;border:1px solid var(--bdr);color:#aaa;font-family:var(--mono);font-size:.6rem;letter-spacing:.09em;padding:.48rem;transition:all .2s;text-transform:uppercase;cursor:pointer;}
+.stock-btn.in{background:rgba(37,211,102,.08);border-color:var(--green);color:var(--green);}
+.stock-btn.out{background:rgba(239,68,68,.08);border-color:var(--err);color:var(--err);}
+.form-actions{display:flex;gap:.6rem;padding-top:.5rem;border-top:1px solid var(--bdr);}
+.btn-cancel{background:transparent;border:1px solid var(--bdr);color:#aaa;font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;padding:.58rem 1rem;transition:all .2s;cursor:pointer;}
+.btn-cancel:hover{border-color:var(--text);color:var(--text);}
+.btn-submit{flex:1;background:var(--red);border:none;color:#fff;font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;padding:.62rem;transition:all .25s;cursor:pointer;}
+.btn-submit:hover{box-shadow:0 0 20px rgba(224,26,26,.4);}
+.btn-submit:disabled{opacity:.3;cursor:default;box-shadow:none;}
+
+/* ── CATEGORIES ADMIN VIEW ── */
+.cat-list{display:flex;flex-direction:column;gap:.5rem;}
+.cat-item{display:flex;align-items:center;gap:.65rem;background:var(--card);border:1px solid var(--bdr);padding:.62rem .82rem;transition:border-color .2s;}
+.cat-item:hover{border-color:var(--muted);}
+.cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.cat-item-name{flex:1;font-family:var(--disp);font-size:.95rem;font-weight:700;color:var(--text);}
+.cat-item-count{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.08em;}
+.cat-item-actions{display:flex;gap:.3rem;flex-shrink:0;}
+.cat-default-tag{font-family:var(--mono);font-size:.48rem;color:var(--muted);letter-spacing:.1em;border:1px solid var(--bdr);padding:.12rem .35rem;}
+.cat-add-form{display:flex;flex-direction:column;gap:.6rem;padding:.9rem;border:1px solid var(--bdr);background:var(--card);}
+.cat-add-title{font-family:var(--mono);font-size:.57rem;color:var(--red);letter-spacing:.18em;}
+.cat-color-row{display:flex;gap:.5rem;align-items:center;}
+.cat-color-swatch{width:32px;height:32px;border:2px solid var(--bdr);border-radius:3px;cursor:pointer;transition:border-color .2s;overflow:hidden;flex-shrink:0;}
+.cat-color-swatch:hover{border-color:var(--red);}
+.cat-color-swatch input[type=color]{width:200%;height:200%;margin:-50%;border:none;background:none;cursor:pointer;opacity:0;position:absolute;}
+.cat-color-preview{width:32px;height:32px;border-radius:3px;display:block;}
+
+/* Policy section */
+.policy-admin .ftx{min-height:80px;}
+
+.ap-list{flex:1;overflow-y:auto;padding:.7rem 1rem;display:flex;flex-direction:column;gap:.42rem;}
+.ap-list::-webkit-scrollbar{width:3px;}
+.ap-list::-webkit-scrollbar-thumb{background:var(--bdr);}
+.list-empty{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.1em;text-align:center;padding:2.5rem;}
+.list-item{display:flex;align-items:center;gap:.68rem;background:var(--card);border:1px solid var(--bdr);padding:.62rem .82rem;transition:border-color .2s;}
+.list-item:hover{border-color:var(--muted);}
+.list-thumb{width:44px;height:44px;background:#0a0a0a;border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.list-thumb img{width:100%;height:100%;object-fit:cover;}
+.list-hex{font-size:1.1rem;color:var(--muted);}
+.list-info{flex:1;min-width:0;}
+.list-name{font-family:var(--disp);font-size:.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
+.list-meta{display:flex;align-items:center;gap:.42rem;margin-top:2px;flex-wrap:wrap;}
+.list-cat{font-family:var(--mono);font-size:.52rem;color:var(--muted);}
+.list-price{font-family:var(--mono);font-size:.57rem;color:var(--red);}
+.list-stock{font-family:var(--mono);font-size:.5rem;letter-spacing:.07em;padding:.1rem .36rem;border:1px solid;}
+.list-stock.in{color:var(--green);border-color:rgba(37,211,102,.3);}
+.list-stock.out{color:var(--err);border-color:rgba(239,68,68,.3);}
+.list-actions{display:flex;gap:.3rem;flex-shrink:0;}
+.list-btn{width:29px;height:29px;background:transparent;border:1px solid var(--bdr);color:var(--muted);font-size:.75rem;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;}
+.list-btn.tg:hover{border-color:var(--green);color:var(--green);}
+.list-btn.ed:hover{border-color:var(--red);color:var(--red);}
+.list-btn.dl:hover{border-color:var(--err);color:var(--err);}
+.del-overlay{position:absolute;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:10;}
+.del-box{background:var(--surf);border:1px solid var(--bdr);padding:1.6rem;width:260px;text-align:center;}
+.del-title{font-family:var(--disp);font-size:1rem;font-weight:700;margin-bottom:.4rem;color:var(--text);}
+.del-sub{font-family:var(--mono);font-size:.6rem;color:var(--muted);letter-spacing:.09em;margin-bottom:1.1rem;}
+.del-actions{display:flex;gap:.4rem;}
+.btn-delete{flex:1;background:var(--err);border:none;color:#fff;font-family:var(--mono);font-size:.64rem;font-weight:700;letter-spacing:.09em;padding:.55rem;transition:opacity .2s;cursor:pointer;}
+.btn-delete:hover{opacity:.85;}
+
+/* POLICY MODAL */
+.policy-modal{max-width:640px;}
+.policy-modal-content{padding:1.4rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;}
+.policy-block h3{font-family:var(--disp);font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:.5rem;}
+.policy-block p{font-family:var(--body);font-size:.85rem;color:#aaa;line-height:1.75;}
+
+@media(max-width:768px){
+  .nav-link{display:none;}
+  .hdr{padding:0 1rem;}
+  .hero,.filters-wrap,.products-wrap,.policy-section{padding-left:1rem;padding-right:1rem;}
+  .hero h1{font-size:2.2rem;}
+  .stats{flex-wrap:wrap;}
+  .stat-card{flex:1 1 40%;}
+  .grid{grid-template-columns:1fr;}
+  .ap-panel{width:100vw;}
+  .g3{grid-template-columns:1fr 1fr;}
+  .footer-inner{text-align:center;}
+  .footer-top{flex-direction:column;gap:.75rem;}
+  .footer-links{flex-wrap:wrap;justify-content:center;}
+  #langBtn{left:.5rem;}
+  .co-row-2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="cg"></div>
+<div id="gb"></div>
+
+<!-- LANG SWITCHER -->
+<div id="langBtn">
+  <button class="lang-opt on" data-lang="ro">RO</button>
+  <button class="lang-opt" data-lang="en">EN</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<div id="app">
+
+<!-- HEADER -->
+<header>
+  <div class="hdr">
+    <div class="logo">
+      <span class="logo-hex">⬡</span>
+      <div>
+        <div class="logo-name">AUTOCORE<span>3D</span></div>
+        <div class="logo-tag" data-i18n="tagline">ENGINEERING · PRINTING · PERFORMANCE</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#" class="nav-link" data-i18n="nav_products">Produse</a>
+      <a href="#" class="nav-link" data-i18n="nav_materials">Materiale</a>
+      <a href="#" class="nav-link" data-i18n="nav_about">Despre</a>
+      <button class="nav-admin" id="admBtn" title="Admin">⚙</button>
+      <a href="https://wa.me/40771119423" target="_blank" class="nav-cta">
+        <span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span>
+      </a>
+    </nav>
+  </div>
+  <div class="hbar"></div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow" data-i18n="hero_eyebrow">// CATALOG PRODUSE 2025</div>
+  <h1 data-i18n="hero_h1_html">PIESE AUTO<br><em>3D</em> PREMIUM</h1>
+  <p class="hero-sub" data-i18n="hero_sub">Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț</p>
+  <div class="stats">
+    <div class="stat-card"><span class="stat-val" id="heroCount">6+</span><span class="stat-lbl" data-i18n="stat_products">Produse</span></div>
+    <div class="stat-card"><span class="stat-val">ABS/ASA</span><span class="stat-lbl" data-i18n="stat_material">Material</span></div>
+    <div class="stat-card"><span class="stat-val">CARBON</span><span class="stat-lbl" data-i18n="stat_composite">Compozit</span></div>
+    <div class="stat-card"><span class="stat-val">100%</span><span class="stat-lbl" data-i18n="stat_shipping">Transport inclus</span></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+<!-- FILTERS -->
+<div class="filters-wrap">
+  <div class="section-label" data-i18n="filter_label">// FILTRARE RAPIDĂ</div>
+  <div class="fbar" id="fbar"></div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products-wrap">
+  <div class="prod-hdr">
+    <span class="prod-count" id="prodCount">—</span>
+    <div class="prod-line"></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- POLICY SECTION -->
+<div class="policy-section">
+  <div class="section-label" data-i18n="policy_label">// POLITICI & CONFIDENȚIALITATE</div>
+  <div class="policy-grid" id="policyGrid"></div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <span class="f-logo">AUTOCORE<span>3D</span></span>
+      <div class="footer-links">
+        <span class="footer-link" id="fpPrivacy" data-i18n="fp_privacy">Politică de confidențialitate</span>
+        <span class="footer-link" id="fpTerms" data-i18n="fp_terms">Termeni și condiții</span>
+        <span class="footer-link" id="fpReturn" data-i18n="fp_return">Politică de retur</span>
+        <span class="footer-link" id="fpCookies" data-i18n="fp_cookies">Cookies</span>
+      </div>
+    </div>
+    <div class="footer-bottom" data-i18n="footer_bottom">
+      © 2025 AUTOCORE3D · Inginerie Auto & Printare 3D · România · Transport și taxe incluse în toate prețurile afișate.
+    </div>
+  </div>
+</footer>
+</div><!-- #app -->
+
+<!-- ══ CHECKOUT MODAL ══ -->
+<div class="modal-overlay" id="coModal">
+  <div class="modal-box">
+    <button class="modal-close" id="coClose">✕</button>
+    <div class="modal-section">
+      <div class="co-prod-row">
+        <div class="co-thumb" id="coThumb"></div>
+        <div>
+          <div class="co-prod-name" id="coProdName">—</div>
+          <div class="co-prod-price" id="coProdPrice">—</div>
+        </div>
+      </div>
+      <div class="co-shipping-note">✓ <span data-i18n="shipping_included">Transport și taxe incluse în preț</span></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-title" data-i18n="co_details_title">// DATE DE LIVRARE</div>
+      <div class="co-fields">
+        <div class="co-row-2">
+          <div class="co-field"><label class="co-label" data-i18n="co_fname">Prenume</label><input class="co-input" id="coFname" placeholder="Ion"/></div>
+          <div class="co-field"><label class="co-label" data-i18n="co_lname">Nume</label><input class="co-input" id="coLname" placeholder="Popescu"/></div>
+        </div>
+        <div class="co-field"><label class="co-label" data-i18n="co_phone">Număr de telefon</label><input class="co-input" id="coPhone" type="tel" placeholder="07xx xxx xxx"/></div>
+        <div class="co-field"><label class="co-label" data-i18n="co_email">Adresă e-mail</label><input class="co-input" id="coEmail" type="email" placeholder="email@exemplu.ro"/></div>
+        <div class="co-field"><label class="co-label" data-i18n="co_address">Adresă livrare</label><input class="co-input" id="coAddress" placeholder="Strada, număr, oraș, județ"/></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-title" data-i18n="co_pay_title">// METODĂ DE PLATĂ</div>
+      <div class="pay-opts">
+        <div class="pay-opt sel" data-pay="RAMBURS">
+          <div class="pay-radio"></div><div class="pay-opt-icon">📦</div>
+          <div><div class="pay-opt-title" data-i18n="pay_ramburs">Ramburs</div><div class="pay-opt-desc" data-i18n="pay_ramburs_desc">Plătești la livrare · Curier la ușă</div></div>
+        </div>
+        <div class="pay-opt" data-pay="ONLINE">
+          <div class="pay-radio"></div><div class="pay-opt-icon">💳</div>
+          <div><div class="pay-opt-title" data-i18n="pay_online">Online — Card / Transfer</div><div class="pay-opt-desc" data-i18n="pay_online_desc">Confirmare imediată · Securizat</div></div>
+        </div>
+        <div class="pay-opt" data-pay="50% ONLINE + 50% RAMBURS">
+          <div class="pay-radio"></div><div class="pay-opt-icon">⚡</div>
+          <div><div class="pay-opt-title" data-i18n="pay_split">50% Online + 50% Ramburs</div><div class="pay-opt-desc" data-i18n="pay_split_desc">Jumătate acum, jumătate la livrare</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="co-actions" id="coActions"></div>
+  </div>
+</div>
+
+<!-- ══ POLICY MODAL ══ -->
+<div class="modal-overlay" id="policyModal">
+  <div class="modal-box policy-modal">
+    <button class="modal-close" id="policyClose">✕</button>
+    <div class="modal-section"><div class="modal-title" id="policyModalTitle">// POLITICĂ</div></div>
+    <div class="policy-modal-content" id="policyModalContent"></div>
+  </div>
+</div>
+
+<!-- ══ PASSWORD ══ -->
+<div class="pw-overlay" id="pwOverlay" style="display:none">
+  <div class="pw-box">
+    <div class="pw-lbl" data-i18n="admin_access">// ACCES ADMINISTRATOR</div>
+    <input class="pw-inp" id="pwInp" type="password" placeholder="Parolă administrator"/>
+    <div class="pw-err" id="pwErr" style="display:none" data-i18n="pw_wrong">Parolă incorectă</div>
+    <button class="pw-btn" id="pwBtn" data-i18n="pw_login">Autentificare ›</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ══ -->
+<div class="ap-overlay" id="apOverlay" style="display:none">
+  <div class="ap-panel">
+    <div class="ap-hdr">
+      <div class="ap-hdr-l"><span class="ap-ico">⬡</span><div><div class="ap-title">ADMIN PANEL</div><div class="ap-sub">// AUTOCORE3D</div></div></div>
+      <button class="ap-close" id="apClose">✕</button>
+    </div>
+    <div class="ap-tabs">
+      <button class="ap-tab on" id="tabAdd">+ Adaugă</button>
+      <button class="ap-tab" id="tabList">☰ Produse (<span id="tabCount">0</span>)</button>
+      <button class="ap-tab" id="tabCat">◈ Grupe</button>
+      <button class="ap-tab" id="tabPolicy">⚖ Politici</button>
+    </div>
+    <div class="ap-ok" id="apOk" style="display:none"></div>
+
+    <!-- FORM VIEW -->
+    <div class="ap-form" id="formView">
+      <div class="ap-sec first">// INFORMAȚII PRODUS</div>
+      <div class="g2">
+        <div class="field"><label>Nume *</label><input class="finput" id="fName" placeholder="Suport Senzor"/></div>
+        <div class="field"><label>Brand</label><input class="finput" id="fBrand" placeholder="AutoCore OEM"/></div>
+      </div>
+      <div class="g3">
+        <div class="field"><label>Categorie</label><select class="fsel" id="fCat"></select></div>
+        <div class="field"><label>Material</label>
+          <select class="fsel" id="fMat">
+            <option>ABS/ASA</option><option>Carbon Fiber</option><option>PETG</option><option>TPU</option><option>Nylon PA12</option>
+          </select>
+        </div>
+        <div class="field"><label>Preț (RON) *</label><input class="finput" id="fPrice" type="number" min="0" step="0.5" placeholder="150"/></div>
+      </div>
+      <div class="field"><label>Descriere</label><textarea class="ftx" id="fDesc" rows="2"></textarea></div>
+      <div class="ap-sec">// IMAGINE</div>
+      <div class="img-tabs">
+        <button class="img-tab on" id="imgUrlBtn">🔗 URL</button>
+        <button class="img-tab" id="imgFileBtn">📁 Upload</button>
+      </div>
+      <div id="urlView"><input class="finput" id="fImgUrl" placeholder="https://..."/></div>
+      <div id="fileView" style="display:none">
+        <div class="dropzone" id="dropzone">Click pentru a selecta imaginea</div>
+        <input type="file" id="fileInput" accept="image/*" style="display:none"/>
+      </div>
+      <div class="img-prev" id="imgPrev" style="display:none"><img id="imgPrevEl" src="" alt=""/></div>
+      <div class="ap-sec">// PROPRIETĂȚI TEHNICE</div>
+      <div class="badge-grid" id="badgeGrid"></div>
+      <div class="ap-sec">// STOC</div>
+      <div class="stock-row">
+        <button class="stock-btn in" id="stIn">● În Stoc</button>
+        <button class="stock-btn" id="stOut">○ Epuizat</button>
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" id="formCancel" style="display:none">✕ Anulează</button>
+        <button class="btn-submit" id="formSubmit">+ Adaugă</button>
+      </div>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div class="ap-list" id="listView" style="display:none"></div>
+
+    <!-- CATEGORIES VIEW -->
+    <div class="ap-form" id="catView" style="display:none">
+      <div class="ap-sec first">// GRUPE DE PRODUSE</div>
+      <div class="cat-list" id="catList"></div>
+
+      <div class="ap-sec">// ADAUGĂ GRUPĂ NOUĂ</div>
+      <div class="cat-add-form">
+        <div class="cat-add-title">GRUPĂ NOUĂ</div>
+        <div class="field"><label>Nume grupă *</label><input class="finput" id="catNewName" placeholder="ex: Sport, Tuning, OEM..."/></div>
+        <div class="cat-color-row">
+          <div class="field" style="flex:1"><label>Culoare accent</label>
+            <input class="finput" id="catNewColor" type="color" value="#E01A1A" style="height:36px;padding:.2rem .4rem;cursor:pointer;"/>
+          </div>
+          <div class="field" style="flex:2"><label>Previzualizare</label>
+            <div id="catColorPrev" style="height:36px;background:#E01A1A;border:1px solid #333;display:flex;align-items:center;padding:0 .7rem;font-family:var(--mono);font-size:.6rem;color:#fff;letter-spacing:.1em;">GRUPĂ NOUĂ</div>
+          </div>
+        </div>
+        <button class="btn-submit" id="catAddBtn">+ Adaugă Grupă</button>
+      </div>
+    </div>
+
+    <!-- POLICY VIEW -->
+    <div class="ap-form" id="policyView" style="display:none">
+      <div class="ap-sec first">// POLITICI & CONFIDENȚIALITATE</div>
+      <div class="field"><label>Politică de confidențialitate (RO)</label><textarea class="ftx" id="pPrivacyRo" rows="5"></textarea></div>
+      <div class="field"><label>Privacy Policy (EN)</label><textarea class="ftx" id="pPrivacyEn" rows="5"></textarea></div>
+      <div class="field"><label>Termeni și condiții (RO)</label><textarea class="ftx" id="pTermsRo" rows="5"></textarea></div>
+      <div class="field"><label>Terms & Conditions (EN)</label><textarea class="ftx" id="pTermsEn" rows="5"></textarea></div>
+      <div class="field"><label>Politică de retur (RO)</label><textarea class="ftx" id="pReturnRo" rows="4"></textarea></div>
+      <div class="field"><label>Return Policy (EN)</label><textarea class="ftx" id="pReturnEn" rows="4"></textarea></div>
+      <div class="field"><label>Cookies (RO)</label><textarea class="ftx" id="pCookiesRo" rows="4"></textarea></div>
+      <div class="field"><label>Cookies (EN)</label><textarea class="ftx" id="pCookiesEn" rows="4"></textarea></div>
+      <div class="form-actions">
+        <button class="btn-submit" id="savePolicies">✓ Salvează Politicile</button>
+      </div>
+    </div>
+
+    <!-- DEL CONFIRM -->
+    <div class="del-overlay" id="delConfirm" style="display:none">
+      <div class="del-box">
+        <div class="del-title" id="delTitle">Ștergi produsul?</div>
+        <div class="del-sub" id="delSub">Acțiune ireversibilă.</div>
+        <div class="del-actions">
+          <button class="btn-cancel" id="delCancel">Nu</button>
+          <button class="btn-delete" id="delOk">Șterge</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ CONFIG ══ */
+const WA_NUMBER  = "40771119423";
+const ADMIN_PASS = "Darius12@";
+
+/* ══ TRANSLATIONS ══ */
+const T = {
+  ro:{
+    tagline:"ENGINEERING · PRINTING · PERFORMANCE",
+    nav_products:"Produse", nav_materials:"Materiale", nav_about:"Despre", nav_contact:"Contact",
+    hero_eyebrow:"// CATALOG PRODUSE 2025",
+    hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",
+    hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț",
+    stat_products:"Produse", stat_material:"Material", stat_composite:"Compozit", stat_shipping:"Transport inclus",
+    filter_label:"// FILTRARE RAPIDĂ",
+    prod_found:"PRODUSE GĂSITE",
+    order_btn:"Comandă", unavailable:"Indisponibil",
+    shipping_included:"Transport și taxe incluse în preț",
+    co_details_title:"// DATE DE LIVRARE",
+    co_fname:"Prenume", co_lname:"Nume", co_phone:"Număr de telefon",
+    co_email:"Adresă e-mail", co_address:"Adresă livrare",
+    ph_fname:"Ion", ph_lname:"Popescu", ph_phone:"07xx xxx xxx",
+    ph_email:"email@exemplu.ro", ph_address:"Stradă, nr., oraș, județ",
+    co_pay_title:"// METODĂ DE PLATĂ",
+    pay_ramburs:"Ramburs", pay_ramburs_desc:"Plătești la livrare · Curier la ușă",
+    pay_online:"Online — Card / Transfer", pay_online_desc:"Confirmare imediată · Securizat",
+    pay_split:"50% Online + 50% Ramburs", pay_split_desc:"Jumătate acum, jumătate la livrare",
+    btn_wa:"Trimite pe WhatsApp",
+    btn_direct:"Plasează comanda direct",
+    btn_direct_note:"Vei fi contactat în cel mai scurt timp",
+    btn_wa_only:"Pentru plata online te rugăm să ne contactezi pe WhatsApp",
+    cancel:"Anulează",
+    policy_label:"// POLITICI & CONFIDENȚIALITATE",
+    fp_privacy:"Politică de confidențialitate", fp_terms:"Termeni și condiții",
+    fp_return:"Politică de retur", fp_cookies:"Cookies",
+    footer_bottom:"© 2025 AUTOCORE3D · Inginerie Auto & Printare 3D · România · Transport și taxe incluse în toate prețurile afișate.",
+    admin_access:"// ACCES ADMINISTRATOR",
+    pw_wrong:"Parolă incorectă", pw_login:"Autentificare ›",
+    toast_order:"✓ Comandă plasată! Vei fi contactat în curând.",
+    toast_saved:"✓ Salvat cu succes!",
+    policy_cards:[
+      {title:"🔒 Confidențialitate",text:"Datele personale colectate (nume, telefon, email, adresă) sunt folosite exclusiv pentru procesarea comenzii tale și nu sunt transmise terților."},
+      {title:"📦 Transport & Livrare",text:"Transportul și toate taxele sunt incluse în prețul afișat. Livrare prin curier rapid pe teritoriul României."},
+      {title:"↩ Retur",text:"Produsele pot fi returnate în termen de 14 zile de la primire, în stare originală, nefolosită. Costul returului este suportat de cumpărător."},
+      {title:"🍪 Cookies",text:"Site-ul folosește cookie-uri esențiale pentru funcționare. Nu colectăm date de marketing fără acordul tău explicit."},
+    ],
+    policy_privacy_title:"Politică de Confidențialitate",
+    policy_terms_title:"Termeni și Condiții",
+    policy_return_title:"Politică de Retur",
+    policy_cookies_title:"Politică Cookies",
+  },
+  en:{
+    tagline:"ENGINEERING · PRINTING · PERFORMANCE",
+    nav_products:"Products", nav_materials:"Materials", nav_about:"About", nav_contact:"Contact",
+    hero_eyebrow:"// PRODUCT CATALOG 2025",
+    hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",
+    hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",
+    stat_products:"Products", stat_material:"Material", stat_composite:"Composite", stat_shipping:"Shipping incl.",
+    filter_label:"// QUICK FILTER",
+    prod_found:"PRODUCTS FOUND",
+    order_btn:"Order", unavailable:"Unavailable",
+    shipping_included:"Shipping and taxes included in price",
+    co_details_title:"// DELIVERY DETAILS",
+    co_fname:"First Name", co_lname:"Last Name", co_phone:"Phone Number",
+    co_email:"Email Address", co_address:"Delivery Address",
+    ph_fname:"John", ph_lname:"Smith", ph_phone:"+40 7xx xxx xxx",
+    ph_email:"email@example.com", ph_address:"Street, no., city, county",
+    co_pay_title:"// PAYMENT METHOD",
+    pay_ramburs:"Cash on Delivery", pay_ramburs_desc:"Pay upon delivery · Courier to your door",
+    pay_online:"Online — Card / Transfer", pay_online_desc:"Immediate confirmation · Secure",
+    pay_split:"50% Online + 50% Cash on Delivery", pay_split_desc:"Half now, half on delivery",
+    btn_wa:"Send via WhatsApp",
+    btn_direct:"Place order directly",
+    btn_direct_note:"You will be contacted as soon as possible",
+    btn_wa_only:"For online payment please contact us on WhatsApp",
+    cancel:"Cancel",
+    policy_label:"// POLICIES & PRIVACY",
+    fp_privacy:"Privacy Policy", fp_terms:"Terms & Conditions",
+    fp_return:"Return Policy", fp_cookies:"Cookies",
+    footer_bottom:"© 2025 AUTOCORE3D · Auto Engineering & 3D Printing · Romania · Shipping and taxes included in all displayed prices.",
+    admin_access:"// ADMINISTRATOR ACCESS",
+    pw_wrong:"Incorrect password", pw_login:"Login ›",
+    toast_order:"✓ Order placed! You will be contacted shortly.",
+    toast_saved:"✓ Saved successfully!",
+    policy_cards:[
+      {title:"🔒 Privacy",text:"Personal data collected (name, phone, email, address) is used exclusively for processing your order and is not shared with third parties."},
+      {title:"📦 Shipping & Delivery",text:"Shipping and all taxes are included in the displayed price. Delivery via express courier throughout Romania."},
+      {title:"↩ Returns",text:"Products can be returned within 14 days of receipt, in original unused condition. Return shipping costs are borne by the buyer."},
+      {title:"🍪 Cookies",text:"This site uses essential cookies for operation. We do not collect marketing data without your explicit consent."},
+    ],
+    policy_privacy_title:"Privacy Policy",
+    policy_terms_title:"Terms & Conditions",
+    policy_return_title:"Return Policy",
+    policy_cookies_title:"Cookie Policy",
+  }
+};
+
+/* ══ BADGE / MATERIAL CONFIG ══ */
+const BC=[{k:"UV Resistant",i:"☀",c:"#f59e0b"},{k:"High Temp",i:"🌡",c:"#ef4444"},{k:"Carbon Rigid",i:"◈",c:"#a3a3a3"},{k:"Impact Proof",i:"⬡",c:"#E01A1A"}];
+const MC={"ABS/ASA":"#3b82f6","Carbon Fiber":"#a3a3a3","PETG":"#8b5cf6","TPU":"#10b981","Nylon PA12":"#f59e0b"};
+const LS_PROD="ac3d_prod_v4", LS_POLICY="ac3d_policy_v1", LS_CATS="ac3d_cats_v1";
+const TICK=["CARBON FIBER","ABS/ASA","IMPACT PROOF","UV RESISTANT","HIGH TEMP","RAMBURS","PRINTARE 3D","INGINERIE AUTO","TOLERANȚE STRÂNSE","MADE IN ROMANIA","TRANSPORT INCLUS","AFTERMARKET","MATERIALE TEHNICE","CARBON COMPOZIT"];
+
+/* ══ DEFAULT CATEGORIES ══ */
+const DEFAULT_CATS = [
+  {id:"piese-auto", name:"Piese Auto", color:"#E01A1A", isDefault:true},
+  {id:"abs-asa",    name:"ABS/ASA",    color:"#3b82f6", isDefault:true},
+  {id:"carbon",     name:"Carbon Fiber",color:"#a3a3a3",isDefault:true},
+  {id:"altele",     name:"Altele",     color:"#8b5cf6", isDefault:true},
+];
+
+/* ══ STATE ══ */
+let lang="ro";
+let products=loadProducts(), nextId=products.reduce((m,p)=>Math.max(m,p.id),0)+1;
+let categories=loadCategories();
+let filter="Toate", editId=null, stockVal=true, selB=[], imgMode="url", prevSrc="", delTgt=null, delType="prod", adminAuth=false;
+let coProd=null, payMethod="RAMBURS";
+let policies=loadPolicies();
+
+function loadProducts(){
+  try{const r=localStorage.getItem(LS_PROD);if(r)return JSON.parse(r);}catch{}
+  return[
+    {id:1,name:"Suport Senzor Parcare",brand:"AutoCore OEM",category:"Piese Auto",material:"ABS/ASA",price:45,imageUrl:"",badges:["UV Resistant","Impact Proof"],description:"Suport 3D pentru senzori parcare OEM, rezistent UV și impact. Transport inclus.",stock:true},
+    {id:2,name:"Canalizare Intercooler",brand:"CorePerformance",category:"Piese Auto",material:"Carbon Fiber",price:180,imageUrl:"",badges:["High Temp","Carbon Rigid"],description:"Conductă aer carbon compozit pentru intercooler. Transport și taxe incluse.",stock:true},
+    {id:3,name:"Grilă Ventilație Habitaclu",brand:"AutoCore OEM",category:"ABS/ASA",material:"ABS/ASA",price:30,imageUrl:"",badges:["UV Resistant","Impact Proof"],description:"Grilă ventilație ABS/ASA cu finisaj mat, rezistentă UV. Transport inclus.",stock:true},
+    {id:4,name:"Bracket Filtru Sport",brand:"CorePerformance",category:"Carbon Fiber",material:"Carbon Fiber",price:210,imageUrl:"",badges:["Carbon Rigid","High Temp"],description:"Suport rigid carbon pentru filtre sport aftermarket. Transport inclus.",stock:false},
+    {id:5,name:"Capac Oglindă Aerodinamic",brand:"AutoCore OEM",category:"Piese Auto",material:"ABS/ASA",price:75,imageUrl:"",badges:["UV Resistant","Impact Proof"],description:"Carcase oglinzi aerodinamice, compatibile VAG/BMW. Transport inclus.",stock:true},
+    {id:6,name:"Difuzor Spate Universal",brand:"CorePerformance",category:"Altele",material:"Carbon Fiber",price:320,imageUrl:"",badges:["Carbon Rigid","UV Resistant","Impact Proof"],description:"Difuzor aerodinamic spate, carbon compozit. Transport inclus.",stock:true},
+  ];
+}
+function saveProd(){try{localStorage.setItem(LS_PROD,JSON.stringify(products));}catch{}}
+
+function loadCategories(){
+  try{const r=localStorage.getItem(LS_CATS);if(r)return JSON.parse(r);}catch{}
+  return JSON.parse(JSON.stringify(DEFAULT_CATS));
+}
+function saveCats(){try{localStorage.setItem(LS_CATS,JSON.stringify(categories));}catch{}}
+
+function loadPolicies(){
+  try{const r=localStorage.getItem(LS_POLICY);if(r)return JSON.parse(r);}catch{}
+  return{
+    privacyRo:"Datele personale colectate (nume, telefon, email, adresă) sunt utilizate exclusiv pentru procesarea comenzilor și nu sunt transmise unor terțe părți fără consimțământul dumneavoastră.",
+    privacyEn:"Personal data collected (name, phone, email, address) is used exclusively for order processing and is not shared with third parties without your consent.",
+    termsRo:"Prin plasarea unei comenzi, ești de acord cu termenii și condițiile AUTOCORE3D. Prețurile afișate includ TVA, transport și toate taxele.",
+    termsEn:"By placing an order, you agree to AUTOCORE3D's terms and conditions. Displayed prices include VAT, shipping and all taxes.",
+    returnRo:"Produsele pot fi returnate în termen de 14 zile calendaristice de la primire, în stare originală, nefolosită și în ambalajul original.",
+    returnEn:"Products can be returned within 14 calendar days of receipt, in original, unused condition and original packaging.",
+    cookiesRo:"Folosim cookie-uri esențiale pentru funcționarea corectă a site-ului. Nu colectăm cookie-uri de marketing fără acordul explicit al utilizatorului.",
+    cookiesEn:"We use essential cookies for the correct functioning of the website. We do not collect marketing cookies without the explicit consent of the user.",
+  };
+}
+function savePolicies(){try{localStorage.setItem(LS_POLICY,JSON.stringify(policies));}catch{}}
+
+/* ══ CURSOR GLOW ══ */
+const cgEl=document.getElementById('cg');
+document.addEventListener('mousemove',e=>{cgEl.style.left=e.clientX+'px';cgEl.style.top=e.clientY+'px';});
+
+/* ══ TICKER ══ */
+function buildTicker(){
+  const arr=[...TICK,...TICK];
+  document.getElementById('ticker').innerHTML=arr.map(t=>`<span class="t-item"><b>▸</b>${t}</span>`).join('');
+}
+
+/* ══ SVGs ══ */
+function hexSVG(s=68){return`<svg width="${s}" height="${s}" viewBox="0 0 80 80" fill="none"><polygon points="40,8 72,28 72,52 40,72 8,52 8,28" stroke="#E01A1A" stroke-width="1.5" fill="none" opacity=".4"/><polygon points="40,20 60,32 60,48 40,60 20,48 20,32" stroke="#E01A1A" stroke-width="1" fill="none" opacity=".22"/><line x1="40" y1="8" x2="40" y2="20" stroke="#E01A1A" stroke-width="1" opacity=".3"/><line x1="72" y1="28" x2="60" y2="32" stroke="#E01A1A" stroke-width="1" opacity=".3"/><line x1="72" y1="52" x2="60" y2="48" stroke="#E01A1A" stroke-width="1" opacity=".3"/><line x1="40" y1="72" x2="40" y2="60" stroke="#E01A1A" stroke-width="1" opacity=".3"/><line x1="8" y1="52" x2="20" y2="48" stroke="#E01A1A" stroke-width="1" opacity=".3"/><line x1="8" y1="28" x2="20" y2="32" stroke="#E01A1A" stroke-width="1" opacity=".3"/><circle cx="40" cy="40" r="4" fill="#E01A1A" opacity=".65"/></svg>`;}
+function waSVG(){return`<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;}
+
+/* ══ I18N ══ */
+function t(key){return T[lang][key]||T['ro'][key]||key;}
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.dataset.i18n;
+    if(k==='hero_h1_html'){el.innerHTML=t(k);}
+    else{el.textContent=t(k);}
+  });
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
+  renderFilters();
+  renderGrid();
+  renderPolicyCards();
+}
+
+document.getElementById('langBtn').addEventListener('click',e=>{
+  const b=e.target.closest('.lang-opt');if(!b)return;
+  lang=b.dataset.lang;
+  applyI18n();
+});
+
+/* ══ TOAST ══ */
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),4000);
+}
+
+/* ══ CATEGORY HELPERS ══ */
+function getCatColor(catName){
+  const c=categories.find(x=>x.name===catName);
+  return c?c.color:"#E01A1A";
+}
+function getAllCatNames(){
+  return categories.map(c=>c.name);
+}
+
+/* ══ RENDER CARD ══ */
+function renderCard(p){
+  const mc=MC[p.material]||"#E01A1A";
+  const catColor=getCatColor(p.category);
+  const bgs=(p.badges||[]).map(b=>{const c=BC.find(x=>x.k===b)||{i:"·",c:"#E01A1A"};return`<span class="badge" style="border-color:${c.c}44;color:${c.c}"><span>${c.i}</span> ${b}</span>`;}).join('');
+  const imgEl=p.imageUrl?`<img src="${p.imageUrl}" alt="${p.name}" onerror="this.style.display='none';this.nextSibling.style.display='flex'"/><div class="card-hex-wrap" style="display:none">${hexSVG()}<span class="hex-lbl">3D MODEL</span></div>`:`<div class="card-hex-wrap">${hexSVG()}<span class="hex-lbl">3D MODEL</span></div>`;
+  return`<div class="card${p.stock?'':' card-oos'}" data-id="${p.id}">
+    <div class="card-glow"></div>
+    <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
+    ${!p.stock?`<div class="stock-badge">${t('unavailable')}</div>`:''}
+    <div class="card-img">${imgEl}<div class="mat-tag" style="border-color:${mc}55;color:${mc}">${p.material}</div></div>
+    <div class="card-body">
+      <div class="card-cat" style="color:${catColor}">// ${p.category}</div>
+      <div class="card-name">${p.name}</div>
+      ${p.brand?`<div class="card-brand">⬡ ${p.brand}</div>`:''}
+      <div class="card-desc">${p.description||''}</div>
+      <div class="badges">${bgs}</div>
+      <div class="card-foot">
+        <div><div class="price">${p.price} RON</div><div class="price-sub">${t('shipping_included')}</div></div>
+        ${p.stock?`<button class="order-btn" data-order="${p.id}">${waSVG()} ${t('order_btn')}</button>`:`<button class="order-btn dis" disabled>${t('unavailable')}</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ══ RENDER GRID ══ */
+function renderGrid(){
+  const allLabel=lang==='ro'?"Toate":"All";
+  const list=(filter===allLabel||filter==="Toate"||filter==="All")
+    ?products
+    :products.filter(p=>p.category===filter);
+  const g=document.getElementById('grid');
+  g.innerHTML=list.length?list.map(renderCard).join(''):`<div class="no-prod">// 0 ${t('prod_found')}</div>`;
+  document.getElementById('prodCount').textContent=`${list.length} ${t('prod_found')}`;
+  document.getElementById('heroCount').textContent=`${products.length}+`;
+  document.getElementById('tabCount').textContent=products.length;
+  g.querySelectorAll('.card').forEach((c,i)=>{
+    c.style.transitionDelay=`${i*55}ms`;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add('visible')));
+  });
+}
+
+/* ══ RENDER FILTERS ══ */
+function renderFilters(){
+  const allLabel=lang==='ro'?"Toate":"All";
+  const names=[allLabel,...getAllCatNames()];
+  const currentIsAll=(filter==="Toate"||filter==="All");
+  document.getElementById('fbar').innerHTML=names.map((name,i)=>{
+    const isAll=(i===0);
+    const isOn=isAll?currentIsAll:(filter===name);
+    const color=isAll?"#E01A1A":getCatColor(name);
+    return`<button class="fb${isOn?' on':''}" data-fname="${name}" style="${isOn?`background:${color};border-color:${color};`:`border-color:#262626;`}">${name}</button>`;
+  }).join('');
+}
+
+document.getElementById('fbar').addEventListener('click',e=>{
+  const b=e.target.closest('.fb');if(!b)return;
+  filter=b.dataset.fname;
+  renderFilters();renderGrid();
+});
+
+/* ══ POLICY CARDS ══ */
+function renderPolicyCards(){
+  const cards=t('policy_cards');
+  document.getElementById('policyGrid').innerHTML=cards.map(c=>`<div class="policy-card"><div class="policy-title">${c.title}</div><div class="policy-text">${c.text}</div></div>`).join('');
+}
+
+/* ══ POLICY MODALS ══ */
+function openPolicyModal(type){
+  const titles={privacy:t('policy_privacy_title'),terms:t('policy_terms_title'),return:t('policy_return_title'),cookies:t('policy_cookies_title')};
+  const contentKey={privacy:lang==='ro'?'privacyRo':'privacyEn',terms:lang==='ro'?'termsRo':'termsEn',return:lang==='ro'?'returnRo':'returnEn',cookies:lang==='ro'?'cookiesRo':'cookiesEn'};
+  document.getElementById('policyModalTitle').textContent=`// ${titles[type].toUpperCase()}`;
+  document.getElementById('policyModalContent').innerHTML=`<div class="policy-block"><p>${(policies[contentKey[type]]||'—').replace(/\n/g,'<br>')}</p></div>`;
+  document.getElementById('policyModal').classList.add('open');
+}
+document.getElementById('fpPrivacy').addEventListener('click',()=>openPolicyModal('privacy'));
+document.getElementById('fpTerms').addEventListener('click',()=>openPolicyModal('terms'));
+document.getElementById('fpReturn').addEventListener('click',()=>openPolicyModal('return'));
+document.getElementById('fpCookies').addEventListener('click',()=>openPolicyModal('cookies'));
+document.getElementById('policyClose').addEventListener('click',()=>document.getElementById('policyModal').classList.remove('open'));
+document.getElementById('policyModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+
+/* ══ CHECKOUT MODAL ══ */
+function openCheckout(id){
+  coProd=products.find(p=>p.id===id);if(!coProd)return;
+  payMethod="RAMBURS";
+  document.getElementById('coProdName').textContent=coProd.name;
+  document.getElementById('coProdPrice').textContent=`${coProd.price} RON — ${t('shipping_included')}`;
+  const th=document.getElementById('coThumb');
+  th.innerHTML=coProd.imageUrl?`<img src="${coProd.imageUrl}" alt="${coProd.name}"/>`:`<div style="font-size:1.4rem;color:#333">⬡</div>`;
+  ['coFname','coLname','coPhone','coEmail','coAddress'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.value='';el.classList.remove('invalid');
+  });
+  document.getElementById('coFname').placeholder=t('ph_fname');
+  document.getElementById('coLname').placeholder=t('ph_lname');
+  document.getElementById('coPhone').placeholder=t('ph_phone');
+  document.getElementById('coEmail').placeholder=t('ph_email');
+  document.getElementById('coAddress').placeholder=t('ph_address');
+  document.querySelectorAll('.co-label[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll('.pay-opt-title[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll('.pay-opt-desc[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n="co_details_title"]').forEach(el=>el.textContent=t('co_details_title'));
+  document.querySelectorAll('[data-i18n="co_pay_title"]').forEach(el=>el.textContent=t('co_pay_title'));
+  document.querySelectorAll('[data-i18n="shipping_included"]').forEach(el=>el.textContent=t('shipping_included'));
+  document.querySelectorAll('.pay-opt').forEach(o=>o.classList.toggle('sel',o.dataset.pay==="RAMBURS"));
+  renderCoActions();
+  document.getElementById('coModal').classList.add('open');
+}
+
+function renderCoActions(){
+  const el=document.getElementById('coActions');
+  if(payMethod==="RAMBURS"){
+    el.innerHTML=`
+      <p class="co-info-note">${t('btn_direct_note')}</p>
+      <button class="btn-direct" id="btnDirect">${waSVG()} ${t('btn_direct')}</button>
+      <button class="btn-wa" id="btnWa">${waSVG()} ${t('btn_wa')}</button>
+      <button class="btn-outline-cancel" id="btnCancelCo">${t('cancel')}</button>`;
+    document.getElementById('btnDirect').addEventListener('click',handleDirectOrder);
+    document.getElementById('btnWa').addEventListener('click',handleWaOrder);
+    document.getElementById('btnCancelCo').addEventListener('click',closeCheckout);
+  }else{
+    el.innerHTML=`
+      <p class="co-info-note" style="color:#aaa;">${t('btn_wa_only')}</p>
+      <button class="btn-wa" id="btnWa">${waSVG()} ${t('btn_wa')}</button>
+      <button class="btn-outline-cancel" id="btnCancelCo">${t('cancel')}</button>`;
+    document.getElementById('btnWa').addEventListener('click',handleWaOrder);
+    document.getElementById('btnCancelCo').addEventListener('click',closeCheckout);
+  }
+}
+
+function getFormData(){
+  return{
+    fname:document.getElementById('coFname').value.trim(),
+    lname:document.getElementById('coLname').value.trim(),
+    phone:document.getElementById('coPhone').value.trim(),
+    email:document.getElementById('coEmail').value.trim(),
+    address:document.getElementById('coAddress').value.trim(),
+  };
+}
+function validateForm(){
+  const d=getFormData();let ok=true;
+  const req={coFname:d.fname,coLname:d.lname,coPhone:d.phone,coAddress:d.address};
+  Object.entries(req).forEach(([id,val])=>{const el=document.getElementById(id);if(!val){el.classList.add('invalid');ok=false;}else el.classList.remove('invalid');});
+  return ok?d:null;
+}
+function buildWaMsg(d,prod,method){
+  return encodeURIComponent(`Bună ziua! Doresc să plasez o comandă:\n\n🛒 *Produs:* ${prod.name}\n💰 *Preț:* ${prod.price} RON (transport inclus)\n💳 *Plată:* ${method}\n\n👤 *Nume:* ${d.fname} ${d.lname}\n📞 *Telefon:* ${d.phone}\n📧 *Email:* ${d.email}\n📍 *Adresă:* ${d.address}\n\nVă mulțumesc!`);
+}
+function handleWaOrder(){const d=validateForm();if(!d)return;window.open(`https://wa.me/${WA_NUMBER}?text=${buildWaMsg(d,coProd,payMethod)}`,'_blank');closeCheckout();}
+function handleDirectOrder(){
+  const d=validateForm();if(!d)return;
+  const ownerMsg=encodeURIComponent(`🔔 *COMANDĂ NOUĂ — AUTOCORE3D*\n\n🛒 *Produs:* ${coProd.name}\n💰 *Preț:* ${coProd.price} RON\n💳 *Plată:* ${payMethod}\n\n👤 *Client:* ${d.fname} ${d.lname}\n📞 *Telefon:* ${d.phone}\n📧 *Email:* ${d.email}\n📍 *Adresă:* ${d.address}\n\n⏰ *Data:* ${new Date().toLocaleString('ro-RO')}`);
+  window.open(`https://wa.me/${WA_NUMBER}?text=${ownerMsg}`,'_blank');
+  showToast(t('toast_order'));closeCheckout();
+}
+function closeCheckout(){document.getElementById('coModal').classList.remove('open');coProd=null;}
+document.getElementById('coModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCheckout();});
+document.getElementById('coClose').addEventListener('click',closeCheckout);
+document.getElementById('coModal').addEventListener('click',e=>{
+  const o=e.target.closest('.pay-opt');if(!o)return;
+  payMethod=o.dataset.pay;
+  document.querySelectorAll('.pay-opt').forEach(x=>x.classList.toggle('sel',x===o));
+  renderCoActions();
+});
+
+/* ══ GRID ORDER CLICK ══ */
+document.getElementById('grid').addEventListener('click',e=>{
+  const b=e.target.closest('[data-order]');if(!b)return;
+  openCheckout(+b.dataset.order);
+});
+
+/* ══ ADMIN AUTH ══ */
+document.getElementById('admBtn').addEventListener('click',()=>{
+  if(adminAuth){openAdminPanel();return;}
+  document.getElementById('pwOverlay').style.display='flex';
+  setTimeout(()=>document.getElementById('pwInp').focus(),80);
+});
+function tryPass(){
+  if(document.getElementById('pwInp').value===ADMIN_PASS){
+    adminAuth=true;
+    document.getElementById('pwOverlay').style.display='none';
+    document.getElementById('pwInp').value='';
+    document.getElementById('pwErr').style.display='none';
+    document.getElementById('pwInp').classList.remove('err');
+    openAdminPanel();
+  }else{
+    document.getElementById('pwErr').style.display='block';
+    const i=document.getElementById('pwInp');i.classList.add('err');
+    setTimeout(()=>i.classList.remove('err'),400);
+  }
+}
+function openAdminPanel(){
+  document.getElementById('apOverlay').style.display='flex';
+  populateCatSelect();
+  renderBadges();
+  loadPolicyFields();
+}
+document.getElementById('pwBtn').addEventListener('click',tryPass);
+document.getElementById('pwInp').addEventListener('keydown',e=>{if(e.key==='Enter')tryPass();});
+document.getElementById('pwOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none';});
+document.getElementById('apClose').addEventListener('click',()=>document.getElementById('apOverlay').style.display='none');
+document.getElementById('apOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none';});
+
+/* ══ ADMIN TABS ══ */
+function showTab(tabName){
+  ['formView','listView','catView','policyView'].forEach(id=>document.getElementById(id).style.display='none');
+  document.querySelectorAll('.ap-tab').forEach(b=>b.classList.remove('on'));
+  const map={add:['formView','tabAdd'],list:['listView','tabList'],cat:['catView','tabCat'],policy:['policyView','tabPolicy']};
+  const[view,tab]=map[tabName];
+  document.getElementById(view).style.display='flex';
+  document.getElementById(tab).classList.add('on');
+  if(tabName==='list')renderList();
+  if(tabName==='cat')renderCatList();
+  if(tabName==='policy')loadPolicyFields();
+  if(tabName!=='add')resetForm();
+}
+document.getElementById('tabAdd').addEventListener('click',()=>showTab('add'));
+document.getElementById('tabList').addEventListener('click',()=>showTab('list'));
+document.getElementById('tabCat').addEventListener('click',()=>showTab('cat'));
+document.getElementById('tabPolicy').addEventListener('click',()=>showTab('policy'));
+
+/* ══ CATEGORIES ADMIN ══ */
+function populateCatSelect(){
+  const sel=document.getElementById('fCat');
+  const cur=sel.value;
+  sel.innerHTML=getAllCatNames().map(n=>`<option value="${n}">${n}</option>`).join('');
+  if(cur && getAllCatNames().includes(cur))sel.value=cur;
+}
+
+function renderCatList(){
+  const el=document.getElementById('catList');
+  if(!categories.length){el.innerHTML='<div class="list-empty">Nicio grupă.</div>';return;}
+  el.innerHTML=categories.map(c=>{
+    const count=products.filter(p=>p.category===c.name).length;
+    return`<div class="cat-item">
+      <div class="cat-dot" style="background:${c.color}"></div>
+      <div class="cat-item-name">${c.name}</div>
+      <div class="cat-item-count">${count} prod.</div>
+      ${c.isDefault?`<span class="cat-default-tag">DEFAULT</span>`:`<div class="cat-item-actions"><button class="list-btn dl" data-catdel="${c.id}" title="Șterge grupă">✕</button></div>`}
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('catList').addEventListener('click',e=>{
+  const dl=e.target.closest('[data-catdel]');if(!dl)return;
+  const catId=dl.dataset.catdel;
+  const cat=categories.find(c=>c.id===catId);if(!cat||cat.isDefault)return;
+  const count=products.filter(p=>p.category===cat.name).length;
+  delTgt=catId; delType="cat";
+  document.getElementById('delTitle').textContent=`Ștergi grupa "${cat.name}"?`;
+  document.getElementById('delSub').textContent=count>0?`${count} produs(e) vor fi mutate în "Altele". Acțiune ireversibilă.`:"Acțiune ireversibilă.";
+  document.getElementById('delConfirm').style.display='flex';
+});
+
+// Color preview for new category
+document.getElementById('catNewColor').addEventListener('input',e=>{
+  const name=document.getElementById('catNewName').value||'GRUPĂ NOUĂ';
+  document.getElementById('catColorPrev').style.background=e.target.value;
+  document.getElementById('catColorPrev').textContent=name.toUpperCase();
+});
+document.getElementById('catNewName').addEventListener('input',e=>{
+  document.getElementById('catColorPrev').textContent=(e.target.value||'GRUPĂ NOUĂ').toUpperCase();
+});
+
+document.getElementById('catAddBtn').addEventListener('click',()=>{
+  const name=document.getElementById('catNewName').value.trim();
+  if(!name){document.getElementById('catNewName').style.borderColor='var(--err)';return;}
+  if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){
+    showOk('⚠ Grupă deja existentă!');return;
+  }
+  const color=document.getElementById('catNewColor').value;
+  const id='cat-'+Date.now();
+  categories.push({id,name,color,isDefault:false});
+  saveCats();
+  document.getElementById('catNewName').value='';
+  document.getElementById('catNewColor').value='#E01A1A';
+  document.getElementById('catColorPrev').style.background='#E01A1A';
+  document.getElementById('catColorPrev').textContent='GRUPĂ NOUĂ';
+  document.getElementById('catNewName').style.borderColor='';
+  renderCatList();
+  populateCatSelect();
+  renderFilters();
+  showOk(`✓ Grupă "${name}" adăugată!`);
+});
+
+/* ══ POLICY ADMIN ══ */
+function loadPolicyFields(){
+  document.getElementById('pPrivacyRo').value=policies.privacyRo||'';
+  document.getElementById('pPrivacyEn').value=policies.privacyEn||'';
+  document.getElementById('pTermsRo').value=policies.termsRo||'';
+  document.getElementById('pTermsEn').value=policies.termsEn||'';
+  document.getElementById('pReturnRo').value=policies.returnRo||'';
+  document.getElementById('pReturnEn').value=policies.returnEn||'';
+  document.getElementById('pCookiesRo').value=policies.cookiesRo||'';
+  document.getElementById('pCookiesEn').value=policies.cookiesEn||'';
+}
+document.getElementById('savePolicies').addEventListener('click',()=>{
+  policies={
+    privacyRo:document.getElementById('pPrivacyRo').value,
+    privacyEn:document.getElementById('pPrivacyEn').value,
+    termsRo:document.getElementById('pTermsRo').value,
+    termsEn:document.getElementById('pTermsEn').value,
+    returnRo:document.getElementById('pReturnRo').value,
+    returnEn:document.getElementById('pReturnEn').value,
+    cookiesRo:document.getElementById('pCookiesRo').value,
+    cookiesEn:document.getElementById('pCookiesEn').value,
+  };
+  savePolicies();showOk(t('toast_saved'));
+});
+
+/* ══ FORM HELPERS ══ */
+function renderBadges(){document.getElementById('badgeGrid').innerHTML=BC.map(b=>`<button class="badge-btn${selB.includes(b.k)?' on':''}" data-badge="${b.k}"><span>${b.i}</span> ${b.k}</button>`).join('');}
+function setStk(){document.getElementById('stIn').className='stock-btn'+(stockVal?' in':'');document.getElementById('stOut').className='stock-btn'+(stockVal?'':' out');}
+function setImg(){
+  document.getElementById('imgUrlBtn').className='img-tab'+(imgMode==='url'?' on':'');
+  document.getElementById('imgFileBtn').className='img-tab'+(imgMode==='file'?' on':'');
+  document.getElementById('urlView').style.display=imgMode==='url'?'block':'none';
+  document.getElementById('fileView').style.display=imgMode==='file'?'block':'none';
+}
+function resetForm(){
+  editId=null;stockVal=true;selB=[];prevSrc='';imgMode='url';
+  ['fName','fBrand','fPrice','fDesc','fImgUrl'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  populateCatSelect();
+  document.getElementById('fMat').value='ABS/ASA';
+  document.getElementById('imgPrev').style.display='none';
+  document.getElementById('formSubmit').textContent='+ Adaugă';
+  document.getElementById('formCancel').style.display='none';
+  document.getElementById('tabAdd').textContent='+ Adaugă';
+  setStk();setImg();renderBadges();
+}
+function showOk(m){const e=document.getElementById('apOk');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
+
+document.getElementById('stIn').addEventListener('click',()=>{stockVal=true;setStk();});
+document.getElementById('stOut').addEventListener('click',()=>{stockVal=false;setStk();});
+document.getElementById('imgUrlBtn').addEventListener('click',()=>{imgMode='url';setImg();});
+document.getElementById('imgFileBtn').addEventListener('click',()=>{imgMode='file';setImg();});
+document.getElementById('dropzone').addEventListener('click',()=>document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{prevSrc=ev.target.result;document.getElementById('imgPrevEl').src=prevSrc;document.getElementById('imgPrev').style.display='flex';};r.readAsDataURL(f);
+});
+document.getElementById('fImgUrl').addEventListener('input',e=>{
+  prevSrc=e.target.value;document.getElementById('imgPrevEl').src=prevSrc;document.getElementById('imgPrev').style.display=prevSrc?'flex':'none';
+});
+document.getElementById('badgeGrid').addEventListener('click',e=>{
+  const b=e.target.closest('.badge-btn');if(!b)return;
+  const k=b.dataset.badge;selB=selB.includes(k)?selB.filter(x=>x!==k):[...selB,k];renderBadges();
+});
+document.getElementById('formCancel').addEventListener('click',resetForm);
+document.getElementById('formSubmit').addEventListener('click',()=>{
+  const name=document.getElementById('fName').value.trim(),price=parseFloat(document.getElementById('fPrice').value);
+  if(!name||!price)return;
+  const pl={name,brand:document.getElementById('fBrand').value.trim(),category:document.getElementById('fCat').value,material:document.getElementById('fMat').value,price,description:document.getElementById('fDesc').value.trim(),imageUrl:imgMode==='url'?document.getElementById('fImgUrl').value.trim():prevSrc,badges:[...selB],stock:stockVal};
+  if(editId!==null){products=products.map(p=>p.id===editId?{...p,...pl}:p);showOk('✓ Actualizat!');}
+  else{products=[{...pl,id:nextId++},...products];showOk('✓ Adăugat!');}
+  saveProd();resetForm();renderGrid();renderList();
+});
+
+/* ══ LIST ══ */
+function renderList(){
+  const el=document.getElementById('listView');
+  if(!products.length){el.innerHTML='<div class="list-empty">Niciun produs.</div>';return;}
+  el.innerHTML=products.map(p=>`<div class="list-item">
+    <div class="list-thumb">${p.imageUrl?`<img src="${p.imageUrl}" alt="${p.name}" onerror="this.style.display='none'">`:`<span class="list-hex">⬡</span>`}</div>
+    <div class="list-info"><div class="list-name">${p.name}</div><div class="list-meta"><span class="list-cat" style="color:${getCatColor(p.category)}">${p.category}</span><span class="list-price">${p.price} RON</span><span class="list-stock ${p.stock?'in':'out'}">${p.stock?'În stoc':'Epuizat'}</span></div></div>
+    <div class="list-actions"><button class="list-btn tg" data-tg="${p.id}" title="Toggle stoc">${p.stock?'⊘':'✓'}</button><button class="list-btn ed" data-ed="${p.id}" title="Editează">✎</button><button class="list-btn dl" data-dl="${p.id}" title="Șterge">✕</button></div>
+  </div>`).join('');
+}
+document.getElementById('listView').addEventListener('click',e=>{
+  const tg=e.target.closest('[data-tg]'),ed=e.target.closest('[data-ed]'),dl=e.target.closest('[data-dl]');
+  if(tg){const id=+tg.dataset.tg;products=products.map(p=>p.id===id?{...p,stock:!p.stock}:p);saveProd();renderGrid();renderList();return;}
+  if(ed){
+    const id=+ed.dataset.ed,p=products.find(x=>x.id===id);if(!p)return;
+    editId=id;stockVal=p.stock;selB=[...(p.badges||[])];prevSrc=p.imageUrl||'';imgMode='url';
+    document.getElementById('fName').value=p.name||'';document.getElementById('fBrand').value=p.brand||'';
+    populateCatSelect();
+    document.getElementById('fCat').value=p.category||getAllCatNames()[0];
+    document.getElementById('fMat').value=p.material||'ABS/ASA';
+    document.getElementById('fPrice').value=p.price||'';document.getElementById('fDesc').value=p.description||'';
+    document.getElementById('fImgUrl').value=p.imageUrl||'';document.getElementById('imgPrevEl').src=p.imageUrl||'';
+    document.getElementById('imgPrev').style.display=p.imageUrl?'flex':'none';
+    document.getElementById('formSubmit').textContent='✓ Actualizează';document.getElementById('formCancel').style.display='block';
+    document.getElementById('tabAdd').textContent='✎ Editează';
+    setStk();setImg();renderBadges();showTab('add');return;
+  }
+  if(dl){delTgt=+dl.dataset.dl;delType="prod";document.getElementById('delTitle').textContent='Ștergi produsul?';document.getElementById('delSub').textContent='Acțiune ireversibilă.';document.getElementById('delConfirm').style.display='flex';}
+});
+
+document.getElementById('delCancel').addEventListener('click',()=>{delTgt=null;document.getElementById('delConfirm').style.display='none';});
+document.getElementById('delOk').addEventListener('click',()=>{
+  if(delTgt===null){document.getElementById('delConfirm').style.display='none';return;}
+  if(delType==="prod"){
+    products=products.filter(p=>p.id!==delTgt);
+    if(editId===delTgt)resetForm();
+  }else if(delType==="cat"){
+    const cat=categories.find(c=>c.id===delTgt);
+    if(cat&&!cat.isDefault){
+      // Move products from deleted category to "Altele"
+      products=products.map(p=>p.category===cat.name?{...p,category:"Altele"}:p);
+      categories=categories.filter(c=>c.id!==delTgt);
+      saveCats();
+      populateCatSelect();
+      renderCatList();
+      renderFilters();
+      saveProd();
+    }
+  }
+  delTgt=null;delType="prod";
+  document.getElementById('delConfirm').style.display='none';
+  saveProd();renderGrid();renderList();
+});
+
+/* ══ INIT ══ */
+buildTicker();
+applyI18n();
+</script>
+</body>
+</html>
