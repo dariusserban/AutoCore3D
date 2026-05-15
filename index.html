@@ -7,6 +7,27 @@
 <title>AUTOCORE3D — Piese Auto & Printare 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<!-- Firebase compat SDK (works without bundler) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  try{
+    const cfg={
+      apiKey:"AIzaSyCoTXssVSmSKRQRxLQKyj1YnF-2K9PJAX0",
+      authDomain:"autocore3d.firebaseapp.com",
+      projectId:"autocore3d",
+      storageBucket:"autocore3d.firebasestorage.app",
+      messagingSenderId:"709830811613",
+      appId:"1:709830811613:web:e42f1940e797aa2c4e5b7a"
+    };
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    window._db = firebase.firestore();
+    window._fbReady = true;
+    window.dispatchEvent(new Event('fbready'));
+  }catch(e){ console.warn('Firebase init error:',e); }
+})();
+</script>
 <style>
 :root{
   color-scheme:dark!important;
@@ -489,6 +510,10 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   <button class="lang-opt" data-lang="en">EN</button>
 </div>
 <div id="toast"></div>
+<div id="syncStatus" style="position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,.95);border:1px solid var(--bdr);color:var(--muted);font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;padding:.45rem 1rem;z-index:150;display:flex;align-items:center;gap:.5rem;">
+  <span style="width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1s infinite;display:inline-block"></span>
+  SE SINCRONIZEAZĂ...
+</div>
 <div id="app">
 <header>
   <div class="hdr">
@@ -769,8 +794,60 @@ const DEFAULT_MATS = [
 const TICK_ITEMS = ["CARBON FIBER","ABS/ASA","IMPACT PROOF","UV RESISTANT","HIGH TEMP","RAMBURS","PRINTARE 3D","INGINERIE AUTO","TOLERANȚE STRÂNSE","MADE IN ROMANIA","TRANSPORT INCLUS","AFTERMARKET","MATERIALE TEHNICE","CARBON COMPOZIT"];
 const DEFAULT_CATS = [{id:"c1",name:"Piese Auto",color:"#E01A1A"},{id:"c2",name:"ABS/ASA",color:"#3b82f6"},{id:"c3",name:"Carbon Fiber",color:"#a3a3a3"},{id:"c4",name:"Altele",color:"#8b5cf6"}];
 
-/* ══ DATA ══ */
-function defProds(){
+/* ══ FIREBASE PERSISTENCE ══ */
+const LS_P = "ac3d_prod_v5", LS_C = "ac3d_cats_v2", LS_POL = "ac3d_pol_v1", LS_MAT = "ac3d_mat_v1";
+
+// Local cache fallback
+function lsGet(k,def){try{const r=localStorage.getItem(k);if(r)return JSON.parse(r);}catch{}return def;}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+function load(k,def){return lsGet(k,def);}
+function save(k,v){
+  lsSet(k,v);
+  // Also save to Firebase if ready
+  if(window._fbReady) fbSave(k,v);
+}
+
+async function fbSave(key, data){
+  try{
+    if(!window._db) return;
+    await window._db.collection('catalog').doc(key).set({
+      data: JSON.stringify(data),
+      updatedAt: Date.now()
+    });
+  }catch(e){ console.warn('Firebase save error:',e); }
+}
+
+async function fbLoad(key){
+  try{
+    if(!window._db) return null;
+    const snap = await window._db.collection('catalog').doc(key).get();
+    if(snap.exists){
+      const data = JSON.parse(snap.data().data);
+      lsSet(key, data);
+      return data;
+    }
+  }catch(e){ console.warn('Firebase load error:',e); }
+  return null;
+}
+
+// Load from Firebase on startup, then re-render
+async function syncFromFirebase(){
+  try{
+    const keys=[LS_P,LS_C,LS_MAT,LS_POL];
+    const results = await Promise.all(keys.map(k=>fbLoad(k)));
+    let changed=false;
+    if(results[0]){products=results[0].map(p=>({...p,images:p.images||(p.imageUrl?[p.imageUrl]:[]) }));nextId=products.reduce((m,p)=>Math.max(m,p.id),0)+1;changed=true;}
+    if(results[1]){categories=results[1];changed=true;}
+    if(results[2]){materials=results[2];changed=true;}
+    if(results[3]){policies=results[3];}
+    if(changed){renderFilters();renderGrid();}
+    $('syncStatus').style.display='none';
+  }catch(e){
+    console.warn('Sync error:',e);
+    $('syncStatus').style.display='none';
+  }
+}
   return [
     {id:1,name:"Suport Senzor Parcare",brand:"AutoCore OEM",category:"Piese Auto",material:"ABS/ASA",price:45,images:[],badges:["UV Resistant","Impact Proof"],description:"Suport 3D pentru senzori parcare OEM, rezistent UV și impact. Transport inclus.",stock:true},
     {id:2,name:"Canalizare Intercooler",brand:"CorePerformance",category:"Piese Auto",material:"Carbon Fiber",price:180,images:[],badges:["High Temp","Carbon Rigid"],description:"Conductă aer carbon compozit pentru intercooler. Transport inclus.",stock:true},
@@ -780,13 +857,11 @@ function defProds(){
     {id:6,name:"Difuzor Spate Universal",brand:"CorePerformance",category:"Altele",material:"Carbon Fiber",price:320,images:[],badges:["Carbon Rigid","UV Resistant"],description:"Difuzor aerodinamic spate, carbon compozit. Transport inclus.",stock:true},
   ];
 }
-function load(k,def){try{const r=localStorage.getItem(k);if(r)return JSON.parse(r);}catch{}return def;}
-function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
-let products   = load(LS_P, defProds()).map(p=>({...p, images:p.images||(p.imageUrl?[p.imageUrl]:[]) }));
-let categories = load(LS_C, JSON.parse(JSON.stringify(DEFAULT_CATS)));
-let materials  = load(LS_MAT, JSON.parse(JSON.stringify(DEFAULT_MATS)));
-let policies   = load(LS_POL, {privacyRo:"Datele personale colectate sunt utilizate exclusiv pentru procesarea comenzilor și nu sunt transmise terților fără consimțământul dumneavoastră.",privacyEn:"Personal data collected is used exclusively for order processing and is not shared with third parties without your consent.",termsRo:"Prin plasarea unei comenzi, ești de acord cu termenii AUTOCORE3D. Prețurile includ TVA, transport și toate taxele.",termsEn:"By placing an order, you agree to AUTOCORE3D's terms. Prices include VAT, shipping and all taxes.",returnRo:"Produsele pot fi returnate în termen de 14 zile de la primire, în stare originală, nefolosită.",returnEn:"Products can be returned within 14 days of receipt, in original unused condition.",cookiesRo:"Folosim cookie-uri esențiale pentru funcționarea site-ului. Nu colectăm cookie-uri de marketing fără acordul utilizatorului.",cookiesEn:"We use essential cookies for website operation. We do not collect marketing cookies without explicit consent."});
+let products   = lsGet(LS_P, defProds()).map(p=>({...p, images:p.images||(p.imageUrl?[p.imageUrl]:[]) }));
+let categories = lsGet(LS_C, JSON.parse(JSON.stringify(DEFAULT_CATS)));
+let materials  = lsGet(LS_MAT, JSON.parse(JSON.stringify(DEFAULT_MATS)));
+let policies   = lsGet(LS_POL, {privacyRo:"Datele personale colectate sunt utilizate exclusiv pentru procesarea comenzilor și nu sunt transmise terților fără consimțământul dumneavoastră.",privacyEn:"Personal data collected is used exclusively for order processing and is not shared with third parties without your consent.",termsRo:"Prin plasarea unei comenzi, ești de acord cu termenii AUTOCORE3D. Prețurile includ TVA, transport și toate taxele.",termsEn:"By placing an order, you agree to AUTOCORE3D's terms. Prices include VAT, shipping and all taxes.",returnRo:"Produsele pot fi returnate în termen de 14 zile de la primire, în stare originală, nefolosită.",returnEn:"Products can be returned within 14 days of receipt, in original unused condition.",cookiesRo:"Folosim cookie-uri esențiale pentru funcționarea site-ului. Nu colectăm cookie-uri de marketing fără acordul utilizatorului.",cookiesEn:"We use essential cookies for website operation. We do not collect marketing cookies without explicit consent."});
 
 let nextId     = products.reduce((m,p)=>Math.max(m,p.id),0)+1;
 let lang       = "ro";
@@ -1510,6 +1585,16 @@ function attachCarouselLightbox(card){
 /* ══ INIT ══ */
 buildTicker();
 applyI18n();
+
+// Sync from Firebase when SDK is ready
+function startFirebaseSync(){
+  if(window._fbReady){
+    syncFromFirebase();
+  } else {
+    window.addEventListener('fbready', ()=>syncFromFirebase(), {once:true});
+  }
+}
+startFirebaseSync();
 
 /* ── Floating particles ── */
 (function spawnParticles(){
