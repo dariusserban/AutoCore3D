@@ -770,7 +770,7 @@ const TICK_ITEMS = ["CARBON FIBER","ABS/ASA","IMPACT PROOF","UV RESISTANT","HIGH
 const DEFAULT_CATS = [{id:"c1",name:"Piese Auto",color:"#E01A1A"},{id:"c2",name:"ABS/ASA",color:"#3b82f6"},{id:"c3",name:"Carbon Fiber",color:"#a3a3a3"},{id:"c4",name:"Altele",color:"#8b5cf6"}];
 
 /* ══ FIREBASE PERSISTENCE ══ */
-const LS_P = "ac3d_prod_v5", LS_C = "ac3d_cats_v2", LS_POL = "ac3d_pol_v1", LS_MAT = "ac3d_mat_v1";
+// (LS keys already declared above)
 
 // Local cache fallback
 function lsGet(k,def){try{const r=localStorage.getItem(k);if(r)return JSON.parse(r);}catch{}return def;}
