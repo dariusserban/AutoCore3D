@@ -7,27 +7,6 @@
 <title>AUTOCORE3D — Piese Auto & Printare 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<!-- Firebase compat SDK (works without bundler) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script>
-(function(){
-  try{
-    const cfg={
-      apiKey:"AIzaSyCoTXssVSmSKRQRxLQKyj1YnF-2K9PJAX0",
-      authDomain:"autocore3d.firebaseapp.com",
-      projectId:"autocore3d",
-      storageBucket:"autocore3d.firebasestorage.app",
-      messagingSenderId:"709830811613",
-      appId:"1:709830811613:web:e42f1940e797aa2c4e5b7a"
-    };
-    if(!firebase.apps.length) firebase.initializeApp(cfg);
-    window._db = firebase.firestore();
-    window._fbReady = true;
-    window.dispatchEvent(new Event('fbready'));
-  }catch(e){ console.warn('Firebase init error:',e); }
-})();
-</script>
 <style>
 :root{
   color-scheme:dark!important;
@@ -1580,15 +1559,46 @@ function attachCarouselLightbox(card){
 buildTicker();
 applyI18n();
 
-// Sync from Firebase when SDK is ready
+// Init Firebase async - after everything else is ready
 function startFirebaseSync(){
   if(window._fbReady){
     syncFromFirebase();
   } else {
-    window.addEventListener('fbready', ()=>syncFromFirebase(), {once:true});
+    window.addEventListener('fbready',()=>syncFromFirebase(),{once:true});
   }
 }
-startFirebaseSync();
+
+// Firebase — rulează DOAR pe domeniu real, nu în preview
+(function(){
+  const host = window.location.hostname;
+  const isRealDomain = host && host!=='localhost' && !host.includes('claude') && !host.includes('127.0.0');
+  if(!isRealDomain){ console.log('Preview mode — Firebase disabled'); return; }
+
+  const s1=document.createElement('script');
+  s1.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
+  s1.onload=function(){
+    const s2=document.createElement('script');
+    s2.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js';
+    s2.onload=function(){
+      try{
+        if(!window.firebase) return;
+        if(!firebase.apps.length) firebase.initializeApp({
+          apiKey:"AIzaSyCoTXssVSmSKRQRxLQKyj1YnF-2K9PJAX0",
+          authDomain:"autocore3d.firebaseapp.com",
+          projectId:"autocore3d",
+          storageBucket:"autocore3d.firebasestorage.app",
+          messagingSenderId:"709830811613",
+          appId:"1:709830811613:web:e42f1940e797aa2c4e5b7a"
+        });
+        window._db=firebase.firestore();
+        window._fbReady=true;
+        syncFromFirebase();
+      }catch(e){ console.warn('Firebase init:',e); }
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+})();
 
 /* ── Floating particles ── */
 (function spawnParticles(){
