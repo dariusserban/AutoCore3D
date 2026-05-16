@@ -57,15 +57,13 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .nav-cta:hover{box-shadow:0 0 20px rgba(37,211,102,.4);}
 .nav-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.5s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.hbar{height:1px;background:linear-gradient(90deg,transparent,var(--red) 50%,transparent);animation:scan 3s ease-in-out infinite,hbar-color 6s ease-in-out infinite;}
+.hbar{height:1px;background:linear-gradient(90deg,transparent,var(--red) 50%,transparent);animation:scan 3s ease-in-out infinite;}
 @keyframes scan{0%,100%{opacity:.3}50%{opacity:.85}}
-@keyframes hbar-color{0%,100%{opacity:.4}50%{opacity:1}}
 
 .hero{max-width:1280px;margin:0 auto;padding:3.5rem 1.5rem 2rem;}
 .hero-eyebrow{font-family:var(--mono);font-size:.65rem;color:var(--red);letter-spacing:.25em;margin-bottom:.9rem;opacity:0;animation:fadeUp .7s var(--ease) .1s forwards;}
 .hero h1{font-family:var(--disp);font-size:clamp(2.6rem,6.5vw,5rem);font-weight:900;text-transform:uppercase;line-height:.92;letter-spacing:.02em;margin-bottom:.9rem;opacity:0;animation:fadeUp .7s var(--ease) .25s forwards;color:var(--text);}
-.hero h1 em{font-style:normal;color:var(--red);position:relative;animation:glitch-flicker 8s ease-in-out infinite;}
-@keyframes glitch-flicker{0%,96%,100%{text-shadow:none;}97%{text-shadow:2px 0 #00ffff,-2px 0 #ff00ff;}98%{text-shadow:none;}99%{text-shadow:-3px 0 #00ffff,3px 0 #ff00ff,0 2px rgba(224,26,26,.8);}}
+.hero h1 em{font-style:normal;color:var(--red);position:relative;}
 .hero h1 em::after{content:'';position:absolute;bottom:2px;left:0;right:0;height:3px;background:var(--red);transform:scaleX(0);transform-origin:left;animation:grow 1s var(--ease) 1s forwards;}
 @keyframes grow{to{transform:scaleX(1)}}
 .hero-sub{font-family:var(--body);font-size:.95rem;color:var(--sub);line-height:1.6;margin-bottom:2.5rem;opacity:0;animation:fadeUp .7s var(--ease) .4s forwards;}
@@ -80,15 +78,13 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 @keyframes grad-move{0%{background-position:0%}100%{background-position:200%}}
 .stat-lbl{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.14em;margin-top:3px;display:block;}
 
-.ticker-wrap{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);background:var(--surf);padding:.45rem 0;box-shadow:inset 0 1px 0 rgba(224,26,26,.08),inset 0 -1px 0 rgba(224,26,26,.08);}
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);background:var(--surf);padding:.45rem 0;}
 .ticker{display:flex;white-space:nowrap;animation:tick 30s linear infinite;}
 .ticker:hover{animation-play-state:paused;}
 .t-item{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;color:var(--muted);padding:0 2rem;}
-.t-item b{color:var(--red);margin-right:.4rem;font-weight:400;animation:tick-glow 2s ease-in-out infinite;}
-@keyframes tick-glow{0%,100%{text-shadow:none}50%{text-shadow:0 0 8px rgba(224,26,26,.8)}}
+.t-item b{color:var(--red);margin-right:.4rem;font-weight:400;}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* DB STATUS */
 .db-status{max-width:1280px;margin:0 auto;padding:.5rem 1.5rem 0;}
 .db-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.52rem;letter-spacing:.1em;padding:.25rem .65rem;border:1px solid;transition:all .4s;}
 .db-badge.ok{border-color:rgba(37,211,102,.3);color:var(--green);}
@@ -104,8 +100,23 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .fbar{display:flex;gap:.4rem;flex-wrap:wrap;}
 .fb{font-family:var(--mono);font-size:.63rem;letter-spacing:.09em;text-transform:uppercase;padding:.42rem 1.1rem;border:1px solid var(--bdr);background:transparent;color:var(--sub);transition:all .25s;cursor:pointer;}
 .fb:hover{border-color:var(--red);color:var(--red);}
-.fb.on{color:#fff!important;font-weight:700;animation:fb-pulse 2s ease-in-out infinite;}
-@keyframes fb-pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,26,26,0)}50%{box-shadow:0 0 12px 2px rgba(224,26,26,.3)}}
+.fb.on{color:#fff!important;font-weight:700;}
+
+/* SEARCH + SORT */
+.search-sort-wrap{max-width:1280px;margin:0 auto;padding:0 1.5rem .75rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;}
+.search-main-wrap{position:relative;flex:1;min-width:200px;}
+.search-main-ico{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem;pointer-events:none;}
+.search-main-inp{width:100%;background:#0d0d0d!important;border:1px solid var(--bdr);color:#f0f0f0!important;font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;padding:.55rem .55rem .55rem 2.2rem;outline:none;transition:border-color .2s,box-shadow .2s;}
+.search-main-inp:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(224,26,26,.1);}
+.search-main-inp::placeholder{color:var(--muted);}
+.search-main-clear{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;padding:0;line-height:1;display:none;}
+.search-main-clear.vis{display:block;color:var(--sub);}
+.search-main-clear:hover{color:var(--red);}
+.sort-wrap{display:flex;align-items:center;gap:.35rem;flex-shrink:0;}
+.sort-label{font-family:var(--mono);font-size:.55rem;color:var(--muted);letter-spacing:.12em;white-space:nowrap;}
+.sort-btn{font-family:var(--mono);font-size:.58rem;letter-spacing:.07em;padding:.38rem .75rem;border:1px solid var(--bdr);background:transparent;color:var(--sub);transition:all .2s;cursor:pointer;white-space:nowrap;}
+.sort-btn:hover{border-color:var(--red);color:var(--red);}
+.sort-btn.on{border-color:var(--red);background:rgba(224,26,26,.1);color:var(--red);font-weight:700;}
 
 .products-wrap{max-width:1280px;margin:0 auto;padding:0 1.5rem 4rem;}
 .prod-hdr{display:flex;align-items:center;gap:.8rem;margin-bottom:1.3rem;}
@@ -113,8 +124,9 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .prod-line{flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent);}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:1.1rem;}
 .no-prod{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.1em;text-align:center;padding:4rem;border:1px dashed var(--bdr);}
+.no-prod-search{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.08em;text-align:center;padding:3rem 1rem;border:1px dashed var(--bdr);}
 
-/* LOADING SKELETON */
+/* SKELETON */
 .skeleton{background:linear-gradient(90deg,#151515 25%,#1e1e1e 50%,#151515 75%);background-size:200% 100%;animation:shimmer-sk 1.5s infinite;border-radius:2px;}
 @keyframes shimmer-sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skel-card{background:var(--card);border:1px solid var(--bdr);overflow:hidden;}
@@ -127,13 +139,10 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 
 /* CARD */
 .card{position:relative;background:var(--card);border:1px solid var(--bdr);overflow:hidden;cursor:pointer;opacity:0;transform:translateY(22px);transition:opacity .5s var(--ease),transform .5s var(--ease),border-color .3s,box-shadow .3s;}
-.card.visible{opacity:1;transform:translateY(0);animation:shimmer-in .5s var(--ease) forwards;}
-@keyframes shimmer-in{0%{box-shadow:0 0 0 0 rgba(224,26,26,0);}50%{box-shadow:0 0 30px 4px rgba(224,26,26,.12);}100%{box-shadow:none;}}
+.card.visible{opacity:1;transform:translateY(0);}
 .card.visible:hover{border-color:rgba(224,26,26,.4);transform:translateY(-4px) scale(1.01);box-shadow:0 18px 50px rgba(0,0,0,.7),0 0 0 1px rgba(224,26,26,.07);}
 .card-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% -5%,rgba(224,26,26,.08) 0%,transparent 65%);opacity:0;transition:opacity .4s;pointer-events:none;z-index:1;}
 .card:hover .card-glow{opacity:1;}
-.card::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(224,26,26,.025) 50%,transparent 60%);background-size:100% 300%;transform:translateY(-100%);animation:scanline 6s ease-in-out infinite;pointer-events:none;z-index:2;}
-@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
 .corner{position:absolute;width:12px;height:12px;z-index:4;transition:all .3s var(--ease);}
 .c-tl{top:-1px;left:-1px;border-top:2px solid var(--muted);border-left:2px solid var(--muted);}
 .c-tr{top:-1px;right:-1px;border-top:2px solid var(--muted);border-right:2px solid var(--muted);}
@@ -146,7 +155,6 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .card:hover .c-br{bottom:-2px;right:-2px;}
 .card-oos{opacity:.5;}
 .stock-badge{position:absolute;top:.85rem;left:50%;transform:translateX(-50%);background:#0d0d0d;border:1px solid #252525;color:#555;font-family:var(--mono);font-size:.52rem;letter-spacing:.22em;padding:.22rem .7rem;z-index:10;}
-.mat-tag{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;padding:.18rem .55rem;border:1px solid;width:fit-content;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* CAROUSEL */
 .card-carousel{position:relative;height:195px;background:#0a0a0a;border-bottom:1px solid var(--bdr);overflow:hidden;user-select:none;}
@@ -168,21 +176,24 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .card-name{font-family:var(--disp);font-size:1.15rem;font-weight:800;line-height:1.05;color:var(--text);}
 .card-brand{font-family:var(--mono);font-size:.54rem;color:var(--muted);letter-spacing:.1em;}
 .card-desc{font-family:var(--body);font-size:.82rem;color:#aaa;line-height:1.5;}
+/* materiale tags pe card */
+.card-mats{display:flex;flex-wrap:wrap;gap:.28rem;margin-top:.1rem;}
+.card-mat-tag{font-family:var(--mono);font-size:.5rem;letter-spacing:.07em;padding:.14rem .42rem;border:1px solid;white-space:nowrap;}
+.card-mat-price{font-size:.44rem;opacity:.8;margin-left:.15rem;}
 .badges{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.1rem;}
 .badge{display:inline-flex;align-items:center;gap:.25rem;font-family:var(--mono);font-size:.53rem;letter-spacing:.07em;padding:.18rem .48rem;border:1px solid;text-transform:uppercase;color:#ccc;}
 .card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:.4rem;padding-top:.9rem;border-top:1px solid var(--bdr);}
-.price{font-family:var(--disp);font-size:1.4rem;font-weight:800;color:var(--red);line-height:1;animation:price-flash 5s ease-in-out infinite;}
-@keyframes price-flash{0%,95%,100%{color:var(--red)}96%,99%{color:#ff6b6b}}
+.price{font-family:var(--disp);font-size:1.4rem;font-weight:800;color:var(--red);line-height:1;}
 .price-sub{font-family:var(--mono);font-size:.52rem;color:#888;letter-spacing:.07em;margin-top:1px;}
-.order-btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.63rem;font-weight:700;letter-spacing:.06em;padding:.52rem .92rem;transition:all .25s;position:relative;overflow:hidden;animation:btn-pulse 4s ease-in-out infinite;}
-@keyframes btn-pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,26,26,0)}50%{box-shadow:0 0 14px 2px rgba(224,26,26,.25)}}
+.order-btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.63rem;font-weight:700;letter-spacing:.06em;padding:.52rem .92rem;transition:all .25s;position:relative;overflow:hidden;}
 .order-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
 .order-btn:hover::before{transform:translateX(0);}
-.order-btn:hover{box-shadow:0 0 22px rgba(224,26,26,.5);transform:translateY(-1px);animation:none;}
-.order-btn.dis{background:#1e1e1e;color:#444;cursor:default;animation:none;}
+.order-btn:hover{box-shadow:0 0 22px rgba(224,26,26,.5);transform:translateY(-1px);}
+.order-btn.dis{background:#1e1e1e;color:#444;cursor:default;}
 .order-btn.dis:hover{box-shadow:none;transform:none;}
 .order-btn.dis::before{display:none;}
 
+/* POLICY */
 .policy-section{max-width:1280px;margin:0 auto;padding:0 1.5rem 3rem;}
 .policy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-top:.75rem;}
 .policy-card{border:1px solid var(--bdr);padding:1.25rem;background:var(--surf);position:relative;overflow:hidden;}
@@ -219,6 +230,11 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .co-prod-name{font-family:var(--disp);font-size:1.05rem;font-weight:800;color:var(--text);line-height:1.1;}
 .co-prod-price{font-family:var(--mono);font-size:.65rem;color:var(--red);margin-top:3px;letter-spacing:.08em;}
 .co-shipping-note{font-family:var(--body);font-size:.8rem;color:#25D366;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);padding:.6rem .9rem;display:flex;align-items:center;gap:.5rem;margin-top:.9rem;}
+/* Material select in checkout */
+.co-mat-wrap{display:flex;flex-direction:column;gap:.3rem;}
+.co-mat-select{width:100%;background:#0a0a0a!important;border:1px solid var(--bdr);color:#f0f0f0!important;font-family:var(--body);font-size:.9rem;padding:.58rem .85rem;outline:none;transition:border-color .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right .8rem center!important;padding-right:2rem;}
+.co-mat-select:focus{border-color:var(--red);}
+.co-mat-select.invalid{border-color:var(--err);}
 .co-fields{display:flex;flex-direction:column;gap:.65rem;}
 .co-row-2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
 .co-field{display:flex;flex-direction:column;gap:.3rem;}
@@ -288,7 +304,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .policy-modal-content{padding:1.4rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;}
 .policy-block p{font-family:var(--body);font-size:.85rem;color:#aaa;line-height:1.75;}
 
-/* ADMIN PANEL */
+/* ADMIN */
 .ap-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:400;display:flex;justify-content:flex-end;}
 .ap-panel{width:660px;max-width:100vw;height:100vh;background:#0d0d0d;border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;animation:slideIn .3s var(--ease);}
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
@@ -318,13 +334,24 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .fsel{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right .8rem center!important;padding-right:2rem;}
 .ftx{resize:vertical;min-height:70px;line-height:1.5;}
 
-/* UPLOAD PROGRESS */
+/* MATERIALS LIST IN ADMIN FORM */
+.fmat-list{display:flex;flex-direction:column;gap:.35rem;}
+.fmat-item{display:flex;align-items:center;gap:.5rem;background:#0a0a0a;border:1px solid var(--bdr);padding:.38rem .6rem;}
+.fmat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.fmat-name{flex:1;font-family:var(--mono);font-size:.6rem;color:var(--sub);letter-spacing:.06em;}
+.fmat-price{font-family:var(--disp);font-size:.85rem;font-weight:700;color:var(--red);min-width:70px;text-align:right;}
+.fmat-rm{width:22px;height:22px;background:transparent;border:1px solid var(--bdr);color:var(--muted);font-size:.6rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;flex-shrink:0;}
+.fmat-rm:hover{border-color:var(--err);color:var(--err);}
+.fmat-add-row{display:grid;grid-template-columns:1fr 100px auto;gap:.4rem;align-items:end;}
+.fmat-add-btn{background:var(--red);border:none;color:#fff;font-family:var(--mono);font-size:.65rem;font-weight:700;padding:.6rem .7rem;cursor:pointer;transition:all .2s;white-space:nowrap;height:40px;}
+.fmat-add-btn:hover{box-shadow:0 0 14px rgba(224,26,26,.4);}
+.fmat-note{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.06em;}
+
+/* UPLOAD */
 .upload-progress{background:#0a0a0a;border:1px solid var(--bdr);padding:.6rem .9rem;display:flex;flex-direction:column;gap:.4rem;}
 .upload-progress-label{font-family:var(--mono);font-size:.55rem;color:var(--sub);letter-spacing:.08em;}
 .upload-bar-wrap{height:3px;background:#1e1e1e;overflow:hidden;}
 .upload-bar{height:100%;background:var(--red);transition:width .3s;width:0%;}
-
-/* MULTI-IMAGE */
 .img-tabs{display:flex;gap:.38rem;}
 .img-tab{background:transparent;border:1px solid var(--bdr);color:var(--muted);font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;padding:.32rem .78rem;transition:all .2s;cursor:pointer;}
 .img-tab:hover{border-color:var(--red);color:var(--red);}
@@ -361,8 +388,8 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .btn-submit:hover{box-shadow:0 0 20px rgba(224,26,26,.4);}
 .btn-submit:disabled{opacity:.5;cursor:not-allowed;}
 
-/* CATEGORIES */
-.cat-list-wrap{display:flex;flex-direction:column;gap:.42rem;}
+/* CATEGORIES & MATERIALS ADMIN */
+.cat-list-wrap,.mat-list-wrap{display:flex;flex-direction:column;gap:.42rem;}
 .cat-item{display:flex;align-items:center;gap:.65rem;background:var(--card);border:1px solid var(--bdr);padding:.55rem .75rem;transition:border-color .2s;}
 .cat-item:hover{border-color:var(--muted);}
 .cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
@@ -370,7 +397,6 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .cat-item-count{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.08em;margin-right:.3rem;}
 .cat-item-actions{display:flex;gap:.28rem;flex-shrink:0;}
 .cat-add-box{display:flex;flex-direction:column;gap:.6rem;padding:.9rem;border:1px solid var(--bdr);background:var(--card);}
-.cat-add-title{font-family:var(--mono);font-size:.57rem;color:var(--red);letter-spacing:.18em;}
 .cat-color-row{display:flex;gap:.6rem;align-items:flex-end;}
 .cat-color-inp{width:48px;height:36px;border:1px solid var(--bdr);background:#0a0a0a;cursor:pointer;padding:2px;}
 
@@ -405,52 +431,8 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .btn-delete{flex:1;background:var(--err);border:none;color:#fff;font-family:var(--mono);font-size:.64rem;font-weight:700;letter-spacing:.09em;padding:.55rem;transition:opacity .2s;cursor:pointer;}
 .btn-delete:hover{opacity:.85;}
 
-/* POLICY VIEW */
-.policy-modal{max-width:640px;}
-
-/* ══ SEARCH BAR ══ */
-.nav-search-wrap{position:relative;display:flex;align-items:center;}
-.nav-search-inp{background:transparent!important;border:1px solid var(--bdr);color:#f0f0f0!important;font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;padding:.38rem .9rem .38rem 2rem;width:0;opacity:0;transition:width .35s var(--ease),opacity .3s,border-color .2s;outline:none;pointer-events:none;}
-.nav-search-inp.open{width:180px;opacity:1;pointer-events:all;}
-.nav-search-inp:focus{border-color:var(--red);}
-.nav-search-inp::placeholder{color:var(--muted);}
-.nav-search-ico{position:absolute;left:.6rem;font-size:.75rem;color:var(--muted);pointer-events:none;transition:color .2s;}
-.nav-search-btn{background:transparent;border:1px solid var(--bdr);color:var(--muted);width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .25s;flex-shrink:0;}
-.nav-search-btn:hover{border-color:var(--red);color:var(--red);}
-.nav-search-btn.active{border-color:var(--red);color:var(--red);background:rgba(224,26,26,.08);}
-.nav-search-clear{position:absolute;right:.5rem;background:none;border:none;color:var(--muted);font-size:.7rem;cursor:pointer;padding:0;line-height:1;display:none;}
-.nav-search-inp.open:not(:placeholder-shown) ~ .nav-search-clear,
-.nav-search-clear.vis{display:block;}
-
-/* ══ SEARCH + SORT BAR (below filters) ══ */
-.search-sort-wrap{max-width:1280px;margin:0 auto;padding:0 1.5rem .75rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;}
-.search-main-wrap{position:relative;flex:1;min-width:200px;}
-.search-main-ico{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem;pointer-events:none;}
-.search-main-inp{width:100%;background:#0d0d0d!important;border:1px solid var(--bdr);color:#f0f0f0!important;font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;padding:.55rem .55rem .55rem 2.2rem;outline:none;transition:border-color .2s,box-shadow .2s;}
-.search-main-inp:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(224,26,26,.1);}
-.search-main-inp::placeholder{color:var(--muted);}
-.search-main-clear{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;padding:0;line-height:1;display:none;}
-.search-main-clear.vis{display:block;color:var(--sub);}
-.search-main-clear:hover{color:var(--red);}
-
-.sort-wrap{display:flex;align-items:center;gap:.35rem;flex-shrink:0;}
-.sort-label{font-family:var(--mono);font-size:.55rem;color:var(--muted);letter-spacing:.12em;white-space:nowrap;}
-.sort-btn{font-family:var(--mono);font-size:.58rem;letter-spacing:.07em;padding:.38rem .75rem;border:1px solid var(--bdr);background:transparent;color:var(--sub);transition:all .2s;cursor:pointer;white-space:nowrap;}
-.sort-btn:hover{border-color:var(--red);color:var(--red);}
-.sort-btn.on{border-color:var(--red);background:rgba(224,26,26,.1);color:var(--red);font-weight:700;}
-
-/* Search highlight */
-.search-hl{background:rgba(224,26,26,.25);color:#fff;border-radius:1px;}
-
-/* No results with search */
-.no-prod-search{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.08em;text-align:center;padding:3rem 1rem;border:1px dashed var(--bdr);}
-.no-prod-search span{display:block;color:var(--red);font-size:1.2rem;margin-bottom:.5rem;}
-
-/* PARTICLES */
 .particle{position:fixed;pointer-events:none;z-index:0;border-radius:50%;animation:float-p linear infinite;}
 @keyframes float-p{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:.4;}100%{transform:translateY(-10vh) scale(1.2);opacity:0;}}
-
-/* SCROLL REVEAL */
 .anim-ready{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease);}
 .anim-in{opacity:1;transform:translateY(0);}
 
@@ -464,18 +446,18 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   .grid{grid-template-columns:1fr;}
   .ap-panel{width:100vw;border-left:none;}
   .ap-tab{font-size:.58rem;padding:.82rem .2rem;letter-spacing:.04em;}
-  .g3{grid-template-columns:1fr 1fr;}
+  .g2,.g3{grid-template-columns:1fr;}
   .footer-inner{text-align:center;}
   .footer-top{flex-direction:column;gap:.75rem;}
   .footer-links{flex-wrap:wrap;justify-content:center;}
   #langBtn{left:.5rem;}
   .co-row-2{grid-template-columns:1fr;}
-  input,select,textarea{font-size:16px!important;}
-  .nav-search-inp.open{width:130px;}
   .search-sort-wrap{flex-direction:column;align-items:stretch;}
   .sort-wrap{flex-wrap:wrap;gap:.25rem;}
   .sort-btn{font-size:.55rem;padding:.3rem .55rem;}
   .sort-label{display:none;}
+  .fmat-add-row{grid-template-columns:1fr 80px auto;}
+  input,select,textarea{font-size:16px!important;}
 }
 @media(min-width:1200px){.ap-panel{width:720px;}}
 </style>
@@ -518,7 +500,6 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 </section>
 
 <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
-
 <div class="db-status"><div class="db-badge loading" id="dbBadge"><div class="db-dot"></div><span id="dbText">Conectare Supabase...</span></div></div>
 
 <div class="filters-wrap">
@@ -547,7 +528,6 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   <div class="section-label">// POLITICI & CONFIDENȚIALITATE</div>
   <div class="policy-grid" id="policyGrid"></div>
 </div>
-
 <footer>
   <div class="footer-inner">
     <div class="footer-top">
@@ -569,8 +549,18 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   <div class="modal-box">
     <button class="modal-close" id="coClose">✕</button>
     <div class="modal-section">
-      <div class="co-prod-row"><div class="co-thumb" id="coThumb"></div><div><div class="co-prod-name" id="coProdName">—</div><div class="co-prod-price" id="coProdPrice">—</div></div></div>
+      <div class="co-prod-row">
+        <div class="co-thumb" id="coThumb"></div>
+        <div><div class="co-prod-name" id="coProdName">—</div><div class="co-prod-price" id="coProdPrice">—</div></div>
+      </div>
       <div class="co-shipping-note">✓ <span data-i18n="shipping_included">Transport și taxe incluse în preț</span></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-title">// SELECTEAZĂ MATERIAL</div>
+      <div class="co-mat-wrap">
+        <label class="co-label">Material dorit *</label>
+        <select class="co-mat-select" id="coMatSelect"></select>
+      </div>
     </div>
     <div class="modal-section">
       <div class="modal-title">// DATE DE LIVRARE</div>
@@ -592,7 +582,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
         <div class="pay-opt" data-pay="50% ONLINE + 50% RAMBURS"><div class="pay-radio"></div><div class="pay-opt-icon">⚡</div><div><div class="pay-opt-title">50% Online + 50% Ramburs</div><div class="pay-opt-desc">Jumătate acum, jumătate la livrare</div></div></div>
       </div>
     </div>
-    <div class="co-actions" id="coActions">
+    <div class="co-actions">
       <button class="btn-wa" id="btnWA">Trimite pe WhatsApp</button>
       <button class="btn-outline-cancel" id="btnC">Anulează</button>
     </div>
@@ -654,21 +644,28 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
         <div class="field"><label>Nume *</label><input class="finput" id="fName" placeholder="Suport Senzor"/></div>
         <div class="field"><label>Brand</label><input class="finput" id="fBrand" placeholder="AutoCore OEM"/></div>
       </div>
-      <div class="g3">
+      <div class="g2">
         <div class="field"><label>Categorie</label><select class="fsel" id="fCat"></select></div>
-        <div class="field"><label>Material</label><select class="fsel" id="fMat"></select></div>
-        <div class="field"><label>Preț (RON) *</label><input class="finput" id="fPrice" type="number" min="0" step="0.5" placeholder="150"/></div>
       </div>
       <div class="field"><label>Descriere</label><textarea class="ftx" id="fDesc" rows="2"></textarea></div>
 
-      <div class="ap-sec">// IMAGINI PRODUS (Supabase Storage)</div>
+      <div class="ap-sec">// MATERIALE & PREȚURI *</div>
+      <div class="fmat-list" id="fMatList"></div>
+      <div class="fmat-note" id="fMatNote">Adaugă cel puțin un material cu preț</div>
+      <div class="fmat-add-row">
+        <div class="field" style="margin:0"><label>Material</label><select class="fsel" id="fMatSel"></select></div>
+        <div class="field" style="margin:0"><label>Preț RON</label><input class="finput" id="fMatPrice" type="number" min="0" step="0.5" placeholder="150"/></div>
+        <button class="fmat-add-btn" id="fMatAddBtn">+</button>
+      </div>
+
+      <div class="ap-sec">// IMAGINI PRODUS</div>
       <div class="img-count-note" id="imgCountNote">0 imagini adăugate</div>
       <div class="img-tabs">
-        <button class="img-tab on" id="imgFileBtn">📁 Upload în Supabase</button>
+        <button class="img-tab on" id="imgFileBtn">📁 Upload Supabase</button>
         <button class="img-tab" id="imgUrlBtn">🔗 URL extern</button>
       </div>
       <div id="fileInputArea">
-        <div class="dropzone" id="dropzone">Click sau trage imagini aici (selectare multiplă)<br><span style="font-size:.5rem;opacity:.6;">Imaginile se salvează în Supabase Storage</span></div>
+        <div class="dropzone" id="dropzone">Click sau trage imagini aici<br><span style="font-size:.5rem;opacity:.6;">Se salvează în Supabase Storage</span></div>
         <input type="file" id="fileInput" accept="image/*" multiple style="display:none"/>
         <div id="uploadProgress" style="display:none">
           <div class="upload-progress">
@@ -679,7 +676,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
       </div>
       <div id="urlInputArea" style="display:none">
         <div class="img-add-row">
-          <input class="finput" id="fImgUrl" placeholder="https://... apasă + sau Enter"/>
+          <input class="finput" id="fImgUrl" placeholder="https://..."/>
           <button class="img-add-btn" id="addUrlBtn">+</button>
         </div>
       </div>
@@ -771,128 +768,27 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 </div>
 
 <script>
-/* ══ SUPABASE CONFIG ══ */
-const SB_URL  = "https://jimdpmrsprcpbyacxguj.supabase.co";
-const SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbWRwbXJzcHJjcGJ5YWN4Z3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzMwNDcsImV4cCI6MjA5NDQ0OTA0N30.CL0gIG67tokOK2tm7JZgamXb3Dpch-hs2zmqbV6oEBg";
-const BUCKET  = "product-images";
-const WA      = "40771119423";
-const PWD     = "Darius12@";
+/* ══ CONFIG ══ */
+const SB_URL = "https://jimdpmrsprcpbyacxguj.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbWRwbXJzcHJjcGJ5YWN4Z3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzMwNDcsImV4cCI6MjA5NDQ0OTA0N30.CL0gIG67tokOK2tm7JZgamXb3Dpch-hs2zmqbV6oEBg";
+const BUCKET = "product-images";
+const WA     = "40771119423";
+const PWD    = "Darius12@";
 
-/* ══ SUPABASE CLIENT ══ */
-const sb = {
-  async req(path, opts={}){
-    const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
-      ...opts,
-      headers:{
-        'apikey': SB_KEY,
-        'Authorization': `Bearer ${SB_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': opts.prefer||'return=representation',
-        ...(opts.headers||{})
-      }
-    });
-    if(!r.ok){
-      const e = await r.text();
-      throw new Error(`Supabase ${r.status}: ${e}`);
-    }
-    const txt = await r.text();
-    return txt ? JSON.parse(txt) : null;
-  },
-
-  // Products
-  async getProducts(){
-    return this.req('products?select=*&order=created_at.desc');
-  },
-  async insertProduct(p){
-    return this.req('products', {method:'POST', body:JSON.stringify(p)});
-  },
-  async updateProduct(id, p){
-    return this.req(`products?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(p)});
-  },
-  async deleteProduct(id){
-    return this.req(`products?id=eq.${id}`, {method:'DELETE', prefer:'return=minimal', headers:{Prefer:'return=minimal'}});
-  },
-
-  // Categories
-  async getCategories(){
-    return this.req('categories?select=*&order=name.asc');
-  },
-  async upsertCategory(c){
-    return this.req('categories', {method:'POST', body:JSON.stringify(c), headers:{Prefer:'resolution=merge-duplicates,return=representation'}});
-  },
-  async deleteCategory(id){
-    return this.req(`categories?id=eq.${id}`, {method:'DELETE', headers:{Prefer:'return=minimal'}});
-  },
-
-  // Materials
-  async getMaterials(){
-    return this.req('materials?select=*&order=name.asc');
-  },
-  async upsertMaterial(m){
-    return this.req('materials', {method:'POST', body:JSON.stringify(m), headers:{Prefer:'resolution=merge-duplicates,return=representation'}});
-  },
-  async deleteMaterial(id){
-    return this.req(`materials?id=eq.${id}`, {method:'DELETE', headers:{Prefer:'return=minimal'}});
-  },
-
-  // Policies
-  async getPolicies(){
-    const r = await this.req('policies?id=eq.main&select=data');
-    return (r&&r[0]) ? r[0].data : null;
-  },
-  async savePolicies(data){
-    return this.req('policies', {method:'POST', body:JSON.stringify({id:'main',data}), headers:{Prefer:'resolution=merge-duplicates,return=minimal'}});
-  },
-
-  // Storage upload
-  async uploadImage(file, path){
-    const r = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`, {
-      method:'POST',
-      headers:{
-        'apikey': SB_KEY,
-        'Authorization': `Bearer ${SB_KEY}`,
-        'Content-Type': file.type,
-        'x-upsert': 'true'
-      },
-      body: file
-    });
-    if(!r.ok) throw new Error(`Upload failed: ${r.status}`);
-    return `${SB_URL}/storage/v1/object/public/${BUCKET}/${path}`;
-  },
-
-  async deleteImage(path){
-    // path is the part after /public/product-images/
-    const r = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`, {
-      method:'DELETE',
-      headers:{
-        'apikey': SB_KEY,
-        'Authorization': `Bearer ${SB_KEY}`
-      }
-    });
-    return r.ok;
-  }
-};
-
-/* ══ CONSTANTS ══ */
 const BC = [
   {k:"UV Resistant",i:"☀",c:"#f59e0b"},
-  {k:"High Temp",i:"🌡",c:"#ef4444"},
+  {k:"High Temp",   i:"🌡",c:"#ef4444"},
   {k:"Carbon Rigid",i:"◈",c:"#a3a3a3"},
   {k:"Impact Proof",i:"⬡",c:"#E01A1A"}
 ];
-const TICK_ITEMS = ["CARBON FIBER","ABS/ASA","IMPACT PROOF","UV RESISTANT","HIGH TEMP","RAMBURS","PRINTARE 3D","INGINERIE AUTO","TOLERANȚE STRÂNSE","MADE IN ROMANIA","TRANSPORT INCLUS","AFTERMARKET","MATERIALE TEHNICE","CARBON COMPOZIT"];
-const DEFAULT_CATS = [
-  {id:"c1",name:"Piese Auto",color:"#E01A1A"},
-  {id:"c2",name:"ABS/ASA",color:"#3b82f6"},
-  {id:"c3",name:"Carbon Fiber",color:"#a3a3a3"},
-  {id:"c4",name:"Altele",color:"#8b5cf6"}
-];
+const TICK_ITEMS = ["CARBON FIBER","ABS/ASA","IMPACT PROOF","UV RESISTANT","HIGH TEMP","RAMBURS","PRINTARE 3D","INGINERIE AUTO","TOLERANȚE STRÂNSE","MADE IN ROMANIA","TRANSPORT INCLUS","MATERIALE TEHNICE","CARBON COMPOZIT"];
+const DEFAULT_CATS = [{id:"c1",name:"Piese Auto",color:"#E01A1A"},{id:"c2",name:"ABS/ASA",color:"#3b82f6"},{id:"c3",name:"Carbon Fiber",color:"#a3a3a3"},{id:"c4",name:"Altele",color:"#8b5cf6"}];
 const DEFAULT_MATS = [
-  {id:"m1",name:"ABS/ASA",color:"#3b82f6",description:"Rezistent UV, impact și temperaturi moderate"},
+  {id:"m1",name:"ABS/ASA",    color:"#3b82f6",description:"Rezistent UV, impact și temperaturi moderate"},
   {id:"m2",name:"Carbon Fiber",color:"#a3a3a3",description:"Rigid, ușor, compozit carbon"},
-  {id:"m3",name:"PETG",color:"#8b5cf6",description:"Flexibil, rezistent chimic"},
-  {id:"m4",name:"TPU",color:"#10b981",description:"Flexibil, cauciucat"},
-  {id:"m5",name:"Nylon PA12",color:"#f59e0b",description:"Rezistent impact și oboseală"},
+  {id:"m3",name:"PETG",       color:"#8b5cf6",description:"Flexibil, rezistent chimic"},
+  {id:"m4",name:"TPU",        color:"#10b981",description:"Flexibil, cauciucat"},
+  {id:"m5",name:"Nylon PA12", color:"#f59e0b",description:"Rezistent impact și oboseală"},
 ];
 const DEFAULT_POLICIES = {
   privacyRo:"Datele personale colectate sunt utilizate exclusiv pentru procesarea comenzilor și nu sunt transmise terților fără consimțământul dumneavoastră.",
@@ -905,6 +801,42 @@ const DEFAULT_POLICIES = {
   cookiesEn:"We use essential cookies for website operation. We do not collect marketing cookies without explicit consent."
 };
 
+/* ══ SUPABASE CLIENT ══ */
+const sb = {
+  async req(path, opts={}){
+    const res = await fetch(`${SB_URL}/rest/v1/${path}`,{
+      ...opts,
+      headers:{
+        'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,
+        'Content-Type':'application/json',
+        'Prefer': opts.prefer||'return=representation',
+        ...(opts.headers||{})
+      }
+    });
+    if(!res.ok){ const e=await res.text(); throw new Error(`${res.status}: ${e}`); }
+    const txt=await res.text(); return txt?JSON.parse(txt):null;
+  },
+  getProducts(){ return this.req('products?select=*&order=created_at.desc'); },
+  insertProduct(p){ return this.req('products',{method:'POST',body:JSON.stringify(p)}); },
+  updateProduct(id,p){ return this.req(`products?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(p)}); },
+  deleteProduct(id){ return this.req(`products?id=eq.${id}`,{method:'DELETE',prefer:'return=minimal',headers:{Prefer:'return=minimal'}}); },
+  getCategories(){ return this.req('categories?select=*&order=name.asc'); },
+  upsertCategory(c){ return this.req('categories',{method:'POST',body:JSON.stringify(c),headers:{Prefer:'resolution=merge-duplicates,return=representation'}}); },
+  deleteCategory(id){ return this.req(`categories?id=eq.${id}`,{method:'DELETE',headers:{Prefer:'return=minimal'}}); },
+  getMaterials(){ return this.req('materials?select=*&order=name.asc'); },
+  upsertMaterial(m){ return this.req('materials',{method:'POST',body:JSON.stringify(m),headers:{Prefer:'resolution=merge-duplicates,return=representation'}}); },
+  deleteMaterial(id){ return this.req(`materials?id=eq.${id}`,{method:'DELETE',headers:{Prefer:'return=minimal'}}); },
+  async getPolicies(){ const r=await this.req('policies?id=eq.main&select=data'); return (r&&r[0])?r[0].data:null; },
+  savePolicies(data){ return this.req('policies',{method:'POST',body:JSON.stringify({id:'main',data}),headers:{Prefer:'resolution=merge-duplicates,return=minimal'}}); },
+  async uploadImage(file,path){
+    const r=await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`,{
+      method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':file.type,'x-upsert':'true'},body:file
+    });
+    if(!r.ok) throw new Error(`Upload ${r.status}`);
+    return `${SB_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+  }
+};
+
 /* ══ STATE ══ */
 let products   = [];
 let categories = [];
@@ -914,68 +846,59 @@ let lang       = "ro";
 let filter     = "Toate";
 let searchQ    = "";
 let sortMode   = "newest";
-let editId     = null, stockVal=true, selB=[], imgMode="file", formImgs=[];
+let editId     = null, stockVal=true, selB=[], imgMode="file", formImgs=[], formMats=[];
 let delTgt     = null, delType="prod";
 let catEditId  = null, matEditId=null;
 let adminAuth  = false;
 let coProd     = null, payMethod="RAMBURS";
 
 /* ══ UTILS ══ */
-const $ = id => document.getElementById(id);
-const getCatColor = name => { const c=categories.find(x=>x.name===name); return c?c.color:"#E01A1A"; };
-const getCatNames = () => categories.map(c=>c.name);
-const getMatColor = name => { const m=materials.find(x=>x.name===name); return m?m.color:"#E01A1A"; };
-const getMatNames = () => materials.map(m=>m.name);
-
-function toast(msg, isErr=false){
-  const e=$('toast');
-  e.textContent=msg;
-  e.classList.toggle('err', isErr);
-  e.classList.add('show');
-  setTimeout(()=>e.classList.remove('show'),4000);
-}
-function showOk(m){const e=$('apOk');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
+const $  = id => document.getElementById(id);
+const getCatColor  = name => { const c=categories.find(x=>x.name===name); return c?c.color:"#E01A1A"; };
+const getCatNames  = () => categories.map(c=>c.name);
+const getMatColor  = name => { const m=materials.find(x=>x.name===name); return m?m.color:"#E01A1A"; };
+const getMatNames  = () => materials.map(m=>m.name);
 
 function contrastColor(hex){
   const h=hex.replace('#','');
   const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
   const lum=c=>c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4);
   const L=0.2126*lum(r/255)+0.7152*lum(g/255)+0.0722*lum(b/255);
-  return L>0.179?'#000000':'#ffffff';
+  return L>0.179?'#000':'#fff';
 }
 
-function setDbStatus(state, msg){
-  const badge=$('dbBadge');
-  badge.className=`db-badge ${state}`;
-  $('dbText').textContent=msg;
+/* Extrage materials_list dintr-un produs — cu fallback la câmpul vechi */
+function getProdMats(p){
+  const ml = p.materials_list;
+  if(Array.isArray(ml) && ml.length) return ml;
+  // fallback: material + price vechi
+  if(p.material || p.price) return [{name:p.material||'ABS/ASA', price:p.price||0}];
+  return [];
 }
+
+function toast(msg, isErr=false){
+  const e=$('toast'); e.textContent=msg;
+  e.classList.toggle('err',isErr); e.classList.add('show');
+  setTimeout(()=>e.classList.remove('show'),4000);
+}
+function showOk(m){const e=$('apOk');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
+function setDbStatus(state,msg){const b=$('dbBadge');b.className=`db-badge ${state}`;$('dbText').textContent=msg;}
 
 /* ══ I18N ══ */
 const T={
   ro:{hero_eyebrow:"// PIESE AUTO · PRINTARE 3D · ROMÂNIA",hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț",nav_contact:"Contact",stat_products:"Produse",shipping_included:"Transport și taxe incluse în preț",prod_found:"PRODUSE GĂSITE",order_btn:"Comandă",unavailable:"Indisponibil",toast_saved:"✓ Salvat cu succes!",policy_privacy_title:"Politică de Confidențialitate",policy_terms_title:"Termeni și Condiții",policy_return_title:"Politică de Retur",policy_cookies_title:"Politică Cookies"},
   en:{hero_eyebrow:"// AUTO PARTS · 3D PRINTING · ROMANIA",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",nav_contact:"Contact",stat_products:"Products",shipping_included:"Shipping and taxes included in price",prod_found:"PRODUCTS FOUND",order_btn:"Order",unavailable:"Unavailable",toast_saved:"✓ Saved successfully!",policy_privacy_title:"Privacy Policy",policy_terms_title:"Terms & Conditions",policy_return_title:"Return Policy",policy_cookies_title:"Cookie Policy"}
 };
-const t = k => T[lang][k]||T.ro[k]||k;
-
+const t=k=>T[lang][k]||T.ro[k]||k;
 function applyI18n(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k=el.dataset.i18n;
-    if(k==='hero_h1_html') el.innerHTML=t(k);
-    else el.textContent=t(k);
-  });
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(k==='hero_h1_html')el.innerHTML=t(k);else el.textContent=t(k);});
   document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
   renderFilters(); renderGrid(); renderPolicyCards();
 }
-$('langBtn').addEventListener('click',e=>{
-  const b=e.target.closest('.lang-opt');if(!b)return;
-  lang=b.dataset.lang; applyI18n();
-});
+$('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');if(!b)return;lang=b.dataset.lang;applyI18n();});
 
 /* ══ TICKER ══ */
-function buildTicker(){
-  const a=[...TICK_ITEMS,...TICK_ITEMS];
-  $('ticker').innerHTML=a.map(t=>`<span class="t-item"><b>▸</b>${t}</span>`).join('');
-}
+function buildTicker(){const a=[...TICK_ITEMS,...TICK_ITEMS];$('ticker').innerHTML=a.map(t=>`<span class="t-item"><b>▸</b>${t}</span>`).join('');}
 
 /* ══ SVG ══ */
 function hexSVG(s=68){return`<svg width="${s}" height="${s}" viewBox="0 0 80 80" fill="none"><polygon points="40,8 72,28 72,52 40,72 8,52 8,28" stroke="#E01A1A" stroke-width="1.5" fill="none" opacity=".4"/><polygon points="40,20 60,32 60,48 40,60 20,48 20,32" stroke="#E01A1A" stroke-width="1" fill="none" opacity=".22"/><circle cx="40" cy="40" r="4" fill="#E01A1A" opacity=".65"/></svg>`;}
@@ -991,61 +914,61 @@ function buildCarousel(images){
   const ctr=n>1?`<div class="car-counter">1 / ${n}</div>`:'';
   return `<div class="card-carousel" data-idx="0" data-count="${n}"><div class="carousel-track">${slides}</div>${dots}${ctr}</div>`;
 }
-
 function carGoto(car,ni){
-  const n=parseInt(car.dataset.count)||1;
-  ni=Math.max(0,Math.min(n-1,ni));
-  car.dataset.idx=ni;
-  car.querySelector('.carousel-track').style.transform=`translateX(-${ni*100}%)`;
+  const n=parseInt(car.dataset.count)||1; ni=Math.max(0,Math.min(n-1,ni));
+  car.dataset.idx=ni; car.querySelector('.carousel-track').style.transform=`translateX(-${ni*100}%)`;
   car.querySelectorAll('.car-dot').forEach((d,i)=>d.classList.toggle('on',i===ni));
-  const ctr=car.querySelector('.car-counter');
-  if(ctr) ctr.textContent=`${ni+1} / ${n}`;
+  const ctr=car.querySelector('.car-counter'); if(ctr) ctr.textContent=`${ni+1} / ${n}`;
 }
-
 function attachCarousel(card){
-  const car=card.querySelector('.card-carousel');
-  if(!car) return;
-  const n=parseInt(car.dataset.count||0);
-  if(n<2) return;
-  let startX=0,startY=0;
-  car.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY;},{passive:true});
-  car.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-startX;
-    const dy=e.changedTouches[0].clientY-startY;
-    if(Math.abs(dx)>Math.abs(dy)*1.5&&Math.abs(dx)>40) carGoto(car,parseInt(car.dataset.idx)+(dx<0?1:-1));
-  },{passive:true});
-  let mDown=false,mStartX=0;
-  car.addEventListener('mousedown',e=>{mDown=true;mStartX=e.clientX;});
-  car.addEventListener('mouseup',e=>{
-    if(!mDown) return; mDown=false;
-    const dx=e.clientX-mStartX;
-    if(Math.abs(dx)>40){e.stopPropagation();carGoto(car,parseInt(car.dataset.idx)+(dx<0?1:-1));}
-  });
-  car.addEventListener('mouseleave',()=>{mDown=false;});
+  const car=card.querySelector('.card-carousel'); if(!car) return;
+  const n=parseInt(car.dataset.count||0); if(n<2) return;
+  let sx=0,sy=0;
+  car.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  car.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy)*1.5&&Math.abs(dx)>40)carGoto(car,parseInt(car.dataset.idx)+(dx<0?1:-1));},{passive:true});
+  let md=false,mx=0;
+  car.addEventListener('mousedown',e=>{md=true;mx=e.clientX;});
+  car.addEventListener('mouseup',e=>{if(!md)return;md=false;const dx=e.clientX-mx;if(Math.abs(dx)>40){e.stopPropagation();carGoto(car,parseInt(car.dataset.idx)+(dx<0?1:-1));}});
+  car.addEventListener('mouseleave',()=>{md=false;});
 }
 
 /* ══ CARD ══ */
 function renderCard(p){
-  const mc=getMatColor(p.material);
-  const mtxt=contrastColor(mc);
-  const cc=getCatColor(p.category);
-  const bgs=(p.badges||[]).map(b=>{const bc=BC.find(x=>x.k===b)||{i:"·",c:"#E01A1A"};return`<span class="badge" style="border-color:${bc.c}44;color:${bc.c}"><span>${bc.i}</span> ${b}</span>`;}).join('');
+  const cc  = getCatColor(p.category);
+  const mats= getProdMats(p);
+  const bgs = (p.badges||[]).map(b=>{const bc=BC.find(x=>x.k===b)||{i:"·",c:"#E01A1A"};return`<span class="badge" style="border-color:${bc.c}44;color:${bc.c}"><span>${bc.i}</span> ${b}</span>`;}).join('');
+
+  // Preț: range dacă mai multe materiale
+  let priceStr;
+  if(!mats.length){
+    priceStr=`${p.price||0} RON`;
+  } else if(mats.length===1){
+    priceStr=`${mats[0].price} RON`;
+  } else {
+    const ps=mats.map(m=>Number(m.price)).sort((a,b)=>a-b);
+    priceStr=`${ps[0]} – ${ps[ps.length-1]} RON`;
+  }
+
+  // Materiale tags
+  const matsHtml=mats.length?`<div class="card-mats">${mats.map(m=>{
+    const mc=getMatColor(m.name),mtxt=contrastColor(mc);
+    return `<span class="card-mat-tag" style="border-color:${mc};background:${mc};color:${mtxt}">${m.name}<span class="card-mat-price">${m.price} RON</span></span>`;
+  }).join('')}</div>`:'';
+
   return `<div class="card${p.stock?'':' card-oos'}" data-id="${p.id}">
     <div class="card-glow"></div>
     <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
     ${!p.stock?`<div class="stock-badge">${t('unavailable')}</div>`:''}
     ${buildCarousel(p.images||[])}
     <div class="card-body">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:.4rem;flex-wrap:wrap;">
-        <div class="card-cat" style="color:${cc}">// ${p.category||'—'}</div>
-        <span class="mat-tag" style="border-color:${mc};background:${mc};color:${mtxt}">${p.material||'—'}</span>
-      </div>
+      <div class="card-cat" style="color:${cc}">// ${p.category||'—'}</div>
       <div class="card-name">${p.name}</div>
       ${p.brand?`<div class="card-brand">⬡ ${p.brand}</div>`:''}
       <div class="card-desc">${p.description||''}</div>
+      ${matsHtml}
       <div class="badges">${bgs}</div>
       <div class="card-foot">
-        <div><div class="price">${p.price} RON</div><div class="price-sub">${t('shipping_included')}</div></div>
+        <div><div class="price">${priceStr}</div><div class="price-sub">${t('shipping_included')}</div></div>
         ${p.stock?`<button class="order-btn" data-order="${p.id}">● ${t('order_btn')}</button>`:`<button class="order-btn dis" disabled>${t('unavailable')}</button>`}
       </div>
     </div>
@@ -1053,40 +976,33 @@ function renderCard(p){
 }
 
 /* ══ SKELETON ══ */
-function renderSkeletons(n=6){
-  return Array(n).fill(`<div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton w60"></div><div class="skel-line skeleton w80"></div><div class="skel-line skeleton w40"></div></div></div>`).join('');
-}
+function renderSkeletons(n=6){return Array(n).fill(`<div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton w60"></div><div class="skel-line skeleton w80"></div><div class="skel-line skeleton w40"></div></div></div>`).join('');}
 
-/* ══ GRID ══ */
+/* ══ SEARCH + SORT + GRID ══ */
 function applySearchSort(list){
-  const q = searchQ.trim().toLowerCase();
-  if(q){
-    list = list.filter(p=>{
-      const hay = [p.name,p.brand,p.description,p.material,p.category].filter(Boolean).join(' ').toLowerCase();
-      return hay.includes(q);
-    });
-  }
-  const sorted = [...list];
-  if(sortMode==='price-asc')  sorted.sort((a,b)=>a.price-b.price);
-  if(sortMode==='price-desc') sorted.sort((a,b)=>b.price-a.price);
-  if(sortMode==='newest')     sorted.sort((a,b)=>b.id-a.id);
-  if(sortMode==='stock')      sorted.sort((a,b)=>b.stock-a.stock);
-  return {sorted, q};
+  const q=searchQ.trim().toLowerCase();
+  if(q) list=list.filter(p=>{
+    const mnames=getProdMats(p).map(m=>m.name).join(' ');
+    return [p.name,p.brand,p.description,p.category,mnames].filter(Boolean).join(' ').toLowerCase().includes(q);
+  });
+  const s=[...list];
+  if(sortMode==='price-asc')  s.sort((a,b)=>Math.min(...getProdMats(a).map(m=>m.price))-Math.min(...getProdMats(b).map(m=>m.price)));
+  if(sortMode==='price-desc') s.sort((a,b)=>Math.max(...getProdMats(b).map(m=>m.price))-Math.max(...getProdMats(a).map(m=>m.price)));
+  if(sortMode==='newest')     s.sort((a,b)=>b.id-a.id);
+  if(sortMode==='stock')      s.sort((a,b)=>b.stock-a.stock);
+  return s;
 }
 
 function renderGrid(){
   const all=lang==='ro'?"Toate":"All";
   let base=(filter===all||filter==="Toate"||filter==="All")?products:products.filter(p=>p.category===filter);
-  const {sorted:list, q} = applySearchSort(base);
+  const list=applySearchSort(base);
+  const mc=$('searchMainClear'); if(mc) mc.classList.toggle('vis',searchQ.length>0);
   const g=$('grid');
-
-  const mc=$('searchMainClear');
-  if(mc) mc.classList.toggle('vis', searchQ.length>0);
-
   if(!list.length){
-    g.innerHTML = searchQ
-      ? `<div class="no-prod-search"><span>🔍</span>Niciun rezultat pentru "<b style="color:var(--red)">${searchQ}</b>"</div>`
-      : `<div class="no-prod">// 0 ${t('prod_found')}</div>`;
+    g.innerHTML=searchQ
+      ?`<div class="no-prod-search">🔍 Niciun rezultat pentru "<b style="color:var(--red)">${searchQ}</b>"</div>`
+      :`<div class="no-prod">// 0 ${t('prod_found')}</div>`;
   } else {
     g.innerHTML=list.map(renderCard).join('');
     g.querySelectorAll('.card').forEach((c,i)=>{
@@ -1112,24 +1028,12 @@ function renderFilters(){
     return`<button class="fb${isOn?' on':''}" data-fname="${n}" style="border-color:${isOn?col:'#262626'};${isOn?`background:${col};`:''}color:${isOn?'#fff':'var(--sub)'};">${n}</button>`;
   }).join('');
 }
-$('fbar').addEventListener('click',e=>{
-  const b=e.target.closest('.fb');if(!b)return;
-  filter=b.dataset.fname;renderFilters();renderGrid();
-});
+$('fbar').addEventListener('click',e=>{const b=e.target.closest('.fb');if(!b)return;filter=b.dataset.fname;renderFilters();renderGrid();});
 
 /* ══ SEARCH EVENTS ══ */
-function setSearch(q){
-  searchQ=q;
-  const mi=$('searchMainInp');
-  if(mi&&mi.value!==q) mi.value=q;
-  renderGrid();
-}
-
-// Nav search removed - search bar is below filters
-
-$('searchMainInp').oninput=e=>setSearch(e.target.value);
-$('searchMainInp').onkeydown=e=>{if(e.key==='Escape'){setSearch('');e.target.value='';}};
-$('searchMainClear').onclick=()=>{setSearch('');$('searchMainInp').value='';$('searchMainInp').focus();};
+$('searchMainInp').addEventListener('input',e=>{searchQ=e.target.value;renderGrid();});
+$('searchMainInp').addEventListener('keydown',e=>{if(e.key==='Escape'){searchQ='';e.target.value='';renderGrid();}});
+$('searchMainClear').addEventListener('click',()=>{searchQ='';$('searchMainInp').value='';$('searchMainInp').focus();renderGrid();});
 
 /* ══ SORT EVENTS ══ */
 document.querySelector('.sort-wrap').addEventListener('click',e=>{
@@ -1142,12 +1046,12 @@ document.querySelector('.sort-wrap').addEventListener('click',e=>{
 /* ══ POLICY CARDS ══ */
 function renderPolicyCards(){
   const cards=lang==='ro'?[
-    {title:"🔒 Confidențialitate",text:"Datele personale colectate (nume, telefon, email, adresă) sunt folosite exclusiv pentru procesarea comenzii tale și nu sunt transmise terților."},
+    {title:"🔒 Confidențialitate",text:"Datele personale colectate sunt folosite exclusiv pentru procesarea comenzii și nu sunt transmise terților."},
     {title:"📦 Transport & Livrare",text:"Transportul și toate taxele sunt incluse în prețul afișat. Livrare prin curier rapid pe teritoriul României."},
     {title:"↩ Retur",text:"Produsele pot fi returnate în termen de 14 zile de la primire, în stare originală. Costul returului este suportat de cumpărător."},
     {title:"🍪 Cookies",text:"Site-ul folosește cookie-uri esențiale pentru funcționare. Nu colectăm date de marketing fără acordul tău explicit."}
   ]:[
-    {title:"🔒 Privacy",text:"Personal data collected (name, phone, email, address) is used exclusively for processing your order and is not shared with third parties."},
+    {title:"🔒 Privacy",text:"Personal data collected is used exclusively for processing your order and is not shared with third parties."},
     {title:"📦 Shipping & Delivery",text:"Shipping and all taxes are included in the displayed price. Delivery via express courier throughout Romania."},
     {title:"↩ Returns",text:"Products can be returned within 14 days of receipt, in original unused condition. Return shipping costs are borne by the buyer."},
     {title:"🍪 Cookies",text:"This site uses essential cookies for operation. We do not collect marketing data without your explicit consent."}
@@ -1171,52 +1075,23 @@ $('fpCookies').onclick=()=>openPolicyModal('cookies');
 $('policyClose').onclick=()=>$('policyModal').classList.remove('open');
 $('policyModal').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');};
 
-/* ══ LOAD DATA FROM SUPABASE ══ */
+/* ══ LOAD ALL ══ */
 async function loadAll(){
   $('grid').innerHTML=renderSkeletons();
   setDbStatus('loading','Conectare Supabase...');
-  try {
-    const [prods, cats, mats, pols] = await Promise.all([
-      sb.getProducts(),
-      sb.getCategories(),
-      sb.getMaterials(),
-      sb.getPolicies()
-    ]);
-
-    // Products — normalize images field
-    products = (prods||[]).map(p=>({
-      ...p,
-      images: Array.isArray(p.images) ? p.images : (p.image_url ? [p.image_url] : []),
-      badges: Array.isArray(p.badges) ? p.badges : []
-    }));
-
-    // Categories — use DB or seed defaults
-    if(cats&&cats.length){
-      categories=cats;
-    } else {
-      // Seed defaults
-      await Promise.all(DEFAULT_CATS.map(c=>sb.upsertCategory(c)));
-      categories=[...DEFAULT_CATS];
-    }
-
-    if(mats&&mats.length){
-      materials=mats;
-    } else {
-      await Promise.all(DEFAULT_MATS.map(m=>sb.upsertMaterial({...m,description:m.description})));
-      materials=[...DEFAULT_MATS];
-    }
-
+  try{
+    const [prods,cats,mats,pols]=await Promise.all([sb.getProducts(),sb.getCategories(),sb.getMaterials(),sb.getPolicies()]);
+    products=(prods||[]).map(p=>({...p,images:Array.isArray(p.images)?p.images:(p.image_url?[p.image_url]:[]),badges:Array.isArray(p.badges)?p.badges:[],materials_list:Array.isArray(p.materials_list)?p.materials_list:[]}));
+    if(cats&&cats.length) categories=cats; else { await Promise.all(DEFAULT_CATS.map(c=>sb.upsertCategory(c))); categories=[...DEFAULT_CATS]; }
+    if(mats&&mats.length) materials=mats; else { await Promise.all(DEFAULT_MATS.map(m=>sb.upsertMaterial(m))); materials=[...DEFAULT_MATS]; }
     if(pols) policies={...DEFAULT_POLICIES,...pols};
-
     setDbStatus('ok','Supabase conectat ✓');
-    renderFilters();
-    renderGrid();
-    renderPolicyCards();
-  } catch(e){
-    console.error('Supabase error:', e);
+    renderFilters(); renderGrid(); renderPolicyCards();
+  }catch(e){
+    console.error(e);
     setDbStatus('err',`Eroare: ${e.message}`);
-    toast('Eroare conexiune Supabase. Verifică consola.', true);
-    $('grid').innerHTML=`<div class="no-prod">// Eroare conexiune bază de date</div>`;
+    toast('Eroare conexiune Supabase',true);
+    $('grid').innerHTML=`<div class="no-prod">// Eroare conexiune</div>`;
   }
 }
 
@@ -1226,7 +1101,7 @@ function tryPw(){
   if($('pwInp').value===PWD){adminAuth=true;$('pwOverlay').style.display='none';$('pwInp').value='';$('pwErr').style.display='none';$('pwInp').classList.remove('err');openAdmin();}
   else{$('pwErr').style.display='block';const i=$('pwInp');i.classList.add('err');setTimeout(()=>i.classList.remove('err'),400);}
 }
-function openAdmin(){$('apOverlay').style.display='flex';populateCatSelect();populateMatSelect();renderBadges();loadPolFields();}
+function openAdmin(){$('apOverlay').style.display='flex';populateCatSelect();populateFMatSel();renderBadges();loadPolFields();}
 $('pwBtn').onclick=tryPw;
 $('pwInp').onkeydown=e=>{if(e.key==='Enter')tryPw();};
 $('pwOverlay').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none';};
@@ -1238,13 +1113,12 @@ function showTab(tab){
   ['formView','listView','catView','matView','policyView'].forEach(id=>$(id).style.display='none');
   document.querySelectorAll('.ap-tab').forEach(b=>b.classList.remove('on'));
   const map={add:['formView','tabAdd'],list:['listView','tabList'],cat:['catView','tabCat'],mat:['matView','tabMat'],policy:['policyView','tabPolicy']};
-  const[v,tb]=map[tab];
-  $(v).style.display='flex';$(tb).classList.add('on');
-  if(tab==='list')renderList();
+  const[v,tb]=map[tab];$(v).style.display='flex';$(tb).classList.add('on');
+  if(tab==='list') renderList();
   if(tab==='cat'){catEditId=null;renderCatList();resetCatForm();}
   if(tab==='mat'){matEditId=null;renderMatList();resetMatForm();}
-  if(tab==='policy')loadPolFields();
-  if(tab!=='add')resetForm();
+  if(tab==='policy') loadPolFields();
+  if(tab!=='add') resetForm();
 }
 $('tabAdd').onclick=()=>showTab('add');
 $('tabList').onclick=()=>showTab('list');
@@ -1252,89 +1126,100 @@ $('tabCat').onclick=()=>showTab('cat');
 $('tabMat').onclick=()=>showTab('mat');
 $('tabPolicy').onclick=()=>showTab('policy');
 
-/* ══ IMAGE UPLOAD TO SUPABASE ══ */
+/* ══ FORM MATERIALS LIST ══ */
+function populateFMatSel(){
+  const sel=$('fMatSel');
+  sel.innerHTML=getMatNames().map(n=>`<option>${n}</option>`).join('');
+}
+
+function renderFMatList(){
+  const n=formMats.length;
+  $('fMatNote').textContent=n?`${n} material${n===1?'':'e'} adăugat${n===1?'':'e'}`:'Adaugă cel puțin un material cu preț';
+  $('fMatList').innerHTML=formMats.map((m,i)=>{
+    const mc=getMatColor(m.name), mtxt=contrastColor(mc);
+    return`<div class="fmat-item">
+      <div class="fmat-dot" style="background:${mc}"></div>
+      <div class="fmat-name">${m.name}</div>
+      <div class="fmat-price">${m.price} RON</div>
+      <button class="fmat-rm" data-fmrm="${i}">✕</button>
+    </div>`;
+  }).join('');
+}
+
+$('fMatList').addEventListener('click',e=>{
+  const b=e.target.closest('[data-fmrm]');if(!b)return;
+  formMats.splice(+b.dataset.fmrm,1);renderFMatList();
+});
+
+$('fMatAddBtn').onclick=()=>{
+  const name=$('fMatSel').value;
+  const price=parseFloat($('fMatPrice').value);
+  if(!name||isNaN(price)||price<0) return;
+  // înlocuiește dacă materialul există deja
+  const idx=formMats.findIndex(m=>m.name===name);
+  if(idx>=0) formMats[idx].price=price;
+  else formMats.push({name,price});
+  $('fMatPrice').value='';
+  renderFMatList();
+};
+$('fMatPrice').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('fMatAddBtn').click();}};
+
+/* ══ UPLOAD ══ */
 async function uploadFilesToSupabase(files){
   const urls=[];
-  const total=files.length;
   $('uploadProgress').style.display='block';
-  for(let i=0;i<total;i++){
-    const file=files[i];
-    const ext=file.name.split('.').pop();
+  for(let i=0;i<files.length;i++){
+    const f=files[i];
+    const ext=f.name.split('.').pop();
     const path=`products/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-    $('uploadLabel').textContent=`Se încarcă ${i+1}/${total}: ${file.name}`;
-    $('uploadBar').style.width=`${Math.round((i/total)*100)}%`;
-    try{
-      const url=await sb.uploadImage(file,path);
-      urls.push(url);
-    }catch(e){
-      toast(`Eroare upload ${file.name}: ${e.message}`,true);
-    }
+    $('uploadLabel').textContent=`Se încarcă ${i+1}/${files.length}: ${f.name}`;
+    $('uploadBar').style.width=`${Math.round((i/files.length)*100)}%`;
+    try{ urls.push(await sb.uploadImage(f,path)); }
+    catch(e){ toast(`Eroare upload: ${e.message}`,true); }
   }
   $('uploadBar').style.width='100%';
   setTimeout(()=>{$('uploadProgress').style.display='none';$('uploadBar').style.width='0%';},1000);
   return urls;
 }
 
-/* ══ MULTI-IMAGE ADMIN ══ */
+/* ══ MULTI-IMAGE ══ */
 function renderImgsList(){
   $('imgCountNote').textContent=`${formImgs.length} imagin${formImgs.length===1?'e':'i'} adăugat${formImgs.length===1?'ă':'e'}`;
   $('imgsList').innerHTML=formImgs.map((url,i)=>{
-    const isSB = url.includes('supabase');
-    const label= isSB ? `☁ Supabase: …${url.slice(-30)}` : (url.length>42?url.slice(0,40)+'…':url);
-    const upBtn=i>0?`<button class="img-row-btn mv" data-mv="${i}" data-dir="-1">↑</button>`:'';
-    const dnBtn=i<formImgs.length-1?`<button class="img-row-btn mv" data-mv="${i}" data-dir="1">↓</button>`:'';
-    return`<div class="img-row">
-      <div class="img-row-thumb"><img src="${url}" alt="" onerror="this.parentElement.textContent='⬡'"/></div>
-      <div class="img-row-label" title="${url}">${label}</div>
-      <div class="img-row-actions">${upBtn}${dnBtn}<button class="img-row-btn" data-rm="${i}">✕</button></div>
-    </div>`;
+    const isSB=url.includes('supabase');
+    const label=isSB?`☁ …${url.slice(-28)}`:(url.length>42?url.slice(0,40)+'…':url);
+    const up=i>0?`<button class="img-row-btn mv" data-mv="${i}" data-dir="-1">↑</button>`:'';
+    const dn=i<formImgs.length-1?`<button class="img-row-btn mv" data-mv="${i}" data-dir="1">↓</button>`:'';
+    return`<div class="img-row"><div class="img-row-thumb"><img src="${url}" alt="" onerror="this.parentElement.textContent='⬡'"/></div><div class="img-row-label" title="${url}">${label}</div><div class="img-row-actions">${up}${dn}<button class="img-row-btn" data-rm="${i}">✕</button></div></div>`;
   }).join('');
 }
-
 $('imgsList').addEventListener('click',e=>{
   const rm=e.target.closest('[data-rm]'),mv=e.target.closest('[data-mv]');
   if(rm){formImgs.splice(+rm.dataset.rm,1);renderImgsList();}
   if(mv){const i=+mv.dataset.mv,d=+mv.dataset.dir,ni=i+d;if(ni<0||ni>=formImgs.length)return;[formImgs[i],formImgs[ni]]=[formImgs[ni],formImgs[i]];renderImgsList();}
 });
-
 $('imgUrlBtn').onclick=()=>{imgMode='url';$('urlInputArea').style.display='block';$('fileInputArea').style.display='none';$('imgUrlBtn').classList.add('on');$('imgFileBtn').classList.remove('on');};
 $('imgFileBtn').onclick=()=>{imgMode='file';$('urlInputArea').style.display='none';$('fileInputArea').style.display='block';$('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');};
 $('addUrlBtn').onclick=()=>{const u=$('fImgUrl').value.trim();if(!u)return;formImgs.push(u);$('fImgUrl').value='';renderImgsList();};
 $('fImgUrl').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('addUrlBtn').click();}};
-
 $('dropzone').onclick=()=>$('fileInput').click();
-$('fileInput').onchange=async e=>{
-  const files=Array.from(e.target.files);
-  if(!files.length) return;
-  const urls=await uploadFilesToSupabase(files);
-  formImgs.push(...urls);
-  renderImgsList();
-  e.target.value='';
-};
+$('fileInput').onchange=async e=>{const files=Array.from(e.target.files);if(!files.length)return;const urls=await uploadFilesToSupabase(files);formImgs.push(...urls);renderImgsList();e.target.value='';};
 $('dropzone').ondragover=e=>{e.preventDefault();$('dropzone').classList.add('drag');};
 $('dropzone').ondragleave=()=>$('dropzone').classList.remove('drag');
-$('dropzone').ondrop=async e=>{
-  e.preventDefault();$('dropzone').classList.remove('drag');
-  const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
-  if(!files.length) return;
-  const urls=await uploadFilesToSupabase(files);
-  formImgs.push(...urls);
-  renderImgsList();
-};
+$('dropzone').ondrop=async e=>{e.preventDefault();$('dropzone').classList.remove('drag');const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));if(!files.length)return;const urls=await uploadFilesToSupabase(files);formImgs.push(...urls);renderImgsList();};
 
 /* ══ FORM ══ */
 function renderBadges(){$('badgeGrid').innerHTML=BC.map(b=>`<button class="badge-btn${selB.includes(b.k)?' on':''}" data-badge="${b.k}"><span>${b.i}</span> ${b.k}</button>`).join('');}
 function setStk(){$('stIn').className='stock-btn'+(stockVal?' in':'');$('stOut').className='stock-btn'+(stockVal?'':' out');}
 function populateCatSelect(){const sel=$('fCat'),cur=sel.value;sel.innerHTML=getCatNames().map(n=>`<option>${n}</option>`).join('');if(cur&&getCatNames().includes(cur))sel.value=cur;}
-function populateMatSelect(){const sel=$('fMat'),cur=sel.value;sel.innerHTML=getMatNames().map(n=>`<option>${n}</option>`).join('');if(cur&&getMatNames().includes(cur))sel.value=cur;}
 
 function resetForm(){
-  editId=null;stockVal=true;selB=[];formImgs=[];imgMode='file';
-  ['fName','fBrand','fPrice','fDesc','fImgUrl'].forEach(id=>{const e=$(id);if(e)e.value='';});
-  populateCatSelect();populateMatSelect();
+  editId=null;stockVal=true;selB=[];formImgs=[];formMats=[];imgMode='file';
+  ['fName','fBrand','fDesc','fImgUrl','fMatPrice'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  populateCatSelect();populateFMatSel();
   $('urlInputArea').style.display='none';$('fileInputArea').style.display='block';
   $('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');
-  renderImgsList();
+  renderImgsList();renderFMatList();
   $('formSubmit').textContent='+ Adaugă Produs';$('formCancel').style.display='none';
   $('tabAdd').textContent='+ Adaugă';
   setStk();renderBadges();
@@ -1346,23 +1231,29 @@ $('badgeGrid').addEventListener('click',e=>{const b=e.target.closest('.badge-btn
 $('formCancel').onclick=resetForm;
 
 $('formSubmit').onclick=async()=>{
-  const name=$('fName').value.trim(), price=parseFloat($('fPrice').value);
-  if(!name||!price) return;
+  const name=$('fName').value.trim();
+  if(!name){ toast('Completează numele produsului',true); return; }
+  if(!formMats.length){ toast('Adaugă cel puțin un material cu preț',true); return; }
   const btn=$('formSubmit');
   btn.disabled=true; btn.textContent='Se salvează...';
-
+  // Prețul principal = minimul din materiale (pentru compatibilitate)
+  const minPrice=Math.min(...formMats.map(m=>m.price));
   const pl={
     name, brand:$('fBrand').value.trim(),
-    category:$('fCat').value, material:$('fMat').value,
-    price, description:$('fDesc').value.trim(),
-    images:[...formImgs], badges:[...selB], stock:stockVal
+    category:$('fCat').value,
+    material:formMats[0].name,
+    price:minPrice,
+    description:$('fDesc').value.trim(),
+    images:[...formImgs],
+    badges:[...selB],
+    stock:stockVal,
+    materials_list:formMats.map(m=>({name:m.name,price:m.price}))
   };
-
   try{
     if(editId!==null){
-      await sb.updateProduct(editId, pl);
+      await sb.updateProduct(editId,pl);
       products=products.map(p=>p.id===editId?{...p,...pl}:p);
-      showOk('✓ Actualizat în Supabase!');
+      showOk('✓ Actualizat!');
     } else {
       const res=await sb.insertProduct(pl);
       if(res&&res[0]) products=[res[0],...products];
@@ -1381,25 +1272,26 @@ $('formSubmit').onclick=async()=>{
 /* ══ LIST ══ */
 function renderList(){
   const el=$('listView');
-  if(!products.length){el.innerHTML='<div class="list-empty">Niciun produs în Supabase.</div>';return;}
+  if(!products.length){el.innerHTML='<div class="list-empty">Niciun produs.</div>';return;}
   el.innerHTML=products.map(p=>{
     const fi=(p.images||[])[0];
-    const ic=(p.images||[]).length;
+    const mats=getProdMats(p);
+    const priceStr=mats.length===0?`${p.price||0}`:(mats.length===1?`${mats[0].price}`:`${Math.min(...mats.map(m=>m.price))}–${Math.max(...mats.map(m=>m.price))}`);
     return`<div class="list-item">
       <div class="list-thumb">${fi?`<img src="${fi}" alt="" onerror="this.style.display='none'">`:`<span class="list-hex">⬡</span>`}</div>
       <div class="list-info">
         <div class="list-name">${p.name}</div>
         <div class="list-meta">
           <span class="list-cat" style="color:${getCatColor(p.category)}">${p.category||'—'}</span>
-          <span class="list-price">${p.price} RON</span>
+          <span class="list-price">${priceStr} RON</span>
           <span class="list-stock ${p.stock?'in':'out'}">${p.stock?'În stoc':'Epuizat'}</span>
-          ${ic?`<span style="font-family:var(--mono);font-size:.48rem;color:var(--muted)">☁ ${ic}</span>`:''}
+          <span style="font-family:var(--mono);font-size:.48rem;color:var(--muted)">${mats.length} mat.</span>
         </div>
       </div>
       <div class="list-actions">
-        <button class="list-btn tg" data-tg="${p.id}" title="Toggle stoc">${p.stock?'⊘':'✓'}</button>
-        <button class="list-btn ed" data-ed="${p.id}" title="Editează">✎</button>
-        <button class="list-btn dl" data-dl="${p.id}" title="Șterge">✕</button>
+        <button class="list-btn tg" data-tg="${p.id}">${p.stock?'⊘':'✓'}</button>
+        <button class="list-btn ed" data-ed="${p.id}">✎</button>
+        <button class="list-btn dl" data-dl="${p.id}">✕</button>
       </div>
     </div>`;
   }).join('');
@@ -1408,25 +1300,23 @@ function renderList(){
 $('listView').addEventListener('click',async e=>{
   const tg=e.target.closest('[data-tg]'),ed=e.target.closest('[data-ed]'),dl=e.target.closest('[data-dl]');
   if(tg){
-    const id=+tg.dataset.tg;
-    const p=products.find(x=>x.id===id);if(!p)return;
-    try{
-      await sb.updateProduct(id,{stock:!p.stock});
-      products=products.map(x=>x.id===id?{...x,stock:!x.stock}:x);
-      renderGrid();renderList();
-    }catch(e){toast('Eroare actualizare stoc',true);}
+    const id=+tg.dataset.tg,p=products.find(x=>x.id===id);if(!p)return;
+    try{ await sb.updateProduct(id,{stock:!p.stock}); products=products.map(x=>x.id===id?{...x,stock:!x.stock}:x); renderGrid();renderList(); }
+    catch(e){toast('Eroare stoc',true);}
     return;
   }
   if(ed){
     const id=+ed.dataset.ed,p=products.find(x=>x.id===id);if(!p)return;
-    editId=id;stockVal=p.stock;selB=[...(p.badges||[])];formImgs=[...(p.images||[])];imgMode='file';
+    editId=id;stockVal=p.stock;selB=[...(p.badges||[])];formImgs=[...(p.images||[])];
+    formMats=getProdMats(p).map(m=>({name:m.name,price:m.price}));
+    imgMode='file';
     $('fName').value=p.name||'';$('fBrand').value=p.brand||'';
     populateCatSelect();$('fCat').value=p.category||getCatNames()[0];
-    populateMatSelect();$('fMat').value=p.material||getMatNames()[0];
-    $('fPrice').value=p.price||'';$('fDesc').value=p.description||'';
+    $('fDesc').value=p.description||'';
+    populateFMatSel();
     $('urlInputArea').style.display='none';$('fileInputArea').style.display='block';
     $('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');
-    renderImgsList();
+    renderImgsList();renderFMatList();
     $('formSubmit').textContent='✓ Actualizează';$('formCancel').style.display='block';
     $('tabAdd').textContent='✎ Editează';
     setStk();renderBadges();showTab('add');return;
@@ -1434,7 +1324,7 @@ $('listView').addEventListener('click',async e=>{
   if(dl){
     delTgt=+dl.dataset.dl;delType="prod";
     $('delTitle').textContent='Ștergi produsul?';
-    $('delSub').textContent='Imaginile din Supabase Storage vor rămâne. Acțiune ireversibilă.';
+    $('delSub').textContent='Acțiune ireversibilă.';
     $('delConfirm').style.display='flex';
   }
 });
@@ -1445,152 +1335,82 @@ function renderCatList(){
   if(!categories.length){el.innerHTML='<div class="list-empty">Nicio grupă.</div>';return;}
   el.innerHTML=categories.map(c=>{
     const cnt=products.filter(p=>p.category===c.name).length;
-    return`<div class="cat-item">
-      <div class="cat-dot" style="background:${c.color}"></div>
-      <div class="cat-item-name">${c.name}</div>
-      <div class="cat-item-count">${cnt} prod.</div>
-      <div class="cat-item-actions">
-        <button class="list-btn ed" data-cated="${c.id}">✎</button>
-        <button class="list-btn dl" data-catdel="${c.id}">✕</button>
-      </div>
-    </div>`;
+    return`<div class="cat-item"><div class="cat-dot" style="background:${c.color}"></div><div class="cat-item-name">${c.name}</div><div class="cat-item-count">${cnt} prod.</div><div class="cat-item-actions"><button class="list-btn ed" data-cated="${c.id}">✎</button><button class="list-btn dl" data-catdel="${c.id}">✕</button></div></div>`;
   }).join('');
 }
-
 $('catListWrap').addEventListener('click',e=>{
   const ed=e.target.closest('[data-cated]'),dl=e.target.closest('[data-catdel]');
-  if(ed){
-    const cat=categories.find(c=>c.id===ed.dataset.cated);if(!cat)return;
-    catEditId=cat.id;$('catNewName').value=cat.name;$('catNewColor').value=cat.color;
-    $('catColorPrev').style.background=cat.color;$('catColorPrev').textContent=cat.name.toUpperCase();
-    $('catFormHeading').textContent='EDITEAZĂ GRUPĂ';$('catSaveBtn').textContent='✓ Salvează';$('catCancelBtn').style.display='block';
-  }
-  if(dl){
-    const cat=categories.find(c=>c.id===dl.dataset.catdel);if(!cat)return;
-    const cnt=products.filter(p=>p.category===cat.name).length;
-    const fb=categories.find(c=>c.id!==cat.id);
-    delTgt=cat.id;delType="cat";
-    $('delTitle').textContent=`Ștergi grupa "${cat.name}"?`;
-    $('delSub').textContent=cnt>0?`${cnt} produs(e) vor fi mutate în "${fb?fb.name:'—'}". Ireversibil.`:'Acțiune ireversibilă.';
-    $('delConfirm').style.display='flex';
-  }
+  if(ed){const cat=categories.find(c=>c.id===ed.dataset.cated);if(!cat)return;catEditId=cat.id;$('catNewName').value=cat.name;$('catNewColor').value=cat.color;$('catColorPrev').style.background=cat.color;$('catColorPrev').textContent=cat.name.toUpperCase();$('catFormHeading').textContent='EDITEAZĂ GRUPĂ';$('catSaveBtn').textContent='✓ Salvează';$('catCancelBtn').style.display='block';}
+  if(dl){const cat=categories.find(c=>c.id===dl.dataset.catdel);if(!cat)return;const cnt=products.filter(p=>p.category===cat.name).length;const fb=categories.find(c=>c.id!==cat.id);delTgt=cat.id;delType="cat";$('delTitle').textContent=`Ștergi grupa "${cat.name}"?`;$('delSub').textContent=cnt>0?`${cnt} produs(e) → "${fb?fb.name:'—'}". Ireversibil.`:'Acțiune ireversibilă.';$('delConfirm').style.display='flex';}
 });
-
 function resetCatForm(){catEditId=null;$('catNewName').value='';$('catNewColor').value='#E01A1A';$('catColorPrev').style.background='#E01A1A';$('catColorPrev').textContent='GRUPĂ NOUĂ';$('catFormHeading').textContent='ADAUGĂ GRUPĂ NOUĂ';$('catSaveBtn').textContent='+ Adaugă Grupă';$('catCancelBtn').style.display='none';}
 $('catCancelBtn').onclick=resetCatForm;
 $('catNewColor').oninput=e=>{$('catColorPrev').style.background=e.target.value;$('catColorPrev').textContent=($('catNewName').value||'GRUPĂ NOUĂ').toUpperCase();};
 $('catNewName').oninput=e=>{$('catColorPrev').textContent=(e.target.value||'GRUPĂ NOUĂ').toUpperCase();};
-
 $('catSaveBtn').onclick=async()=>{
-  const name=$('catNewName').value.trim();
-  if(!name){$('catNewName').style.borderColor='var(--err)';return;}
-  $('catNewName').style.borderColor='';
+  const name=$('catNewName').value.trim();if(!name){$('catNewName').style.borderColor='var(--err)';return;}$('catNewName').style.borderColor='';
   const color=$('catNewColor').value;
   const id=catEditId||(name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now());
   try{
-    if(catEditId){
-      const old=categories.find(c=>c.id===catEditId);
-      await sb.upsertCategory({id,name,color});
-      if(old&&old.name!==name){
-        // update all products with old category name
-        const toUpdate=products.filter(p=>p.category===old.name);
-        await Promise.all(toUpdate.map(p=>sb.updateProduct(p.id,{category:name})));
-        products=products.map(p=>p.category===old.name?{...p,category:name}:p);
-      }
-      categories=categories.map(c=>c.id===catEditId?{...c,name,color}:c);
-      showOk('✓ Grupă actualizată!');
-    } else {
-      if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){showOk('⚠ Grupă deja existentă!');return;}
-      await sb.upsertCategory({id,name,color});
-      categories.push({id,name,color});
-      showOk(`✓ Grupă "${name}" adăugată!`);
-    }
+    if(catEditId){const old=categories.find(c=>c.id===catEditId);await sb.upsertCategory({id,name,color});if(old&&old.name!==name){const toUp=products.filter(p=>p.category===old.name);await Promise.all(toUp.map(p=>sb.updateProduct(p.id,{category:name})));products=products.map(p=>p.category===old.name?{...p,category:name}:p);}categories=categories.map(c=>c.id===catEditId?{...c,name,color}:c);showOk('✓ Actualizat!');}
+    else{if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){showOk('⚠ Există deja!');return;}await sb.upsertCategory({id,name,color});categories.push({id,name,color});showOk(`✓ "${name}" adăugat!`);}
     resetCatForm();renderCatList();populateCatSelect();renderFilters();renderGrid();
-  }catch(e){toast('Eroare salvare grupă: '+e.message,true);}
+  }catch(e){toast('Eroare: '+e.message,true);}
 };
 
-/* ══ MATERIALS ══ */
+/* ══ MATERIALS ADMIN ══ */
 function renderMatList(){
   const el=$('matListWrap');
   if(!materials.length){el.innerHTML='<div class="list-empty">Niciun material.</div>';return;}
   el.innerHTML=materials.map(m=>{
-    const cnt=products.filter(p=>p.material===m.name).length;
-    return`<div class="cat-item">
-      <div class="cat-dot" style="background:${m.color}"></div>
-      <div class="cat-item-name" style="flex:1">${m.name}</div>
-      ${m.description?`<div class="cat-item-count" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${m.description}">${m.description}</div>`:''}
-      <div class="cat-item-count">${cnt} prod.</div>
-      <div class="cat-item-actions">
-        <button class="list-btn ed" data-mated="${m.id}">✎</button>
-        <button class="list-btn dl" data-matdel="${m.id}">✕</button>
-      </div>
-    </div>`;
+    const cnt=products.filter(p=>getProdMats(p).some(x=>x.name===m.name)).length;
+    return`<div class="cat-item"><div class="cat-dot" style="background:${m.color}"></div><div class="cat-item-name" style="flex:1">${m.name}</div>${m.description?`<div class="cat-item-count" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.description}</div>`:''}<div class="cat-item-count">${cnt} prod.</div><div class="cat-item-actions"><button class="list-btn ed" data-mated="${m.id}">✎</button><button class="list-btn dl" data-matdel="${m.id}">✕</button></div></div>`;
   }).join('');
 }
-
 $('matListWrap').addEventListener('click',e=>{
   const ed=e.target.closest('[data-mated]'),dl=e.target.closest('[data-matdel]');
-  if(ed){
-    const mat=materials.find(m=>m.id===ed.dataset.mated);if(!mat)return;
-    matEditId=mat.id;$('matNewName').value=mat.name;$('matNewColor').value=mat.color;$('matNewDesc').value=mat.description||'';
-    $('matColorPrev').style.background=mat.color;$('matPrevName').textContent=mat.name.toUpperCase();
-    $('matFormHeading').textContent='EDITEAZĂ MATERIAL';$('matSaveBtn').textContent='✓ Salvează';$('matCancelBtn').style.display='block';
-  }
-  if(dl){
-    const mat=materials.find(m=>m.id===dl.dataset.matdel);if(!mat)return;
-    const cnt=products.filter(p=>p.material===mat.name).length;
-    const fb=materials.find(m=>m.id!==mat.id);
-    delTgt=mat.id;delType="mat";
-    $('delTitle').textContent=`Ștergi materialul "${mat.name}"?`;
-    $('delSub').textContent=cnt>0?`${cnt} produs(e) vor trece la "${fb?fb.name:'—'}". Ireversibil.`:'Acțiune ireversibilă.';
-    $('delConfirm').style.display='flex';
-  }
+  if(ed){const mat=materials.find(m=>m.id===ed.dataset.mated);if(!mat)return;matEditId=mat.id;$('matNewName').value=mat.name;$('matNewColor').value=mat.color;$('matNewDesc').value=mat.description||'';$('matColorPrev').style.background=mat.color;$('matPrevName').textContent=mat.name.toUpperCase();$('matFormHeading').textContent='EDITEAZĂ MATERIAL';$('matSaveBtn').textContent='✓ Salvează';$('matCancelBtn').style.display='block';}
+  if(dl){const mat=materials.find(m=>m.id===dl.dataset.matdel);if(!mat)return;const cnt=products.filter(p=>getProdMats(p).some(x=>x.name===mat.name)).length;const fb=materials.find(m=>m.id!==mat.id);delTgt=mat.id;delType="mat";$('delTitle').textContent=`Ștergi "${mat.name}"?`;$('delSub').textContent=cnt>0?`${cnt} produs(e) afectate. Ireversibil.`:'Acțiune ireversibilă.';$('delConfirm').style.display='flex';}
 });
-
 function resetMatForm(){matEditId=null;$('matNewName').value='';$('matNewColor').value='#E01A1A';$('matNewDesc').value='';$('matColorPrev').style.background='#E01A1A';$('matPrevName').textContent='MATERIAL NOU';$('matFormHeading').textContent='ADAUGĂ MATERIAL NOU';$('matSaveBtn').textContent='+ Adaugă Material';$('matCancelBtn').style.display='none';}
 $('matCancelBtn').onclick=resetMatForm;
 $('matNewColor').oninput=e=>{$('matColorPrev').style.background=e.target.value;$('matPrevName').textContent=($('matNewName').value||'MATERIAL NOU').toUpperCase();};
 $('matNewName').oninput=e=>{$('matPrevName').textContent=(e.target.value||'MATERIAL NOU').toUpperCase();};
-
 $('matSaveBtn').onclick=async()=>{
-  const name=$('matNewName').value.trim();
-  if(!name){$('matNewName').style.borderColor='var(--err)';return;}
-  $('matNewName').style.borderColor='';
-  const color=$('matNewColor').value;
-  const description=$('matNewDesc').value.trim();
+  const name=$('matNewName').value.trim();if(!name){$('matNewName').style.borderColor='var(--err)';return;}$('matNewName').style.borderColor='';
+  const color=$('matNewColor').value,description=$('matNewDesc').value.trim();
   const id=matEditId||(name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now());
   try{
     if(matEditId){
       const old=materials.find(m=>m.id===matEditId);
       await sb.upsertMaterial({id,name,color,description});
       if(old&&old.name!==name){
-        const toUpdate=products.filter(p=>p.material===old.name);
-        await Promise.all(toUpdate.map(p=>sb.updateProduct(p.id,{material:name})));
-        products=products.map(p=>p.material===old.name?{...p,material:name}:p);
+        // actualizează materials_list în produsele afectate
+        const toUp=products.filter(p=>getProdMats(p).some(x=>x.name===old.name));
+        await Promise.all(toUp.map(p=>{
+          const newML=getProdMats(p).map(m=>m.name===old.name?{...m,name}:m);
+          return sb.updateProduct(p.id,{material:newML[0]?.name||name,materials_list:newML});
+        }));
+        products=products.map(p=>{const ml=getProdMats(p);if(!ml.some(x=>x.name===old.name))return p;const newML=ml.map(m=>m.name===old.name?{...m,name}:m);return{...p,material:newML[0]?.name||name,materials_list:newML};});
       }
       materials=materials.map(m=>m.id===matEditId?{...m,name,color,description}:m);
-      showOk('✓ Material actualizat!');
+      showOk('✓ Actualizat!');
     } else {
-      if(materials.some(m=>m.name.toLowerCase()===name.toLowerCase())){showOk('⚠ Material deja existent!');return;}
+      if(materials.some(m=>m.name.toLowerCase()===name.toLowerCase())){showOk('⚠ Există deja!');return;}
       await sb.upsertMaterial({id,name,color,description});
       materials.push({id,name,color,description});
-      showOk(`✓ Material "${name}" adăugat!`);
+      showOk(`✓ "${name}" adăugat!`);
     }
-    resetMatForm();renderMatList();populateMatSelect();renderGrid();
-  }catch(e){toast('Eroare salvare material: '+e.message,true);}
+    resetMatForm();renderMatList();populateFMatSel();renderGrid();
+  }catch(e){toast('Eroare: '+e.message,true);}
 };
 
 /* ══ POLICIES ══ */
-function loadPolFields(){
-  const km={pPrivacyRo:'privacyRo',pPrivacyEn:'privacyEn',pTermsRo:'termsRo',pTermsEn:'termsEn',pReturnRo:'returnRo',pReturnEn:'returnEn',pCookiesRo:'cookiesRo',pCookiesEn:'cookiesEn'};
-  Object.entries(km).forEach(([id,k])=>$(id).value=policies[k]||'');
-}
+function loadPolFields(){const km={pPrivacyRo:'privacyRo',pPrivacyEn:'privacyEn',pTermsRo:'termsRo',pTermsEn:'termsEn',pReturnRo:'returnRo',pReturnEn:'returnEn',pCookiesRo:'cookiesRo',pCookiesEn:'cookiesEn'};Object.entries(km).forEach(([id,k])=>$(id).value=policies[k]||'');}
 $('savePolicies').onclick=async()=>{
   policies={privacyRo:$('pPrivacyRo').value,privacyEn:$('pPrivacyEn').value,termsRo:$('pTermsRo').value,termsEn:$('pTermsEn').value,returnRo:$('pReturnRo').value,returnEn:$('pReturnEn').value,cookiesRo:$('pCookiesRo').value,cookiesEn:$('pCookiesEn').value};
-  try{
-    await sb.savePolicies(policies);
-    showOk(t('toast_saved'));
-  }catch(e){toast('Eroare salvare politici: '+e.message,true);}
+  try{await sb.savePolicies(policies);showOk(t('toast_saved'));}
+  catch(e){toast('Eroare: '+e.message,true);}
 };
 
 /* ══ DELETE ══ */
@@ -1601,37 +1421,19 @@ $('delOk').onclick=async()=>{
   try{
     if(delType==="prod"){
       await sb.deleteProduct(delTgt);
-      if(editId===delTgt)resetForm();
+      if(editId===delTgt) resetForm();
       products=products.filter(p=>p.id!==delTgt);
     } else if(delType==="cat"){
       const cat=categories.find(c=>c.id===delTgt);
-      if(cat){
-        const fb=categories.find(c=>c.id!==delTgt);
-        const toUpdate=products.filter(p=>p.category===cat.name);
-        await Promise.all(toUpdate.map(p=>sb.updateProduct(p.id,{category:fb?fb.name:'Altele'})));
-        products=products.map(p=>p.category===cat.name?{...p,category:fb?fb.name:'Altele'}:p);
-        await sb.deleteCategory(delTgt);
-        categories=categories.filter(c=>c.id!==delTgt);
-        populateCatSelect();renderFilters();renderCatList();
-      }
+      if(cat){const fb=categories.find(c=>c.id!==delTgt);const toUp=products.filter(p=>p.category===cat.name);await Promise.all(toUp.map(p=>sb.updateProduct(p.id,{category:fb?fb.name:'Altele'})));products=products.map(p=>p.category===cat.name?{...p,category:fb?fb.name:'Altele'}:p);await sb.deleteCategory(delTgt);categories=categories.filter(c=>c.id!==delTgt);populateCatSelect();renderFilters();renderCatList();}
     } else if(delType==="mat"){
-      const mat=materials.find(m=>m.id===delTgt);
-      if(mat){
-        const fb=materials.find(m=>m.id!==delTgt);
-        const toUpdate=products.filter(p=>p.material===mat.name);
-        await Promise.all(toUpdate.map(p=>sb.updateProduct(p.id,{material:fb?fb.name:'ABS/ASA'})));
-        products=products.map(p=>p.material===mat.name?{...p,material:fb?fb.name:'ABS/ASA'}:p);
-        await sb.deleteMaterial(delTgt);
-        materials=materials.filter(m=>m.id!==delTgt);
-        populateMatSelect();renderMatList();
-      }
+      await sb.deleteMaterial(delTgt);
+      materials=materials.filter(m=>m.id!==delTgt);
+      populateFMatSel();renderMatList();
     }
     delTgt=null;delType="prod";$('delConfirm').style.display='none';
     renderGrid();renderList();
-  }catch(e){
-    toast('Eroare ștergere: '+e.message,true);
-    $('delOk').textContent='Șterge';
-  }
+  }catch(e){toast('Eroare: '+e.message,true);$('delOk').textContent='Șterge';}
 };
 
 /* ══ CHECKOUT ══ */
@@ -1641,7 +1443,23 @@ function openCheckout(id){
   coProd=products.find(p=>p.id===id);if(!coProd)return;
   payMethod="RAMBURS";
   $('coProdName').textContent=coProd.name;
-  $('coProdPrice').textContent=`${coProd.price} RON — ${t('shipping_included')}`;
+
+  // Populează dropdown material
+  const mats=getProdMats(coProd);
+  const sel=$('coMatSelect');
+  sel.innerHTML=mats.map(m=>`<option value="${m.name}" data-price="${m.price}">${m.name} — ${m.price} RON</option>`).join('');
+  sel.classList.remove('invalid');
+
+  // Preț inițial = primul material
+  const firstPrice=mats.length?mats[0].price:coProd.price;
+  $('coProdPrice').textContent=`${firstPrice} RON — ${t('shipping_included')}`;
+
+  // Update preț când schimbă materialul
+  sel.onchange=()=>{
+    const opt=sel.options[sel.selectedIndex];
+    $('coProdPrice').textContent=`${opt.dataset.price} RON — ${t('shipping_included')}`;
+  };
+
   const firstImg=(coProd.images||[])[0];
   $('coThumb').innerHTML=firstImg?`<img src="${firstImg}" alt=""/>` : `<div style="font-size:1.4rem;color:#333">⬡</div>`;
   ['coFname','coLname','coPhone','coEmail','coAddress'].forEach(id=>{const el=$(id);el.value='';el.classList.remove('invalid');});
@@ -1656,36 +1474,31 @@ function validateCo(){
   return ok?d:null;
 }
 
-function handleWA(){
+$('btnWA').onclick=()=>{
   const d=validateCo();if(!d)return;
-  const payLabel={'RAMBURS':'💵 Ramburs (plată la livrare)','ONLINE':'💳 Card / Transfer bancar','50% ONLINE + 50% RAMBURS':'⚡ 50% Online + 50% Ramburs'}[payMethod]||payMethod;
-  const msg=`Bună ziua! Doresc să plasez o comandă:\n\n🛒 *Produs:* ${coProd.name}\n💰 *Preț:* ${coProd.price} RON (transport inclus)\n${payLabel}\n\n👤 *Nume:* ${d.fname} ${d.lname}\n📞 *Telefon:* ${d.phone}\n📧 *Email:* ${d.email||'—'}\n📍 *Adresă:* ${d.address}\n\nVă mulțumesc!`;
+  const sel=$('coMatSelect');
+  const matName=sel.value||'—';
+  const matPrice=sel.options[sel.selectedIndex]?.dataset.price||'—';
+  const payLabel={'RAMBURS':'💵 Ramburs','ONLINE':'💳 Card / Transfer','50% ONLINE + 50% RAMBURS':'⚡ 50% Online + 50% Ramburs'}[payMethod]||payMethod;
+  const msg=`Bună ziua! Doresc să plasez o comandă:\n\n🛒 *Produs:* ${coProd.name}\n🔧 *Material:* ${matName}\n💰 *Preț:* ${matPrice} RON (transport inclus)\n${payLabel}\n\n👤 *Nume:* ${d.fname} ${d.lname}\n📞 *Telefon:* ${d.phone}\n📧 *Email:* ${d.email||'—'}\n📍 *Adresă:* ${d.address}\n\nVă mulțumesc!`;
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
   $('coModal').classList.remove('open');
-}
+};
 
-$('btnWA').onclick=handleWA;
 $('btnC').onclick=()=>$('coModal').classList.remove('open');
 $('coClose').onclick=()=>$('coModal').classList.remove('open');
 $('coModal').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');};
-$('coModal').addEventListener('click',e=>{
-  const o=e.target.closest('.pay-opt');if(!o)return;
-  payMethod=o.dataset.pay;
-  document.querySelectorAll('.pay-opt').forEach(x=>x.classList.toggle('sel',x===o));
-});
+$('coModal').addEventListener('click',e=>{const o=e.target.closest('.pay-opt');if(!o)return;payMethod=o.dataset.pay;document.querySelectorAll('.pay-opt').forEach(x=>x.classList.toggle('sel',x===o));});
 
 /* ══ LIGHTBOX ══ */
 let lbImages=[],lbIdx=0,lbProdName='';
 function openLightbox(images,startIdx,prodName){lbImages=[...images];lbIdx=startIdx;lbProdName=prodName||'';lbRender();$('lightbox').classList.add('open');document.body.style.overflow='hidden';}
 function lbRender(){
-  const img=$('lbImg');
-  img.classList.add('fade');
+  const img=$('lbImg');img.classList.add('fade');
   setTimeout(()=>{img.src=lbImages[lbIdx];img.onload=()=>img.classList.remove('fade');img.onerror=()=>img.classList.remove('fade');},180);
   const n=lbImages.length;
-  $('lbCounter').textContent=n>1?`${lbIdx+1} / ${n}`:'';
-  $('lbCounter').style.display=n>1?'block':'none';
-  $('lbPrev').classList.toggle('hidden',lbIdx===0);
-  $('lbNext').classList.toggle('hidden',lbIdx===n-1);
+  $('lbCounter').textContent=n>1?`${lbIdx+1} / ${n}`:'';$('lbCounter').style.display=n>1?'block':'none';
+  $('lbPrev').classList.toggle('hidden',lbIdx===0);$('lbNext').classList.toggle('hidden',lbIdx===n-1);
   $('lbDots').innerHTML=n>1?lbImages.map((_,i)=>`<div class="lb-dot${i===lbIdx?' on':''}" data-i="${i}"></div>`).join(''):'';
   $('lbCaption').textContent=lbProdName?lbProdName.toUpperCase():'';
 }
@@ -1695,40 +1508,22 @@ $('lightbox').addEventListener('click',e=>{if(e.target===$('lightbox')||e.target
 $('lbPrev').onclick=e=>{e.stopPropagation();if(lbIdx>0){lbIdx--;lbRender();}};
 $('lbNext').onclick=e=>{e.stopPropagation();if(lbIdx<lbImages.length-1){lbIdx++;lbRender();}};
 $('lbDots').addEventListener('click',e=>{const d=e.target.closest('[data-i]');if(!d)return;lbIdx=+d.dataset.i;lbRender();});
-document.addEventListener('keydown',e=>{
-  if(!$('lightbox').classList.contains('open'))return;
-  if(e.key==='Escape')closeLightbox();
-  if(e.key==='ArrowLeft'&&lbIdx>0){lbIdx--;lbRender();}
-  if(e.key==='ArrowRight'&&lbIdx<lbImages.length-1){lbIdx++;lbRender();}
-});
+document.addEventListener('keydown',e=>{if(!$('lightbox').classList.contains('open'))return;if(e.key==='Escape')closeLightbox();if(e.key==='ArrowLeft'&&lbIdx>0){lbIdx--;lbRender();}if(e.key==='ArrowRight'&&lbIdx<lbImages.length-1){lbIdx++;lbRender();}});
 let lbTx=0,lbTy=0;
 $('lightbox').addEventListener('touchstart',e=>{lbTx=e.touches[0].clientX;lbTy=e.touches[0].clientY;},{passive:true});
-$('lightbox').addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-lbTx,dy=e.changedTouches[0].clientY-lbTy;
-  if(Math.abs(dx)>Math.abs(dy)*1.3&&Math.abs(dx)>50){if(dx<0&&lbIdx<lbImages.length-1){lbIdx++;lbRender();}else if(dx>0&&lbIdx>0){lbIdx--;lbRender();}}
-},{passive:true});
+$('lightbox').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-lbTx,dy=e.changedTouches[0].clientY-lbTy;if(Math.abs(dx)>Math.abs(dy)*1.3&&Math.abs(dx)>50){if(dx<0&&lbIdx<lbImages.length-1){lbIdx++;lbRender();}else if(dx>0&&lbIdx>0){lbIdx--;lbRender();}}},{passive:true});
 
 function attachCarouselLightbox(card){
   const prod=products.find(p=>p.id===+card.dataset.id);
-  if(!prod||(prod.images||[]).length===0)return;
+  if(!prod||(prod.images||[]).length===0) return;
   const car=card.querySelector('.card-carousel');
   card.querySelectorAll('.carousel-slide img').forEach(img=>{
     let downX=0,downTime=0;
     img.addEventListener('mousedown',e=>{downX=e.clientX;downTime=Date.now();});
-    img.addEventListener('click',e=>{
-      if(Math.abs(e.clientX-downX)<8&&Date.now()-downTime<400){
-        e.stopPropagation();
-        openLightbox(prod.images,car?parseInt(car.dataset.idx||0):0,prod.name);
-      }
-    });
+    img.addEventListener('click',e=>{if(Math.abs(e.clientX-downX)<8&&Date.now()-downTime<400){e.stopPropagation();openLightbox(prod.images,car?parseInt(car.dataset.idx||0):0,prod.name);}});
     let tDown=0,txD=0;
     img.addEventListener('touchstart',e=>{tDown=Date.now();txD=e.touches[0].clientX;},{passive:true});
-    img.addEventListener('touchend',e=>{
-      if(Math.abs(e.changedTouches[0].clientX-txD)<10&&Date.now()-tDown<300){
-        e.stopPropagation();
-        openLightbox(prod.images,car?parseInt(car.dataset.idx||0):0,prod.name);
-      }
-    },{passive:true});
+    img.addEventListener('touchend',e=>{if(Math.abs(e.changedTouches[0].clientX-txD)<10&&Date.now()-tDown<300){e.stopPropagation();openLightbox(prod.images,car?parseInt(car.dataset.idx||0):0,prod.name);}},{passive:true});
   });
 }
 
@@ -1737,11 +1532,7 @@ document.addEventListener('mousemove',e=>{const c=$('cg');c.style.left=e.clientX
 
 /* ══ SCROLL REVEAL ══ */
 function initScrollReveal(){
-  const io=new IntersectionObserver(entries=>{
-    entries.forEach((en,idx)=>{
-      if(en.isIntersecting){setTimeout(()=>en.target.classList.add('anim-in'),idx*80);io.unobserve(en.target);}
-    });
-  },{threshold:0.1});
+  const io=new IntersectionObserver(entries=>{entries.forEach((en,idx)=>{if(en.isIntersecting){setTimeout(()=>en.target.classList.add('anim-in'),idx*80);io.unobserve(en.target);}});},{threshold:0.1});
   document.querySelectorAll('.anim-ready').forEach(el=>io.observe(el));
 }
 
