@@ -1058,14 +1058,7 @@ function renderSkeletons(n=6){
 }
 
 /* ══ GRID ══ */
-function highlight(text, q){
-  if(!q) return text;
-  const esc = q.replace(/[.*+?^${}()|[\]\]/g,'\\$&');
-  return text.replace(new RegExp('('+esc+')','gi'),'<mark class="search-hl">$1</mark>');
-}
-
 function applySearchSort(list){
-  // Search filter
   const q = searchQ.trim().toLowerCase();
   if(q){
     list = list.filter(p=>{
@@ -1073,7 +1066,6 @@ function applySearchSort(list){
       return hay.includes(q);
     });
   }
-  // Sort
   const sorted = [...list];
   if(sortMode==='price-asc')  sorted.sort((a,b)=>a.price-b.price);
   if(sortMode==='price-desc') sorted.sort((a,b)=>b.price-a.price);
@@ -1088,24 +1080,15 @@ function renderGrid(){
   const {sorted:list, q} = applySearchSort(base);
   const g=$('grid');
 
-  // Update clear button
   const mc=$('searchMainClear');
   if(mc) mc.classList.toggle('vis', searchQ.length>0);
 
   if(!list.length){
-    const msg = searchQ ? `<div class="no-prod-search"><span>🔍</span>Niciun rezultat pentru &quot;<b style="color:var(--red)">${searchQ}</b>&quot;<br><small style="font-size:.6rem;opacity:.6;margin-top:.4rem;display:block">Încearcă alt termen de căutare</small></div>` : `<div class="no-prod">// 0 ${t('prod_found')}</div>`;
-    g.innerHTML=msg;
+    g.innerHTML = searchQ
+      ? `<div class="no-prod-search"><span>🔍</span>Niciun rezultat pentru "<b style="color:var(--red)">${searchQ}</b>"</div>`
+      : `<div class="no-prod">// 0 ${t('prod_found')}</div>`;
   } else {
-    g.innerHTML=list.map(p=>{
-      const card = renderCard(p);
-      // Apply highlights if searching
-      if(q){
-        return card
-          .replace(/>([^<]*)<\/div>/g, (m,txt)=>'>'+highlight(txt,q)+'<\/div>')
-          .replace(/>([^<]*)<\/span>/g,(m,txt)=>'>'+highlight(txt,q)+'<\/span>');
-      }
-      return card;
-    }).join('');
+    g.innerHTML=list.map(renderCard).join('');
     g.querySelectorAll('.card').forEach((c,i)=>{
       c.style.transitionDelay=`${i*55}ms`;
       requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add('visible')));
@@ -1193,15 +1176,6 @@ async function loadAll(){
   $('grid').innerHTML=renderSkeletons();
   setDbStatus('loading','Conectare Supabase...');
   try {
-    // Test connection first
-    const testResp = await fetch(`${SB_URL}/rest/v1/products?select=id&limit=1`, {
-      headers:{ 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
-    });
-    if(!testResp.ok){
-      const errText = await testResp.text();
-      throw new Error(`HTTP ${testResp.status}: ${errText}`);
-    }
-
     const [prods, cats, mats, pols] = await Promise.all([
       sb.getProducts(),
       sb.getCategories(),
