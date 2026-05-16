@@ -18,9 +18,6 @@
   --body:'Barlow',sans-serif;
   --ease:cubic-bezier(.16,1,.3,1);
 }
-@media(prefers-color-scheme:light){
-  :root{color-scheme:dark!important;--bg:#0a0a0a!important;--surf:#111!important;--card:#151515!important;--bdr:#262626!important;--text:#f0f0f0!important;}
-}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;forced-color-adjust:none;}
 html{scroll-behavior:smooth;background:#0a0a0a!important;}
 body{background:#0a0a0a!important;color:#f0f0f0!important;font-family:var(--body);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
@@ -50,7 +47,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.95)!important
 nav{display:flex;align-items:center;gap:1.4rem;}
 .nav-link{font-family:var(--mono);font-size:.63rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;transition:color .2s;position:relative;padding-bottom:2px;}
 .nav-link::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--red);transition:width .3s var(--ease);}
-.nav-link:hover{color:var(--text);}
+.nav-link:hover{color:var(--text);text-shadow:0 0 12px rgba(224,26,26,.6);}
 .nav-link:hover::after{width:100%;}
 .nav-admin{background:transparent;border:1px solid var(--bdr);color:var(--muted);width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .25s;}
 .nav-admin:hover{border-color:var(--red);color:var(--red);}
@@ -60,13 +57,15 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .nav-cta:hover{box-shadow:0 0 20px rgba(37,211,102,.4);}
 .nav-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.5s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.hbar{height:1px;background:linear-gradient(90deg,transparent,var(--red) 50%,transparent);animation:scan 4s ease-in-out infinite;}
+.hbar{height:1px;background:linear-gradient(90deg,transparent,var(--red) 50%,transparent);animation:scan 3s ease-in-out infinite,hbar-color 6s ease-in-out infinite;}
 @keyframes scan{0%,100%{opacity:.3}50%{opacity:.85}}
+@keyframes hbar-color{0%,100%{opacity:.4}50%{opacity:1}}
 
 .hero{max-width:1280px;margin:0 auto;padding:3.5rem 1.5rem 2rem;}
 .hero-eyebrow{font-family:var(--mono);font-size:.65rem;color:var(--red);letter-spacing:.25em;margin-bottom:.9rem;opacity:0;animation:fadeUp .7s var(--ease) .1s forwards;}
 .hero h1{font-family:var(--disp);font-size:clamp(2.6rem,6.5vw,5rem);font-weight:900;text-transform:uppercase;line-height:.92;letter-spacing:.02em;margin-bottom:.9rem;opacity:0;animation:fadeUp .7s var(--ease) .25s forwards;color:var(--text);}
-.hero h1 em{font-style:normal;color:var(--red);position:relative;}
+.hero h1 em{font-style:normal;color:var(--red);position:relative;animation:glitch-flicker 8s ease-in-out infinite;}
+@keyframes glitch-flicker{0%,96%,100%{text-shadow:none;}97%{text-shadow:2px 0 #00ffff,-2px 0 #ff00ff;}98%{text-shadow:none;}99%{text-shadow:-3px 0 #00ffff,3px 0 #ff00ff,0 2px rgba(224,26,26,.8);}}
 .hero h1 em::after{content:'';position:absolute;bottom:2px;left:0;right:0;height:3px;background:var(--red);transform:scaleX(0);transform-origin:left;animation:grow 1s var(--ease) 1s forwards;}
 @keyframes grow{to{transform:scaleX(1)}}
 .hero-sub{font-family:var(--body);font-size:.95rem;color:var(--sub);line-height:1.6;margin-bottom:2.5rem;opacity:0;animation:fadeUp .7s var(--ease) .4s forwards;}
@@ -77,22 +76,36 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .stat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(224,26,26,.06) 0%,transparent 60%);opacity:0;transition:opacity .3s;}
 .stat-card:hover{border-color:rgba(224,26,26,.3);}
 .stat-card:hover::before{opacity:1;}
-.stat-val{font-family:var(--disp);font-size:1.5rem;font-weight:800;color:var(--red);line-height:1;display:block;}
+.stat-val{font-family:var(--disp);font-size:1.5rem;font-weight:800;line-height:1;display:block;background:linear-gradient(90deg,var(--red) 0%,#ff6b6b 50%,var(--red) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:grad-move 3s linear infinite;}
+@keyframes grad-move{0%{background-position:0%}100%{background-position:200%}}
 .stat-lbl{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.14em;margin-top:3px;display:block;}
 
-.ticker-wrap{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);background:var(--surf);padding:.45rem 0;}
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);background:var(--surf);padding:.45rem 0;box-shadow:inset 0 1px 0 rgba(224,26,26,.08),inset 0 -1px 0 rgba(224,26,26,.08);}
 .ticker{display:flex;white-space:nowrap;animation:tick 30s linear infinite;}
 .ticker:hover{animation-play-state:paused;}
 .t-item{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;color:var(--muted);padding:0 2rem;}
-.t-item b{color:var(--red);margin-right:.4rem;font-weight:400;}
+.t-item b{color:var(--red);margin-right:.4rem;font-weight:400;animation:tick-glow 2s ease-in-out infinite;}
+@keyframes tick-glow{0%,100%{text-shadow:none}50%{text-shadow:0 0 8px rgba(224,26,26,.8)}}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* DB STATUS */
+.db-status{max-width:1280px;margin:0 auto;padding:.5rem 1.5rem 0;}
+.db-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.52rem;letter-spacing:.1em;padding:.25rem .65rem;border:1px solid;transition:all .4s;}
+.db-badge.ok{border-color:rgba(37,211,102,.3);color:var(--green);}
+.db-badge.err{border-color:rgba(239,68,68,.3);color:var(--err);}
+.db-badge.loading{border-color:var(--bdr);color:var(--muted);}
+.db-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.db-badge.ok .db-dot{animation:blink 1.5s infinite;}
 
 .filters-wrap{max-width:1280px;margin:0 auto;padding:2rem 1.5rem 1.25rem;}
 .section-label{font-family:var(--mono);font-size:.6rem;color:var(--red);letter-spacing:.22em;margin-bottom:.75rem;}
+.section-label::after{content:'_';animation:blink-cursor .8s step-end infinite;}
+@keyframes blink-cursor{0%,100%{opacity:1}50%{opacity:0}}
 .fbar{display:flex;gap:.4rem;flex-wrap:wrap;}
 .fb{font-family:var(--mono);font-size:.63rem;letter-spacing:.09em;text-transform:uppercase;padding:.42rem 1.1rem;border:1px solid var(--bdr);background:transparent;color:var(--sub);transition:all .25s;cursor:pointer;}
 .fb:hover{border-color:var(--red);color:var(--red);}
-.fb.on{color:#fff!important;font-weight:700;}
+.fb.on{color:#fff!important;font-weight:700;animation:fb-pulse 2s ease-in-out infinite;}
+@keyframes fb-pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,26,26,0)}50%{box-shadow:0 0 12px 2px rgba(224,26,26,.3)}}
 
 .products-wrap{max-width:1280px;margin:0 auto;padding:0 1.5rem 4rem;}
 .prod-hdr{display:flex;align-items:center;gap:.8rem;margin-bottom:1.3rem;}
@@ -101,12 +114,26 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:1.1rem;}
 .no-prod{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.1em;text-align:center;padding:4rem;border:1px dashed var(--bdr);}
 
+/* LOADING SKELETON */
+.skeleton{background:linear-gradient(90deg,#151515 25%,#1e1e1e 50%,#151515 75%);background-size:200% 100%;animation:shimmer-sk 1.5s infinite;border-radius:2px;}
+@keyframes shimmer-sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-card{background:var(--card);border:1px solid var(--bdr);overflow:hidden;}
+.skel-img{height:195px;}
+.skel-body{padding:1.1rem;display:flex;flex-direction:column;gap:.6rem;}
+.skel-line{height:12px;}
+.skel-line.w60{width:60%;}
+.skel-line.w40{width:40%;}
+.skel-line.w80{width:80%;}
+
 /* CARD */
 .card{position:relative;background:var(--card);border:1px solid var(--bdr);overflow:hidden;cursor:pointer;opacity:0;transform:translateY(22px);transition:opacity .5s var(--ease),transform .5s var(--ease),border-color .3s,box-shadow .3s;}
-.card.visible{opacity:1;transform:translateY(0);}
+.card.visible{opacity:1;transform:translateY(0);animation:shimmer-in .5s var(--ease) forwards;}
+@keyframes shimmer-in{0%{box-shadow:0 0 0 0 rgba(224,26,26,0);}50%{box-shadow:0 0 30px 4px rgba(224,26,26,.12);}100%{box-shadow:none;}}
 .card.visible:hover{border-color:rgba(224,26,26,.4);transform:translateY(-4px) scale(1.01);box-shadow:0 18px 50px rgba(0,0,0,.7),0 0 0 1px rgba(224,26,26,.07);}
 .card-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% -5%,rgba(224,26,26,.08) 0%,transparent 65%);opacity:0;transition:opacity .4s;pointer-events:none;z-index:1;}
 .card:hover .card-glow{opacity:1;}
+.card::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(224,26,26,.025) 50%,transparent 60%);background-size:100% 300%;transform:translateY(-100%);animation:scanline 6s ease-in-out infinite;pointer-events:none;z-index:2;}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
 .corner{position:absolute;width:12px;height:12px;z-index:4;transition:all .3s var(--ease);}
 .c-tl{top:-1px;left:-1px;border-top:2px solid var(--muted);border-left:2px solid var(--muted);}
 .c-tr{top:-1px;right:-1px;border-top:2px solid var(--muted);border-right:2px solid var(--muted);}
@@ -119,6 +146,7 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .card:hover .c-br{bottom:-2px;right:-2px;}
 .card-oos{opacity:.5;}
 .stock-badge{position:absolute;top:.85rem;left:50%;transform:translateX(-50%);background:#0d0d0d;border:1px solid #252525;color:#555;font-family:var(--mono);font-size:.52rem;letter-spacing:.22em;padding:.22rem .7rem;z-index:10;}
+.mat-tag{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;padding:.18rem .55rem;border:1px solid;width:fit-content;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* CAROUSEL */
 .card-carousel{position:relative;height:195px;background:#0a0a0a;border-bottom:1px solid var(--bdr);overflow:hidden;user-select:none;}
@@ -134,8 +162,6 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .car-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .25s;}
 .car-dot.on{background:#fff;width:14px;border-radius:3px;}
 .car-counter{position:absolute;top:.5rem;right:.55rem;font-family:var(--mono);font-size:.48rem;color:rgba(255,255,255,.7);background:rgba(0,0,0,.65);padding:.14rem .42rem;border:1px solid rgba(255,255,255,.1);z-index:5;backdrop-filter:blur(4px);}
-/* mat-tag now lives in card-body, not absolute */
-.mat-tag{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;padding:.18rem .55rem;border:1px solid;width:fit-content;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .card-body{padding:1.1rem;display:flex;flex-direction:column;gap:.48rem;}
 .card-cat{font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;}
@@ -145,13 +171,15 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .badges{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.1rem;}
 .badge{display:inline-flex;align-items:center;gap:.25rem;font-family:var(--mono);font-size:.53rem;letter-spacing:.07em;padding:.18rem .48rem;border:1px solid;text-transform:uppercase;color:#ccc;}
 .card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:.4rem;padding-top:.9rem;border-top:1px solid var(--bdr);}
-.price{font-family:var(--disp);font-size:1.4rem;font-weight:800;color:var(--red);line-height:1;}
+.price{font-family:var(--disp);font-size:1.4rem;font-weight:800;color:var(--red);line-height:1;animation:price-flash 5s ease-in-out infinite;}
+@keyframes price-flash{0%,95%,100%{color:var(--red)}96%,99%{color:#ff6b6b}}
 .price-sub{font-family:var(--mono);font-size:.52rem;color:#888;letter-spacing:.07em;margin-top:1px;}
-.order-btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.63rem;font-weight:700;letter-spacing:.06em;padding:.52rem .92rem;transition:all .25s;position:relative;overflow:hidden;}
+.order-btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.63rem;font-weight:700;letter-spacing:.06em;padding:.52rem .92rem;transition:all .25s;position:relative;overflow:hidden;animation:btn-pulse 4s ease-in-out infinite;}
+@keyframes btn-pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,26,26,0)}50%{box-shadow:0 0 14px 2px rgba(224,26,26,.25)}}
 .order-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
 .order-btn:hover::before{transform:translateX(0);}
-.order-btn:hover{box-shadow:0 0 22px rgba(224,26,26,.5);transform:translateY(-1px);}
-.order-btn.dis{background:#1e1e1e;color:#444;cursor:default;}
+.order-btn:hover{box-shadow:0 0 22px rgba(224,26,26,.5);transform:translateY(-1px);animation:none;}
+.order-btn.dis{background:#1e1e1e;color:#444;cursor:default;animation:none;}
 .order-btn.dis:hover{box-shadow:none;transform:none;}
 .order-btn.dis::before{display:none;}
 
@@ -172,6 +200,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .footer-link:hover{color:var(--red);}
 .footer-bottom{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.08em;line-height:1.8;}
 
+/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s;}
 .modal-overlay.open{opacity:1;pointer-events:all;}
 .modal-box{background:var(--surf);border:1px solid var(--bdr);width:100%;max-width:500px;max-height:92vh;overflow-y:auto;position:relative;transform:translateY(28px) scale(.96);transition:transform .38s var(--ease);}
@@ -184,7 +213,6 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .modal-section{padding:1.4rem 1.5rem 0;}
 .modal-section:last-child{padding-bottom:1.5rem;}
 .modal-title{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.2em;margin-bottom:1rem;}
-
 .co-prod-row{display:flex;align-items:center;gap:.9rem;padding-bottom:1.25rem;border-bottom:1px solid var(--bdr);}
 .co-thumb{width:54px;height:54px;background:#0a0a0a;border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
 .co-thumb img{width:100%;height:100%;object-fit:cover;}
@@ -213,20 +241,18 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .pay-opt-title{font-family:var(--disp);font-size:.98rem;font-weight:700;color:var(--text);}
 .pay-opt-desc{font-family:var(--body);font-size:.78rem;color:#999;margin-top:2px;}
 .co-actions{display:flex;flex-direction:column;gap:.55rem;padding:1.25rem 1.5rem 1.5rem;}
-.co-info-note{font-family:var(--body);font-size:.78rem;color:#999;text-align:center;padding:.5rem 0;}
-.btn-wa,.btn-direct{display:flex;align-items:center;justify-content:center;gap:.5rem;color:#fff;font-family:var(--body);font-size:.92rem;font-weight:600;padding:.72rem;transition:all .25s;position:relative;overflow:hidden;width:100%;cursor:pointer;border:none;}
-.btn-wa::before,.btn-direct::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
-.btn-wa:hover::before,.btn-direct:hover::before{transform:translateX(0);}
-.btn-wa{background:var(--green);}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:.5rem;color:#fff;font-family:var(--body);font-size:.92rem;font-weight:600;padding:.72rem;transition:all .25s;position:relative;overflow:hidden;width:100%;cursor:pointer;border:none;background:var(--green);}
+.btn-wa::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
+.btn-wa:hover::before{transform:translateX(0);}
 .btn-wa:hover{box-shadow:0 0 22px rgba(37,211,102,.45);}
-.btn-direct{background:var(--red);}
-.btn-direct:hover{box-shadow:0 0 22px rgba(224,26,26,.45);}
 .btn-outline-cancel{background:transparent;border:1px solid var(--bdr);color:#aaa;font-family:var(--body);font-size:.88rem;padding:.65rem;transition:all .2s;width:100%;cursor:pointer;}
 .btn-outline-cancel:hover{border-color:var(--text);color:var(--text);}
 
 #toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surf);border:1px solid rgba(37,211,102,.3);color:var(--green);font-family:var(--body);font-size:.88rem;padding:.75rem 1.5rem;z-index:500;opacity:0;transition:all .4s var(--ease);white-space:nowrap;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#toast.err{border-color:rgba(239,68,68,.3);color:var(--err);}
 
+/* PASSWORD */
 .pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);z-index:400;display:flex;align-items:center;justify-content:center;}
 .pw-box{background:var(--surf);border:1px solid var(--bdr);padding:2rem;width:320px;position:relative;overflow:hidden;}
 .pw-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
@@ -239,6 +265,30 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .pw-btn{width:100%;background:var(--red);border:none;color:#fff;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:.62rem;margin-top:.4rem;transition:box-shadow .25s;cursor:pointer;}
 .pw-btn:hover{box-shadow:0 0 20px rgba(224,26,26,.4);}
 
+/* LIGHTBOX */
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(12px);}
+#lightbox.open{opacity:1;pointer-events:all;}
+.lb-inner{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.lb-img{max-width:90vw;max-height:88vh;object-fit:contain;border:1px solid var(--bdr);box-shadow:0 0 60px rgba(0,0,0,.8);transition:opacity .25s;}
+.lb-img.fade{opacity:0;}
+.lb-close{position:absolute;top:1rem;right:1rem;width:40px;height:40px;background:rgba(0,0,0,.7);border:1px solid var(--bdr);color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:10;}
+.lb-close:hover{border-color:var(--err);color:var(--err);}
+.lb-arr{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:1.5rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:10;}
+.lb-arr:hover{background:rgba(224,26,26,.8);border-color:var(--red);}
+.lb-prev{left:1rem;}.lb-next{right:1rem;}
+.lb-arr.hidden{opacity:0;pointer-events:none;}
+.lb-dots{position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;z-index:10;}
+.lb-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .25s;}
+.lb-dot.on{background:#fff;width:20px;border-radius:4px;}
+.lb-counter{position:absolute;top:1rem;left:1rem;font-family:var(--mono);font-size:.6rem;color:rgba(255,255,255,.6);background:rgba(0,0,0,.6);padding:.25rem .6rem;border:1px solid rgba(255,255,255,.1);}
+.lb-caption{position:absolute;bottom:3.2rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.58rem;color:rgba(255,255,255,.5);letter-spacing:.12em;white-space:nowrap;}
+
+/* POLICY MODAL */
+.policy-modal{max-width:640px;}
+.policy-modal-content{padding:1.4rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;}
+.policy-block p{font-family:var(--body);font-size:.85rem;color:#aaa;line-height:1.75;}
+
+/* ADMIN PANEL */
 .ap-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:400;display:flex;justify-content:flex-end;}
 .ap-panel{width:660px;max-width:100vw;height:100vh;background:#0d0d0d;border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;animation:slideIn .3s var(--ease);}
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
@@ -267,10 +317,12 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .finput:focus,.fsel:focus,.ftx:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(224,26,26,.12);}
 .fsel{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right .8rem center!important;padding-right:2rem;}
 .ftx{resize:vertical;min-height:70px;line-height:1.5;}
-/* Prevent iOS zoom on inputs - font-size must be >= 16px */
-@media(max-width:768px){
-  .finput,.fsel,.ftx,.co-input,.pw-inp{font-size:16px!important;}
-}
+
+/* UPLOAD PROGRESS */
+.upload-progress{background:#0a0a0a;border:1px solid var(--bdr);padding:.6rem .9rem;display:flex;flex-direction:column;gap:.4rem;}
+.upload-progress-label{font-family:var(--mono);font-size:.55rem;color:var(--sub);letter-spacing:.08em;}
+.upload-bar-wrap{height:3px;background:#1e1e1e;overflow:hidden;}
+.upload-bar{height:100%;background:var(--red);transition:width .3s;width:0%;}
 
 /* MULTI-IMAGE */
 .img-tabs{display:flex;gap:.38rem;}
@@ -307,6 +359,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .btn-cancel:hover{border-color:var(--text);color:var(--text);}
 .btn-submit{flex:1;background:var(--red);border:none;color:#fff;font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;padding:.62rem;transition:all .25s;cursor:pointer;}
 .btn-submit:hover{box-shadow:0 0 20px rgba(224,26,26,.4);}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;}
 
 /* CATEGORIES */
 .cat-list-wrap{display:flex;flex-direction:column;gap:.42rem;}
@@ -352,111 +405,16 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .btn-delete{flex:1;background:var(--err);border:none;color:#fff;font-family:var(--mono);font-size:.64rem;font-weight:700;letter-spacing:.09em;padding:.55rem;transition:opacity .2s;cursor:pointer;}
 .btn-delete:hover{opacity:.85;}
 
+/* POLICY VIEW */
 .policy-modal{max-width:640px;}
-.policy-modal-content{padding:1.4rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;}
-.policy-block p{font-family:var(--body);font-size:.85rem;color:#aaa;line-height:1.75;}
 
-/* ── ORDER CONFIRMATION ── */
-.order-confirm{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.75rem;padding:.5rem 0;}
-.oc-icon{width:64px;height:64px;border-radius:50%;background:rgba(37,211,102,.12);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:var(--green);animation:popIn .4s var(--ease);}
-@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
-.oc-title{font-family:var(--disp);font-size:1.6rem;font-weight:900;color:var(--text);letter-spacing:.04em;}
-.oc-text{font-family:var(--body);font-size:.88rem;color:#aaa;line-height:1.75;max-width:340px;}
-.oc-text b{color:var(--text);}
+/* PARTICLES */
+.particle{position:fixed;pointer-events:none;z-index:0;border-radius:50%;animation:float-p linear infinite;}
+@keyframes float-p{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:.4;}100%{transform:translateY(-10vh) scale(1.2);opacity:0;}}
 
-/* ── LIGHTBOX ── */
-#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(12px);}
-#lightbox.open{opacity:1;pointer-events:all;}
-.lb-inner{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
-.lb-img{max-width:90vw;max-height:88vh;object-fit:contain;border:1px solid var(--bdr);box-shadow:0 0 60px rgba(0,0,0,.8);transition:opacity .25s;}
-.lb-img.fade{opacity:0;}
-.lb-close{position:absolute;top:1rem;right:1rem;width:40px;height:40px;background:rgba(0,0,0,.7);border:1px solid var(--bdr);color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:10;}
-.lb-close:hover{border-color:var(--err);color:var(--err);}
-.lb-arr{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:1.5rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:10;}
-.lb-arr:hover{background:rgba(224,26,26,.8);border-color:var(--red);}
-.lb-prev{left:1rem;}
-.lb-next{right:1rem;}
-.lb-arr.hidden{opacity:0;pointer-events:none;}
-.lb-dots{position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;z-index:10;}
-.lb-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .25s;}
-.lb-dot.on{background:#fff;width:20px;border-radius:4px;}
-.lb-counter{position:absolute;top:1rem;left:1rem;font-family:var(--mono);font-size:.6rem;color:rgba(255,255,255,.6);background:rgba(0,0,0,.6);padding:.25rem .6rem;border:1px solid rgba(255,255,255,.1);}
-.lb-caption{position:absolute;bottom:3.2rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.58rem;color:rgba(255,255,255,.5);letter-spacing:.12em;white-space:nowrap;}
-/* Make carousel images clickable */
-.carousel-slide img{cursor:zoom-in;}
-
-/* ══ ANIMATIONS ══ */
-
-/* Scroll reveal */
+/* SCROLL REVEAL */
 .anim-ready{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease),transform .6s var(--ease);}
 .anim-in{opacity:1;transform:translateY(0);}
-
-/* Floating particles background */
-.particle{position:fixed;pointer-events:none;z-index:0;border-radius:50%;animation:float-p linear infinite;}
-@keyframes float-p{
-  0%{transform:translateY(100vh) scale(0);opacity:0;}
-  10%{opacity:1;}
-  90%{opacity:.4;}
-  100%{transform:translateY(-10vh) scale(1.2);opacity:0;}
-}
-
-/* Hero title glitch effect */
-.hero h1 em{animation:glitch-flicker 8s ease-in-out infinite;}
-@keyframes glitch-flicker{
-  0%,96%,100%{text-shadow:none;}
-  97%{text-shadow:2px 0 #00ffff,−2px 0 #ff00ff;}
-  98%{text-shadow:none;}
-  99%{text-shadow:−3px 0 #00ffff,3px 0 #ff00ff,0 2px rgba(224,26,26,.8);}
-}
-
-/* Scanline sweep on cards */
-.card::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(224,26,26,.025) 50%,transparent 60%);background-size:100% 300%;transform:translateY(-100%);animation:scanline 6s ease-in-out infinite;pointer-events:none;z-index:2;}
-@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
-
-/* Card shimmer on load */
-.card.visible{animation:shimmer-in .5s var(--ease) forwards;}
-@keyframes shimmer-in{
-  0%{box-shadow:0 0 0 0 rgba(224,26,26,0);}
-  50%{box-shadow:0 0 30px 4px rgba(224,26,26,.12);}
-  100%{box-shadow:none;}
-}
-
-/* Hbar pulse stronger */
-.hbar{animation:scan 3s ease-in-out infinite,hbar-color 6s ease-in-out infinite;}
-@keyframes hbar-color{0%,100%{opacity:.4}50%{opacity:1}}
-
-/* Nav link hover glow */
-.nav-link:hover{color:var(--text);text-shadow:0 0 12px rgba(224,26,26,.6);}
-
-/* Order button pulse */
-.order-btn{animation:btn-pulse 4s ease-in-out infinite;}
-@keyframes btn-pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,26,26,0)}50%{box-shadow:0 0 14px 2px rgba(224,26,26,.25)}}
-.order-btn:hover{animation:none;}
-
-/* Price counter flash */
-.price{animation:price-flash 5s ease-in-out infinite;}
-@keyframes price-flash{0%,95%,100%{color:var(--red)}96%,99%{color:#ff6b6b}}
-
-/* Ticker glow */
-.ticker-wrap{box-shadow:inset 0 1px 0 rgba(224,26,26,.08),inset 0 -1px 0 rgba(224,26,26,.08);}
-.t-item b{animation:tick-glow 2s ease-in-out infinite;}
-@keyframes tick-glow{0%,100%{text-shadow:none}50%{text-shadow:0 0 8px rgba(224,26,26,.8)}}
-
-/* Logo hex spinning ring */
-.logo-hex{display:inline-block;animation:pulse-r 3s ease-in-out infinite,spin-slow 20s linear infinite;}
-@keyframes spin-slow{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-
-/* Stat card count-up shimmer */
-.stat-val{background:linear-gradient(90deg,var(--red) 0%,#ff6b6b 50%,var(--red) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:grad-move 3s linear infinite;}
-@keyframes grad-move{0%{background-position:0%}100%{background-position:200%}}
-
-/* Filter button active pulse */
-.fb.on{animation:fb-pulse 2s ease-in-out infinite;}
-@keyframes fb-pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,26,26,0)}50%{box-shadow:0 0 12px 2px rgba(224,26,26,.3)}}
-
-/* Section label typewriter blink */
-.section-label::after{content:'_';animation:blink-cursor .8s step-end infinite;}
-@keyframes blink-cursor{0%,100%{opacity:1}50%{opacity:0}}
 
 @media(max-width:768px){
   .nav-link{display:none;}
@@ -474,12 +432,9 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   .footer-links{flex-wrap:wrap;justify-content:center;}
   #langBtn{left:.5rem;}
   .co-row-2{grid-template-columns:1fr;}
-  /* Prevent iOS auto-zoom: inputs must be font-size ≥ 16px */
   input,select,textarea{font-size:16px!important;}
 }
-@media(min-width:1200px){
-  .ap-panel{width:720px;}
-}
+@media(min-width:1200px){.ap-panel{width:720px;}}
 </style>
 </head>
 <body>
@@ -506,18 +461,23 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   </div>
   <div class="hbar"></div>
 </header>
+
 <section class="hero">
   <div class="hero-eyebrow" data-i18n="hero_eyebrow">// PIESE AUTO · PRINTARE 3D · ROMÂNIA</div>
   <h1 data-i18n="hero_h1_html">PIESE AUTO<br><em>3D</em> PREMIUM</h1>
   <p class="hero-sub" data-i18n="hero_sub">Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț</p>
   <div class="stats">
-    <div class="stat-card"><span class="stat-val" id="heroCount">6+</span><span class="stat-lbl" data-i18n="stat_products">Produse</span></div>
-    <div class="stat-card"><span class="stat-val">ABS/ASA</span><span class="stat-lbl">Material</span></div>
-    <div class="stat-card"><span class="stat-val">CARBON</span><span class="stat-lbl">Compozit</span></div>
-    <div class="stat-card"><span class="stat-val">100%</span><span class="stat-lbl">Transport inclus</span></div>
+    <div class="stat-card anim-ready"><span class="stat-val" id="heroCount">—</span><span class="stat-lbl" data-i18n="stat_products">Produse</span></div>
+    <div class="stat-card anim-ready"><span class="stat-val">ABS/ASA</span><span class="stat-lbl">Material</span></div>
+    <div class="stat-card anim-ready"><span class="stat-val">CARBON</span><span class="stat-lbl">Compozit</span></div>
+    <div class="stat-card anim-ready"><span class="stat-val">100%</span><span class="stat-lbl">Transport inclus</span></div>
   </div>
 </section>
+
 <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+<div class="db-status"><div class="db-badge loading" id="dbBadge"><div class="db-dot"></div><span id="dbText">Conectare Supabase...</span></div></div>
+
 <div class="filters-wrap">
   <div class="section-label">// FILTRARE RAPIDĂ</div>
   <div class="fbar" id="fbar"></div>
@@ -530,6 +490,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   <div class="section-label">// POLITICI & CONFIDENȚIALITATE</div>
   <div class="policy-grid" id="policyGrid"></div>
 </div>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-top">
@@ -575,7 +536,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
       </div>
     </div>
     <div class="co-actions" id="coActions">
-      <button class="btn-direct" id="btnD">✓ Plasează comanda</button>
+      <button class="btn-wa" id="btnWA">Trimite pe WhatsApp</button>
       <button class="btn-outline-cancel" id="btnC">Anulează</button>
     </div>
   </div>
@@ -617,7 +578,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 <div class="ap-overlay" id="apOverlay" style="display:none">
   <div class="ap-panel">
     <div class="ap-hdr">
-      <div class="ap-hdr-l"><span class="ap-ico">⬡</span><div><div class="ap-title">ADMIN PANEL</div><div class="ap-sub">// AUTOCORE3D</div></div></div>
+      <div class="ap-hdr-l"><span class="ap-ico">⬡</span><div><div class="ap-title">ADMIN PANEL</div><div class="ap-sub">// AUTOCORE3D · Supabase</div></div></div>
       <button class="ap-close" id="apClose">✕</button>
     </div>
     <div class="ap-tabs">
@@ -643,21 +604,27 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
       </div>
       <div class="field"><label>Descriere</label><textarea class="ftx" id="fDesc" rows="2"></textarea></div>
 
-      <div class="ap-sec">// IMAGINI PRODUS</div>
+      <div class="ap-sec">// IMAGINI PRODUS (Supabase Storage)</div>
       <div class="img-count-note" id="imgCountNote">0 imagini adăugate</div>
       <div class="img-tabs">
-        <button class="img-tab on" id="imgUrlBtn">🔗 URL</button>
-        <button class="img-tab" id="imgFileBtn">📁 Upload</button>
+        <button class="img-tab on" id="imgFileBtn">📁 Upload în Supabase</button>
+        <button class="img-tab" id="imgUrlBtn">🔗 URL extern</button>
       </div>
-      <div id="urlInputArea">
+      <div id="fileInputArea">
+        <div class="dropzone" id="dropzone">Click sau trage imagini aici (selectare multiplă)<br><span style="font-size:.5rem;opacity:.6;">Imaginile se salvează în Supabase Storage</span></div>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none"/>
+        <div id="uploadProgress" style="display:none">
+          <div class="upload-progress">
+            <div class="upload-progress-label" id="uploadLabel">Se încarcă...</div>
+            <div class="upload-bar-wrap"><div class="upload-bar" id="uploadBar"></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="urlInputArea" style="display:none">
         <div class="img-add-row">
           <input class="finput" id="fImgUrl" placeholder="https://... apasă + sau Enter"/>
           <button class="img-add-btn" id="addUrlBtn">+</button>
         </div>
-      </div>
-      <div id="fileInputArea" style="display:none">
-        <div class="dropzone" id="dropzone">Click sau trage imagini aici (selectare multiplă)</div>
-        <input type="file" id="fileInput" accept="image/*" multiple style="display:none"/>
       </div>
       <div class="imgs-list" id="imgsList"></div>
 
@@ -685,14 +652,8 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
       <div class="cat-add-box">
         <div class="field"><label>Nume grupă *</label><input class="finput" id="catNewName" placeholder="ex: Sport, Tuning, OEM..."/></div>
         <div class="cat-color-row">
-          <div class="field" style="flex:0 0 auto">
-            <label>Culoare</label>
-            <input type="color" id="catNewColor" value="#E01A1A" class="cat-color-inp"/>
-          </div>
-          <div class="field" style="flex:1">
-            <label>Previzualizare</label>
-            <div id="catColorPrev" style="height:36px;background:#E01A1A;border:1px solid #333;display:flex;align-items:center;padding:0 .75rem;font-family:var(--mono);font-size:.6rem;color:#fff;letter-spacing:.1em;">GRUPĂ NOUĂ</div>
-          </div>
+          <div class="field" style="flex:0 0 auto"><label>Culoare</label><input type="color" id="catNewColor" value="#E01A1A" class="cat-color-inp"/></div>
+          <div class="field" style="flex:1"><label>Previzualizare</label><div id="catColorPrev" style="height:36px;background:#E01A1A;border:1px solid #333;display:flex;align-items:center;padding:0 .75rem;font-family:var(--mono);font-size:.6rem;color:#fff;letter-spacing:.1em;">GRUPĂ NOUĂ</div></div>
         </div>
         <div style="display:flex;gap:.5rem;">
           <button class="btn-submit" id="catSaveBtn" style="flex:1">+ Adaugă Grupă</button>
@@ -711,7 +672,7 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
           <div class="field"><label>Nume material *</label><input class="finput" id="matNewName" placeholder="ex: PLA+, PEEK, Nylon CF..."/></div>
           <div class="field"><label>Culoare accent</label><input type="color" id="matNewColor" value="#E01A1A" class="cat-color-inp" style="width:100%;height:36px;"/></div>
         </div>
-        <div class="field"><label>Descriere scurtă (opțional)</label><input class="finput" id="matNewDesc" placeholder="ex: Rezistent UV, Flexibil, Temperatura înaltă..."/></div>
+        <div class="field"><label>Descriere scurtă (opțional)</label><input class="finput" id="matNewDesc" placeholder="ex: Rezistent UV, Flexibil..."/></div>
         <div class="field"><label>Previzualizare</label>
           <div id="matColorPrev" style="height:36px;background:#E01A1A;border:1px solid #333;display:flex;align-items:center;padding:0 .75rem;font-family:var(--mono);font-size:.6rem;color:#fff;letter-spacing:.1em;gap:.5rem;">
             <span id="matPrevName">MATERIAL NOU</span>
@@ -753,96 +714,150 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 </div>
 
 <script>
+/* ══ SUPABASE CONFIG ══ */
+const SB_URL  = "https://jimdpmrsprcp byacxguj.supabase.co";
+const SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbWRwbXJzcHJjcGJ5YWN4Z3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzMwNDcsImV4cCI6MjA5NDQ0OTA0N30.CL0gIG67tokOK2tm7JZgamXb3Dpch-hs2zmqbV6oEBg";
+const BUCKET  = "product-images";
+const WA      = "40771119423";
+const PWD     = "Darius12@";
+
+/* ══ SUPABASE CLIENT ══ */
+const sb = {
+  async req(path, opts={}){
+    const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
+      ...opts,
+      headers:{
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': opts.prefer||'return=representation',
+        ...(opts.headers||{})
+      }
+    });
+    if(!r.ok){
+      const e = await r.text();
+      throw new Error(`Supabase ${r.status}: ${e}`);
+    }
+    const txt = await r.text();
+    return txt ? JSON.parse(txt) : null;
+  },
+
+  // Products
+  async getProducts(){
+    return this.req('products?select=*&order=created_at.desc');
+  },
+  async insertProduct(p){
+    return this.req('products', {method:'POST', body:JSON.stringify(p)});
+  },
+  async updateProduct(id, p){
+    return this.req(`products?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(p)});
+  },
+  async deleteProduct(id){
+    return this.req(`products?id=eq.${id}`, {method:'DELETE', prefer:'return=minimal', headers:{Prefer:'return=minimal'}});
+  },
+
+  // Categories
+  async getCategories(){
+    return this.req('categories?select=*&order=name.asc');
+  },
+  async upsertCategory(c){
+    return this.req('categories', {method:'POST', body:JSON.stringify(c), headers:{Prefer:'resolution=merge-duplicates,return=representation'}});
+  },
+  async deleteCategory(id){
+    return this.req(`categories?id=eq.${id}`, {method:'DELETE', headers:{Prefer:'return=minimal'}});
+  },
+
+  // Materials
+  async getMaterials(){
+    return this.req('materials?select=*&order=name.asc');
+  },
+  async upsertMaterial(m){
+    return this.req('materials', {method:'POST', body:JSON.stringify(m), headers:{Prefer:'resolution=merge-duplicates,return=representation'}});
+  },
+  async deleteMaterial(id){
+    return this.req(`materials?id=eq.${id}`, {method:'DELETE', headers:{Prefer:'return=minimal'}});
+  },
+
+  // Policies
+  async getPolicies(){
+    const r = await this.req('policies?id=eq.main&select=data');
+    return (r&&r[0]) ? r[0].data : null;
+  },
+  async savePolicies(data){
+    return this.req('policies', {method:'POST', body:JSON.stringify({id:'main',data}), headers:{Prefer:'resolution=merge-duplicates,return=minimal'}});
+  },
+
+  // Storage upload
+  async uploadImage(file, path){
+    const r = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`, {
+      method:'POST',
+      headers:{
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Content-Type': file.type,
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+    if(!r.ok) throw new Error(`Upload failed: ${r.status}`);
+    return `${SB_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+  },
+
+  async deleteImage(path){
+    // path is the part after /public/product-images/
+    const r = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`, {
+      method:'DELETE',
+      headers:{
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`
+      }
+    });
+    return r.ok;
+  }
+};
+
 /* ══ CONSTANTS ══ */
-const WA  = "40771119423";
-const PWD = "Darius12@";
-const LS_P = "ac3d_prod_v5", LS_C = "ac3d_cats_v2", LS_POL = "ac3d_pol_v1", LS_MAT = "ac3d_mat_v1";
-const BC = [{k:"UV Resistant",i:"☀",c:"#f59e0b"},{k:"High Temp",i:"🌡",c:"#ef4444"},{k:"Carbon Rigid",i:"◈",c:"#a3a3a3"},{k:"Impact Proof",i:"⬡",c:"#E01A1A"}];
-const MC_DEFAULT = {"ABS/ASA":"#3b82f6","Carbon Fiber":"#a3a3a3","PETG":"#8b5cf6","TPU":"#10b981","Nylon PA12":"#f59e0b"};
-const DEFAULT_MATS = [
-  {id:"m1",name:"ABS/ASA",   color:"#3b82f6", desc:"Rezistent UV, impact și temperaturi moderate"},
-  {id:"m2",name:"Carbon Fiber",color:"#a3a3a3",desc:"Rigid, ușor, compozit carbon"},
-  {id:"m3",name:"PETG",      color:"#8b5cf6", desc:"Flexibil, rezistent chimic"},
-  {id:"m4",name:"TPU",       color:"#10b981", desc:"Flexibil, cauciucat"},
-  {id:"m5",name:"Nylon PA12",color:"#f59e0b", desc:"Rezistent impact și oboseală"},
+const BC = [
+  {k:"UV Resistant",i:"☀",c:"#f59e0b"},
+  {k:"High Temp",i:"🌡",c:"#ef4444"},
+  {k:"Carbon Rigid",i:"◈",c:"#a3a3a3"},
+  {k:"Impact Proof",i:"⬡",c:"#E01A1A"}
 ];
 const TICK_ITEMS = ["CARBON FIBER","ABS/ASA","IMPACT PROOF","UV RESISTANT","HIGH TEMP","RAMBURS","PRINTARE 3D","INGINERIE AUTO","TOLERANȚE STRÂNSE","MADE IN ROMANIA","TRANSPORT INCLUS","AFTERMARKET","MATERIALE TEHNICE","CARBON COMPOZIT"];
-const DEFAULT_CATS = [{id:"c1",name:"Piese Auto",color:"#E01A1A"},{id:"c2",name:"ABS/ASA",color:"#3b82f6"},{id:"c3",name:"Carbon Fiber",color:"#a3a3a3"},{id:"c4",name:"Altele",color:"#8b5cf6"}];
+const DEFAULT_CATS = [
+  {id:"c1",name:"Piese Auto",color:"#E01A1A"},
+  {id:"c2",name:"ABS/ASA",color:"#3b82f6"},
+  {id:"c3",name:"Carbon Fiber",color:"#a3a3a3"},
+  {id:"c4",name:"Altele",color:"#8b5cf6"}
+];
+const DEFAULT_MATS = [
+  {id:"m1",name:"ABS/ASA",color:"#3b82f6",description:"Rezistent UV, impact și temperaturi moderate"},
+  {id:"m2",name:"Carbon Fiber",color:"#a3a3a3",description:"Rigid, ușor, compozit carbon"},
+  {id:"m3",name:"PETG",color:"#8b5cf6",description:"Flexibil, rezistent chimic"},
+  {id:"m4",name:"TPU",color:"#10b981",description:"Flexibil, cauciucat"},
+  {id:"m5",name:"Nylon PA12",color:"#f59e0b",description:"Rezistent impact și oboseală"},
+];
+const DEFAULT_POLICIES = {
+  privacyRo:"Datele personale colectate sunt utilizate exclusiv pentru procesarea comenzilor și nu sunt transmise terților fără consimțământul dumneavoastră.",
+  privacyEn:"Personal data collected is used exclusively for order processing and is not shared with third parties without your consent.",
+  termsRo:"Prin plasarea unei comenzi, ești de acord cu termenii AUTOCORE3D. Prețurile includ TVA, transport și toate taxele.",
+  termsEn:"By placing an order, you agree to AUTOCORE3D terms. Prices include VAT, shipping and all taxes.",
+  returnRo:"Produsele pot fi returnate în termen de 14 zile de la primire, în stare originală, nefolosită.",
+  returnEn:"Products can be returned within 14 days of receipt, in original unused condition.",
+  cookiesRo:"Folosim cookie-uri esențiale pentru funcționarea site-ului. Nu colectăm cookie-uri de marketing fără acordul utilizatorului.",
+  cookiesEn:"We use essential cookies for website operation. We do not collect marketing cookies without explicit consent."
+};
 
-/* ══ FIREBASE PERSISTENCE ══ */
-// (LS keys already declared above)
-
-// Local cache fallback
-function lsGet(k,def){try{const r=localStorage.getItem(k);if(r)return JSON.parse(r);}catch{}return def;}
-function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
-
-function load(k,def){return lsGet(k,def);}
-function save(k,v){
-  lsSet(k,v);
-  // Also save to Firebase if ready
-  if(window._fbReady) fbSave(k,v);
-}
-
-async function fbSave(key, data){
-  try{
-    if(!window._db) return;
-    await window._db.collection('catalog').doc(key).set({
-      data: JSON.stringify(data),
-      updatedAt: Date.now()
-    });
-  }catch(e){ console.warn('Firebase save error:',e); }
-}
-
-async function fbLoad(key){
-  try{
-    if(!window._db) return null;
-    const snap = await window._db.collection('catalog').doc(key).get();
-    if(snap.exists){
-      const data = JSON.parse(snap.data().data);
-      lsSet(key, data);
-      return data;
-    }
-  }catch(e){ console.warn('Firebase load error:',e); }
-  return null;
-}
-
-// Sync from Firebase silently on startup
-async function syncFromFirebase(){
-  try{
-    const keys=[LS_P,LS_C,LS_MAT,LS_POL];
-    const results = await Promise.all(keys.map(k=>fbLoad(k)));
-    let changed=false;
-    if(results[0]&&results[0].length){products=results[0].map(p=>({...p,images:p.images||(p.imageUrl?[p.imageUrl]:[]) }));nextId=products.reduce((m,p)=>Math.max(m,p.id),0)+1;changed=true;}
-    if(results[1]&&results[1].length){categories=results[1];changed=true;}
-    if(results[2]&&results[2].length){materials=results[2];changed=true;}
-    if(results[3]){policies=results[3];}
-    if(changed){renderFilters();renderGrid();populateCatSelect();populateMatSelect();}
-  }catch(e){ console.warn('Firebase sync error:',e); }
-}
-
-function defProds(){
-  return [
-    {id:1,name:"Suport Senzor Parcare",brand:"AutoCore OEM",category:"Piese Auto",material:"ABS/ASA",price:45,images:[],badges:["UV Resistant","Impact Proof"],description:"Suport 3D pentru senzori parcare OEM, rezistent UV și impact. Transport inclus.",stock:true},
-    {id:2,name:"Canalizare Intercooler",brand:"CorePerformance",category:"Piese Auto",material:"Carbon Fiber",price:180,images:[],badges:["High Temp","Carbon Rigid"],description:"Conductă aer carbon compozit pentru intercooler. Transport inclus.",stock:true},
-    {id:3,name:"Grilă Ventilație Habitaclu",brand:"AutoCore OEM",category:"ABS/ASA",material:"ABS/ASA",price:30,images:[],badges:["UV Resistant","Impact Proof"],description:"Grilă ventilație ABS/ASA cu finisaj mat, rezistentă UV. Transport inclus.",stock:true},
-    {id:4,name:"Bracket Filtru Sport",brand:"CorePerformance",category:"Carbon Fiber",material:"Carbon Fiber",price:210,images:[],badges:["Carbon Rigid","High Temp"],description:"Suport rigid carbon pentru filtre sport aftermarket. Transport inclus.",stock:false},
-    {id:5,name:"Capac Oglindă Aerodinamic",brand:"AutoCore OEM",category:"Piese Auto",material:"ABS/ASA",price:75,images:[],badges:["UV Resistant","Impact Proof"],description:"Carcase oglinzi aerodinamice, compatibile VAG/BMW. Transport inclus.",stock:true},
-    {id:6,name:"Difuzor Spate Universal",brand:"CorePerformance",category:"Altele",material:"Carbon Fiber",price:320,images:[],badges:["Carbon Rigid","UV Resistant"],description:"Difuzor aerodinamic spate, carbon compozit. Transport inclus.",stock:true},
-  ];
-}
-
-let products   = lsGet(LS_P, defProds()).map(p=>({...p, images:p.images||(p.imageUrl?[p.imageUrl]:[]) }));
-let categories = lsGet(LS_C, JSON.parse(JSON.stringify(DEFAULT_CATS)));
-let materials  = lsGet(LS_MAT, JSON.parse(JSON.stringify(DEFAULT_MATS)));
-let policies   = lsGet(LS_POL, {privacyRo:"Datele personale colectate sunt utilizate exclusiv pentru procesarea comenzilor și nu sunt transmise terților fără consimțământul dumneavoastră.",privacyEn:"Personal data collected is used exclusively for order processing and is not shared with third parties without your consent.",termsRo:"Prin plasarea unei comenzi, ești de acord cu termenii AUTOCORE3D. Prețurile includ TVA, transport și toate taxele.",termsEn:"By placing an order, you agree to AUTOCORE3D's terms. Prices include VAT, shipping and all taxes.",returnRo:"Produsele pot fi returnate în termen de 14 zile de la primire, în stare originală, nefolosită.",returnEn:"Products can be returned within 14 days of receipt, in original unused condition.",cookiesRo:"Folosim cookie-uri esențiale pentru funcționarea site-ului. Nu colectăm cookie-uri de marketing fără acordul utilizatorului.",cookiesEn:"We use essential cookies for website operation. We do not collect marketing cookies without explicit consent."});
-
-let nextId     = products.reduce((m,p)=>Math.max(m,p.id),0)+1;
+/* ══ STATE ══ */
+let products   = [];
+let categories = [];
+let materials  = [];
+let policies   = {...DEFAULT_POLICIES};
 let lang       = "ro";
 let filter     = "Toate";
-let editId     = null, stockVal=true, selB=[], imgMode="url", formImgs=[];
-let delTgt     = null, delType ="prod";
-let catEditId  = null;
-let matEditId  = null;
+let editId     = null, stockVal=true, selB=[], imgMode="file", formImgs=[];
+let delTgt     = null, delType="prod";
+let catEditId  = null, matEditId=null;
 let adminAuth  = false;
 let coProd     = null, payMethod="RAMBURS";
 
@@ -850,108 +865,112 @@ let coProd     = null, payMethod="RAMBURS";
 const $ = id => document.getElementById(id);
 const getCatColor = name => { const c=categories.find(x=>x.name===name); return c?c.color:"#E01A1A"; };
 const getCatNames = () => categories.map(c=>c.name);
-const getMatColor = name => { const m=materials.find(x=>x.name===name); return m?m.color:(MC_DEFAULT[name]||"#E01A1A"); };
+const getMatColor = name => { const m=materials.find(x=>x.name===name); return m?m.color:"#E01A1A"; };
 const getMatNames = () => materials.map(m=>m.name);
-function toast(msg){const e=$('toast');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),4000);}
+
+function toast(msg, isErr=false){
+  const e=$('toast');
+  e.textContent=msg;
+  e.classList.toggle('err', isErr);
+  e.classList.add('show');
+  setTimeout(()=>e.classList.remove('show'),4000);
+}
 function showOk(m){const e=$('apOk');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
 
-/* ══ CURSOR ══ */
-document.addEventListener('mousemove',e=>{const c=$('cg');c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';});
+function contrastColor(hex){
+  const h=hex.replace('#','');
+  const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  const lum=c=>c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4);
+  const L=0.2126*lum(r/255)+0.7152*lum(g/255)+0.0722*lum(b/255);
+  return L>0.179?'#000000':'#ffffff';
+}
+
+function setDbStatus(state, msg){
+  const badge=$('dbBadge');
+  badge.className=`db-badge ${state}`;
+  $('dbText').textContent=msg;
+}
+
+/* ══ I18N ══ */
+const T={
+  ro:{hero_eyebrow:"// PIESE AUTO · PRINTARE 3D · ROMÂNIA",hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț",nav_contact:"Contact",stat_products:"Produse",shipping_included:"Transport și taxe incluse în preț",prod_found:"PRODUSE GĂSITE",order_btn:"Comandă",unavailable:"Indisponibil",toast_saved:"✓ Salvat cu succes!",policy_privacy_title:"Politică de Confidențialitate",policy_terms_title:"Termeni și Condiții",policy_return_title:"Politică de Retur",policy_cookies_title:"Politică Cookies"},
+  en:{hero_eyebrow:"// AUTO PARTS · 3D PRINTING · ROMANIA",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",nav_contact:"Contact",stat_products:"Products",shipping_included:"Shipping and taxes included in price",prod_found:"PRODUCTS FOUND",order_btn:"Order",unavailable:"Unavailable",toast_saved:"✓ Saved successfully!",policy_privacy_title:"Privacy Policy",policy_terms_title:"Terms & Conditions",policy_return_title:"Return Policy",policy_cookies_title:"Cookie Policy"}
+};
+const t = k => T[lang][k]||T.ro[k]||k;
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.dataset.i18n;
+    if(k==='hero_h1_html') el.innerHTML=t(k);
+    else el.textContent=t(k);
+  });
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
+  renderFilters(); renderGrid(); renderPolicyCards();
+}
+$('langBtn').addEventListener('click',e=>{
+  const b=e.target.closest('.lang-opt');if(!b)return;
+  lang=b.dataset.lang; applyI18n();
+});
 
 /* ══ TICKER ══ */
-function buildTicker(){const a=[...TICK_ITEMS,...TICK_ITEMS];$('ticker').innerHTML=a.map(t=>`<span class="t-item"><b>▸</b>${t}</span>`).join('');}
+function buildTicker(){
+  const a=[...TICK_ITEMS,...TICK_ITEMS];
+  $('ticker').innerHTML=a.map(t=>`<span class="t-item"><b>▸</b>${t}</span>`).join('');
+}
 
 /* ══ SVG ══ */
 function hexSVG(s=68){return`<svg width="${s}" height="${s}" viewBox="0 0 80 80" fill="none"><polygon points="40,8 72,28 72,52 40,72 8,52 8,28" stroke="#E01A1A" stroke-width="1.5" fill="none" opacity=".4"/><polygon points="40,20 60,32 60,48 40,60 20,48 20,32" stroke="#E01A1A" stroke-width="1" fill="none" opacity=".22"/><circle cx="40" cy="40" r="4" fill="#E01A1A" opacity=".65"/></svg>`;}
 function waSVG(){return`<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;}
 
-/* ══ I18N ══ */
-const T={ro:{hero_eyebrow:"// PIESE AUTO · PRINTARE 3D · ROMÂNIA",hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport și taxe incluse în preț",nav_contact:"Contact",stat_products:"Produse",shipping_included:"Transport și taxe incluse în preț",prod_found:"PRODUSE GĂSITE",order_btn:"Comandă",unavailable:"Indisponibil",btn_wa:"Trimite pe WhatsApp",btn_direct:"Plasează comanda direct",btn_direct_note:"Vei fi contactat în cel mai scurt timp",btn_wa_only:"Pentru plata online contactați-ne pe WhatsApp",cancel:"Anulează",toast_order:"✓ Comandă plasată! Vei fi contactat în curând.",toast_saved:"✓ Salvat cu succes!",policy_privacy_title:"Politică de Confidențialitate",policy_terms_title:"Termeni și Condiții",policy_return_title:"Politică de Retur",policy_cookies_title:"Politică Cookies"},en:{hero_eyebrow:"// AUTO PARTS · 3D PRINTING · ROMANIA",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",nav_contact:"Contact",stat_products:"Products",shipping_included:"Shipping and taxes included in price",prod_found:"PRODUCTS FOUND",order_btn:"Order",unavailable:"Unavailable",btn_wa:"Send via WhatsApp",btn_direct:"Place order directly",btn_direct_note:"You will be contacted as soon as possible",btn_wa_only:"For online payment please contact us on WhatsApp",cancel:"Cancel",toast_order:"✓ Order placed! You will be contacted shortly.",toast_saved:"✓ Saved successfully!",policy_privacy_title:"Privacy Policy",policy_terms_title:"Terms & Conditions",policy_return_title:"Return Policy",policy_cookies_title:"Cookie Policy"}};
-const t = k => T[lang][k]||T.ro[k]||k;
-function applyI18n(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(k==='hero_h1_html')el.innerHTML=t(k);else el.textContent=t(k);});
-  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
-  renderFilters(); renderGrid(); renderPolicyCards();
-}
-$('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');if(!b)return;lang=b.dataset.lang;applyI18n();});
-
-/* ══ COLOR CONTRAST ══ */
-function contrastColor(hex){
-  // Returns #fff or #000 based on luminance of hex color
-  const h = hex.replace('#','');
-  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
-  // Relative luminance (WCAG)
-  const lum = (c=>c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4));
-  const L = 0.2126*lum(r/255) + 0.7152*lum(g/255) + 0.0722*lum(b/255);
-  return L > 0.179 ? '#000000' : '#ffffff';
-}
-
 /* ══ CAROUSEL ══ */
 function buildCarousel(images){
-  const imgs = (images&&images.length) ? images : [];
-  const n = imgs.length;
-  if(!n){
-    return `<div class="card-carousel"><div class="carousel-track"><div class="carousel-slide"><div class="card-hex-wrap">${hexSVG()}<span class="hex-lbl">3D MODEL</span></div></div></div></div>`;
-  }
-  const slides = imgs.map(u=>`<div class="carousel-slide"><img src="${u}" alt="" loading="lazy" onerror="this.parentElement.style.background='#0d0d0d'"/></div>`).join('');
-  const dots   = n>1 ? `<div class="car-dots">${imgs.map((_,i)=>`<div class="car-dot${i===0?' on':''}"></div>`).join('')}</div>` : '';
-  const ctr    = n>1 ? `<div class="car-counter">1 / ${n}</div>` : '';
+  const imgs=(images&&images.length)?images:[];
+  const n=imgs.length;
+  if(!n) return `<div class="card-carousel"><div class="carousel-track"><div class="carousel-slide"><div class="card-hex-wrap">${hexSVG()}<span class="hex-lbl">3D MODEL</span></div></div></div></div>`;
+  const slides=imgs.map(u=>`<div class="carousel-slide"><img src="${u}" alt="" loading="lazy" onerror="this.parentElement.style.background='#0d0d0d'"/></div>`).join('');
+  const dots=n>1?`<div class="car-dots">${imgs.map((_,i)=>`<div class="car-dot${i===0?' on':''}"></div>`).join('')}</div>`:'';
+  const ctr=n>1?`<div class="car-counter">1 / ${n}</div>`:'';
   return `<div class="card-carousel" data-idx="0" data-count="${n}"><div class="carousel-track">${slides}</div>${dots}${ctr}</div>`;
 }
 
-function carGoto(car, ni){
-  const n = parseInt(car.dataset.count)||1;
-  ni = Math.max(0, Math.min(n-1, ni));
-  car.dataset.idx = ni;
-  car.querySelector('.carousel-track').style.transform = `translateX(-${ni*100}%)`;
+function carGoto(car,ni){
+  const n=parseInt(car.dataset.count)||1;
+  ni=Math.max(0,Math.min(n-1,ni));
+  car.dataset.idx=ni;
+  car.querySelector('.carousel-track').style.transform=`translateX(-${ni*100}%)`;
   car.querySelectorAll('.car-dot').forEach((d,i)=>d.classList.toggle('on',i===ni));
-  const ctr = car.querySelector('.car-counter');
-  if(ctr) ctr.textContent = `${ni+1} / ${n}`;
+  const ctr=car.querySelector('.car-counter');
+  if(ctr) ctr.textContent=`${ni+1} / ${n}`;
 }
 
 function attachCarousel(card){
-  const car = card.querySelector('.card-carousel');
+  const car=card.querySelector('.card-carousel');
   if(!car) return;
-  const n = parseInt(car.dataset.count||0);
-  if(n < 2) return;
-
-  // Touch swipe
-  let startX=0, startY=0, moved=false;
-  car.addEventListener('touchstart',e=>{
-    startX=e.touches[0].clientX;
-    startY=e.touches[0].clientY;
-    moved=false;
-  },{passive:true});
-  car.addEventListener('touchmove',e=>{
-    if(Math.abs(e.touches[0].clientX-startX)>8) moved=true;
-  },{passive:true});
+  const n=parseInt(car.dataset.count||0);
+  if(n<2) return;
+  let startX=0,startY=0;
+  car.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY;},{passive:true});
   car.addEventListener('touchend',e=>{
     const dx=e.changedTouches[0].clientX-startX;
     const dy=e.changedTouches[0].clientY-startY;
-    // only swipe if horizontal movement dominates
-    if(Math.abs(dx)>Math.abs(dy)*1.5 && Math.abs(dx)>40){
-      carGoto(car, parseInt(car.dataset.idx)+(dx<0?1:-1));
-    }
+    if(Math.abs(dx)>Math.abs(dy)*1.5&&Math.abs(dx)>40) carGoto(car,parseInt(car.dataset.idx)+(dx<0?1:-1));
   },{passive:true});
-
-  // Mouse drag (desktop)
-  let mDown=false, mStartX=0, dragged=false;
-  car.addEventListener('mousedown',e=>{mDown=true;mStartX=e.clientX;dragged=false;});
-  car.addEventListener('mousemove',e=>{if(mDown&&Math.abs(e.clientX-mStartX)>8)dragged=true;});
+  let mDown=false,mStartX=0;
+  car.addEventListener('mousedown',e=>{mDown=true;mStartX=e.clientX;});
   car.addEventListener('mouseup',e=>{
-    if(!mDown)return; mDown=false;
+    if(!mDown) return; mDown=false;
     const dx=e.clientX-mStartX;
-    if(Math.abs(dx)>40){e.stopPropagation();e.preventDefault();carGoto(car,parseInt(car.dataset.idx)+(dx<0?1:-1));}
+    if(Math.abs(dx)>40){e.stopPropagation();carGoto(car,parseInt(car.dataset.idx)+(dx<0?1:-1));}
   });
   car.addEventListener('mouseleave',()=>{mDown=false;});
 }
 
 /* ══ CARD ══ */
 function renderCard(p){
-  const mc   = getMatColor(p.material);
-  const mtxt = contrastColor(mc);
-  const cc   = getCatColor(p.category);
-  const bgs  = (p.badges||[]).map(b=>{const bc=BC.find(x=>x.k===b)||{i:"·",c:"#E01A1A"};return`<span class="badge" style="border-color:${bc.c}44;color:${bc.c}"><span>${bc.i}</span> ${b}</span>`;}).join('');
+  const mc=getMatColor(p.material);
+  const mtxt=contrastColor(mc);
+  const cc=getCatColor(p.category);
+  const bgs=(p.badges||[]).map(b=>{const bc=BC.find(x=>x.k===b)||{i:"·",c:"#E01A1A"};return`<span class="badge" style="border-color:${bc.c}44;color:${bc.c}"><span>${bc.i}</span> ${b}</span>`;}).join('');
   return `<div class="card${p.stock?'':' card-oos'}" data-id="${p.id}">
     <div class="card-glow"></div>
     <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
@@ -959,8 +978,8 @@ function renderCard(p){
     ${buildCarousel(p.images||[])}
     <div class="card-body">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:.4rem;flex-wrap:wrap;">
-        <div class="card-cat" style="color:${cc}">// ${p.category}</div>
-        <span class="mat-tag" style="border-color:${mc};background:${mc};color:${mtxt}">${p.material}</span>
+        <div class="card-cat" style="color:${cc}">// ${p.category||'—'}</div>
+        <span class="mat-tag" style="border-color:${mc};background:${mc};color:${mtxt}">${p.material||'—'}</span>
       </div>
       <div class="card-name">${p.name}</div>
       ${p.brand?`<div class="card-brand">⬡ ${p.brand}</div>`:''}
@@ -974,13 +993,19 @@ function renderCard(p){
   </div>`;
 }
 
+/* ══ SKELETON ══ */
+function renderSkeletons(n=6){
+  return Array(n).fill(`<div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton w60"></div><div class="skel-line skeleton w80"></div><div class="skel-line skeleton w40"></div></div></div>`).join('');
+}
+
 /* ══ GRID ══ */
 function renderGrid(){
-  const all = lang==='ro'?"Toate":"All";
-  const list= (filter===all||filter==="Toate"||filter==="All") ? products : products.filter(p=>p.category===filter);
+  const all=lang==='ro'?"Toate":"All";
+  const list=(filter===all||filter==="Toate"||filter==="All")?products:products.filter(p=>p.category===filter);
   const g=$('grid');
-  if(!list.length){g.innerHTML=`<div class="no-prod">// 0 ${t('prod_found')}</div>`;}
-  else{
+  if(!list.length){
+    g.innerHTML=`<div class="no-prod">// 0 ${t('prod_found')}</div>`;
+  } else {
     g.innerHTML=list.map(renderCard).join('');
     g.querySelectorAll('.card').forEach((c,i)=>{
       c.style.transitionDelay=`${i*55}ms`;
@@ -1000,18 +1025,31 @@ function renderFilters(){
   const names=[all,...getCatNames()];
   const curIsAll=filter==="Toate"||filter==="All";
   $('fbar').innerHTML=names.map((n,i)=>{
-    const isAll=i===0, isOn=isAll?curIsAll:(filter===n);
+    const isAll=i===0,isOn=isAll?curIsAll:(filter===n);
     const col=isAll?"#E01A1A":getCatColor(n);
-    return`<button class="fb${isOn?' on':''}" data-fname="${n}" style="border-color:${isOn?col:'#262626'};${isOn?`background:${col};`:''}color:${isOn?'#fff':'var(--sub)'};${!isOn?`--hover-col:${col}`:''}">` +
-      `${n}</button>`;
+    return`<button class="fb${isOn?' on':''}" data-fname="${n}" style="border-color:${isOn?col:'#262626'};${isOn?`background:${col};`:''}color:${isOn?'#fff':'var(--sub)'};">${n}</button>`;
   }).join('');
 }
-$('fbar').addEventListener('click',e=>{const b=e.target.closest('.fb');if(!b)return;filter=b.dataset.fname;renderFilters();renderGrid();});
+$('fbar').addEventListener('click',e=>{
+  const b=e.target.closest('.fb');if(!b)return;
+  filter=b.dataset.fname;renderFilters();renderGrid();
+});
 
 /* ══ POLICY CARDS ══ */
 function renderPolicyCards(){
-  const cards=lang==='ro'?[{title:"🔒 Confidențialitate",text:"Datele personale colectate (nume, telefon, email, adresă) sunt folosite exclusiv pentru procesarea comenzii tale și nu sunt transmise terților."},{title:"📦 Transport & Livrare",text:"Transportul și toate taxele sunt incluse în prețul afișat. Livrare prin curier rapid pe teritoriul României."},{title:"↩ Retur",text:"Produsele pot fi returnate în termen de 14 zile de la primire, în stare originală. Costul returului este suportat de cumpărător."},{title:"🍪 Cookies",text:"Site-ul folosește cookie-uri esențiale pentru funcționare. Nu colectăm date de marketing fără acordul tău explicit."}]:[{title:"🔒 Privacy",text:"Personal data collected (name, phone, email, address) is used exclusively for processing your order and is not shared with third parties."},{title:"📦 Shipping & Delivery",text:"Shipping and all taxes are included in the displayed price. Delivery via express courier throughout Romania."},{title:"↩ Returns",text:"Products can be returned within 14 days of receipt, in original unused condition. Return shipping costs are borne by the buyer."},{title:"🍪 Cookies",text:"This site uses essential cookies for operation. We do not collect marketing data without your explicit consent."}];
-  $('policyGrid').innerHTML=cards.map(c=>`<div class="policy-card"><div class="policy-title">${c.title}</div><div class="policy-text">${c.text}</div></div>`).join('');
+  const cards=lang==='ro'?[
+    {title:"🔒 Confidențialitate",text:"Datele personale colectate (nume, telefon, email, adresă) sunt folosite exclusiv pentru procesarea comenzii tale și nu sunt transmise terților."},
+    {title:"📦 Transport & Livrare",text:"Transportul și toate taxele sunt incluse în prețul afișat. Livrare prin curier rapid pe teritoriul României."},
+    {title:"↩ Retur",text:"Produsele pot fi returnate în termen de 14 zile de la primire, în stare originală. Costul returului este suportat de cumpărător."},
+    {title:"🍪 Cookies",text:"Site-ul folosește cookie-uri esențiale pentru funcționare. Nu colectăm date de marketing fără acordul tău explicit."}
+  ]:[
+    {title:"🔒 Privacy",text:"Personal data collected (name, phone, email, address) is used exclusively for processing your order and is not shared with third parties."},
+    {title:"📦 Shipping & Delivery",text:"Shipping and all taxes are included in the displayed price. Delivery via express courier throughout Romania."},
+    {title:"↩ Returns",text:"Products can be returned within 14 days of receipt, in original unused condition. Return shipping costs are borne by the buyer."},
+    {title:"🍪 Cookies",text:"This site uses essential cookies for operation. We do not collect marketing data without your explicit consent."}
+  ];
+  $('policyGrid').innerHTML=cards.map(c=>`<div class="policy-card anim-ready"><div class="policy-title">${c.title}</div><div class="policy-text">${c.text}</div></div>`).join('');
+  initScrollReveal();
 }
 
 /* ══ POLICY MODAL ══ */
@@ -1029,114 +1067,54 @@ $('fpCookies').onclick=()=>openPolicyModal('cookies');
 $('policyClose').onclick=()=>$('policyModal').classList.remove('open');
 $('policyModal').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');};
 
-/* ══ TELEGRAM via Cloudflare Worker ══ */
-const WORKER_URL = "https://autocore3d.darius-madness2001.workers.dev";
+/* ══ LOAD DATA FROM SUPABASE ══ */
+async function loadAll(){
+  $('grid').innerHTML=renderSkeletons();
+  setDbStatus('loading','Conectare Supabase...');
+  try {
+    const [prods, cats, mats, pols] = await Promise.all([
+      sb.getProducts(),
+      sb.getCategories(),
+      sb.getMaterials(),
+      sb.getPolicies()
+    ]);
 
-async function sendTelegram(text){
-  try{
-    const res = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({text})
-    });
-    const data = await res.json();
-    if(!data.ok) console.warn("Telegram error:", data);
-  }catch(e){
-    console.warn("Worker error:", e);
+    // Products — normalize images field
+    products = (prods||[]).map(p=>({
+      ...p,
+      images: Array.isArray(p.images) ? p.images : (p.image_url ? [p.image_url] : []),
+      badges: Array.isArray(p.badges) ? p.badges : []
+    }));
+
+    // Categories — use DB or seed defaults
+    if(cats&&cats.length){
+      categories=cats;
+    } else {
+      // Seed defaults
+      await Promise.all(DEFAULT_CATS.map(c=>sb.upsertCategory(c)));
+      categories=[...DEFAULT_CATS];
+    }
+
+    if(mats&&mats.length){
+      materials=mats;
+    } else {
+      await Promise.all(DEFAULT_MATS.map(m=>sb.upsertMaterial({...m,description:m.description})));
+      materials=[...DEFAULT_MATS];
+    }
+
+    if(pols) policies={...DEFAULT_POLICIES,...pols};
+
+    setDbStatus('ok','Supabase conectat ✓');
+    renderFilters();
+    renderGrid();
+    renderPolicyCards();
+  } catch(e){
+    console.error('Supabase error:', e);
+    setDbStatus('err',`Eroare: ${e.message}`);
+    toast('Eroare conexiune Supabase. Verifică consola.', true);
+    $('grid').innerHTML=`<div class="no-prod">// Eroare conexiune bază de date</div>`;
   }
 }
-
-/* ══ CHECKOUT ══ */
-$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-order]');if(!b)return;openCheckout(+b.dataset.order);});
-
-function openCheckout(id){
-  coProd=products.find(p=>p.id===id);if(!coProd)return;
-  payMethod="RAMBURS";
-  $('coProdName').textContent=coProd.name;
-  $('coProdPrice').textContent=`${coProd.price} RON — ${t('shipping_included')}`;
-  const firstImg=(coProd.images||[])[0];
-  $('coThumb').innerHTML=firstImg?`<img src="${firstImg}" alt=""/>` : `<div style="font-size:1.4rem;color:#333">⬡</div>`;
-  ['coFname','coLname','coPhone','coEmail','coAddress'].forEach(id=>{const el=$(id);el.value='';el.classList.remove('invalid');});
-  document.querySelectorAll('.pay-opt').forEach(o=>o.classList.toggle('sel',o.dataset.pay==="RAMBURS"));
-  renderCoActions();
-  $('coModal').classList.add('open');
-}
-
-function renderCoActions(){
-  const el=$('coActions');
-  el.innerHTML=`
-    <button class="btn-wa" id="btnWA" style="background:#25D366">${waSVG()} Trimite comanda pe WhatsApp</button>
-    <button class="btn-outline-cancel" id="btnC">Anulează</button>`;
-  $('btnWA').onclick=handleWA;
-  $('btnC').onclick=closeCheckout;
-}
-
-function getCoData(){return{fname:$('coFname').value.trim(),lname:$('coLname').value.trim(),phone:$('coPhone').value.trim(),email:$('coEmail').value.trim(),address:$('coAddress').value.trim()};}
-
-function validateCo(){
-  const d=getCoData();let ok=true;
-  ['coFname','coLname','coPhone','coAddress'].forEach(id=>{
-    const el=$(id);
-    if(!el.value.trim()){el.classList.add('invalid');ok=false;}
-    else el.classList.remove('invalid');
-  });
-  return ok?d:null;
-}
-
-function handleWA(){
-  const d=validateCo();if(!d)return;
-  const payLabel={
-    'RAMBURS':'💵 Ramburs (plată la livrare)',
-    'ONLINE':'💳 Card / Transfer bancar',
-    '50% ONLINE + 50% RAMBURS':'⚡ 50% Online + 50% Ramburs'
-  }[payMethod]||payMethod;
-
-  const msg=`Bună ziua! Doresc să plasez o comandă:
-
-🛒 *Produs:* ${coProd.name}
-💰 *Preț:* ${coProd.price} RON (transport inclus)
-${payLabel}
-
-👤 *Nume:* ${d.fname} ${d.lname}
-📞 *Telefon:* ${d.phone}
-📧 *Email:* ${d.email||'—'}
-📍 *Adresă:* ${d.address}
-
-Vă mulțumesc!`;
-
-  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
-  closeCheckout();
-}
-
-function closeCheckout(){
-  $('coModal').classList.remove('open');
-  coProd=null;
-  // Restore modal box to original after animation
-  setTimeout(()=>{
-    const box=$('coModal').querySelector('.modal-box');
-    if(box) box.innerHTML=_coModalHTML;
-    // Re-wire pay options
-    $('coModal').querySelectorAll('.pay-opt').forEach(o=>{
-      o.addEventListener('click',()=>{
-        payMethod=o.dataset.pay;
-        document.querySelectorAll('.pay-opt').forEach(x=>x.classList.toggle('sel',x===o));
-        renderCoActions();
-      });
-    });
-    $('coClose').onclick=closeCheckout;
-  },350);
-}
-
-// Store original modal HTML to restore it after close
-const _coModalHTML = $('coModal').querySelector('.modal-box').innerHTML;
-$('coClose').onclick=closeCheckout;
-$('coModal').onclick=e=>{if(e.target===e.currentTarget)closeCheckout();};
-$('coModal').addEventListener('click',e=>{
-  const o=e.target.closest('.pay-opt');if(!o)return;
-  payMethod=o.dataset.pay;
-  document.querySelectorAll('.pay-opt').forEach(x=>x.classList.toggle('sel',x===o));
-  renderCoActions();
-});
 
 /* ══ AUTH ══ */
 $('admBtn').onclick=()=>{if(adminAuth){openAdmin();return;}$('pwOverlay').style.display='flex';setTimeout(()=>$('pwInp').focus(),80);};
@@ -1156,7 +1134,8 @@ function showTab(tab){
   ['formView','listView','catView','matView','policyView'].forEach(id=>$(id).style.display='none');
   document.querySelectorAll('.ap-tab').forEach(b=>b.classList.remove('on'));
   const map={add:['formView','tabAdd'],list:['listView','tabList'],cat:['catView','tabCat'],mat:['matView','tabMat'],policy:['policyView','tabPolicy']};
-  const[v,tb]=map[tab];$(v).style.display='flex';$(tb).classList.add('on');
+  const[v,tb]=map[tab];
+  $(v).style.display='flex';$(tb).classList.add('on');
   if(tab==='list')renderList();
   if(tab==='cat'){catEditId=null;renderCatList();resetCatForm();}
   if(tab==='mat'){matEditId=null;renderMatList();resetMatForm();}
@@ -1169,39 +1148,74 @@ $('tabCat').onclick=()=>showTab('cat');
 $('tabMat').onclick=()=>showTab('mat');
 $('tabPolicy').onclick=()=>showTab('policy');
 
+/* ══ IMAGE UPLOAD TO SUPABASE ══ */
+async function uploadFilesToSupabase(files){
+  const urls=[];
+  const total=files.length;
+  $('uploadProgress').style.display='block';
+  for(let i=0;i<total;i++){
+    const file=files[i];
+    const ext=file.name.split('.').pop();
+    const path=`products/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    $('uploadLabel').textContent=`Se încarcă ${i+1}/${total}: ${file.name}`;
+    $('uploadBar').style.width=`${Math.round((i/total)*100)}%`;
+    try{
+      const url=await sb.uploadImage(file,path);
+      urls.push(url);
+    }catch(e){
+      toast(`Eroare upload ${file.name}: ${e.message}`,true);
+    }
+  }
+  $('uploadBar').style.width='100%';
+  setTimeout(()=>{$('uploadProgress').style.display='none';$('uploadBar').style.width='0%';},1000);
+  return urls;
+}
+
 /* ══ MULTI-IMAGE ADMIN ══ */
 function renderImgsList(){
   $('imgCountNote').textContent=`${formImgs.length} imagin${formImgs.length===1?'e':'i'} adăugat${formImgs.length===1?'ă':'e'}`;
   $('imgsList').innerHTML=formImgs.map((url,i)=>{
-    const label=url.startsWith('data:')?`Upload ${i+1}`:(url.length>42?url.slice(0,40)+'…':url);
-    const upBtn  = i>0                ? `<button class="img-row-btn mv" data-mv="${i}" data-dir="-1" title="Mută sus">↑</button>` : '';
-    const dnBtn  = i<formImgs.length-1? `<button class="img-row-btn mv" data-mv="${i}" data-dir="1"  title="Mută jos">↓</button>` : '';
+    const isSB = url.includes('supabase');
+    const label= isSB ? `☁ Supabase: …${url.slice(-30)}` : (url.length>42?url.slice(0,40)+'…':url);
+    const upBtn=i>0?`<button class="img-row-btn mv" data-mv="${i}" data-dir="-1">↑</button>`:'';
+    const dnBtn=i<formImgs.length-1?`<button class="img-row-btn mv" data-mv="${i}" data-dir="1">↓</button>`:'';
     return`<div class="img-row">
       <div class="img-row-thumb"><img src="${url}" alt="" onerror="this.parentElement.textContent='⬡'"/></div>
-      <div class="img-row-label" title="${url.startsWith('data:')?'':url}">${label}</div>
-      <div class="img-row-actions">${upBtn}${dnBtn}<button class="img-row-btn" data-rm="${i}" title="Șterge">✕</button></div>
+      <div class="img-row-label" title="${url}">${label}</div>
+      <div class="img-row-actions">${upBtn}${dnBtn}<button class="img-row-btn" data-rm="${i}">✕</button></div>
     </div>`;
   }).join('');
 }
+
 $('imgsList').addEventListener('click',e=>{
-  const rm=e.target.closest('[data-rm]'), mv=e.target.closest('[data-mv]');
+  const rm=e.target.closest('[data-rm]'),mv=e.target.closest('[data-mv]');
   if(rm){formImgs.splice(+rm.dataset.rm,1);renderImgsList();}
   if(mv){const i=+mv.dataset.mv,d=+mv.dataset.dir,ni=i+d;if(ni<0||ni>=formImgs.length)return;[formImgs[i],formImgs[ni]]=[formImgs[ni],formImgs[i]];renderImgsList();}
 });
+
 $('imgUrlBtn').onclick=()=>{imgMode='url';$('urlInputArea').style.display='block';$('fileInputArea').style.display='none';$('imgUrlBtn').classList.add('on');$('imgFileBtn').classList.remove('on');};
 $('imgFileBtn').onclick=()=>{imgMode='file';$('urlInputArea').style.display='none';$('fileInputArea').style.display='block';$('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');};
 $('addUrlBtn').onclick=()=>{const u=$('fImgUrl').value.trim();if(!u)return;formImgs.push(u);$('fImgUrl').value='';renderImgsList();};
 $('fImgUrl').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('addUrlBtn').click();}};
+
 $('dropzone').onclick=()=>$('fileInput').click();
-$('fileInput').onchange=e=>{
-  Array.from(e.target.files).forEach(f=>{const r=new FileReader();r.onload=ev=>{formImgs.push(ev.target.result);renderImgsList();};r.readAsDataURL(f);});
+$('fileInput').onchange=async e=>{
+  const files=Array.from(e.target.files);
+  if(!files.length) return;
+  const urls=await uploadFilesToSupabase(files);
+  formImgs.push(...urls);
+  renderImgsList();
   e.target.value='';
 };
 $('dropzone').ondragover=e=>{e.preventDefault();$('dropzone').classList.add('drag');};
 $('dropzone').ondragleave=()=>$('dropzone').classList.remove('drag');
-$('dropzone').ondrop=e=>{
+$('dropzone').ondrop=async e=>{
   e.preventDefault();$('dropzone').classList.remove('drag');
-  Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')).forEach(f=>{const r=new FileReader();r.onload=ev=>{formImgs.push(ev.target.result);renderImgsList();};r.readAsDataURL(f);});
+  const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+  if(!files.length) return;
+  const urls=await uploadFilesToSupabase(files);
+  formImgs.push(...urls);
+  renderImgsList();
 };
 
 /* ══ FORM ══ */
@@ -1209,34 +1223,61 @@ function renderBadges(){$('badgeGrid').innerHTML=BC.map(b=>`<button class="badge
 function setStk(){$('stIn').className='stock-btn'+(stockVal?' in':'');$('stOut').className='stock-btn'+(stockVal?'':' out');}
 function populateCatSelect(){const sel=$('fCat'),cur=sel.value;sel.innerHTML=getCatNames().map(n=>`<option>${n}</option>`).join('');if(cur&&getCatNames().includes(cur))sel.value=cur;}
 function populateMatSelect(){const sel=$('fMat'),cur=sel.value;sel.innerHTML=getMatNames().map(n=>`<option>${n}</option>`).join('');if(cur&&getMatNames().includes(cur))sel.value=cur;}
+
 function resetForm(){
-  editId=null;stockVal=true;selB=[];formImgs=[];imgMode='url';
+  editId=null;stockVal=true;selB=[];formImgs=[];imgMode='file';
   ['fName','fBrand','fPrice','fDesc','fImgUrl'].forEach(id=>{const e=$(id);if(e)e.value='';});
   populateCatSelect();populateMatSelect();
-  $('urlInputArea').style.display='block';$('fileInputArea').style.display='none';
-  $('imgUrlBtn').classList.add('on');$('imgFileBtn').classList.remove('on');
+  $('urlInputArea').style.display='none';$('fileInputArea').style.display='block';
+  $('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');
   renderImgsList();
   $('formSubmit').textContent='+ Adaugă Produs';$('formCancel').style.display='none';
   $('tabAdd').textContent='+ Adaugă';
   setStk();renderBadges();
 }
+
 $('stIn').onclick=()=>{stockVal=true;setStk();};
 $('stOut').onclick=()=>{stockVal=false;setStk();};
 $('badgeGrid').addEventListener('click',e=>{const b=e.target.closest('.badge-btn');if(!b)return;const k=b.dataset.badge;selB=selB.includes(k)?selB.filter(x=>x!==k):[...selB,k];renderBadges();});
 $('formCancel').onclick=resetForm;
-$('formSubmit').onclick=()=>{
+
+$('formSubmit').onclick=async()=>{
   const name=$('fName').value.trim(), price=parseFloat($('fPrice').value);
-  if(!name||!price)return;
-  const pl={name,brand:$('fBrand').value.trim(),category:$('fCat').value,material:$('fMat').value,price,description:$('fDesc').value.trim(),images:[...formImgs],badges:[...selB],stock:stockVal};
-  if(editId!==null){products=products.map(p=>p.id===editId?{...p,...pl}:p);showOk('✓ Actualizat!');}
-  else{products=[{...pl,id:nextId++},...products];showOk('✓ Adăugat!');}
-  save(LS_P,products);resetForm();renderGrid();renderList();
+  if(!name||!price) return;
+  const btn=$('formSubmit');
+  btn.disabled=true; btn.textContent='Se salvează...';
+
+  const pl={
+    name, brand:$('fBrand').value.trim(),
+    category:$('fCat').value, material:$('fMat').value,
+    price, description:$('fDesc').value.trim(),
+    images:[...formImgs], badges:[...selB], stock:stockVal
+  };
+
+  try{
+    if(editId!==null){
+      await sb.updateProduct(editId, pl);
+      products=products.map(p=>p.id===editId?{...p,...pl}:p);
+      showOk('✓ Actualizat în Supabase!');
+    } else {
+      const res=await sb.insertProduct(pl);
+      if(res&&res[0]) products=[res[0],...products];
+      else await loadAll();
+      showOk('✓ Adăugat în Supabase!');
+    }
+    resetForm();renderGrid();renderList();
+  }catch(e){
+    toast(`Eroare: ${e.message}`,true);
+  }finally{
+    btn.disabled=false;
+    btn.textContent=editId!==null?'✓ Actualizează':'+ Adaugă Produs';
+  }
 };
 
 /* ══ LIST ══ */
 function renderList(){
   const el=$('listView');
-  if(!products.length){el.innerHTML='<div class="list-empty">Niciun produs.</div>';return;}
+  if(!products.length){el.innerHTML='<div class="list-empty">Niciun produs în Supabase.</div>';return;}
   el.innerHTML=products.map(p=>{
     const fi=(p.images||[])[0];
     const ic=(p.images||[]).length;
@@ -1245,10 +1286,10 @@ function renderList(){
       <div class="list-info">
         <div class="list-name">${p.name}</div>
         <div class="list-meta">
-          <span class="list-cat" style="color:${getCatColor(p.category)}">${p.category}</span>
+          <span class="list-cat" style="color:${getCatColor(p.category)}">${p.category||'—'}</span>
           <span class="list-price">${p.price} RON</span>
           <span class="list-stock ${p.stock?'in':'out'}">${p.stock?'În stoc':'Epuizat'}</span>
-          ${ic?`<span style="font-family:var(--mono);font-size:.48rem;color:var(--muted)">📷 ${ic}</span>`:''}
+          ${ic?`<span style="font-family:var(--mono);font-size:.48rem;color:var(--muted)">☁ ${ic}</span>`:''}
         </div>
       </div>
       <div class="list-actions">
@@ -1259,23 +1300,39 @@ function renderList(){
     </div>`;
   }).join('');
 }
-$('listView').addEventListener('click',e=>{
+
+$('listView').addEventListener('click',async e=>{
   const tg=e.target.closest('[data-tg]'),ed=e.target.closest('[data-ed]'),dl=e.target.closest('[data-dl]');
-  if(tg){const id=+tg.dataset.tg;products=products.map(p=>p.id===id?{...p,stock:!p.stock}:p);save(LS_P,products);renderGrid();renderList();return;}
+  if(tg){
+    const id=+tg.dataset.tg;
+    const p=products.find(x=>x.id===id);if(!p)return;
+    try{
+      await sb.updateProduct(id,{stock:!p.stock});
+      products=products.map(x=>x.id===id?{...x,stock:!x.stock}:x);
+      renderGrid();renderList();
+    }catch(e){toast('Eroare actualizare stoc',true);}
+    return;
+  }
   if(ed){
-    const id=+ed.dataset.ed, p=products.find(x=>x.id===id);if(!p)return;
-    editId=id;stockVal=p.stock;selB=[...(p.badges||[])];formImgs=[...(p.images||[])];imgMode='url';
+    const id=+ed.dataset.ed,p=products.find(x=>x.id===id);if(!p)return;
+    editId=id;stockVal=p.stock;selB=[...(p.badges||[])];formImgs=[...(p.images||[])];imgMode='file';
     $('fName').value=p.name||'';$('fBrand').value=p.brand||'';
     populateCatSelect();$('fCat').value=p.category||getCatNames()[0];
-    populateMatSelect();$('fMat').value=p.material||getMatNames()[0];$('fPrice').value=p.price||'';$('fDesc').value=p.description||'';
-    $('urlInputArea').style.display='block';$('fileInputArea').style.display='none';
-    $('imgUrlBtn').classList.add('on');$('imgFileBtn').classList.remove('on');
+    populateMatSelect();$('fMat').value=p.material||getMatNames()[0];
+    $('fPrice').value=p.price||'';$('fDesc').value=p.description||'';
+    $('urlInputArea').style.display='none';$('fileInputArea').style.display='block';
+    $('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');
     renderImgsList();
     $('formSubmit').textContent='✓ Actualizează';$('formCancel').style.display='block';
     $('tabAdd').textContent='✎ Editează';
     setStk();renderBadges();showTab('add');return;
   }
-  if(dl){delTgt=+dl.dataset.dl;delType="prod";$('delTitle').textContent='Ștergi produsul?';$('delSub').textContent='Acțiune ireversibilă.';$('delConfirm').style.display='flex';}
+  if(dl){
+    delTgt=+dl.dataset.dl;delType="prod";
+    $('delTitle').textContent='Ștergi produsul?';
+    $('delSub').textContent='Imaginile din Supabase Storage vor rămâne. Acțiune ireversibilă.';
+    $('delConfirm').style.display='flex';
+  }
 });
 
 /* ══ CATEGORIES ══ */
@@ -1289,21 +1346,20 @@ function renderCatList(){
       <div class="cat-item-name">${c.name}</div>
       <div class="cat-item-count">${cnt} prod.</div>
       <div class="cat-item-actions">
-        <button class="list-btn ed" data-cated="${c.id}" title="Editează">✎</button>
-        <button class="list-btn dl" data-catdel="${c.id}" title="Șterge">✕</button>
+        <button class="list-btn ed" data-cated="${c.id}">✎</button>
+        <button class="list-btn dl" data-catdel="${c.id}">✕</button>
       </div>
     </div>`;
   }).join('');
 }
+
 $('catListWrap').addEventListener('click',e=>{
-  const ed=e.target.closest('[data-cated]'), dl=e.target.closest('[data-catdel]');
+  const ed=e.target.closest('[data-cated]'),dl=e.target.closest('[data-catdel]');
   if(ed){
     const cat=categories.find(c=>c.id===ed.dataset.cated);if(!cat)return;
-    catEditId=cat.id;
-    $('catNewName').value=cat.name;$('catNewColor').value=cat.color;
+    catEditId=cat.id;$('catNewName').value=cat.name;$('catNewColor').value=cat.color;
     $('catColorPrev').style.background=cat.color;$('catColorPrev').textContent=cat.name.toUpperCase();
-    $('catFormHeading').textContent='EDITEAZĂ GRUPĂ';
-    $('catSaveBtn').textContent='✓ Salvează';$('catCancelBtn').style.display='block';
+    $('catFormHeading').textContent='EDITEAZĂ GRUPĂ';$('catSaveBtn').textContent='✓ Salvează';$('catCancelBtn').style.display='block';
   }
   if(dl){
     const cat=categories.find(c=>c.id===dl.dataset.catdel);if(!cat)return;
@@ -1311,38 +1367,45 @@ $('catListWrap').addEventListener('click',e=>{
     const fb=categories.find(c=>c.id!==cat.id);
     delTgt=cat.id;delType="cat";
     $('delTitle').textContent=`Ștergi grupa "${cat.name}"?`;
-    $('delSub').textContent=cnt>0?`${cnt} produs(e) vor fi mutate în "${fb?fb.name:'—'}". Acțiune ireversibilă.`:'Acțiune ireversibilă.';
+    $('delSub').textContent=cnt>0?`${cnt} produs(e) vor fi mutate în "${fb?fb.name:'—'}". Ireversibil.`:'Acțiune ireversibilă.';
     $('delConfirm').style.display='flex';
   }
 });
-function resetCatForm(){
-  catEditId=null;$('catNewName').value='';$('catNewColor').value='#E01A1A';
-  $('catColorPrev').style.background='#E01A1A';$('catColorPrev').textContent='GRUPĂ NOUĂ';
-  $('catFormHeading').textContent='ADAUGĂ GRUPĂ NOUĂ';
-  $('catSaveBtn').textContent='+ Adaugă Grupă';$('catCancelBtn').style.display='none';
-}
+
+function resetCatForm(){catEditId=null;$('catNewName').value='';$('catNewColor').value='#E01A1A';$('catColorPrev').style.background='#E01A1A';$('catColorPrev').textContent='GRUPĂ NOUĂ';$('catFormHeading').textContent='ADAUGĂ GRUPĂ NOUĂ';$('catSaveBtn').textContent='+ Adaugă Grupă';$('catCancelBtn').style.display='none';}
 $('catCancelBtn').onclick=resetCatForm;
 $('catNewColor').oninput=e=>{$('catColorPrev').style.background=e.target.value;$('catColorPrev').textContent=($('catNewName').value||'GRUPĂ NOUĂ').toUpperCase();};
 $('catNewName').oninput=e=>{$('catColorPrev').textContent=(e.target.value||'GRUPĂ NOUĂ').toUpperCase();};
-$('catSaveBtn').onclick=()=>{
+
+$('catSaveBtn').onclick=async()=>{
   const name=$('catNewName').value.trim();
   if(!name){$('catNewName').style.borderColor='var(--err)';return;}
   $('catNewName').style.borderColor='';
   const color=$('catNewColor').value;
-  if(catEditId){
-    const old=categories.find(c=>c.id===catEditId);
-    if(old&&old.name!==name) products=products.map(p=>p.category===old.name?{...p,category:name}:p);
-    categories=categories.map(c=>c.id===catEditId?{...c,name,color}:c);
-    save(LS_P,products);showOk('✓ Grupă actualizată!');
-  }else{
-    if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){showOk('⚠ Grupă deja existentă!');return;}
-    categories.push({id:'cat'+Date.now(),name,color});
-    showOk(`✓ Grupă "${name}" adăugată!`);
-  }
-  save(LS_C,categories);resetCatForm();renderCatList();populateCatSelect();renderFilters();renderGrid();renderList();
+  const id=catEditId||(name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now());
+  try{
+    if(catEditId){
+      const old=categories.find(c=>c.id===catEditId);
+      await sb.upsertCategory({id,name,color});
+      if(old&&old.name!==name){
+        // update all products with old category name
+        const toUpdate=products.filter(p=>p.category===old.name);
+        await Promise.all(toUpdate.map(p=>sb.updateProduct(p.id,{category:name})));
+        products=products.map(p=>p.category===old.name?{...p,category:name}:p);
+      }
+      categories=categories.map(c=>c.id===catEditId?{...c,name,color}:c);
+      showOk('✓ Grupă actualizată!');
+    } else {
+      if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){showOk('⚠ Grupă deja existentă!');return;}
+      await sb.upsertCategory({id,name,color});
+      categories.push({id,name,color});
+      showOk(`✓ Grupă "${name}" adăugată!`);
+    }
+    resetCatForm();renderCatList();populateCatSelect();renderFilters();renderGrid();
+  }catch(e){toast('Eroare salvare grupă: '+e.message,true);}
 };
 
-/* ══ MATERIALS ADMIN ══ */
+/* ══ MATERIALS ══ */
 function renderMatList(){
   const el=$('matListWrap');
   if(!materials.length){el.innerHTML='<div class="list-empty">Niciun material.</div>';return;}
@@ -1351,139 +1414,169 @@ function renderMatList(){
     return`<div class="cat-item">
       <div class="cat-dot" style="background:${m.color}"></div>
       <div class="cat-item-name" style="flex:1">${m.name}</div>
-      ${m.desc?`<div class="cat-item-count" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${m.desc}">${m.desc}</div>`:''}
+      ${m.description?`<div class="cat-item-count" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${m.description}">${m.description}</div>`:''}
       <div class="cat-item-count">${cnt} prod.</div>
       <div class="cat-item-actions">
-        <button class="list-btn ed" data-mated="${m.id}" title="Editează">✎</button>
-        <button class="list-btn dl" data-matdel="${m.id}" title="Șterge">✕</button>
+        <button class="list-btn ed" data-mated="${m.id}">✎</button>
+        <button class="list-btn dl" data-matdel="${m.id}">✕</button>
       </div>
     </div>`;
   }).join('');
 }
 
 $('matListWrap').addEventListener('click',e=>{
-  const ed=e.target.closest('[data-mated]'), dl=e.target.closest('[data-matdel]');
+  const ed=e.target.closest('[data-mated]'),dl=e.target.closest('[data-matdel]');
   if(ed){
     const mat=materials.find(m=>m.id===ed.dataset.mated);if(!mat)return;
-    matEditId=mat.id;
-    $('matNewName').value=mat.name;
-    $('matNewColor').value=mat.color;
-    $('matNewDesc').value=mat.desc||'';
-    $('matColorPrev').style.background=mat.color;
-    $('matPrevName').textContent=mat.name.toUpperCase();
-    $('matFormHeading').textContent='EDITEAZĂ MATERIAL';
-    $('matSaveBtn').textContent='✓ Salvează';
-    $('matCancelBtn').style.display='block';
+    matEditId=mat.id;$('matNewName').value=mat.name;$('matNewColor').value=mat.color;$('matNewDesc').value=mat.description||'';
+    $('matColorPrev').style.background=mat.color;$('matPrevName').textContent=mat.name.toUpperCase();
+    $('matFormHeading').textContent='EDITEAZĂ MATERIAL';$('matSaveBtn').textContent='✓ Salvează';$('matCancelBtn').style.display='block';
   }
   if(dl){
     const mat=materials.find(m=>m.id===dl.dataset.matdel);if(!mat)return;
     const cnt=products.filter(p=>p.material===mat.name).length;
     const fb=materials.find(m=>m.id!==mat.id);
-    delTgt=mat.id; delType="mat";
+    delTgt=mat.id;delType="mat";
     $('delTitle').textContent=`Ștergi materialul "${mat.name}"?`;
-    $('delSub').textContent=cnt>0
-      ?`${cnt} produs(e) vor fi mutate la "${fb?fb.name:'—'}". Acțiune ireversibilă.`
-      :'Acțiune ireversibilă.';
+    $('delSub').textContent=cnt>0?`${cnt} produs(e) vor trece la "${fb?fb.name:'—'}". Ireversibil.`:'Acțiune ireversibilă.';
     $('delConfirm').style.display='flex';
   }
 });
 
-function resetMatForm(){
-  matEditId=null;
-  $('matNewName').value='';$('matNewColor').value='#E01A1A';$('matNewDesc').value='';
-  $('matColorPrev').style.background='#E01A1A';$('matPrevName').textContent='MATERIAL NOU';
-  $('matFormHeading').textContent='ADAUGĂ MATERIAL NOU';
-  $('matSaveBtn').textContent='+ Adaugă Material';$('matCancelBtn').style.display='none';
-}
+function resetMatForm(){matEditId=null;$('matNewName').value='';$('matNewColor').value='#E01A1A';$('matNewDesc').value='';$('matColorPrev').style.background='#E01A1A';$('matPrevName').textContent='MATERIAL NOU';$('matFormHeading').textContent='ADAUGĂ MATERIAL NOU';$('matSaveBtn').textContent='+ Adaugă Material';$('matCancelBtn').style.display='none';}
 $('matCancelBtn').onclick=resetMatForm;
-$('matNewColor').oninput=e=>{
-  $('matColorPrev').style.background=e.target.value;
-  $('matPrevName').textContent=($('matNewName').value||'MATERIAL NOU').toUpperCase();
-};
+$('matNewColor').oninput=e=>{$('matColorPrev').style.background=e.target.value;$('matPrevName').textContent=($('matNewName').value||'MATERIAL NOU').toUpperCase();};
 $('matNewName').oninput=e=>{$('matPrevName').textContent=(e.target.value||'MATERIAL NOU').toUpperCase();};
-$('matNewDesc').oninput=e=>{
-  // show desc preview inside color bar
-  const desc=e.target.value;
-  $('matColorPrev').title=desc;
-};
-$('matSaveBtn').onclick=()=>{
+
+$('matSaveBtn').onclick=async()=>{
   const name=$('matNewName').value.trim();
   if(!name){$('matNewName').style.borderColor='var(--err)';return;}
   $('matNewName').style.borderColor='';
   const color=$('matNewColor').value;
-  const desc=$('matNewDesc').value.trim();
-  if(matEditId){
-    const old=materials.find(m=>m.id===matEditId);
-    if(old&&old.name!==name){
-      // rename material on all products
-      products=products.map(p=>p.material===old.name?{...p,material:name}:p);
-      save(LS_P,products);
+  const description=$('matNewDesc').value.trim();
+  const id=matEditId||(name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now());
+  try{
+    if(matEditId){
+      const old=materials.find(m=>m.id===matEditId);
+      await sb.upsertMaterial({id,name,color,description});
+      if(old&&old.name!==name){
+        const toUpdate=products.filter(p=>p.material===old.name);
+        await Promise.all(toUpdate.map(p=>sb.updateProduct(p.id,{material:name})));
+        products=products.map(p=>p.material===old.name?{...p,material:name}:p);
+      }
+      materials=materials.map(m=>m.id===matEditId?{...m,name,color,description}:m);
+      showOk('✓ Material actualizat!');
+    } else {
+      if(materials.some(m=>m.name.toLowerCase()===name.toLowerCase())){showOk('⚠ Material deja existent!');return;}
+      await sb.upsertMaterial({id,name,color,description});
+      materials.push({id,name,color,description});
+      showOk(`✓ Material "${name}" adăugat!`);
     }
-    materials=materials.map(m=>m.id===matEditId?{...m,name,color,desc}:m);
-    showOk('✓ Material actualizat!');
-  }else{
-    if(materials.some(m=>m.name.toLowerCase()===name.toLowerCase())){showOk('⚠ Material deja existent!');return;}
-    materials.push({id:'mat'+Date.now(),name,color,desc});
-    showOk(`✓ Material "${name}" adăugat!`);
-  }
-  save(LS_MAT,materials);resetMatForm();renderMatList();populateMatSelect();renderGrid();renderList();
+    resetMatForm();renderMatList();populateMatSelect();renderGrid();
+  }catch(e){toast('Eroare salvare material: '+e.message,true);}
 };
 
-/* ══ POLICY ══ */
+/* ══ POLICIES ══ */
 function loadPolFields(){
   const km={pPrivacyRo:'privacyRo',pPrivacyEn:'privacyEn',pTermsRo:'termsRo',pTermsEn:'termsEn',pReturnRo:'returnRo',pReturnEn:'returnEn',pCookiesRo:'cookiesRo',pCookiesEn:'cookiesEn'};
   Object.entries(km).forEach(([id,k])=>$(id).value=policies[k]||'');
 }
-$('savePolicies').onclick=()=>{
+$('savePolicies').onclick=async()=>{
   policies={privacyRo:$('pPrivacyRo').value,privacyEn:$('pPrivacyEn').value,termsRo:$('pTermsRo').value,termsEn:$('pTermsEn').value,returnRo:$('pReturnRo').value,returnEn:$('pReturnEn').value,cookiesRo:$('pCookiesRo').value,cookiesEn:$('pCookiesEn').value};
-  save(LS_POL,policies);showOk(t('toast_saved'));
+  try{
+    await sb.savePolicies(policies);
+    showOk(t('toast_saved'));
+  }catch(e){toast('Eroare salvare politici: '+e.message,true);}
 };
 
-/* ══ DEL ══ */
+/* ══ DELETE ══ */
 $('delCancel').onclick=()=>{delTgt=null;$('delConfirm').style.display='none';};
-$('delOk').onclick=()=>{
+$('delOk').onclick=async()=>{
   if(delTgt===null){$('delConfirm').style.display='none';return;}
-  if(delType==="prod"){
-    products=products.filter(p=>p.id!==delTgt);
-    if(editId===delTgt)resetForm();
-  }else if(delType==="cat"){
-    const cat=categories.find(c=>c.id===delTgt);
-    if(cat){
-      const fb=categories.find(c=>c.id!==delTgt);
-      products=products.map(p=>p.category===cat.name?{...p,category:fb?fb.name:'Altele'}:p);
-      categories=categories.filter(c=>c.id!==delTgt);
-      save(LS_C,categories);populateCatSelect();renderFilters();renderCatList();
+  $('delOk').textContent='...';
+  try{
+    if(delType==="prod"){
+      await sb.deleteProduct(delTgt);
+      if(editId===delTgt)resetForm();
+      products=products.filter(p=>p.id!==delTgt);
+    } else if(delType==="cat"){
+      const cat=categories.find(c=>c.id===delTgt);
+      if(cat){
+        const fb=categories.find(c=>c.id!==delTgt);
+        const toUpdate=products.filter(p=>p.category===cat.name);
+        await Promise.all(toUpdate.map(p=>sb.updateProduct(p.id,{category:fb?fb.name:'Altele'})));
+        products=products.map(p=>p.category===cat.name?{...p,category:fb?fb.name:'Altele'}:p);
+        await sb.deleteCategory(delTgt);
+        categories=categories.filter(c=>c.id!==delTgt);
+        populateCatSelect();renderFilters();renderCatList();
+      }
+    } else if(delType==="mat"){
+      const mat=materials.find(m=>m.id===delTgt);
+      if(mat){
+        const fb=materials.find(m=>m.id!==delTgt);
+        const toUpdate=products.filter(p=>p.material===mat.name);
+        await Promise.all(toUpdate.map(p=>sb.updateProduct(p.id,{material:fb?fb.name:'ABS/ASA'})));
+        products=products.map(p=>p.material===mat.name?{...p,material:fb?fb.name:'ABS/ASA'}:p);
+        await sb.deleteMaterial(delTgt);
+        materials=materials.filter(m=>m.id!==delTgt);
+        populateMatSelect();renderMatList();
+      }
     }
-  }else if(delType==="mat"){
-    const mat=materials.find(m=>m.id===delTgt);
-    if(mat){
-      const fb=materials.find(m=>m.id!==delTgt);
-      products=products.map(p=>p.material===mat.name?{...p,material:fb?fb.name:'ABS/ASA'}:p);
-      materials=materials.filter(m=>m.id!==delTgt);
-      save(LS_MAT,materials);populateMatSelect();renderMatList();
-    }
+    delTgt=null;delType="prod";$('delConfirm').style.display='none';
+    renderGrid();renderList();
+  }catch(e){
+    toast('Eroare ștergere: '+e.message,true);
+    $('delOk').textContent='Șterge';
   }
-  delTgt=null;delType="prod";$('delConfirm').style.display='none';
-  save(LS_P,products);renderGrid();renderList();
 };
+
+/* ══ CHECKOUT ══ */
+$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-order]');if(!b)return;openCheckout(+b.dataset.order);});
+
+function openCheckout(id){
+  coProd=products.find(p=>p.id===id);if(!coProd)return;
+  payMethod="RAMBURS";
+  $('coProdName').textContent=coProd.name;
+  $('coProdPrice').textContent=`${coProd.price} RON — ${t('shipping_included')}`;
+  const firstImg=(coProd.images||[])[0];
+  $('coThumb').innerHTML=firstImg?`<img src="${firstImg}" alt=""/>` : `<div style="font-size:1.4rem;color:#333">⬡</div>`;
+  ['coFname','coLname','coPhone','coEmail','coAddress'].forEach(id=>{const el=$(id);el.value='';el.classList.remove('invalid');});
+  document.querySelectorAll('.pay-opt').forEach(o=>o.classList.toggle('sel',o.dataset.pay==="RAMBURS"));
+  $('coModal').classList.add('open');
+}
+
+function validateCo(){
+  const d={fname:$('coFname').value.trim(),lname:$('coLname').value.trim(),phone:$('coPhone').value.trim(),email:$('coEmail').value.trim(),address:$('coAddress').value.trim()};
+  let ok=true;
+  ['coFname','coLname','coPhone','coAddress'].forEach(id=>{const el=$(id);if(!el.value.trim()){el.classList.add('invalid');ok=false;}else el.classList.remove('invalid');});
+  return ok?d:null;
+}
+
+function handleWA(){
+  const d=validateCo();if(!d)return;
+  const payLabel={'RAMBURS':'💵 Ramburs (plată la livrare)','ONLINE':'💳 Card / Transfer bancar','50% ONLINE + 50% RAMBURS':'⚡ 50% Online + 50% Ramburs'}[payMethod]||payMethod;
+  const msg=`Bună ziua! Doresc să plasez o comandă:\n\n🛒 *Produs:* ${coProd.name}\n💰 *Preț:* ${coProd.price} RON (transport inclus)\n${payLabel}\n\n👤 *Nume:* ${d.fname} ${d.lname}\n📞 *Telefon:* ${d.phone}\n📧 *Email:* ${d.email||'—'}\n📍 *Adresă:* ${d.address}\n\nVă mulțumesc!`;
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
+  $('coModal').classList.remove('open');
+}
+
+$('btnWA').onclick=handleWA;
+$('btnC').onclick=()=>$('coModal').classList.remove('open');
+$('coClose').onclick=()=>$('coModal').classList.remove('open');
+$('coModal').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');};
+$('coModal').addEventListener('click',e=>{
+  const o=e.target.closest('.pay-opt');if(!o)return;
+  payMethod=o.dataset.pay;
+  document.querySelectorAll('.pay-opt').forEach(x=>x.classList.toggle('sel',x===o));
+});
 
 /* ══ LIGHTBOX ══ */
-let lbImages=[], lbIdx=0, lbProdName='';
-
-function openLightbox(images, startIdx, prodName){
-  lbImages=[...images]; lbIdx=startIdx; lbProdName=prodName||'';
-  lbRender();
-  $('lightbox').classList.add('open');
-  document.body.style.overflow='hidden';
-}
+let lbImages=[],lbIdx=0,lbProdName='';
+function openLightbox(images,startIdx,prodName){lbImages=[...images];lbIdx=startIdx;lbProdName=prodName||'';lbRender();$('lightbox').classList.add('open');document.body.style.overflow='hidden';}
 function lbRender(){
   const img=$('lbImg');
   img.classList.add('fade');
-  setTimeout(()=>{
-    img.src=lbImages[lbIdx];
-    img.onload=()=>img.classList.remove('fade');
-    img.onerror=()=>img.classList.remove('fade');
-  },180);
+  setTimeout(()=>{img.src=lbImages[lbIdx];img.onload=()=>img.classList.remove('fade');img.onerror=()=>img.classList.remove('fade');},180);
   const n=lbImages.length;
   $('lbCounter').textContent=n>1?`${lbIdx+1} / ${n}`:'';
   $('lbCounter').style.display=n>1?'block':'none';
@@ -1492,15 +1585,9 @@ function lbRender(){
   $('lbDots').innerHTML=n>1?lbImages.map((_,i)=>`<div class="lb-dot${i===lbIdx?' on':''}" data-i="${i}"></div>`).join(''):'';
   $('lbCaption').textContent=lbProdName?lbProdName.toUpperCase():'';
 }
-function closeLightbox(){
-  $('lightbox').classList.remove('open');
-  document.body.style.overflow='';
-}
+function closeLightbox(){$('lightbox').classList.remove('open');document.body.style.overflow='';}
 $('lbClose').onclick=closeLightbox;
-$('lightbox').addEventListener('click',e=>{
-  // close only if clicking the dark backdrop (not the image or controls)
-  if(e.target===$('lightbox')||e.target.classList.contains('lb-inner'))closeLightbox();
-});
+$('lightbox').addEventListener('click',e=>{if(e.target===$('lightbox')||e.target.classList.contains('lb-inner'))closeLightbox();});
 $('lbPrev').onclick=e=>{e.stopPropagation();if(lbIdx>0){lbIdx--;lbRender();}};
 $('lbNext').onclick=e=>{e.stopPropagation();if(lbIdx<lbImages.length-1){lbIdx++;lbRender();}};
 $('lbDots').addEventListener('click',e=>{const d=e.target.closest('[data-i]');if(!d)return;lbIdx=+d.dataset.i;lbRender();});
@@ -1510,126 +1597,67 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft'&&lbIdx>0){lbIdx--;lbRender();}
   if(e.key==='ArrowRight'&&lbIdx<lbImages.length-1){lbIdx++;lbRender();}
 });
-// Touch swipe lightbox
 let lbTx=0,lbTy=0;
 $('lightbox').addEventListener('touchstart',e=>{lbTx=e.touches[0].clientX;lbTy=e.touches[0].clientY;},{passive:true});
 $('lightbox').addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-lbTx;
-  const dy=e.changedTouches[0].clientY-lbTy;
-  if(Math.abs(dx)>Math.abs(dy)*1.3&&Math.abs(dx)>50){
-    if(dx<0&&lbIdx<lbImages.length-1){lbIdx++;lbRender();}
-    else if(dx>0&&lbIdx>0){lbIdx--;lbRender();}
-  }
+  const dx=e.changedTouches[0].clientX-lbTx,dy=e.changedTouches[0].clientY-lbTy;
+  if(Math.abs(dx)>Math.abs(dy)*1.3&&Math.abs(dx)>50){if(dx<0&&lbIdx<lbImages.length-1){lbIdx++;lbRender();}else if(dx>0&&lbIdx>0){lbIdx--;lbRender();}}
 },{passive:true});
 
-// Attach lightbox to carousel images - fires on click (not drag)
 function attachCarouselLightbox(card){
   const prod=products.find(p=>p.id===+card.dataset.id);
   if(!prod||(prod.images||[]).length===0)return;
   const car=card.querySelector('.card-carousel');
-
   card.querySelectorAll('.carousel-slide img').forEach(img=>{
-    // Track if this was a drag or a click
-    let downX=0, downTime=0;
+    let downX=0,downTime=0;
     img.addEventListener('mousedown',e=>{downX=e.clientX;downTime=Date.now();});
     img.addEventListener('click',e=>{
-      const moved=Math.abs(e.clientX-downX)>8;
-      const quick=Date.now()-downTime<400;
-      if(!moved&&quick){
+      if(Math.abs(e.clientX-downX)<8&&Date.now()-downTime<400){
         e.stopPropagation();
-        const idx=car?parseInt(car.dataset.idx||0):0;
-        openLightbox(prod.images,idx,prod.name);
+        openLightbox(prod.images,car?parseInt(car.dataset.idx||0):0,prod.name);
       }
     });
-    // Touch tap (not swipe)
     let tDown=0,txD=0;
     img.addEventListener('touchstart',e=>{tDown=Date.now();txD=e.touches[0].clientX;},{passive:true});
     img.addEventListener('touchend',e=>{
-      const dx=Math.abs(e.changedTouches[0].clientX-txD);
-      if(dx<10&&Date.now()-tDown<300){
+      if(Math.abs(e.changedTouches[0].clientX-txD)<10&&Date.now()-tDown<300){
         e.stopPropagation();
-        const idx=car?parseInt(car.dataset.idx||0):0;
-        openLightbox(prod.images,idx,prod.name);
+        openLightbox(prod.images,car?parseInt(car.dataset.idx||0):0,prod.name);
       }
     },{passive:true});
   });
 }
 
-/* ══ INIT ══ */
-buildTicker();
-applyI18n();
+/* ══ CURSOR ══ */
+document.addEventListener('mousemove',e=>{const c=$('cg');c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';});
 
-// Init Firebase async - after everything else is ready
-function startFirebaseSync(){
-  if(window._fbReady){
-    syncFromFirebase();
-  } else {
-    window.addEventListener('fbready',()=>syncFromFirebase(),{once:true});
-  }
+/* ══ SCROLL REVEAL ══ */
+function initScrollReveal(){
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach((en,idx)=>{
+      if(en.isIntersecting){setTimeout(()=>en.target.classList.add('anim-in'),idx*80);io.unobserve(en.target);}
+    });
+  },{threshold:0.1});
+  document.querySelectorAll('.anim-ready').forEach(el=>io.observe(el));
 }
 
-// Firebase — rulează DOAR pe domeniu real, nu în preview
+/* ══ PARTICLES ══ */
 (function(){
-  const host = window.location.hostname;
-  const isRealDomain = host && host!=='localhost' && !host.includes('claude') && !host.includes('127.0.0');
-  if(!isRealDomain){ console.log('Preview mode — Firebase disabled'); return; }
-
-  const s1=document.createElement('script');
-  s1.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
-  s1.onload=function(){
-    const s2=document.createElement('script');
-    s2.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js';
-    s2.onload=function(){
-      try{
-        if(!window.firebase) return;
-        if(!firebase.apps.length) firebase.initializeApp({
-          apiKey:"AIzaSyCoTXssVSmSKRQRxLQKyj1YnF-2K9PJAX0",
-          authDomain:"autocore3d.firebaseapp.com",
-          projectId:"autocore3d",
-          storageBucket:"autocore3d.firebasestorage.app",
-          messagingSenderId:"709830811613",
-          appId:"1:709830811613:web:e42f1940e797aa2c4e5b7a"
-        });
-        window._db=firebase.firestore();
-        window._fbReady=true;
-        syncFromFirebase();
-      }catch(e){ console.warn('Firebase init:',e); }
-    };
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s1);
-})();
-
-/* ── Floating particles ── */
-(function spawnParticles(){
   const colors=['rgba(224,26,26,.35)','rgba(224,26,26,.2)','rgba(255,80,80,.25)','rgba(200,200,200,.1)'];
   for(let i=0;i<18;i++){
-    const p=document.createElement('div');
-    p.className='particle';
-    const sz=Math.random()*4+1.5;
-    const col=colors[Math.floor(Math.random()*colors.length)];
-    const dur=Math.random()*18+10;
-    const delay=Math.random()*-20;
-    const left=Math.random()*100;
+    const p=document.createElement('div');p.className='particle';
+    const sz=Math.random()*4+1.5,col=colors[Math.floor(Math.random()*colors.length)];
+    const dur=Math.random()*18+10,delay=Math.random()*-20,left=Math.random()*100;
     p.style.cssText=`width:${sz}px;height:${sz}px;background:${col};left:${left}%;animation-duration:${dur}s;animation-delay:${delay}s;`;
     document.body.appendChild(p);
   }
 })();
 
-/* ── Scroll reveal ── */
-(function(){
-  const io=new IntersectionObserver(entries=>{
-    entries.forEach((en,idx)=>{
-      if(en.isIntersecting){
-        setTimeout(()=>en.target.classList.add('anim-in'),idx*80);
-        io.unobserve(en.target);
-      }
-    });
-  },{threshold:0.1});
-  document.querySelectorAll('.stat-card,.policy-card').forEach(el=>{
-    el.classList.add('anim-ready');io.observe(el);
-  });
-})();
+/* ══ INIT ══ */
+buildTicker();
+applyI18n();
+loadAll();
+initScrollReveal();
 </script>
 </body>
 </html>
