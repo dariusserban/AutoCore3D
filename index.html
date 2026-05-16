@@ -408,6 +408,44 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 /* POLICY VIEW */
 .policy-modal{max-width:640px;}
 
+/* ══ SEARCH BAR ══ */
+.nav-search-wrap{position:relative;display:flex;align-items:center;}
+.nav-search-inp{background:transparent!important;border:1px solid var(--bdr);color:#f0f0f0!important;font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;padding:.38rem .9rem .38rem 2rem;width:0;opacity:0;transition:width .35s var(--ease),opacity .3s,border-color .2s;outline:none;pointer-events:none;}
+.nav-search-inp.open{width:180px;opacity:1;pointer-events:all;}
+.nav-search-inp:focus{border-color:var(--red);}
+.nav-search-inp::placeholder{color:var(--muted);}
+.nav-search-ico{position:absolute;left:.6rem;font-size:.75rem;color:var(--muted);pointer-events:none;transition:color .2s;}
+.nav-search-btn{background:transparent;border:1px solid var(--bdr);color:var(--muted);width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .25s;flex-shrink:0;}
+.nav-search-btn:hover{border-color:var(--red);color:var(--red);}
+.nav-search-btn.active{border-color:var(--red);color:var(--red);background:rgba(224,26,26,.08);}
+.nav-search-clear{position:absolute;right:.5rem;background:none;border:none;color:var(--muted);font-size:.7rem;cursor:pointer;padding:0;line-height:1;display:none;}
+.nav-search-inp.open:not(:placeholder-shown) ~ .nav-search-clear,
+.nav-search-clear.vis{display:block;}
+
+/* ══ SEARCH + SORT BAR (below filters) ══ */
+.search-sort-wrap{max-width:1280px;margin:0 auto;padding:0 1.5rem .75rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;}
+.search-main-wrap{position:relative;flex:1;min-width:200px;}
+.search-main-ico{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem;pointer-events:none;}
+.search-main-inp{width:100%;background:#0d0d0d!important;border:1px solid var(--bdr);color:#f0f0f0!important;font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;padding:.55rem .55rem .55rem 2.2rem;outline:none;transition:border-color .2s,box-shadow .2s;}
+.search-main-inp:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(224,26,26,.1);}
+.search-main-inp::placeholder{color:var(--muted);}
+.search-main-clear{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;padding:0;line-height:1;display:none;}
+.search-main-clear.vis{display:block;color:var(--sub);}
+.search-main-clear:hover{color:var(--red);}
+
+.sort-wrap{display:flex;align-items:center;gap:.35rem;flex-shrink:0;}
+.sort-label{font-family:var(--mono);font-size:.55rem;color:var(--muted);letter-spacing:.12em;white-space:nowrap;}
+.sort-btn{font-family:var(--mono);font-size:.58rem;letter-spacing:.07em;padding:.38rem .75rem;border:1px solid var(--bdr);background:transparent;color:var(--sub);transition:all .2s;cursor:pointer;white-space:nowrap;}
+.sort-btn:hover{border-color:var(--red);color:var(--red);}
+.sort-btn.on{border-color:var(--red);background:rgba(224,26,26,.1);color:var(--red);font-weight:700;}
+
+/* Search highlight */
+.search-hl{background:rgba(224,26,26,.25);color:#fff;border-radius:1px;}
+
+/* No results with search */
+.no-prod-search{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.08em;text-align:center;padding:3rem 1rem;border:1px dashed var(--bdr);}
+.no-prod-search span{display:block;color:var(--red);font-size:1.2rem;margin-bottom:.5rem;}
+
 /* PARTICLES */
 .particle{position:fixed;pointer-events:none;z-index:0;border-radius:50%;animation:float-p linear infinite;}
 @keyframes float-p{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:.4;}100%{transform:translateY(-10vh) scale(1.2);opacity:0;}}
@@ -433,6 +471,11 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   #langBtn{left:.5rem;}
   .co-row-2{grid-template-columns:1fr;}
   input,select,textarea{font-size:16px!important;}
+  .nav-search-inp.open{width:130px;}
+  .search-sort-wrap{flex-direction:column;align-items:stretch;}
+  .sort-wrap{flex-wrap:wrap;gap:.25rem;}
+  .sort-btn{font-size:.55rem;padding:.3rem .55rem;}
+  .sort-label{display:none;}
 }
 @media(min-width:1200px){.ap-panel{width:720px;}}
 </style>
@@ -455,6 +498,12 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
       <a href="#" class="nav-link">Produse</a>
       <a href="#" class="nav-link">Materiale</a>
       <a href="#" class="nav-link">Despre</a>
+      <div class="nav-search-wrap">
+        <button class="nav-search-btn" id="navSearchBtn">🔍</button>
+        <input class="nav-search-inp" id="navSearchInp" placeholder="Caută produs..." autocomplete="off" spellcheck="false"/>
+        <span class="nav-search-ico">🔍</span>
+        <button class="nav-search-clear" id="navSearchClear">✕</button>
+      </div>
       <button class="nav-admin" id="admBtn">⚙</button>
       <a href="https://wa.me/40771119423" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
     </nav>
@@ -481,6 +530,20 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 <div class="filters-wrap">
   <div class="section-label">// FILTRARE RAPIDĂ</div>
   <div class="fbar" id="fbar"></div>
+</div>
+<div class="search-sort-wrap">
+  <div class="search-main-wrap">
+    <span class="search-main-ico">🔍</span>
+    <input class="search-main-inp" id="searchMainInp" placeholder="Caută după nume, descriere, material..." autocomplete="off" spellcheck="false"/>
+    <button class="search-main-clear" id="searchMainClear">✕</button>
+  </div>
+  <div class="sort-wrap">
+    <span class="sort-label">// SORT</span>
+    <button class="sort-btn on" data-sort="newest">Cele mai noi</button>
+    <button class="sort-btn" data-sort="price-asc">Preț ↑</button>
+    <button class="sort-btn" data-sort="price-desc">Preț ↓</button>
+    <button class="sort-btn" data-sort="stock">Stoc ↑</button>
+  </div>
 </div>
 <div class="products-wrap">
   <div class="prod-hdr"><span class="prod-count" id="prodCount">—</span><div class="prod-line"></div></div>
@@ -855,6 +918,8 @@ let materials  = [];
 let policies   = {...DEFAULT_POLICIES};
 let lang       = "ro";
 let filter     = "Toate";
+let searchQ    = "";
+let sortMode   = "newest";
 let editId     = null, stockVal=true, selB=[], imgMode="file", formImgs=[];
 let delTgt     = null, delType="prod";
 let catEditId  = null, matEditId=null;
@@ -999,14 +1064,56 @@ function renderSkeletons(n=6){
 }
 
 /* ══ GRID ══ */
+function highlight(text, q){
+  if(!q) return text;
+  const esc = q.replace(/[.*+?^${}()|[\]\]/g,'\\$&');
+  return text.replace(new RegExp('('+esc+')','gi'),'<mark class="search-hl">$1</mark>');
+}
+
+function applySearchSort(list){
+  // Search filter
+  const q = searchQ.trim().toLowerCase();
+  if(q){
+    list = list.filter(p=>{
+      const hay = [p.name,p.brand,p.description,p.material,p.category].filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+  }
+  // Sort
+  const sorted = [...list];
+  if(sortMode==='price-asc')  sorted.sort((a,b)=>a.price-b.price);
+  if(sortMode==='price-desc') sorted.sort((a,b)=>b.price-a.price);
+  if(sortMode==='newest')     sorted.sort((a,b)=>b.id-a.id);
+  if(sortMode==='stock')      sorted.sort((a,b)=>b.stock-a.stock);
+  return {sorted, q};
+}
+
 function renderGrid(){
   const all=lang==='ro'?"Toate":"All";
-  const list=(filter===all||filter==="Toate"||filter==="All")?products:products.filter(p=>p.category===filter);
+  let base=(filter===all||filter==="Toate"||filter==="All")?products:products.filter(p=>p.category===filter);
+  const {sorted:list, q} = applySearchSort(base);
   const g=$('grid');
+
+  // Update clear button
+  const mc=$('searchMainClear');
+  if(mc) mc.classList.toggle('vis', searchQ.length>0);
+  const nc=$('navSearchClear');
+  if(nc) nc.classList.toggle('vis', searchQ.length>0);
+
   if(!list.length){
-    g.innerHTML=`<div class="no-prod">// 0 ${t('prod_found')}</div>`;
+    const msg = searchQ ? `<div class="no-prod-search"><span>🔍</span>Niciun rezultat pentru &quot;<b style="color:var(--red)">${searchQ}</b>&quot;<br><small style="font-size:.6rem;opacity:.6;margin-top:.4rem;display:block">Încearcă alt termen de căutare</small></div>` : `<div class="no-prod">// 0 ${t('prod_found')}</div>`;
+    g.innerHTML=msg;
   } else {
-    g.innerHTML=list.map(renderCard).join('');
+    g.innerHTML=list.map(p=>{
+      const card = renderCard(p);
+      // Apply highlights if searching
+      if(q){
+        return card
+          .replace(/>([^<]*)<\/div>/g, (m,txt)=>'>'+highlight(txt,q)+'<\/div>')
+          .replace(/>([^<]*)<\/span>/g,(m,txt)=>'>'+highlight(txt,q)+'<\/span>');
+      }
+      return card;
+    }).join('');
     g.querySelectorAll('.card').forEach((c,i)=>{
       c.style.transitionDelay=`${i*55}ms`;
       requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add('visible')));
@@ -1033,6 +1140,39 @@ function renderFilters(){
 $('fbar').addEventListener('click',e=>{
   const b=e.target.closest('.fb');if(!b)return;
   filter=b.dataset.fname;renderFilters();renderGrid();
+});
+
+/* ══ SEARCH EVENTS ══ */
+function setSearch(q){
+  searchQ=q;
+  // Sync both inputs
+  const ni=$('navSearchInp'), mi=$('searchMainInp');
+  if(ni&&ni.value!==q) ni.value=q;
+  if(mi&&mi.value!==q) mi.value=q;
+  renderGrid();
+}
+
+$('navSearchBtn').onclick=()=>{
+  const inp=$('navSearchInp');
+  inp.classList.toggle('open');
+  $('navSearchBtn').classList.toggle('active');
+  if(inp.classList.contains('open')) setTimeout(()=>inp.focus(),50);
+  else{setSearch('');inp.value='';}
+};
+$('navSearchInp').oninput=e=>setSearch(e.target.value);
+$('navSearchInp').onkeydown=e=>{if(e.key==='Escape'){setSearch('');e.target.value='';e.target.classList.remove('open');$('navSearchBtn').classList.remove('active');}};
+$('navSearchClear').onclick=()=>{setSearch('');$('navSearchInp').value='';$('navSearchInp').focus();};
+
+$('searchMainInp').oninput=e=>setSearch(e.target.value);
+$('searchMainInp').onkeydown=e=>{if(e.key==='Escape'){setSearch('');e.target.value='';}};
+$('searchMainClear').onclick=()=>{setSearch('');$('searchMainInp').value='';$('searchMainInp').focus();};
+
+/* ══ SORT EVENTS ══ */
+document.querySelector('.sort-wrap').addEventListener('click',e=>{
+  const b=e.target.closest('.sort-btn');if(!b)return;
+  sortMode=b.dataset.sort;
+  document.querySelectorAll('.sort-btn').forEach(x=>x.classList.toggle('on',x===b));
+  renderGrid();
 });
 
 /* ══ POLICY CARDS ══ */
