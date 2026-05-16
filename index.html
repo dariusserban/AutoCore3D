@@ -498,12 +498,6 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
       <a href="#" class="nav-link">Produse</a>
       <a href="#" class="nav-link">Materiale</a>
       <a href="#" class="nav-link">Despre</a>
-      <div class="nav-search-wrap">
-        <button class="nav-search-btn" id="navSearchBtn">🔍</button>
-        <input class="nav-search-inp" id="navSearchInp" placeholder="Caută produs..." autocomplete="off" spellcheck="false"/>
-        <span class="nav-search-ico">🔍</span>
-        <button class="nav-search-clear" id="navSearchClear">✕</button>
-      </div>
       <button class="nav-admin" id="admBtn">⚙</button>
       <a href="https://wa.me/40771119423" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
     </nav>
@@ -1097,8 +1091,6 @@ function renderGrid(){
   // Update clear button
   const mc=$('searchMainClear');
   if(mc) mc.classList.toggle('vis', searchQ.length>0);
-  const nc=$('navSearchClear');
-  if(nc) nc.classList.toggle('vis', searchQ.length>0);
 
   if(!list.length){
     const msg = searchQ ? `<div class="no-prod-search"><span>🔍</span>Niciun rezultat pentru &quot;<b style="color:var(--red)">${searchQ}</b>&quot;<br><small style="font-size:.6rem;opacity:.6;margin-top:.4rem;display:block">Încearcă alt termen de căutare</small></div>` : `<div class="no-prod">// 0 ${t('prod_found')}</div>`;
@@ -1145,23 +1137,12 @@ $('fbar').addEventListener('click',e=>{
 /* ══ SEARCH EVENTS ══ */
 function setSearch(q){
   searchQ=q;
-  // Sync both inputs
-  const ni=$('navSearchInp'), mi=$('searchMainInp');
-  if(ni&&ni.value!==q) ni.value=q;
+  const mi=$('searchMainInp');
   if(mi&&mi.value!==q) mi.value=q;
   renderGrid();
 }
 
-$('navSearchBtn').onclick=()=>{
-  const inp=$('navSearchInp');
-  inp.classList.toggle('open');
-  $('navSearchBtn').classList.toggle('active');
-  if(inp.classList.contains('open')) setTimeout(()=>inp.focus(),50);
-  else{setSearch('');inp.value='';}
-};
-$('navSearchInp').oninput=e=>setSearch(e.target.value);
-$('navSearchInp').onkeydown=e=>{if(e.key==='Escape'){setSearch('');e.target.value='';e.target.classList.remove('open');$('navSearchBtn').classList.remove('active');}};
-$('navSearchClear').onclick=()=>{setSearch('');$('navSearchInp').value='';$('navSearchInp').focus();};
+// Nav search removed - search bar is below filters
 
 $('searchMainInp').oninput=e=>setSearch(e.target.value);
 $('searchMainInp').onkeydown=e=>{if(e.key==='Escape'){setSearch('');e.target.value='';}};
@@ -1212,6 +1193,15 @@ async function loadAll(){
   $('grid').innerHTML=renderSkeletons();
   setDbStatus('loading','Conectare Supabase...');
   try {
+    // Test connection first
+    const testResp = await fetch(`${SB_URL}/rest/v1/products?select=id&limit=1`, {
+      headers:{ 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+    });
+    if(!testResp.ok){
+      const errText = await testResp.text();
+      throw new Error(`HTTP ${testResp.status}: ${errText}`);
+    }
+
     const [prods, cats, mats, pols] = await Promise.all([
       sb.getProducts(),
       sb.getCategories(),
