@@ -1076,6 +1076,8 @@ const FIL_RON_PER_KG  = 150;   /* RON per kg filament ABS */
 const ELEC_RON_KWH    = 2;     /* RON per kWh */
 const PRINTER_WATTS   = 130;   /* W consum mediu printer FDM */
 const TRANSPORT_RON   = 20;    /* RON transport, inclus în preț, afișat ca "gratuit" */
+const MARKUP          = 2.5;   /* multiplicator manoperă + profit */
+const TVA             = 1.21;  /* 21% impozit */
 
 /* ══ CONFIGURATOR DATA ══ */
 const CONF_DATA = {
@@ -1326,7 +1328,7 @@ function parseGCode(txt){
 function calcGCodePrice(mins,grams){
   const filCost=grams/1000*FIL_RON_PER_KG;
   const elecCost=mins/60*(PRINTER_WATTS/1000)*ELEC_RON_KWH;
-  const total=Math.ceil((filCost+elecCost)*2)+TRANSPORT_RON;
+  const total=Math.ceil((filCost+elecCost)*MARKUP*TVA)+TRANSPORT_RON;
   return {filCost,elecCost,total,h:Math.floor(mins/60),m:mins%60,grams};
 }
 function showGCodePrice(p){
