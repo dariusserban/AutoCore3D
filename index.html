@@ -592,19 +592,21 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .conf-title{font-family:var(--disp);font-size:clamp(1.6rem,3.2vw,2.5rem);font-weight:900;text-transform:uppercase;color:var(--text);margin-bottom:.4rem;line-height:1;}
 .conf-title span{color:var(--red);}
 .conf-sub{font-family:var(--body);font-size:.88rem;color:var(--sub);margin-bottom:2rem;line-height:1.6;}
-.conf-selectors{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
-.conf-group-lbl{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.2em;margin-bottom:.55rem;}
-.conf-btns{display:flex;gap:.35rem;flex-wrap:wrap;}
-.conf-btn{font-family:var(--mono);font-size:.62rem;letter-spacing:.07em;padding:.45rem 1rem;border:1px solid rgba(30,61,80,.6);background:rgba(8,15,20,.5);color:var(--muted);cursor:pointer;transition:all .22s;white-space:nowrap;}
-.conf-btn:hover{border-color:rgba(232,75,26,.5);color:var(--sub);background:rgba(232,75,26,.05);}
-#confZoneBar[data-active="motor"] .conf-btn[data-zone="motor"],
-#confZoneBar[data-active="exterior"] .conf-btn[data-zone="exterior"],
-#confZoneBar[data-active="interior"] .conf-btn[data-zone="interior"],
-#confStressBar[data-active="low"] .conf-btn[data-stress="low"],
-#confStressBar[data-active="mid"] .conf-btn[data-stress="mid"]{background:var(--red);border-color:var(--red);color:#fff;font-weight:700;box-shadow:0 0 16px rgba(232,75,26,.5),inset 0 1px 0 rgba(255,255,255,.12);}
-#confStressBar[data-active="crit"] .conf-btn[data-stress="crit"]{background:#c0392b;border-color:#c0392b;color:#fff;font-weight:700;box-shadow:0 0 16px rgba(192,57,43,.5);}
-.conf-btn.warn{border-color:rgba(30,61,80,.6);}
-.conf-sel-state{font-family:var(--mono);font-size:.6rem;color:var(--orange);letter-spacing:.15em;text-transform:uppercase;border-left:2px solid var(--red);padding:.3rem .8rem;margin-bottom:1rem;background:rgba(232,75,26,.06);}
+.upload-zone{border:2px dashed var(--bdr);background:rgba(8,15,20,.6);padding:2.2rem 1.5rem;text-align:center;cursor:pointer;transition:all .25s;margin-bottom:1.5rem;user-select:none;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--red);background:rgba(232,75,26,.05);box-shadow:0 0 0 1px rgba(232,75,26,.12);}
+.upload-zone.has-file{border-color:var(--green);border-style:solid;background:rgba(37,211,102,.05);}
+.upload-icon{font-size:2.2rem;display:block;margin-bottom:.5rem;}
+.upload-title{font-family:var(--disp);font-size:1.25rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem;}
+.upload-sub{font-family:var(--body);font-size:.82rem;color:var(--sub);}
+.upload-hint{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.1em;margin-top:.65rem;}
+.upload-fname{font-family:var(--mono);font-size:.75rem;color:var(--green);font-weight:700;margin-top:.5rem;word-break:break-all;}
+.conf-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.conf-form-group{display:flex;flex-direction:column;gap:.4rem;}
+.conf-form-lbl{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.2em;}
+.conf-select,.conf-input{font-family:var(--body);font-size:.88rem;color:var(--text);background:#080F14;border:1px solid var(--bdr);padding:.65rem .85rem;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;box-sizing:border-box;}
+.conf-select{cursor:pointer;}
+.conf-select:focus,.conf-input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(232,75,26,.15);}
+.conf-input::placeholder{color:var(--muted);opacity:1;}
 .conf-result{background:var(--card);border:2px solid var(--bdr);position:relative;overflow:hidden;margin-bottom:1.5rem;transition:border-color .3s;box-shadow:0 0 0 1px rgba(232,75,26,.08);}
 .conf-result::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
 .conf-result:hover{border-color:rgba(232,75,26,.3);}
@@ -635,7 +637,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .conf-cta-btn:hover{box-shadow:0 0 32px rgba(232,75,26,.5);transform:translateY(-2px);}
 .conf-cta-sub{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.12em;}
 @media(max-width:768px){
-  .conf-selectors{grid-template-columns:1fr;gap:1rem;}
+  .conf-form-grid{grid-template-columns:1fr;}
   .conf-result-inner{grid-template-columns:1fr;}
   .conf-left{border-right:none;border-bottom:1px solid var(--bdr);padding:1.1rem;}
   .conf-right{padding:1.1rem;}
@@ -688,37 +690,65 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
   <div class="db-badge loading" id="filBadge"><div class="db-dot"></div><span id="filBadgeText">Inventar filamente...</span></div>
 </div>
 
-<!-- ══ SECTION 1: CONFIGURATOR TEHNIC & ESTIMATOR ══ -->
+<!-- ══ SECTION 1: CERERE PRINTARE 3D ══ -->
 <section id="configurator" class="conf-section">
   <div class="conf-inner">
-    <div class="conf-eyebrow">// 01 · CONFIGURATOR TEHNIC &amp; ESTIMATOR AI</div>
-    <h2 class="conf-title">Configurează <span>Piesa Ta</span> Auto</h2>
-    <p class="conf-sub">Selectează zona vehiculului și nivelul de solicitare — AI-ul nostru recomandă materialul optim și estimează prețul instant.</p>
-    <div class="conf-selectors">
-      <div>
-        <div class="conf-group-lbl">// ZONA PIESEI</div>
-        <div class="conf-btns" id="confZoneBar" data-active="motor">
-          <button class="conf-btn" data-zone="motor">🔧 Compartiment Motor</button>
-          <button class="conf-btn" data-zone="exterior">🚗 Exterior Caroserie</button>
-          <button class="conf-btn" data-zone="interior">🪑 Interior / Habitaclu</button>
-        </div>
+    <div class="conf-eyebrow">// 01 · CERERE PRINTARE 3D PERSONALIZATĂ</div>
+    <h2 class="conf-title">Trimite <span>Fișierul Tău</span> 3D</h2>
+    <p class="conf-sub">Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.</p>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept=".stl,.step,.stp" style="display:none">
+      <span class="upload-icon">📁</span>
+      <div class="upload-title">Trage fișierul STL / STEP aici</div>
+      <div class="upload-sub">sau apasă pentru a selecta</div>
+      <div class="upload-hint">FORMATE ACCEPTATE: .STL · .STEP · .STP</div>
+    </div>
+    <div class="conf-form-grid">
+      <div class="conf-form-group">
+        <label class="conf-form-lbl" for="selZone">// ZONA PIESEI</label>
+        <select class="conf-select" id="selZone">
+          <option value="motor">🔧 Compartiment Motor</option>
+          <option value="exterior">🚗 Exterior Caroserie</option>
+          <option value="interior">🪑 Interior / Habitaclu</option>
+        </select>
       </div>
-      <div>
-        <div class="conf-group-lbl">// NIVEL STRES MECANIC</div>
-        <div class="conf-btns" id="confStressBar" data-active="low">
-          <button class="conf-btn" data-stress="low">⬡ Scăzut</button>
-          <button class="conf-btn" data-stress="mid">◈ Mediu</button>
-          <button class="conf-btn warn" data-stress="crit">⚠ Critic</button>
-        </div>
+      <div class="conf-form-group">
+        <label class="conf-form-lbl" for="selStress">// NIVEL STRES MECANIC</label>
+        <select class="conf-select" id="selStress">
+          <option value="low">⬡ Scăzut — uz interior, decorativ</option>
+          <option value="mid">◈ Mediu — vibrații, temperaturi moderate</option>
+          <option value="crit">⚠ Critic — motor, impact, temp. ridicate</option>
+        </select>
+      </div>
+      <div class="conf-form-group">
+        <label class="conf-form-lbl" for="orderName">// NUMELE TĂU</label>
+        <input class="conf-input" id="orderName" type="text" placeholder="Cum te cheamă...">
+      </div>
+      <div class="conf-form-group">
+        <label class="conf-form-lbl" for="orderContact">// TELEFON SAU EMAIL</label>
+        <input class="conf-input" id="orderContact" type="text" placeholder="07XX... sau email@...">
       </div>
     </div>
-    <div class="conf-sel-state" id="confSelState">Compartiment Motor · Stres Scăzut</div>
     <div class="conf-result">
-      <div class="conf-result-inner" id="confResult"></div>
+      <div class="conf-result-inner">
+        <div class="conf-left">
+          <div class="conf-mat-eyebrow" id="matEyebrow">// MATERIAL RECOMANDAT</div>
+          <div class="conf-mat-name" id="matName">ABS / ASA</div>
+          <div class="conf-spec-badges" id="specBadges"></div>
+        </div>
+        <div class="conf-right">
+          <div class="conf-price-autocore">
+            <div class="conf-brand-badge">⬡ PREȚ ESTIMAT AUTOCORE3D</div>
+            <div class="conf-price-desc" id="priceDesc">Material + electricitate 2 RON/kWh + transport gratuit inclus</div>
+            <div class="conf-price-main" id="priceMain">— RON</div>
+            <div class="conf-price-save">✓ Transport GRATUIT inclus · Prețul final se confirmă după analiza fișierului (±15%)</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="conf-cta-wrap">
-      <button class="conf-cta-btn" id="confCtaBtn">📁 Încarcă fișier .STL / .STEP — Evaluare Gratuită</button>
-      <span class="conf-cta-sub">Validare gratuită · Ofertă personalizată în 24h · Transport inclus</span>
+      <button class="conf-cta-btn" id="confCtaBtn">📲 Trimite Comanda pe WhatsApp</button>
+      <span class="conf-cta-sub">Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT</span>
     </div>
   </div>
 </section>
@@ -1184,8 +1214,7 @@ let filStockFilter     = 'all';
 let filSearchQ         = '';
 
 /* Configurator state */
-let confZone   = 'motor';
-let confStress = 'low';
+let orderFile = null;
 
 /* ══ UTILS ══ */
 const $  = id => document.getElementById(id);
@@ -1233,42 +1262,47 @@ $('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');
 /* ══ TICKER ══ */
 function buildTicker(){const a=[...TICK_ITEMS,...TICK_ITEMS];$('ticker').innerHTML=a.map(ti=>`<span class="t-item"><b>▸</b>${ti}</span>`).join('');}
 
-/* ══ CONFIGURATOR ══ */
-function updateConfigurator(){
-  const zd=CONF_DATA[confZone],sd=zd[confStress];
-  const market=Math.round(sd.base*1.25);
-  const save=market-sd.base;
-  const stressLabel={low:'Scăzut',mid:'Mediu',crit:'Critic'}[confStress];
-  $('confResult').innerHTML=`
-    <div class="conf-left">
-      <div class="conf-mat-eyebrow">// MATERIAL RECOMANDAT AI · ${zd.name.toUpperCase()} · STRES ${stressLabel.toUpperCase()}</div>
-      <div class="conf-mat-name" style="color:${sd.color}">${sd.mat}</div>
-      <div class="conf-spec-badges">${sd.specs.map(s=>`<div class="conf-spec-badge"><span class="conf-spec-icon">${s.i}</span><span class="conf-spec-lbl">${s.l}</span><span class="conf-spec-val">${s.v}</span></div>`).join('')}</div>
-    </div>
-    <div class="conf-right">
-      <div class="conf-price-market">
-        <div class="conf-price-mkt-lbl">// PREȚ PROTOTIPARE STANDARD (PIAȚĂ)</div>
-        <div class="conf-price-mkt-val">${market} RON</div>
-      </div>
-      <div class="conf-price-autocore">
-        <div class="conf-brand-badge">⬡ REALIZAT CU AUTOCORE3D</div>
-        <div class="conf-price-desc">Include marcaj discret de brand pe piesă · Transport inclus</div>
-        <div class="conf-price-main">${sd.base} RON</div>
-        <div class="conf-price-save">✓ Economisești ${save} RON față de prețul de piață</div>
-      </div>
-    </div>`;
-  /* update data-active on containers — CSS handles all styling */
-  $('confZoneBar').dataset.active=confZone;
-  $('confStressBar').dataset.active=confStress;
-  const sel=$('confSelState');
-  if(sel)sel.textContent=`${zd.name} · Stres ${stressLabel}`;
+/* ══ CONFIGURATOR — UPLOAD + ESTIMATE ══ */
+function updateEstimate(){
+  const zone=$('selZone').value, stress=$('selStress').value;
+  if(!zone||!stress)return;
+  const zd=CONF_DATA[zone],sd=zd[stress];
+  const total=sd.base+20; // +20 RON transport inclus în preț, afisat ca gratuit
+  $('matEyebrow').textContent=`// MATERIAL RECOMANDAT · ${zd.name.toUpperCase()}`;
+  $('matName').textContent=sd.mat;
+  $('matName').style.color=sd.color;
+  $('specBadges').innerHTML=sd.specs.map(s=>`<div class="conf-spec-badge"><span class="conf-spec-icon">${s.i}</span><span class="conf-spec-lbl">${s.l}</span><span class="conf-spec-val">${s.v}</span></div>`).join('');
+  $('priceMain').textContent=`${total} RON`;
 }
-$('confZoneBar').addEventListener('click',e=>{const b=e.target.closest('.conf-btn');if(!b)return;confZone=b.dataset.zone;updateConfigurator();});
-$('confStressBar').addEventListener('click',e=>{const b=e.target.closest('.conf-btn');if(!b)return;confStress=b.dataset.stress;updateConfigurator();});
+function setUploadFile(f){
+  const ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(!['stl','step','stp'].includes(ext)){toast('Formate acceptate: .STL, .STEP, .STP',true);return;}
+  orderFile=f;
+  const uz=$('uploadZone');
+  uz.classList.add('has-file');
+  uz.innerHTML=`<input type="file" id="fileInput" accept=".stl,.step,.stp" style="display:none"><span class="upload-icon">✅</span><div class="upload-title" style="color:var(--green)">Fișier încărcat cu succes!</div><div class="upload-fname">${f.name}</div><div class="upload-sub" style="margin-top:.4rem">${(f.size/1024/1024).toFixed(2)} MB · Apasă pentru a schimba</div>`;
+  document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0])setUploadFile(e.target.files[0]);});
+  uz.onclick=()=>document.getElementById('fileInput').click();
+}
+(function initUpload(){
+  const uz=$('uploadZone'),fi=$('fileInput');
+  uz.addEventListener('click',e=>{if(e.target!==fi)fi.click();});
+  uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag');});
+  uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
+  uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)setUploadFile(f);});
+  fi.addEventListener('change',e=>{if(e.target.files[0])setUploadFile(e.target.files[0]);});
+})();
+$('selZone').addEventListener('change',updateEstimate);
+$('selStress').addEventListener('change',updateEstimate);
 $('confCtaBtn').addEventListener('click',()=>{
-  const zd=CONF_DATA[confZone],sd=zd[confStress];
-  const sLabel={low:'Scăzut',mid:'Mediu',crit:'Critic'}[confStress];
-  const msg=`Buna ziua!\n\nDoresc evaluarea unui fisier 3D pentru o piesa auto:\n\n📍 Zona: ${zd.name}\n⚡ Stres mecanic: ${sLabel}\n🔧 Material recomandat: ${sd.mat}\n💰 Pret estimat: ~${sd.base} RON\n\nVreau sa trimit fisierul .STL/.STEP pentru o oferta personalizata.\n\nVa multumesc!`;
+  const zone=$('selZone').value, stress=$('selStress').value;
+  const zd=CONF_DATA[zone],sd=zd[stress];
+  const total=sd.base+20;
+  const sLabel={low:'Scăzut',mid:'Mediu',crit:'Critic'}[stress];
+  const name=$('orderName').value.trim()||'—';
+  const contact=$('orderContact').value.trim()||'—';
+  const fName=orderFile?orderFile.name:'(fișierul nu a fost încărcat)';
+  const msg=`Buna ziua!\n\nDoresc o ofertă pentru printare 3D:\n\n👤 Nume: ${name}\n📞 Contact: ${contact}\n📁 Fișier: ${fName}\n\n🚗 Zona: ${zd.name}\n⚡ Stres mecanic: ${sLabel}\n🔧 Material recomandat: ${sd.mat}\n💰 Preț estimat: ${total} RON (transport gratuit inclus)\n\nVoi atașa fișierul STL/STEP la acest mesaj.\n\nVă mulțumesc!`;
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
@@ -1974,7 +2008,7 @@ function initScrollReveal(){
 /* ══ INIT ══ */
 buildTicker();
 applyI18n();
-updateConfigurator();
+updateEstimate();
 loadAll();
 loadFilaments();
 initScrollReveal();
