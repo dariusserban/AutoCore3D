@@ -554,7 +554,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 /* Configurator — vintage workshop feel */
 .conf-section{background:linear-gradient(180deg,#0E2030 0%,#0C1820 100%);}
 .conf-section::before{background:linear-gradient(90deg,transparent,rgba(232,75,26,.6) 30%,rgba(255,107,53,.8) 50%,rgba(232,75,26,.6) 70%,transparent);}
-.conf-result{background:linear-gradient(160deg,#142838 0%,#0F2030 100%);border-color:var(--bdr);}
+.conf-result{background:linear-gradient(160deg,#142838 0%,#0F2030 100%);border-color:rgba(30,61,80,.8);}
 .conf-result::before{background:linear-gradient(90deg,transparent,rgba(232,75,26,.5),transparent);}
 .conf-price-market{background:#080F14;border-color:#1A3040;}
 .conf-price-autocore{background:rgba(232,75,26,.07);border-color:rgba(232,75,26,.4);}
@@ -600,7 +600,8 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .conf-btn.active{background:var(--red);border-color:var(--red);color:#fff;font-weight:700;box-shadow:0 0 16px rgba(232,75,26,.5),inset 0 1px 0 rgba(255,255,255,.12);}
 .conf-btn.warn{border-color:rgba(30,61,80,.6);}
 .conf-btn.warn.active{background:#c0392b;border-color:#c0392b;box-shadow:0 0 16px rgba(192,57,43,.5);}
-.conf-result{background:var(--card);border:1px solid var(--bdr);position:relative;overflow:hidden;margin-bottom:1.5rem;transition:border-color .3s;}
+.conf-sel-state{font-family:var(--mono);font-size:.6rem;color:var(--orange);letter-spacing:.15em;text-transform:uppercase;border-left:2px solid var(--red);padding:.3rem .8rem;margin-bottom:1rem;background:rgba(232,75,26,.06);}
+.conf-result{background:var(--card);border:2px solid var(--bdr);position:relative;overflow:hidden;margin-bottom:1.5rem;transition:border-color .3s;box-shadow:0 0 0 1px rgba(232,75,26,.08);}
 .conf-result::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
 .conf-result:hover{border-color:rgba(232,75,26,.3);}
 .conf-result-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;}
@@ -707,6 +708,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
         </div>
       </div>
     </div>
+    <div class="conf-sel-state" id="confSelState">Compartiment Motor · Stres Scăzut</div>
     <div class="conf-result">
       <div class="conf-result-inner" id="confResult"></div>
     </div>
@@ -1251,9 +1253,16 @@ function updateConfigurator(){
         <div class="conf-price-save">✓ Economisești ${save} RON față de prețul de piață</div>
       </div>
     </div>`;
-  /* sync button states */
-  document.querySelectorAll('#confZoneBar .conf-btn').forEach(b=>b.classList.toggle('active',b.dataset.zone===confZone));
-  document.querySelectorAll('#confStressBar .conf-btn').forEach(b=>b.classList.toggle('active',b.dataset.stress===confStress));
+  /* sync button states — explicit add/remove, no toggle ambiguity */
+  document.querySelectorAll('#confZoneBar .conf-btn').forEach(b=>{
+    if(b.dataset.zone===confZone)b.classList.add('active');else b.classList.remove('active');
+  });
+  document.querySelectorAll('#confStressBar .conf-btn').forEach(b=>{
+    if(b.dataset.stress===confStress)b.classList.add('active');else b.classList.remove('active');
+  });
+  /* update visible selection summary */
+  const sel=$('confSelState');
+  if(sel)sel.textContent=`${zd.name} · Stres ${stressLabel}`;
 }
 $('confZoneBar').addEventListener('click',e=>{const b=e.target.closest('.conf-btn');if(!b)return;confZone=b.dataset.zone;updateConfigurator();});
 $('confStressBar').addEventListener('click',e=>{const b=e.target.closest('.conf-btn');if(!b)return;confStress=b.dataset.stress;updateConfigurator();});
