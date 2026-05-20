@@ -1085,13 +1085,13 @@ const CONF_DATA = {
     name:'Compartiment Motor',
     low: {mat:'ABS/ASA',     color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'90°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],     base:120},
     mid: {mat:'ASA Premium', color:'#f59e0b', specs:[{i:'🌡',l:'Termic',v:'110°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Excelent'}],base:185},
-    crit:{mat:'Carbon + PA12',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'150°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Extrem'}],  base:290}
+    crit:{mat:'ABS Carbon Fiber',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'150°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Extrem'}],  base:290}
   },
   exterior:{
     name:'Exterior Caroserie',
     low: {mat:'ASA',          color:'#25D366', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Bun'}],     base:95},
-    mid: {mat:'ASA + Carbon', color:'#a3a3a3', specs:[{i:'🌡',l:'Termic',v:'105°C'},{i:'☀',l:'UV',v:'Excelent'},{i:'⬡',l:'Impact',v:'Ridicat'}],base:165},
-    crit:{mat:'Carbon ASA',   color:'#a3a3a3', specs:[{i:'🌡',l:'Termic',v:'130°C'},{i:'☀',l:'UV',v:'Maxim'},{i:'⬡',l:'Impact',v:'Extrem'}],   base:265}
+    mid: {mat:'ASA Carbon Fiber',color:'#a3a3a3', specs:[{i:'🌡',l:'Termic',v:'105°C'},{i:'☀',l:'UV',v:'Excelent'},{i:'⬡',l:'Impact',v:'Ridicat'}],base:165},
+    crit:{mat:'ASA Carbon Fiber',color:'#a3a3a3', specs:[{i:'🌡',l:'Termic',v:'130°C'},{i:'☀',l:'UV',v:'Maxim'},{i:'⬡',l:'Impact',v:'Extrem'}],   base:265}
   },
   interior:{
     name:'Interior / Habitaclu',
@@ -1323,13 +1323,34 @@ function parseGCode(txt){
   // 5. "Filament length: Xmm" — Simplify3D (conversie mm → grame)
   if(!grams){const g5=txt.match(/;[^\n]*filament[^\n]*?([\d.]+)\s*mm/i);if(g5)grams=Math.PI*0.0875*0.0875*+g5[1]/10*1.04;}
 
-  return{mins,grams};
+  /* tip filament — Bambu: "; filament_type = ASA" sau "; filament_type = ABS-CF" */
+  const ft=txt.match(/;[^\n]*filament_type[^\n]*=\s*([^\n;]+)/i);
+  const filamentType=ft?ft[1].trim():'';
+  return{mins,grams,filamentType};
 }
-function calcGCodePrice(mins,grams){
-  const filCost=grams/1000*FIL_RON_PER_KG;
+function findBambuFilament(gcodeType){
+  if(!gcodeType||!filaments.length)return null;
+  const norm=s=>s.toLowerCase().replace(/[-_\s]/g,'');
+  const gt=norm(gcodeType);
+  const bambu=filaments.filter(f=>norm(f.brand||'').includes('bambu'));
+  return bambu.find(f=>norm(f.type||'')===gt)
+      ||bambu.find(f=>{const n=norm(f.type||'');return n.includes(gt)||gt.includes(n);})
+      ||null;
+}
+function calcGCodePrice(mins,grams,filType){
+  let filCost;
+  const fil=findBambuFilament(filType);
+  if(fil){
+    /* preț sheets (fără markup catalog) × 2 + 12 RON per rolă */
+    const rawPrice=fil.price-FILAMENT_MARKUP;
+    const efectivPerRola=rawPrice*2+FILAMENT_MARKUP;
+    filCost=grams/fil.weight*efectivPerRola;
+  } else {
+    filCost=grams/1000*FIL_RON_PER_KG; /* fallback 150 RON/kg */
+  }
   const elecCost=mins/60*(PRINTER_WATTS/1000)*ELEC_RON_KWH;
   const total=Math.ceil((filCost+elecCost)*MARKUP*TVA)+TRANSPORT_RON;
-  return {filCost,elecCost,total,h:Math.floor(mins/60),m:mins%60,grams};
+  return{filCost,elecCost,total,h:Math.floor(mins/60),m:mins%60,grams};
 }
 function showGCodePrice(p){
   $('priceBadge').textContent='⬡ PREȚ CALCULAT DIN GCODE ✓';
@@ -1373,9 +1394,9 @@ function setUploadFile(f){
     const blob=f.size>131072?new Blob([f.slice(0,65536),f.slice(-65536)]):f;
     const reader=new FileReader();
     reader.onload=e=>{
-      const {mins,grams}=parseGCode(e.target.result);
+      const {mins,grams,filamentType}=parseGCode(e.target.result);
       if(mins>0||grams>0){
-        showGCodePrice(calcGCodePrice(mins,grams));
+        showGCodePrice(calcGCodePrice(mins,grams,filamentType));
         $('uploadContent').querySelector('.upload-title').textContent='GCode încărcat ✓';
       } else {
         toast('Nu am găsit datele în GCode — verifică că fișierul e din Prusa/Cura Slicer',true);
