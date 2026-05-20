@@ -1323,31 +1323,47 @@ function parseGCode(txt){
   // 5. "Filament length: Xmm" — Simplify3D (conversie mm → grame)
   if(!grams){const g5=txt.match(/;[^\n]*filament[^\n]*?([\d.]+)\s*mm/i);if(g5)grams=Math.PI*0.0875*0.0875*+g5[1]/10*1.04;}
 
-  /* tip filament — Bambu: "; filament_type = ASA" sau "; filament_type = ABS-CF" */
-  const ft=txt.match(/;[^\n]*filament_type[^\n]*=\s*([^\n;]+)/i);
-  const filamentType=ft?ft[1].trim():'';
-  return{mins,grams,filamentType};
+  /* tip filament — nu mai extragem din GCode, vine din selectia utilizatorului */
+  return{mins,grams};
 }
-function findBambuFilament(gcodeType){
-  if(!gcodeType||!filaments.length)return null;
+/* extrage cuvântul cheie de filament din numele materialului din CONF_DATA
+   ex: "ASA Carbon Fiber" → "ASA-CF", "ABS Premium" → "ABS", "PLA+ / ABS" → "PLA" */
+function matToFilType(matName){
+  const m=matName.toLowerCase();
+  if(m.includes('abs')&&m.includes('carbon'))return'ABS-CF';
+  if(m.includes('asa')&&m.includes('carbon'))return'ASA-CF';
+  if(m.includes('pa12')||m.includes('pa-cf')||m.includes('nylon'))return'PA12';
+  if(m.includes('petg'))return'PETG';
+  if(m.includes('tpu')||m.includes('tpe'))return'TPU';
+  if(m.includes('asa'))return'ASA';
+  if(m.includes('abs'))return'ABS';
+  if(m.includes('pla'))return'PLA';
+  return matName;
+}
+function findBambuFilament(matName){
+  if(!matName||!filaments.length)return null;
+  const filType=matToFilType(matName);
   const norm=s=>s.toLowerCase().replace(/[-_\s]/g,'');
-  const gt=norm(gcodeType);
+  const ft=norm(filType);
   const bambu=filaments.filter(f=>norm(f.brand||'').includes('bambu'));
-  return bambu.find(f=>norm(f.type||'')===gt)
-      ||bambu.find(f=>{const n=norm(f.type||'');return n.includes(gt)||gt.includes(n);})
+  return bambu.find(f=>norm(f.type||'')===ft)
+      ||bambu.find(f=>{const n=norm(f.type||'');return n.includes(ft)||ft.includes(n);})
       ||null;
 }
-function calcGCodePrice(mins,grams,filType){
+function calcGCodePrice(mins,grams,matName){
   let filCost;
-  const fil=findBambuFilament(filType);
+  const fil=findBambuFilament(matName);
+  const filWeight=fil&&fil.weight>0?fil.weight:1000;
+  const filPrice=fil&&!isNaN(fil.price)?fil.price:FIL_RON_PER_KG+FILAMENT_MARKUP;
   if(fil){
     /* preț sheets (fără markup catalog) × 2 + 12 RON per rolă */
-    const rawPrice=fil.price-FILAMENT_MARKUP;
+    const rawPrice=Math.max(0,filPrice-FILAMENT_MARKUP);
     const efectivPerRola=rawPrice*2+FILAMENT_MARKUP;
-    filCost=grams/fil.weight*efectivPerRola;
+    filCost=grams/filWeight*efectivPerRola;
   } else {
-    filCost=grams/1000*FIL_RON_PER_KG; /* fallback 150 RON/kg */
+    filCost=grams/1000*FIL_RON_PER_KG;
   }
+  if(isNaN(filCost))filCost=grams/1000*FIL_RON_PER_KG; /* gardă NaN */
   const elecCost=mins/60*(PRINTER_WATTS/1000)*ELEC_RON_KWH;
   const total=Math.ceil((filCost+elecCost)*MARKUP*TVA)+TRANSPORT_RON;
   return{filCost,elecCost,total,h:Math.floor(mins/60),m:mins%60,grams};
@@ -1394,12 +1410,13 @@ function setUploadFile(f){
     const blob=f.size>131072?new Blob([f.slice(0,65536),f.slice(-65536)]):f;
     const reader=new FileReader();
     reader.onload=e=>{
-      const {mins,grams,filamentType}=parseGCode(e.target.result);
+      const {mins,grams}=parseGCode(e.target.result);
       if(mins>0||grams>0){
-        showGCodePrice(calcGCodePrice(mins,grams,filamentType));
+        const matName=CONF_DATA[$('selZone').value][$('selStress').value].mat;
+        showGCodePrice(calcGCodePrice(mins,grams,matName));
         $('uploadContent').querySelector('.upload-title').textContent='GCode încărcat ✓';
       } else {
-        toast('Nu am găsit datele în GCode — verifică că fișierul e din Prusa/Cura Slicer',true);
+        toast('Nu am găsit datele în GCode — verifică că fișierul conține timp și greutate filament',true);
         updateEstimate();
       }
     };
