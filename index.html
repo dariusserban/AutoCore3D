@@ -48,8 +48,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,22,30,.97)!important
 nav{display:flex;align-items:center;gap:1.4rem;}
 .nav-link{font-family:var(--mono);font-size:.63rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase;transition:color .2s;position:relative;padding-bottom:2px;}
 .nav-link::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--red);transition:width .3s var(--ease);}
-.nav-link:hover{color:var(--text);text-shadow:0 0 14px rgba(232,75,26,.7),0 0 28px rgba(232,75,26,.3);}
-.nav-link:hover::after{width:100%;}
+.nav-link:hover,.nav-link.active{color:var(--text);text-shadow:0 0 14px rgba(232,75,26,.7),0 0 28px rgba(232,75,26,.3);}
+.nav-link:hover::after,.nav-link.active::after{width:100%;}
 .nav-admin{background:transparent;border:1px solid var(--bdr);color:var(--muted);width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .25s;}
 .nav-admin:hover{border-color:var(--red);color:var(--red);}
 .nav-cta{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.08em;padding:.44rem .95rem;transition:all .25s;position:relative;overflow:hidden;}
@@ -644,6 +644,14 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .conf-cta-btn:hover{box-shadow:0 0 32px rgba(232,75,26,.5);transform:translateY(-2px);}
 .conf-cta-sub{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.12em;}
 @media(max-width:960px){.conf-panels{grid-template-columns:1fr;}}
+/* ── TABS ── */
+.tabs-bar{display:flex;background:var(--surf);border-bottom:2px solid var(--bdr);position:sticky;top:0;z-index:100;overflow-x:auto;scrollbar-width:none;}
+.tabs-bar::-webkit-scrollbar{display:none;}
+.tab-btn{flex:1;min-width:110px;padding:.85rem 1rem;font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);background:transparent;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;transition:color .2s,border-color .2s,background .2s;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:.4rem;}
+.tab-btn:hover{color:var(--text);background:rgba(255,255,255,.04);}
+.tab-btn.active{color:var(--red);border-bottom-color:var(--red);background:rgba(232,75,26,.06);}
+.tab-section{display:none;}
+.tab-section.active{display:block;}
 @media(max-width:768px){
   .conf-form-grid{grid-template-columns:1fr;}
   .conf-left{padding:1.1rem;}
@@ -668,9 +676,9 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       <div><div class="logo-name">AUTOCORE<span>3D</span></div><div class="logo-tag">3D PRINTING & ENGINEERING · SINCE 2023</div></div>
     </div>
     <nav>
-      <a href="#configurator" class="nav-link" data-i18n="nav_configurator">Configurator</a>
-      <a href="#produse" class="nav-link" data-i18n="nav_products">Produse</a>
-      <a href="#filamente" class="nav-link" data-i18n="nav_filaments">Filamente</a>
+      <a href="#" class="nav-link" data-tab="configurator" data-i18n="nav_configurator">Configurator</a>
+      <a href="#" class="nav-link" data-tab="produse" data-i18n="nav_products">Produse</a>
+      <a href="#" class="nav-link" data-tab="filamente" data-i18n="nav_filaments">Filamente</a>
       <button class="nav-admin" id="admBtn">⚙</button>
       <a href="https://wa.me/40771119423" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
     </nav>
@@ -697,8 +705,14 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
   <div class="db-badge loading" id="filBadge"><div class="db-dot"></div><span id="filBadgeText">Inventar filamente...</span></div>
 </div>
 
+<div class="tabs-bar" id="tabsBar">
+  <button class="tab-btn active" data-tab="configurator">⬡ <span data-i18n="nav_configurator">Configurator</span></button>
+  <button class="tab-btn" data-tab="produse">🚗 <span data-i18n="nav_products">Produse</span></button>
+  <button class="tab-btn" data-tab="filamente">🧵 <span data-i18n="nav_filaments">Filamente</span></button>
+</div>
+
 <!-- ══ SECTION 1: CERERE PRINTARE 3D ══ -->
-<section id="configurator" class="conf-section">
+<section id="configurator" class="conf-section tab-section active">
   <div class="conf-inner">
     <div class="conf-eyebrow" data-i18n="conf_eyebrow">// 01 · CERERE PRINTARE 3D PERSONALIZATĂ</div>
     <h2 class="conf-title" data-i18n="conf_title_html">Trimite <span>Fișierul Tău</span> 3D</h2>
@@ -771,7 +785,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 </section>
 
 <!-- ══ SECTION 2: CATALOG PIESE AUTO ══ -->
-<section id="produse">
+<section id="produse" class="tab-section">
   <div class="sect-wrap">
     <div class="sect-top">
       <span class="sect-num" data-i18n="prod_sect_num">02 / CATALOG</span>
@@ -805,7 +819,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 </section>
 
 <!-- ══ SECTION 3: CATALOG FILAMENTE TEHNICE ══ -->
-<section id="filamente" class="fil-section">
+<section id="filamente" class="fil-section tab-section">
   <div class="sect-wrap">
     <div class="sect-top">
       <span class="sect-num" data-i18n="fil_sect_num">03 / CATALOG</span>
@@ -2220,6 +2234,16 @@ function initScrollReveal(){
     document.body.appendChild(p);
   }
 })();
+
+/* ══ TABS ══ */
+function showTab(id){
+  document.querySelectorAll('.tab-section').forEach(s=>s.classList.toggle('active',s.id===id));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.classList.toggle('active',a.dataset.tab===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showTab(a.dataset.tab);}));
 
 /* ══ INIT ══ */
 buildTicker();
