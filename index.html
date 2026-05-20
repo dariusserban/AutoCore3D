@@ -706,7 +706,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
         <span class="upload-icon">📁</span>
         <div class="upload-title">Trage fișierul 3D aici</div>
         <div class="upload-sub">sau apasă pentru a selecta</div>
-        <div class="upload-hint">STL / STEP — preț estimat &nbsp;·&nbsp; GCODE (Prusa/Cura) — preț exact calculat automat</div>
+        <div class="upload-hint">STL / STEP — ofertă personalizată pe WhatsApp &nbsp;·&nbsp; GCODE — preț calculat automat</div>
       </div>
     </div>
     <div class="conf-form-grid">
@@ -1322,18 +1322,19 @@ function updateEstimate(){
   const zone=$('selZone').value,stress=$('selStress').value;
   if(!zone||!stress)return;
   const zd=CONF_DATA[zone],sd=zd[stress];
-  const total=sd.base+TRANSPORT_RON;
   $('matEyebrow').textContent=`// MATERIAL RECOMANDAT · ${zd.name.toUpperCase()}`;
   $('matName').textContent=sd.mat;
   $('matName').style.color=sd.color;
   $('specBadges').innerHTML=sd.specs.map(s=>`<div class="conf-spec-badge"><span class="conf-spec-icon">${s.i}</span><span class="conf-spec-lbl">${s.l}</span><span class="conf-spec-val">${s.v}</span></div>`).join('');
-  /* dacă nu avem GCode, arătăm estimat din config */
-  if(!orderFile||!['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase())){
-    $('priceBadge').textContent='⬡ PREȚ ESTIMAT AUTOCORE3D';
-    $('priceBadge').style.color='';
+  const isGcode=orderFile&&['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase());
+  if(!isGcode){
+    /* STL/STEP sau fără fișier — ofertă personalizată, fără preț afișat */
+    $('priceBadge').textContent='⬡ OFERTĂ PERSONALIZATĂ';
+    $('priceBadge').style.color='var(--sub)';
     $('priceBreakdown').style.display='none';
-    $('priceMain').textContent=`${total} RON`;
-    $('priceSave').textContent='✓ Transport GRATUIT inclus · Estimat ±15% · Încarcă GCode pentru preț exact';
+    $('priceMain').textContent='— RON';
+    $('priceMain').style.fontSize='1.2rem';
+    $('priceSave').innerHTML='Prețul depinde de dimensiune, complexitate și timp de printare.<br>Trimite cererea pe WhatsApp — îți calculăm și confirmăm în 24h.';
   }
 }
 function setUploadFile(f){
@@ -1379,9 +1380,12 @@ $('confCtaBtn').addEventListener('click',()=>{
   const name=$('orderName').value.trim()||'—';
   const contact=$('orderContact').value.trim()||'—';
   const fName=orderFile?orderFile.name:'(fișierul nu a fost încărcat)';
+  const isGcode=orderFile&&['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase());
   const priceShown=$('priceMain').textContent;
-  const isExact=orderFile&&['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase());
-  const msg=`Buna ziua!\n\nDoresc o ofertă pentru printare 3D:\n\n👤 Nume: ${name}\n📞 Contact: ${contact}\n📁 Fișier: ${fName}\n\n🚗 Zona: ${zd.name}\n⚡ Stres mecanic: ${sLabel}\n🔧 Material recomandat: ${sd.mat}\n💰 Preț ${isExact?'calculat exact':'estimat'}: ${priceShown} (transport gratuit inclus)\n\nVoi atașa fișierul la acest mesaj.\n\nVă mulțumesc!`;
+  const priceLine=isGcode
+    ?`💰 Preț calculat din GCode: ${priceShown} (transport gratuit inclus)`
+    :`💰 Preț: de calculat — aștept oferta dumneavoastră`;
+  const msg=`Buna ziua!\n\nDoresc o ofertă pentru printare 3D:\n\n👤 Nume: ${name}\n📞 Contact: ${contact}\n📁 Fișier: ${fName}\n\n🚗 Zona: ${zd.name}\n⚡ Stres mecanic: ${sLabel}\n🔧 Material recomandat: ${sd.mat}\n${priceLine}\n\nVoi atașa fișierul la acest mesaj.\n\nVă mulțumesc!`;
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
