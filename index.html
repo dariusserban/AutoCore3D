@@ -1333,10 +1333,9 @@ function calcGCodePrice(mins,grams){
 function showGCodePrice(p){
   $('priceBadge').textContent='⬡ PREȚ CALCULAT DIN GCODE ✓';
   $('priceBadge').style.color='var(--green)';
-  const bd=$('priceBreakdown');
-  bd.style.display='flex';
-  bd.innerHTML=`<span>⚖️ Filament: <b>${p.grams.toFixed(1)}g</b> × 150 RON/kg = <b>${p.filCost.toFixed(2)} RON</b></span><span>⚡ Electricitate: <b>${p.h}h${p.m}m</b> × ${PRINTER_WATTS}W × 2 RON/kWh = <b>${p.elecCost.toFixed(2)} RON</b></span><span>🚚 Transport: <b>GRATUIT</b></span><span class="pb-total">TOTAL: <b>${p.total} RON</b></span>`;
+  $('priceBreakdown').style.display='none';
   $('priceMain').textContent=`${p.total} RON`;
+  $('priceMain').style.fontSize='';
   $('priceSave').textContent='✓ Preț calculat exact din fișier · Transport GRATUIT inclus';
 }
 
