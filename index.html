@@ -630,6 +630,10 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .conf-price-desc{font-family:var(--body);font-size:.78rem;color:#bbb;margin-bottom:.45rem;line-height:1.4;}
 .conf-price-main{font-family:var(--disp);font-size:2rem;font-weight:900;color:var(--red);line-height:1;margin-bottom:.25rem;}
 .conf-price-save{font-family:var(--mono);font-size:.52rem;color:var(--green);letter-spacing:.1em;}
+.price-breakdown{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.55rem;padding:.55rem .7rem;background:rgba(0,0,0,.3);border-left:2px solid var(--bdr);}
+.price-breakdown span{font-family:var(--mono);font-size:.55rem;color:var(--sub);letter-spacing:.06em;}
+.price-breakdown span b{color:var(--text);}
+.price-breakdown .pb-total{color:var(--green);margin-top:.15rem;border-top:1px solid var(--bdr);padding-top:.3rem;}
 .conf-cta-wrap{border:1px dashed rgba(232,75,26,.2);background:rgba(232,75,26,.03);padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:.65rem;text-align:center;}
 .conf-cta-btn{display:inline-flex;align-items:center;gap:.6rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:.82rem 2.2rem;border:none;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
 .conf-cta-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
@@ -697,12 +701,12 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
     <h2 class="conf-title">Trimite <span>Fișierul Tău</span> 3D</h2>
     <p class="conf-sub">Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.</p>
     <div class="upload-zone" id="uploadZone">
-      <input type="file" id="fileInput" accept=".stl,.step,.stp" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;">
+      <input type="file" id="fileInput" accept=".stl,.step,.stp,.gcode,.gco,.gc" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;">
       <div id="uploadContent">
         <span class="upload-icon">📁</span>
-        <div class="upload-title">Trage fișierul STL / STEP aici</div>
+        <div class="upload-title">Trage fișierul 3D aici</div>
         <div class="upload-sub">sau apasă pentru a selecta</div>
-        <div class="upload-hint">FORMATE ACCEPTATE: .STL · .STEP · .STP</div>
+        <div class="upload-hint">STL / STEP — preț estimat &nbsp;·&nbsp; GCODE (Prusa/Cura) — preț exact calculat automat</div>
       </div>
     </div>
     <div class="conf-form-grid">
@@ -740,10 +744,10 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
         </div>
         <div class="conf-right">
           <div class="conf-price-autocore">
-            <div class="conf-brand-badge">⬡ PREȚ ESTIMAT AUTOCORE3D</div>
-            <div class="conf-price-desc" id="priceDesc">Material + electricitate 2 RON/kWh + transport gratuit inclus</div>
+            <div class="conf-brand-badge" id="priceBadge">⬡ PREȚ ESTIMAT AUTOCORE3D</div>
+            <div class="price-breakdown" id="priceBreakdown" style="display:none"></div>
             <div class="conf-price-main" id="priceMain">— RON</div>
-            <div class="conf-price-save">✓ Transport GRATUIT inclus · Prețul final se confirmă după analiza fișierului (±15%)</div>
+            <div class="conf-price-save" id="priceSave">✓ Transport GRATUIT inclus · Încarcă fișierul pentru preț</div>
           </div>
         </div>
       </div>
@@ -1067,6 +1071,12 @@ const SHEET_ID         = "1-_i4yL6UbWsbr1GPyCoALnODXlz3SOtBEqcLBhqANOk";
 const SHEET_NAME       = "Marketplace";
 const FILAMENT_MARKUP  = 12; /* RON adăugați automat per rolă */
 
+/* ══ PRICE CALC CONFIG ══ */
+const FIL_RON_PER_KG  = 150;   /* RON per kg filament ABS */
+const ELEC_RON_KWH    = 2;     /* RON per kWh */
+const PRINTER_WATTS   = 130;   /* W consum mediu printer FDM */
+const TRANSPORT_RON   = 20;    /* RON transport, inclus în preț, afișat ca "gratuit" */
+
 /* ══ CONFIGURATOR DATA ══ */
 const CONF_DATA = {
   motor:{
@@ -1264,28 +1274,97 @@ $('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');
 /* ══ TICKER ══ */
 function buildTicker(){const a=[...TICK_ITEMS,...TICK_ITEMS];$('ticker').innerHTML=a.map(ti=>`<span class="t-item"><b>▸</b>${ti}</span>`).join('');}
 
+/* ══ GCODE PARSER ══ */
+function parseGCode(txt){
+  let mins=0,grams=0;
+  /* Prusa Slicer / Bambu: "; estimated printing time (normal mode) = 1h 23m 45s" */
+  const pt=txt.match(/; estimated printing time(?:\s*\([^)]*\))?\s*=\s*(.+)/i);
+  if(pt){
+    const t=pt[1];
+    mins+=parseInt((t.match(/(\d+)\s*d/)||[,0])[1]||0)*1440;
+    mins+=parseInt((t.match(/(\d+)\s*h/)||[,0])[1]||0)*60;
+    mins+=parseInt((t.match(/(\d+)\s*m/)||[,0])[1]||0);
+  } else {
+    /* Cura: ";TIME:8130" (secunde) */
+    const ct=txt.match(/^;TIME:(\d+)/m);
+    if(ct)mins=Math.round(parseInt(ct[1])/60);
+  }
+  /* Prusa: "; total filament used [g] = 14.82" */
+  const pw=txt.match(/; (?:total )?filament used \[g\]\s*=\s*([\d.]+)/i);
+  if(pw){
+    grams=parseFloat(pw[1]);
+  } else {
+    /* Cura: ";Filament used: 4.32789m" → convertit în grame pt filament 1.75mm ABS */
+    const cf=txt.match(/^;Filament used:\s*([\d.]+)m/m);
+    if(cf){const v=Math.PI*0.0875*0.0875*parseFloat(cf[1])*100;grams=v*1.04;}
+  }
+  return {mins,grams};
+}
+function calcGCodePrice(mins,grams){
+  const filCost=grams/1000*FIL_RON_PER_KG;
+  const elecCost=mins/60*(PRINTER_WATTS/1000)*ELEC_RON_KWH;
+  const subtotal=filCost+elecCost;
+  const total=Math.ceil(subtotal)+TRANSPORT_RON;
+  return {filCost,elecCost,total,h:Math.floor(mins/60),m:mins%60,grams};
+}
+function showGCodePrice(p){
+  $('priceBadge').textContent='⬡ PREȚ CALCULAT DIN GCODE ✓';
+  $('priceBadge').style.color='var(--green)';
+  const bd=$('priceBreakdown');
+  bd.style.display='flex';
+  bd.innerHTML=`<span>⚖️ Filament: <b>${p.grams.toFixed(1)}g</b> × 150 RON/kg = <b>${p.filCost.toFixed(2)} RON</b></span><span>⚡ Electricitate: <b>${p.h}h${p.m}m</b> × ${PRINTER_WATTS}W × 2 RON/kWh = <b>${p.elecCost.toFixed(2)} RON</b></span><span>🚚 Transport: <b>GRATUIT</b></span><span class="pb-total">TOTAL: <b>${p.total} RON</b></span>`;
+  $('priceMain').textContent=`${p.total} RON`;
+  $('priceSave').textContent='✓ Preț calculat exact din fișier · Transport GRATUIT inclus';
+}
+
 /* ══ CONFIGURATOR — UPLOAD + ESTIMATE ══ */
 function updateEstimate(){
-  const zone=$('selZone').value, stress=$('selStress').value;
+  const zone=$('selZone').value,stress=$('selStress').value;
   if(!zone||!stress)return;
   const zd=CONF_DATA[zone],sd=zd[stress];
-  const total=sd.base+20; // +20 RON transport inclus în preț, afisat ca gratuit
+  const total=sd.base+TRANSPORT_RON;
   $('matEyebrow').textContent=`// MATERIAL RECOMANDAT · ${zd.name.toUpperCase()}`;
   $('matName').textContent=sd.mat;
   $('matName').style.color=sd.color;
   $('specBadges').innerHTML=sd.specs.map(s=>`<div class="conf-spec-badge"><span class="conf-spec-icon">${s.i}</span><span class="conf-spec-lbl">${s.l}</span><span class="conf-spec-val">${s.v}</span></div>`).join('');
-  $('priceMain').textContent=`${total} RON`;
+  /* dacă nu avem GCode, arătăm estimat din config */
+  if(!orderFile||!['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase())){
+    $('priceBadge').textContent='⬡ PREȚ ESTIMAT AUTOCORE3D';
+    $('priceBadge').style.color='';
+    $('priceBreakdown').style.display='none';
+    $('priceMain').textContent=`${total} RON`;
+    $('priceSave').textContent='✓ Transport GRATUIT inclus · Estimat ±15% · Încarcă GCode pentru preț exact';
+  }
 }
 function setUploadFile(f){
   const ext=(f.name.split('.').pop()||'').toLowerCase();
-  if(!['stl','step','stp'].includes(ext)){toast('Formate acceptate: .STL, .STEP, .STP',true);return;}
+  const isGcode=['gcode','gco','gc'].includes(ext);
+  const isModel=['stl','step','stp'].includes(ext);
+  if(!isGcode&&!isModel){toast('Formate: .STL .STEP .STP .GCODE',true);return;}
   orderFile=f;
   $('uploadZone').classList.add('has-file');
-  $('uploadContent').innerHTML=`<span class="upload-icon">✅</span><div class="upload-title" style="color:var(--green)">Fișier încărcat!</div><div class="upload-fname">${f.name}</div><div class="upload-sub" style="margin-top:.35rem">${(f.size/1024/1024).toFixed(2)} MB · Apasă pentru a schimba</div>`;
+  $('uploadContent').innerHTML=`<span class="upload-icon">${isGcode?'⚙️':'✅'}</span><div class="upload-title" style="color:var(--green)">${isGcode?'GCode încărcat — calculez prețul...':'Fișier încărcat!'}</div><div class="upload-fname">${f.name}</div><div class="upload-sub" style="margin-top:.35rem">${(f.size/1024/1024).toFixed(2)} MB · Apasă pentru a schimba</div>`;
+  if(isGcode){
+    /* citim primii + ultimii 16KB — acolo sunt headerele Prusa/Cura */
+    const blob=f.size>32768?new Blob([f.slice(0,16384),f.slice(-16384)]):f;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const {mins,grams}=parseGCode(e.target.result);
+      if(mins>0||grams>0){
+        showGCodePrice(calcGCodePrice(mins,grams));
+        $('uploadContent').querySelector('.upload-title').textContent='GCode încărcat ✓';
+      } else {
+        toast('Nu am găsit datele în GCode — verifică că fișierul e din Prusa/Cura Slicer',true);
+        updateEstimate();
+      }
+    };
+    reader.readAsText(blob);
+  } else {
+    updateEstimate();
+  }
 }
 (function initUpload(){
   const uz=$('uploadZone'),fi=$('fileInput');
-  /* input acoperă zona — iOS tastează nativ, fără JS click intermediar */
   uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag');});
   uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
   uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)setUploadFile(f);});
@@ -1294,14 +1373,15 @@ function setUploadFile(f){
 $('selZone').addEventListener('change',updateEstimate);
 $('selStress').addEventListener('change',updateEstimate);
 $('confCtaBtn').addEventListener('click',()=>{
-  const zone=$('selZone').value, stress=$('selStress').value;
+  const zone=$('selZone').value,stress=$('selStress').value;
   const zd=CONF_DATA[zone],sd=zd[stress];
-  const total=sd.base+20;
   const sLabel={low:'Scăzut',mid:'Mediu',crit:'Critic'}[stress];
   const name=$('orderName').value.trim()||'—';
   const contact=$('orderContact').value.trim()||'—';
   const fName=orderFile?orderFile.name:'(fișierul nu a fost încărcat)';
-  const msg=`Buna ziua!\n\nDoresc o ofertă pentru printare 3D:\n\n👤 Nume: ${name}\n📞 Contact: ${contact}\n📁 Fișier: ${fName}\n\n🚗 Zona: ${zd.name}\n⚡ Stres mecanic: ${sLabel}\n🔧 Material recomandat: ${sd.mat}\n💰 Preț estimat: ${total} RON (transport gratuit inclus)\n\nVoi atașa fișierul STL/STEP la acest mesaj.\n\nVă mulțumesc!`;
+  const priceShown=$('priceMain').textContent;
+  const isExact=orderFile&&['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase());
+  const msg=`Buna ziua!\n\nDoresc o ofertă pentru printare 3D:\n\n👤 Nume: ${name}\n📞 Contact: ${contact}\n📁 Fișier: ${fName}\n\n🚗 Zona: ${zd.name}\n⚡ Stres mecanic: ${sLabel}\n🔧 Material recomandat: ${sd.mat}\n💰 Preț ${isExact?'calculat exact':'estimat'}: ${priceShown} (transport gratuit inclus)\n\nVoi atașa fișierul la acest mesaj.\n\nVă mulțumesc!`;
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
