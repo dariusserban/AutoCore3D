@@ -1326,8 +1326,7 @@ function parseGCode(txt){
 function calcGCodePrice(mins,grams){
   const filCost=grams/1000*FIL_RON_PER_KG;
   const elecCost=mins/60*(PRINTER_WATTS/1000)*ELEC_RON_KWH;
-  const subtotal=filCost+elecCost;
-  const total=Math.ceil(subtotal)+TRANSPORT_RON;
+  const total=Math.ceil((filCost+elecCost)*2)+TRANSPORT_RON;
   return {filCost,elecCost,total,h:Math.floor(mins/60),m:mins%60,grams};
 }
 function showGCodePrice(p){
