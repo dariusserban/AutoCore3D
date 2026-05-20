@@ -591,8 +591,11 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .conf-eyebrow{font-family:var(--mono);font-size:.6rem;color:var(--red);letter-spacing:.25em;margin-bottom:.7rem;}
 .conf-title{font-family:var(--disp);font-size:clamp(1.6rem,3.2vw,2.5rem);font-weight:900;text-transform:uppercase;color:var(--text);margin-bottom:.4rem;line-height:1;}
 .conf-title span{color:var(--red);}
-.conf-sub{font-family:var(--body);font-size:.88rem;color:var(--sub);margin-bottom:2rem;line-height:1.6;}
-.upload-zone{position:relative;border:2px dashed var(--bdr);background:rgba(8,15,20,.6);padding:2.2rem 1.5rem;text-align:center;cursor:pointer;transition:all .25s;margin-bottom:1.5rem;user-select:none;}
+.conf-sub{font-family:var(--body);font-size:.88rem;color:var(--sub);margin-bottom:1.75rem;line-height:1.6;}
+.conf-panels{display:grid;grid-template-columns:1fr 400px;gap:2rem;align-items:start;}
+.conf-panel-left{display:flex;flex-direction:column;gap:1rem;}
+.conf-panel-right{display:flex;flex-direction:column;gap:1rem;}
+.upload-zone{position:relative;border:2px dashed var(--bdr);background:rgba(8,15,20,.6);padding:2.2rem 1.5rem;text-align:center;cursor:pointer;transition:all .25s;user-select:none;}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--red);background:rgba(232,75,26,.05);box-shadow:0 0 0 1px rgba(232,75,26,.12);}
 .upload-zone.has-file{border-color:var(--green);border-style:solid;background:rgba(37,211,102,.05);}
 .upload-icon{font-size:2.2rem;display:block;margin-bottom:.5rem;}
@@ -600,18 +603,18 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .upload-sub{font-family:var(--body);font-size:.82rem;color:var(--sub);}
 .upload-hint{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.1em;margin-top:.65rem;}
 .upload-fname{font-family:var(--mono);font-size:.75rem;color:var(--green);font-weight:700;margin-top:.5rem;word-break:break-all;}
-.conf-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.conf-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
 .conf-form-group{display:flex;flex-direction:column;gap:.4rem;}
 .conf-form-lbl{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.2em;}
 .conf-select,.conf-input{font-family:var(--body);font-size:.88rem;color:var(--text);background:#080F14;border:1px solid var(--bdr);padding:.65rem .85rem;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;box-sizing:border-box;}
 .conf-select{cursor:pointer;}
 .conf-select:focus,.conf-input:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(232,75,26,.15);}
 .conf-input::placeholder{color:var(--muted);opacity:1;}
-.conf-result{background:var(--card);border:2px solid var(--bdr);position:relative;overflow:hidden;margin-bottom:1.5rem;transition:border-color .3s;box-shadow:0 0 0 1px rgba(232,75,26,.08);}
+.conf-result{background:var(--card);border:2px solid var(--bdr);position:relative;overflow:hidden;transition:border-color .3s;box-shadow:0 0 0 1px rgba(232,75,26,.08);}
 .conf-result::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
 .conf-result:hover{border-color:rgba(232,75,26,.3);}
-.conf-result-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;}
-.conf-left{padding:1.5rem;border-right:1px solid var(--bdr);}
+.conf-result-inner{display:grid;grid-template-columns:1fr;gap:0;}
+.conf-left{padding:1.5rem;border-bottom:1px solid var(--bdr);}
 .conf-right{padding:1.5rem;}
 .conf-mat-eyebrow{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.2em;margin-bottom:.6rem;}
 .conf-mat-name{font-family:var(--disp);font-size:1.55rem;font-weight:900;line-height:1;margin-bottom:.9rem;transition:color .3s;}
@@ -640,10 +643,10 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .conf-cta-btn:hover::before{transform:translateX(0);}
 .conf-cta-btn:hover{box-shadow:0 0 32px rgba(232,75,26,.5);transform:translateY(-2px);}
 .conf-cta-sub{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.12em;}
+@media(max-width:960px){.conf-panels{grid-template-columns:1fr;}}
 @media(max-width:768px){
   .conf-form-grid{grid-template-columns:1fr;}
-  .conf-result-inner{grid-template-columns:1fr;}
-  .conf-left{border-right:none;border-bottom:1px solid var(--bdr);padding:1.1rem;}
+  .conf-left{padding:1.1rem;}
   .conf-right{padding:1.1rem;}
   .sect-wrap{padding:2rem 1rem .5rem;}
 }
@@ -700,61 +703,69 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
     <div class="conf-eyebrow">// 01 · CERERE PRINTARE 3D PERSONALIZATĂ</div>
     <h2 class="conf-title">Trimite <span>Fișierul Tău</span> 3D</h2>
     <p class="conf-sub">Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.</p>
-    <div class="upload-zone" id="uploadZone">
-      <input type="file" id="fileInput" accept=".stl,.step,.stp,.gcode,.gco,.gc" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;">
-      <div id="uploadContent">
-        <span class="upload-icon">📁</span>
-        <div class="upload-title">Trage fișierul 3D aici</div>
-        <div class="upload-sub">sau apasă pentru a selecta</div>
-        <div class="upload-hint">STL / STEP — ofertă personalizată pe WhatsApp &nbsp;·&nbsp; GCODE — preț calculat automat</div>
-      </div>
-    </div>
-    <div class="conf-form-grid">
-      <div class="conf-form-group">
-        <label class="conf-form-lbl" for="selZone">// ZONA PIESEI</label>
-        <select class="conf-select" id="selZone">
-          <option value="motor">🔧 Compartiment Motor</option>
-          <option value="exterior">🚗 Exterior Caroserie</option>
-          <option value="interior">🪑 Interior / Habitaclu</option>
-        </select>
-      </div>
-      <div class="conf-form-group">
-        <label class="conf-form-lbl" for="selStress">// NIVEL STRES MECANIC</label>
-        <select class="conf-select" id="selStress">
-          <option value="low">⬡ Scăzut — uz interior, decorativ</option>
-          <option value="mid">◈ Mediu — vibrații, temperaturi moderate</option>
-          <option value="crit">⚠ Critic — motor, impact, temp. ridicate</option>
-        </select>
-      </div>
-      <div class="conf-form-group">
-        <label class="conf-form-lbl" for="orderName">// NUMELE TĂU</label>
-        <input class="conf-input" id="orderName" type="text" placeholder="Cum te cheamă...">
-      </div>
-      <div class="conf-form-group">
-        <label class="conf-form-lbl" for="orderContact">// TELEFON SAU EMAIL</label>
-        <input class="conf-input" id="orderContact" type="text" placeholder="07XX... sau email@...">
-      </div>
-    </div>
-    <div class="conf-result">
-      <div class="conf-result-inner">
-        <div class="conf-left">
-          <div class="conf-mat-eyebrow" id="matEyebrow">// MATERIAL RECOMANDAT</div>
-          <div class="conf-mat-name" id="matName">ABS / ASA</div>
-          <div class="conf-spec-badges" id="specBadges"></div>
+    <div class="conf-panels">
+      <!-- STÂNGA: upload + formulare -->
+      <div class="conf-panel-left">
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept=".stl,.step,.stp,.gcode,.gco,.gc" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;">
+          <div id="uploadContent">
+            <span class="upload-icon">📁</span>
+            <div class="upload-title">Trage fișierul 3D aici</div>
+            <div class="upload-sub">sau apasă pentru a selecta</div>
+            <div class="upload-hint">STL / STEP — ofertă personalizată pe WhatsApp &nbsp;·&nbsp; GCODE — preț calculat automat</div>
+          </div>
         </div>
-        <div class="conf-right">
-          <div class="conf-price-autocore">
-            <div class="conf-brand-badge" id="priceBadge">⬡ PREȚ ESTIMAT AUTOCORE3D</div>
-            <div class="price-breakdown" id="priceBreakdown" style="display:none"></div>
-            <div class="conf-price-main" id="priceMain">— RON</div>
-            <div class="conf-price-save" id="priceSave">✓ Transport GRATUIT inclus · Încarcă fișierul pentru preț</div>
+        <div class="conf-form-grid">
+          <div class="conf-form-group">
+            <label class="conf-form-lbl" for="selZone">// ZONA PIESEI</label>
+            <select class="conf-select" id="selZone">
+              <option value="motor">🔧 Compartiment Motor</option>
+              <option value="exterior">🚗 Exterior Caroserie</option>
+              <option value="interior">🪑 Interior / Habitaclu</option>
+            </select>
+          </div>
+          <div class="conf-form-group">
+            <label class="conf-form-lbl" for="selStress">// NIVEL STRES MECANIC</label>
+            <select class="conf-select" id="selStress">
+              <option value="low">⬡ Scăzut — uz interior, decorativ</option>
+              <option value="mid">◈ Mediu — vibrații, temperaturi moderate</option>
+              <option value="crit">⚠ Critic — motor, impact, temp. ridicate</option>
+            </select>
+          </div>
+          <div class="conf-form-group">
+            <label class="conf-form-lbl" for="orderName">// NUMELE TĂU</label>
+            <input class="conf-input" id="orderName" type="text" placeholder="Cum te cheamă...">
+          </div>
+          <div class="conf-form-group">
+            <label class="conf-form-lbl" for="orderContact">// TELEFON SAU EMAIL</label>
+            <input class="conf-input" id="orderContact" type="text" placeholder="07XX... sau email@...">
           </div>
         </div>
       </div>
-    </div>
-    <div class="conf-cta-wrap">
-      <button class="conf-cta-btn" id="confCtaBtn">📲 Trimite Comanda pe WhatsApp</button>
-      <span class="conf-cta-sub">Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT</span>
+      <!-- DREAPTA: rezultat + CTA -->
+      <div class="conf-panel-right">
+        <div class="conf-result">
+          <div class="conf-result-inner">
+            <div class="conf-left">
+              <div class="conf-mat-eyebrow" id="matEyebrow">// MATERIAL RECOMANDAT</div>
+              <div class="conf-mat-name" id="matName">ABS / ASA</div>
+              <div class="conf-spec-badges" id="specBadges"></div>
+            </div>
+            <div class="conf-right">
+              <div class="conf-price-autocore">
+                <div class="conf-brand-badge" id="priceBadge">⬡ PREȚ ESTIMAT AUTOCORE3D</div>
+                <div class="price-breakdown" id="priceBreakdown" style="display:none"></div>
+                <div class="conf-price-main" id="priceMain">— RON</div>
+                <div class="conf-price-save" id="priceSave">✓ Transport GRATUIT inclus · Încarcă fișierul pentru preț</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="conf-cta-wrap">
+          <button class="conf-cta-btn" id="confCtaBtn">📲 Trimite Comanda pe WhatsApp</button>
+          <span class="conf-cta-sub">Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
