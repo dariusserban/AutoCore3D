@@ -1274,45 +1274,54 @@ $('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');
 /* ══ TICKER ══ */
 function buildTicker(){const a=[...TICK_ITEMS,...TICK_ITEMS];$('ticker').innerHTML=a.map(ti=>`<span class="t-item"><b>▸</b>${ti}</span>`).join('');}
 
-/* ══ GCODE PARSER — Prusa Slicer / Bambu Studio / Cura ══ */
+/* ══ GCODE PARSER — universal, orice slicer ══ */
 function parseGCode(txt){
   let mins=0,grams=0;
 
-  /* ── TIMP ── */
-  /* Prusa Slicer: "; estimated printing time (normal mode) = 1h 23m 45s" */
-  const pt=txt.match(/; estimated printing time(?:\s*\([^)]*\))?\s*=\s*(.+)/i);
-  if(pt){
-    const t=pt[1];
-    mins+=parseInt((t.match(/(\d+)\s*d/)||[,0])[1]||0)*1440;
-    mins+=parseInt((t.match(/(\d+)\s*h/)||[,0])[1]||0)*60;
-    mins+=parseInt((t.match(/(\d+)\s*m/)||[,0])[1]||0);
-  } else {
-    /* Bambu Studio: "; estimated_printing_seconds = 11892"
-       sau "; estimated_printing_time_normal_mode = 11892" */
-    const bs=txt.match(/; estimated_printing_(?:seconds|time_normal_mode)\s*=\s*(\d+)/i);
-    if(bs){mins=Math.round(parseInt(bs[1])/60);}
-    else {
-      /* Cura: ";TIME:8130" (secunde) */
-      const ct=txt.match(/^;TIME:(\d+)/m);
-      if(ct)mins=Math.round(parseInt(ct[1])/60);
-    }
+  /* ── TIMP ── (5 fallback-uri în ordine de prioritate) */
+  // 1. "Xh Xm Xs" / "Xd Xh Xm" — Prusa, SuperSlicer, OrcaSlicer, Bambu string
+  const t1=txt.match(/;[^\n]*?(?:print(?:ing)?\s*time|estimated)[^\n]*?=\s*((?:\d+\s*d\s*)?(?:\d+\s*h\s*)?(?:\d+\s*m\s*)?(?:\d+\s*s\s*)?)/i);
+  if(t1&&/\d/.test(t1[1]||'')){
+    const t=t1[1];
+    mins=+(t.match(/(\d+)\s*d/)||[,0])[1]*1440
+        ++(t.match(/(\d+)\s*h/)||[,0])[1]*60
+        ++(t.match(/(\d+)\s*m/)||[,0])[1];
+  }
+  // 2. integer secunde — Bambu "; estimated_printing_seconds/time_normal_mode = N", Cura ";TIME:N", IdeaMaker
+  if(!mins){
+    const t2=txt.match(/(?:^;TIME:|;[^\n]*?(?:_seconds|time_normal_mode|print_time)[^\n]*?[=:]\s*)(\d{3,})\s*s?\s*(?:\n|$)/im);
+    if(t2)mins=Math.round(+t2[1]/60);
+  }
+  // 3. HH:MM sau HH:MM:SS — Cura, unele versiuni Simplify3D
+  if(!mins){
+    const t3=txt.match(/;[^\n]*time[^\n]*[=:]\s*(\d{1,3}):(\d{2})(?::(\d{2}))?/i);
+    if(t3)mins=+t3[1]*60 + +t3[2];
+  }
+  // 4. "X hours Y minutes" — Flashforge, IdeaMaker string
+  if(!mins){
+    const t4=txt.match(/;[^\n]*?(\d+)\s*h(?:ours?)?[^\n\d]*?(\d+)\s*m(?:in(?:utes?)?)?/i);
+    if(t4)mins=+t4[1]*60 + +t4[2];
+  }
+  // 5. orice comentariu cu "time" + număr mare (>999 → secunde)
+  if(!mins){
+    const t5=txt.match(/;[^\n]*time[^\n]*?[=:\s](\d{4,})/i);
+    if(t5)mins=Math.round(+t5[1]/60);
   }
 
-  /* ── GRAME ── */
-  /* Prusa: "; total filament used [g] = 14.82" */
-  const pw=txt.match(/; (?:total )?filament used \[g\]\s*=\s*([\d.]+)/i);
-  if(pw){grams=parseFloat(pw[1]);}
-  else {
-    /* Bambu Studio: "; filament_used_g = 30.03" sau "; total_weight = 30.03" */
-    const bw=txt.match(/; (?:filament_used_g|total_weight)\s*=\s*([\d.]+)/i);
-    if(bw){grams=parseFloat(bw[1]);}
-    else {
-      /* Cura: ";Filament used: 4.32789m" → convertat în grame (1.75mm ABS) */
-      const cf=txt.match(/^;Filament used:\s*([\d.]+)m/m);
-      if(cf){const v=Math.PI*0.0875*0.0875*parseFloat(cf[1])*100;grams=v*1.04;}
-    }
-  }
-  return {mins,grams};
+  /* ── GRAME ── (5 fallback-uri) */
+  // 1. "[g] = X" sau "_g = X" sau "total_weight = X" — Prusa, Bambu
+  const g1=txt.match(/;[^\n]*(?:filament[_ ]*used[_ \[]*g[\]_ ]?|total[_ ]weight)[^\n]*?[=:]\s*([\d.]+)/i);
+  if(g1)grams=+g1[1];
+  // 2. "= Xg" sau ": Xg" cu unitate explicită — IdeaMaker, Flashforge
+  if(!grams){const g2=txt.match(/;[^\n]*(?:filament|weight)[^\n]*?[=:]\s*([\d.]+)\s*g(?:\s|;|$)/im);if(g2)grams=+g2[1];}
+  // 3. ";PRINT.WEIGHT:X" — Cura
+  if(!grams){const g3=txt.match(/^;PRINT\.WEIGHT:([\d.]+)/m);if(g3)grams=+g3[1];}
+  // 4. ";Filament used: Xm" — Cura (conversie metri → grame 1.75mm ABS)
+  if(!grams){const g4=txt.match(/^;Filament used:\s*([\d.]+)m(?:\s|$)/m);if(g4)grams=Math.PI*0.0875*0.0875*+g4[1]*100*1.04;}
+  // 5. "Filament length: Xmm" — Simplify3D (conversie mm → grame)
+  if(!grams){const g5=txt.match(/;[^\n]*filament[^\n]*?([\d.]+)\s*mm/i);if(g5)grams=Math.PI*0.0875*0.0875*+g5[1]/10*1.04;}
+
+  return{mins,grams};
 }
 function calcGCodePrice(mins,grams){
   const filCost=grams/1000*FIL_RON_PER_KG;
@@ -1361,7 +1370,7 @@ function setUploadFile(f){
   $('uploadContent').innerHTML=`<span class="upload-icon">${isGcode?'⚙️':'✅'}</span><div class="upload-title" style="color:var(--green)">${isGcode?'GCode încărcat — calculez prețul...':'Fișier încărcat!'}</div><div class="upload-fname">${f.name}</div><div class="upload-sub" style="margin-top:.35rem">${(f.size/1024/1024).toFixed(2)} MB · Apasă pentru a schimba</div>`;
   if(isGcode){
     /* citim primii + ultimii 16KB — acolo sunt headerele Prusa/Cura */
-    const blob=f.size>65536?new Blob([f.slice(0,32768),f.slice(-32768)]):f;
+    const blob=f.size>131072?new Blob([f.slice(0,65536),f.slice(-65536)]):f;
     const reader=new FileReader();
     reader.onload=e=>{
       const {mins,grams}=parseGCode(e.target.result);
