@@ -462,6 +462,69 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   input,select,textarea{font-size:16px!important;}
 }
 @media(min-width:1200px){.ap-panel{width:720px;}}
+
+/* ══ SECTION DIVIDERS ══ */
+.sect-wrap{max-width:1280px;margin:0 auto;padding:2.75rem 1.5rem .5rem;display:flex;flex-direction:column;gap:.5rem;}
+.sect-top{display:flex;align-items:center;gap:1rem;}
+.sect-num{font-family:var(--mono);font-size:.5rem;color:var(--red);letter-spacing:.22em;white-space:nowrap;border:1px solid rgba(224,26,26,.2);padding:.18rem .5rem;flex-shrink:0;}
+.sect-title{font-family:var(--disp);font-size:1.15rem;font-weight:900;letter-spacing:.07em;color:var(--text);white-space:nowrap;}
+.sect-title span{color:var(--red);}
+.sect-line{flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent);}
+.sect-desc{font-family:var(--body);font-size:.82rem;color:var(--sub);line-height:1.5;padding-left:2px;}
+.fil-section{border-top:1px solid var(--bdr);background:linear-gradient(180deg,var(--surf) 0%,var(--bg) 100%);padding-bottom:1rem;}
+
+/* ══ CONFIGURATOR SECTION ══ */
+.conf-section{border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);background:linear-gradient(180deg,#0d0d0d 0%,var(--bg) 100%);position:relative;overflow:hidden;}
+.conf-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red) 40%,#ff6b6b 50%,var(--red) 60%,transparent);}
+.conf-inner{max-width:1280px;margin:0 auto;padding:2.5rem 1.5rem 2.75rem;}
+.conf-eyebrow{font-family:var(--mono);font-size:.6rem;color:var(--red);letter-spacing:.25em;margin-bottom:.7rem;}
+.conf-title{font-family:var(--disp);font-size:clamp(1.6rem,3.2vw,2.5rem);font-weight:900;text-transform:uppercase;color:var(--text);margin-bottom:.4rem;line-height:1;}
+.conf-title span{color:var(--red);}
+.conf-sub{font-family:var(--body);font-size:.88rem;color:var(--sub);margin-bottom:2rem;line-height:1.6;}
+.conf-selectors{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+.conf-group-lbl{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.2em;margin-bottom:.55rem;}
+.conf-btns{display:flex;gap:.35rem;flex-wrap:wrap;}
+.conf-btn{font-family:var(--mono);font-size:.62rem;letter-spacing:.07em;padding:.45rem 1rem;border:1px solid var(--bdr);background:transparent;color:var(--sub);cursor:pointer;transition:all .22s;white-space:nowrap;}
+.conf-btn:hover{border-color:var(--red);color:var(--red);}
+.conf-btn.active{background:var(--red);border-color:var(--red);color:#fff;font-weight:700;}
+.conf-btn.warn{border-color:#555;}
+.conf-btn.warn.active{background:#c0392b;border-color:#c0392b;}
+.conf-result{background:var(--card);border:1px solid var(--bdr);position:relative;overflow:hidden;margin-bottom:1.5rem;transition:border-color .3s;}
+.conf-result::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.conf-result:hover{border-color:rgba(224,26,26,.3);}
+.conf-result-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.conf-left{padding:1.5rem;border-right:1px solid var(--bdr);}
+.conf-right{padding:1.5rem;}
+.conf-mat-eyebrow{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.2em;margin-bottom:.6rem;}
+.conf-mat-name{font-family:var(--disp);font-size:1.55rem;font-weight:900;line-height:1;margin-bottom:.9rem;transition:color .3s;}
+.conf-spec-badges{display:flex;gap:.55rem;flex-wrap:wrap;}
+.conf-spec-badge{display:flex;flex-direction:column;align-items:center;gap:.18rem;border:1px solid var(--bdr);padding:.5rem .7rem;background:rgba(0,0,0,.4);min-width:68px;transition:border-color .3s;}
+.conf-spec-badge:hover{border-color:rgba(224,26,26,.3);}
+.conf-spec-icon{font-size:.95rem;}
+.conf-spec-lbl{font-family:var(--mono);font-size:.42rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;}
+.conf-spec-val{font-family:var(--disp);font-size:.82rem;font-weight:700;color:var(--text);}
+.conf-price-market{padding:.8rem 1rem;border:1px solid #222;background:#0d0d0d;margin-bottom:.75rem;opacity:.75;}
+.conf-price-mkt-lbl{font-family:var(--mono);font-size:.47rem;color:var(--muted);letter-spacing:.14em;margin-bottom:.3rem;}
+.conf-price-mkt-val{font-family:var(--disp);font-size:1.3rem;font-weight:700;color:var(--sub);text-decoration:line-through;text-decoration-color:#ef4444;text-decoration-thickness:2px;}
+.conf-price-autocore{padding:1rem;border:1px solid rgba(224,26,26,.35);background:rgba(224,26,26,.05);position:relative;overflow:hidden;}
+.conf-price-autocore::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--red);}
+.conf-brand-badge{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.48rem;color:var(--red);letter-spacing:.14em;background:rgba(224,26,26,.1);border:1px solid rgba(224,26,26,.25);padding:.18rem .45rem;margin-bottom:.45rem;}
+.conf-price-desc{font-family:var(--body);font-size:.78rem;color:#bbb;margin-bottom:.45rem;line-height:1.4;}
+.conf-price-main{font-family:var(--disp);font-size:2rem;font-weight:900;color:var(--red);line-height:1;margin-bottom:.25rem;}
+.conf-price-save{font-family:var(--mono);font-size:.52rem;color:var(--green);letter-spacing:.1em;}
+.conf-cta-wrap{border:1px dashed rgba(224,26,26,.2);background:rgba(224,26,26,.03);padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:.65rem;text-align:center;}
+.conf-cta-btn{display:inline-flex;align-items:center;gap:.6rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:.82rem 2.2rem;border:none;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+.conf-cta-btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);transform:translateX(-100%);transition:transform .3s var(--ease);}
+.conf-cta-btn:hover::before{transform:translateX(0);}
+.conf-cta-btn:hover{box-shadow:0 0 32px rgba(224,26,26,.5);transform:translateY(-2px);}
+.conf-cta-sub{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.12em;}
+@media(max-width:768px){
+  .conf-selectors{grid-template-columns:1fr;gap:1rem;}
+  .conf-result-inner{grid-template-columns:1fr;}
+  .conf-left{border-right:none;border-bottom:1px solid var(--bdr);padding:1.1rem;}
+  .conf-right{padding:1.1rem;}
+  .sect-wrap{padding:2rem 1rem .5rem;}
+}
 </style>
 </head>
 
@@ -480,9 +543,9 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
       <div><div class="logo-name">AUTOCORE<span>3D</span></div><div class="logo-tag">ENGINEERING · PRINTING · PERFORMANCE</div></div>
     </div>
     <nav>
-      <a href="#" class="nav-link">Produse</a>
-      <a href="#" class="nav-link">Filamente</a>
-      <a href="#" class="nav-link">Despre</a>
+      <a href="#configurator" class="nav-link">Configurator</a>
+      <a href="#produse" class="nav-link">Produse</a>
+      <a href="#filamente" class="nav-link">Filamente</a>
       <button class="nav-admin" id="admBtn">⚙</button>
       <a href="https://wa.me/40771119423" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
     </nav>
@@ -509,52 +572,117 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
   <div class="db-badge loading" id="filBadge"><div class="db-dot"></div><span id="filBadgeText">Inventar filamente...</span></div>
 </div>
 
-<div class="filters-wrap">
-  <div class="section-label">// FILTRARE RAPIDĂ</div>
-  <div class="fbar" id="fbar"></div>
-</div>
+<!-- ══ SECTION 1: CONFIGURATOR TEHNIC & ESTIMATOR ══ -->
+<section id="configurator" class="conf-section">
+  <div class="conf-inner">
+    <div class="conf-eyebrow">// 01 · CONFIGURATOR TEHNIC &amp; ESTIMATOR AI</div>
+    <h2 class="conf-title">Configurează <span>Piesa Ta</span> Auto</h2>
+    <p class="conf-sub">Selectează zona vehiculului și nivelul de solicitare — AI-ul nostru recomandă materialul optim și estimează prețul instant.</p>
+    <div class="conf-selectors">
+      <div>
+        <div class="conf-group-lbl">// ZONA PIESEI</div>
+        <div class="conf-btns" id="confZoneBar">
+          <button class="conf-btn active" data-zone="motor">🔧 Compartiment Motor</button>
+          <button class="conf-btn" data-zone="exterior">🚗 Exterior Caroserie</button>
+          <button class="conf-btn" data-zone="interior">🪑 Interior / Habitaclu</button>
+        </div>
+      </div>
+      <div>
+        <div class="conf-group-lbl">// NIVEL STRES MECANIC</div>
+        <div class="conf-btns" id="confStressBar">
+          <button class="conf-btn active" data-stress="low">⬡ Scăzut</button>
+          <button class="conf-btn" data-stress="mid">◈ Mediu</button>
+          <button class="conf-btn warn" data-stress="crit">⚠ Critic</button>
+        </div>
+      </div>
+    </div>
+    <div class="conf-result">
+      <div class="conf-result-inner" id="confResult"></div>
+    </div>
+    <div class="conf-cta-wrap">
+      <button class="conf-cta-btn" id="confCtaBtn">📁 Încarcă fișier .STL / .STEP — Evaluare Gratuită</button>
+      <span class="conf-cta-sub">Validare gratuită · Ofertă personalizată în 24h · Transport inclus</span>
+    </div>
+  </div>
+</section>
 
-<div class="fil-subfilters" id="filSubFilters">
-  <div class="section-label" style="margin-bottom:.6rem;">// FILTRE FILAMENTE</div>
-  <div class="fil-sub-row">
-    <span class="fil-sub-lbl">BRAND</span>
-    <div id="filBrandBar" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
+<!-- ══ SECTION 2: CATALOG PIESE AUTO ══ -->
+<section id="produse">
+  <div class="sect-wrap">
+    <div class="sect-top">
+      <span class="sect-num">02 / CATALOG</span>
+      <span class="sect-title">PIESE <span>AUTO</span> 3D</span>
+      <div class="sect-line"></div>
+    </div>
+    <div class="sect-desc">Componente auto printate 3D din workshopul nostru · Materiale tehnice industriale · Comandă direct cu livrare rapidă</div>
   </div>
-  <div class="fil-sub-row">
-    <span class="fil-sub-lbl">TIP</span>
-    <div id="filCatBar" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
+  <div class="filters-wrap" style="padding-top:.75rem;">
+    <div class="section-label">// FILTRARE RAPIDĂ</div>
+    <div class="fbar" id="fbar"></div>
   </div>
-  <div class="fil-sub-row">
-    <span class="fil-sub-lbl">STOC</span>
-    <button class="fb on" id="filSAll">Toate</button>
-    <button class="fb" id="filSIn">În stoc</button>
-    <button class="fb" id="filSOut">Fără stoc</button>
+  <div class="search-sort-wrap">
+    <div class="search-main-wrap">
+      <span class="search-main-ico">🔍</span>
+      <input class="search-main-inp" id="searchMainInp" placeholder="Caută produs, material, categorie..." autocomplete="off" spellcheck="false"/>
+      <button class="search-main-clear" id="searchMainClear">✕</button>
+    </div>
+    <div class="sort-wrap">
+      <span class="sort-label">// SORT</span>
+      <button class="sort-btn on" data-sort="newest">Cele mai noi</button>
+      <button class="sort-btn" data-sort="price-asc">Preț ↑</button>
+      <button class="sort-btn" data-sort="price-desc">Preț ↓</button>
+      <button class="sort-btn" data-sort="stock">Stoc ↑</button>
+    </div>
   </div>
-  <div class="fil-sync-badge loading" id="filSyncBadge">
-    <div class="fil-sync-dot"></div>
-    <span id="filSyncTxt">Conectare inventar...</span>
+  <div class="products-wrap">
+    <div class="prod-hdr"><span class="prod-count" id="prodCount">—</span><div class="prod-line"></div></div>
+    <div class="grid" id="grid"></div>
   </div>
-</div>
+</section>
 
-<div class="search-sort-wrap">
-  <div class="search-main-wrap">
-    <span class="search-main-ico">🔍</span>
-    <input class="search-main-inp" id="searchMainInp" placeholder="Caută după nume, descriere, material..." autocomplete="off" spellcheck="false"/>
-    <button class="search-main-clear" id="searchMainClear">✕</button>
+<!-- ══ SECTION 3: CATALOG FILAMENTE TEHNICE ══ -->
+<section id="filamente" class="fil-section">
+  <div class="sect-wrap">
+    <div class="sect-top">
+      <span class="sect-num">03 / CATALOG</span>
+      <span class="sect-title">FILAMENTE <span>TEHNICE</span></span>
+      <div class="sect-line"></div>
+    </div>
+    <div class="sect-desc">Materie primă pentru printare 3D · ABS · ASA · Carbon · PETG · Nylon · Stoc actualizat din Google Sheets în timp real</div>
   </div>
-  <div class="sort-wrap">
-    <span class="sort-label">// SORT</span>
-    <button class="sort-btn on" data-sort="newest">Cele mai noi</button>
-    <button class="sort-btn" data-sort="price-asc">Preț ↑</button>
-    <button class="sort-btn" data-sort="price-desc">Preț ↓</button>
-    <button class="sort-btn" data-sort="stock">Stoc ↑</button>
+  <div class="fil-subfilters active" id="filSubFilters">
+    <div class="section-label" style="margin-bottom:.6rem;">// FILTRE FILAMENTE</div>
+    <div class="fil-sub-row">
+      <span class="fil-sub-lbl">BRAND</span>
+      <div id="filBrandBar" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
+    </div>
+    <div class="fil-sub-row">
+      <span class="fil-sub-lbl">TIP</span>
+      <div id="filCatBar" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
+    </div>
+    <div class="fil-sub-row">
+      <span class="fil-sub-lbl">STOC</span>
+      <button class="fb on" id="filSAll">Toate</button>
+      <button class="fb" id="filSIn">În stoc</button>
+      <button class="fb" id="filSOut">Fără stoc</button>
+    </div>
+    <div class="fil-sync-badge loading" id="filSyncBadge">
+      <div class="fil-sync-dot"></div>
+      <span id="filSyncTxt">Conectare inventar...</span>
+    </div>
   </div>
-</div>
-
-<div class="products-wrap">
-  <div class="prod-hdr"><span class="prod-count" id="prodCount">—</span><div class="prod-line"></div></div>
-  <div class="grid" id="grid"></div>
-</div>
+  <div class="search-sort-wrap">
+    <div class="search-main-wrap">
+      <span class="search-main-ico">🔍</span>
+      <input class="search-main-inp" id="filSearchInp" placeholder="Caută filament după culoare, brand, tip..." autocomplete="off" spellcheck="false"/>
+      <button class="search-main-clear" id="filSearchClear">✕</button>
+    </div>
+  </div>
+  <div class="products-wrap" style="padding-bottom:3rem;">
+    <div class="prod-hdr"><span class="prod-count" id="filCount">—</span><div class="prod-line"></div></div>
+    <div class="grid" id="filGrid"></div>
+  </div>
+</section>
 
 <div class="policy-section">
   <div class="section-label">// POLITICI &amp; CONFIDENŢIALITATE</div>
@@ -786,9 +914,31 @@ const WA     = "40771119423";
 const PWD    = "Darius12@";
 
 /* ══ FILAMENTE CONFIG ══ */
-const SHEET_ID        = "1-_i4yL6UbWsbr1GPyCoALnODXlz3SOtBEqcLBhqANOk";
-const SHEET_NAME      = "Marketplace";
-const FILAMENT_FILTER = "__FILAMENTE__";
+const SHEET_ID         = "1-_i4yL6UbWsbr1GPyCoALnODXlz3SOtBEqcLBhqANOk";
+const SHEET_NAME       = "Marketplace";
+const FILAMENT_MARKUP  = 12; /* RON adăugați automat per rolă */
+
+/* ══ CONFIGURATOR DATA ══ */
+const CONF_DATA = {
+  motor:{
+    name:'Compartiment Motor',
+    low: {mat:'ABS/ASA',     color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'90°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],     base:120},
+    mid: {mat:'ASA Premium', color:'#f59e0b', specs:[{i:'🌡',l:'Termic',v:'110°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Excelent'}],base:185},
+    crit:{mat:'Carbon + PA12',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'150°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Extrem'}],  base:290}
+  },
+  exterior:{
+    name:'Exterior Caroserie',
+    low: {mat:'ASA',          color:'#25D366', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Bun'}],     base:95},
+    mid: {mat:'ASA + Carbon', color:'#a3a3a3', specs:[{i:'🌡',l:'Termic',v:'105°C'},{i:'☀',l:'UV',v:'Excelent'},{i:'⬡',l:'Impact',v:'Ridicat'}],base:165},
+    crit:{mat:'Carbon ASA',   color:'#a3a3a3', specs:[{i:'🌡',l:'Termic',v:'130°C'},{i:'☀',l:'UV',v:'Maxim'},{i:'⬡',l:'Impact',v:'Extrem'}],   base:265}
+  },
+  interior:{
+    name:'Interior / Habitaclu',
+    low: {mat:'PLA+ / ABS',   color:'#8b5cf6', specs:[{i:'🌡',l:'Termic',v:'70°C'},{i:'☀',l:'UV',v:'Scăzut'},{i:'⬡',l:'Impact',v:'Moderat'}], base:70},
+    mid: {mat:'ABS Premium',  color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],       base:130},
+    crit:{mat:'ABS / PA12',   color:'#E01A1A', specs:[{i:'🌡',l:'Termic',v:'120°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Ridicat'}],  base:220}
+  }
+};
 
 const COLOR_MAP = {
   'white':'#F0F0F0','jade white':'#C8E6C9','beige':'#F5F0DC','light gray':'#C8C8C8',
@@ -909,11 +1059,16 @@ let adminAuth  = false;
 let coProd     = null, payMethod="RAMBURS";
 
 /* Filament state */
-let filaments         = [];
+let filaments          = [];
 let displayedFilaments = [];
-let filBrand          = '';
-let filCat            = '';
-let filStockFilter    = 'all';
+let filBrand           = '';
+let filCat             = '';
+let filStockFilter     = 'all';
+let filSearchQ         = '';
+
+/* Configurator state */
+let confZone   = 'motor';
+let confStress = 'low';
 
 /* ══ UTILS ══ */
 const $  = id => document.getElementById(id);
@@ -954,12 +1109,49 @@ const t=k=>T[lang][k]||T.ro[k]||k;
 function applyI18n(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(k==='hero_h1_html')el.innerHTML=t(k);else el.textContent=t(k);});
   document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
-  renderFilters();renderGrid();renderPolicyCards();
+  renderFilters();renderGrid();renderFilaments();renderPolicyCards();
 }
 $('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');if(!b)return;lang=b.dataset.lang;applyI18n();});
 
 /* ══ TICKER ══ */
 function buildTicker(){const a=[...TICK_ITEMS,...TICK_ITEMS];$('ticker').innerHTML=a.map(ti=>`<span class="t-item"><b>▸</b>${ti}</span>`).join('');}
+
+/* ══ CONFIGURATOR ══ */
+function updateConfigurator(){
+  const zd=CONF_DATA[confZone],sd=zd[confStress];
+  const market=Math.round(sd.base*1.25);
+  const save=market-sd.base;
+  const stressLabel={low:'Scăzut',mid:'Mediu',crit:'Critic'}[confStress];
+  $('confResult').innerHTML=`
+    <div class="conf-left">
+      <div class="conf-mat-eyebrow">// MATERIAL RECOMANDAT AI · ${zd.name.toUpperCase()} · STRES ${stressLabel.toUpperCase()}</div>
+      <div class="conf-mat-name" style="color:${sd.color}">${sd.mat}</div>
+      <div class="conf-spec-badges">${sd.specs.map(s=>`<div class="conf-spec-badge"><span class="conf-spec-icon">${s.i}</span><span class="conf-spec-lbl">${s.l}</span><span class="conf-spec-val">${s.v}</span></div>`).join('')}</div>
+    </div>
+    <div class="conf-right">
+      <div class="conf-price-market">
+        <div class="conf-price-mkt-lbl">// PREȚ PROTOTIPARE STANDARD (PIAȚĂ)</div>
+        <div class="conf-price-mkt-val">${market} RON</div>
+      </div>
+      <div class="conf-price-autocore">
+        <div class="conf-brand-badge">⬡ REALIZAT CU AUTOCORE3D</div>
+        <div class="conf-price-desc">Include marcaj discret de brand pe piesă · Transport inclus</div>
+        <div class="conf-price-main">${sd.base} RON</div>
+        <div class="conf-price-save">✓ Economisești ${save} RON față de prețul de piață</div>
+      </div>
+    </div>`;
+  /* sync button states */
+  document.querySelectorAll('#confZoneBar .conf-btn').forEach(b=>b.classList.toggle('active',b.dataset.zone===confZone));
+  document.querySelectorAll('#confStressBar .conf-btn').forEach(b=>b.classList.toggle('active',b.dataset.stress===confStress));
+}
+$('confZoneBar').addEventListener('click',e=>{const b=e.target.closest('.conf-btn');if(!b)return;confZone=b.dataset.zone;updateConfigurator();});
+$('confStressBar').addEventListener('click',e=>{const b=e.target.closest('.conf-btn');if(!b)return;confStress=b.dataset.stress;updateConfigurator();});
+$('confCtaBtn').addEventListener('click',()=>{
+  const zd=CONF_DATA[confZone],sd=zd[confStress];
+  const sLabel={low:'Scăzut',mid:'Mediu',crit:'Critic'}[confStress];
+  const msg=`Buna ziua!\n\nDoresc evaluarea unui fisier 3D pentru o piesa auto:\n\n📍 Zona: ${zd.name}\n⚡ Stres mecanic: ${sLabel}\n🔧 Material recomandat: ${sd.mat}\n💰 Pret estimat: ~${sd.base} RON\n\nVreau sa trimit fisierul .STL/.STEP pentru o oferta personalizata.\n\nVa multumesc!`;
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
+});
 
 /* ══ SVG ══ */
 function hexSVG(s=68){return`<svg width="${s}" height="${s}" viewBox="0 0 80 80" fill="none"><polygon points="40,8 72,28 72,52 40,72 8,52 8,28" stroke="#E01A1A" stroke-width="1.5" fill="none" opacity=".4"/><polygon points="40,20 60,32 60,48 40,60 20,48 20,32" stroke="#E01A1A" stroke-width="1" fill="none" opacity=".22"/><circle cx="40" cy="40" r="4" fill="#E01A1A" opacity=".65"/></svg>`;}
@@ -1077,7 +1269,7 @@ function applySearchSort(list){
 
 /* ══ RENDER FILAMENTS ══ */
 function renderFilaments(){
-  const q=searchQ.trim().toLowerCase();
+  const q=filSearchQ.trim().toLowerCase();
   let list=filaments.filter(p=>{
     if(filBrand&&p.brand!==filBrand) return false;
     if(filCat&&p.cat!==filCat)       return false;
@@ -1090,13 +1282,12 @@ function renderFilaments(){
   if(sortMode==='price-desc') list.sort((a,b)=>b.pret-a.pret);
   if(sortMode==='stock')      list.sort((a,b)=>b.stoc-a.stoc);
   displayedFilaments=list;
-  const mc=$('searchMainClear');if(mc)mc.classList.toggle('vis',searchQ.length>0);
-  $('prodCount').textContent=`${list.length} ${t('fil_found')}`;
-  $('heroCount').textContent=`${filaments.length}+`;
-  const g=$('grid');
+  const mc=$('filSearchClear');if(mc)mc.classList.toggle('vis',filSearchQ.length>0);
+  const fc=$('filCount');if(fc)fc.textContent=`${list.length} ${t('fil_found')}`;
+  const g=$('filGrid');if(!g)return;
   if(!list.length){
-    g.innerHTML=searchQ
-      ?`<div class="no-prod-search">🔍 Niciun filament pentru "<b style="color:var(--red)">${searchQ}</b>"</div>`
+    g.innerHTML=filSearchQ
+      ?`<div class="no-prod-search">🔍 Niciun filament pentru "<b style="color:var(--red)">${filSearchQ}</b>"</div>`
       :`<div class="no-prod">// 0 filamente disponibile</div>`;
     return;
   }
@@ -1107,10 +1298,8 @@ function renderFilaments(){
   });
 }
 
-/* ══ RENDER GRID (products) ══ */
+/* ══ RENDER GRID (products only) ══ */
 function renderGrid(){
-  /* Filament mode */
-  if(filter===FILAMENT_FILTER){renderFilaments();return;}
   const all=lang==='ro'?"Toate":"All";
   let base=(filter===all||filter==="Toate"||filter==="All")?products:products.filter(p=>p.category===filter);
   const list=applySearchSort(base);
@@ -1133,24 +1322,16 @@ function renderGrid(){
   $('tabCount').textContent=products.length;
 }
 
-/* ══ FILTERS ══ */
+/* ══ FILTERS (product categories only) ══ */
 function renderFilters(){
   const all=lang==='ro'?"Toate":"All";
   const names=[all,...getCatNames()];
   const curIsAll=filter==="Toate"||filter==="All";
-  const isFilMode=filter===FILAMENT_FILTER;
   $('fbar').innerHTML=names.map((n,i)=>{
-    const isAll=i===0,isOn=isAll?curIsAll:(filter===n&&!isFilMode);
+    const isAll=i===0,isOn=isAll?curIsAll:(filter===n);
     const col=isAll?"#E01A1A":getCatColor(n);
     return`<button class="fb${isOn?' on':''}" data-fname="${n}" style="border-color:${isOn?col:'#262626'};${isOn?`background:${col};`:''}color:${isOn?'#fff':'var(--sub)'};">${n}</button>`;
-  }).join('')+
-  `<button class="fb${isFilMode?' on':''}" data-fname="${FILAMENT_FILTER}" style="border-color:${isFilMode?'#E01A1A':'#262626'};${isFilMode?'background:#E01A1A;':''}color:${isFilMode?'#fff':'var(--sub)'};">🧵 FILAMENTE 3D</button>`;
-  /* Show/hide filament sub-filters */
-  const fs=$('filSubFilters');
-  if(fs){
-    if(isFilMode){fs.classList.add('active');buildFilamentFilters();}
-    else{fs.classList.remove('active');}
-  }
+  }).join('');
 }
 $('fbar').addEventListener('click',e=>{
   const b=e.target.closest('.fb');if(!b)return;
@@ -1179,25 +1360,30 @@ function buildFilamentFilters(){
 }
 document.addEventListener('click',e=>{
   const bb=e.target.closest('[data-filbrand]');
-  if(bb&&$('filBrandBar').contains(bb)){filBrand=bb.dataset.filbrand;filCat='';buildFilamentFilters();renderGrid();return;}
+  if(bb&&$('filBrandBar').contains(bb)){filBrand=bb.dataset.filbrand;filCat='';buildFilamentFilters();renderFilaments();return;}
   const bc=e.target.closest('[data-filcat]');
-  if(bc&&$('filCatBar').contains(bc)){filCat=bc.dataset.filcat;buildFilamentFilters();renderGrid();}
+  if(bc&&$('filCatBar').contains(bc)){filCat=bc.dataset.filcat;buildFilamentFilters();renderFilaments();}
 });
-$('filSAll').addEventListener('click',()=>{filStockFilter='all';buildFilamentFilters();renderGrid();});
-$('filSIn').addEventListener('click', ()=>{filStockFilter='in'; buildFilamentFilters();renderGrid();});
-$('filSOut').addEventListener('click',()=>{filStockFilter='out';buildFilamentFilters();renderGrid();});
+$('filSAll').addEventListener('click',()=>{filStockFilter='all';buildFilamentFilters();renderFilaments();});
+$('filSIn').addEventListener('click', ()=>{filStockFilter='in'; buildFilamentFilters();renderFilaments();});
+$('filSOut').addEventListener('click',()=>{filStockFilter='out';buildFilamentFilters();renderFilaments();});
 
-/* ══ SEARCH EVENTS ══ */
+/* ══ SEARCH EVENTS — Products ══ */
 $('searchMainInp').addEventListener('input',e=>{searchQ=e.target.value;renderGrid();});
 $('searchMainInp').addEventListener('keydown',e=>{if(e.key==='Escape'){searchQ='';e.target.value='';renderGrid();}});
 $('searchMainClear').addEventListener('click',()=>{searchQ='';$('searchMainInp').value='';$('searchMainInp').focus();renderGrid();});
+
+/* ══ SEARCH EVENTS — Filaments ══ */
+$('filSearchInp').addEventListener('input',e=>{filSearchQ=e.target.value;renderFilaments();});
+$('filSearchInp').addEventListener('keydown',e=>{if(e.key==='Escape'){filSearchQ='';e.target.value='';renderFilaments();}});
+$('filSearchClear').addEventListener('click',()=>{filSearchQ='';$('filSearchInp').value='';$('filSearchInp').focus();renderFilaments();});
 
 /* ══ SORT EVENTS ══ */
 document.querySelector('.sort-wrap').addEventListener('click',e=>{
   const b=e.target.closest('.sort-btn');if(!b)return;
   sortMode=b.dataset.sort;
   document.querySelectorAll('.sort-btn').forEach(x=>x.classList.toggle('on',x===b));
-  renderGrid();
+  renderGrid();renderFilaments();
 });
 
 /* ══ POLICY CARDS ══ */
@@ -1251,7 +1437,7 @@ async function loadFilaments(){
     setFilBadge('err',`Filamente offline`);
     setFilSync('err',`Eroare: ${err.message}`);
   }
-  if(filter===FILAMENT_FILTER){buildFilamentFilters();renderGrid();}
+  buildFilamentFilters();renderFilaments();
   setTimeout(loadFilaments,90000);
 }
 
@@ -1262,7 +1448,7 @@ function parseFilamentCSV(csv){
     const cols=splitFilCSV(lines[i]);
     if(!cols||cols.length<4)continue;
     const brand=cleanFil(cols[0]),cat=cleanFil(cols[1]),col=cleanFil(cols[2]),cod=cleanFil(cols[3]);
-    const pret=parseInt(cols[4])||0,stoc=parseInt(cols[5])||0;
+    const pret=(parseInt(cols[4])||0)+FILAMENT_MARKUP,stoc=parseInt(cols[5])||0;
     if(!cat||!col)continue;
     out.push({brand,cat,col,cod,pret,stoc});
   }
@@ -1290,7 +1476,7 @@ async function loadAll(){
     if(mats&&mats.length)materials=mats;else{await Promise.all(DEFAULT_MATS.map(m=>sb.upsertMaterial(m)));materials=[...DEFAULT_MATS];}
     if(pols)policies={...DEFAULT_POLICIES,...pols};
     setDbStatus('ok','Supabase conectat ✓');
-    renderFilters();renderGrid();renderPolicyCards();
+    renderFilters();renderGrid();renderFilaments();renderPolicyCards();
   }catch(e){
     console.error(e);
     setDbStatus('err',`Eroare: ${e.message}`);
@@ -1475,7 +1661,7 @@ $('catSaveBtn').onclick=async()=>{
   try{
     if(catEditId){const old=categories.find(c=>c.id===catEditId);await sb.upsertCategory({id,name,color});if(old&&old.name!==name){const toUp=products.filter(p=>p.category===old.name);await Promise.all(toUp.map(p=>sb.updateProduct(p.id,{category:name})));products=products.map(p=>p.category===old.name?{...p,category:name}:p);}categories=categories.map(c=>c.id===catEditId?{...c,name,color}:c);showOk('✓ Actualizat!');}
     else{if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){showOk('Exista deja!');return;}await sb.upsertCategory({id,name,color});categories.push({id,name,color});showOk(`✓ "${name}" adaugat!`);}
-    resetCatForm();renderCatList();populateCatSelect();renderFilters();renderGrid();
+    resetCatForm();renderCatList();populateCatSelect();renderFilters();renderGrid();renderFilaments();
   }catch(e){toast('Eroare: '+e.message,true);}
 };
 
@@ -1572,12 +1758,15 @@ function openFilamentCheckout(idx){
   $('coModal').classList.add('open');
 }
 
-/* Grid click — products + filaments */
+/* Grid click — products */
 $('grid').addEventListener('click',e=>{
   const b=e.target.closest('[data-order]');
-  if(b){openCheckout(+b.dataset.order);return;}
+  if(b)openCheckout(+b.dataset.order);
+});
+/* Grid click — filaments */
+$('filGrid').addEventListener('click',e=>{
   const fb=e.target.closest('[data-fil-order]');
-  if(fb){openFilamentCheckout(+fb.dataset.filOrder);}
+  if(fb)openFilamentCheckout(+fb.dataset.filOrder);
 });
 
 function validateCo(){
@@ -1666,6 +1855,7 @@ function initScrollReveal(){
 /* ══ INIT ══ */
 buildTicker();
 applyI18n();
+updateConfigurator();
 loadAll();
 loadFilaments();
 initScrollReveal();
