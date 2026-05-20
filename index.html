@@ -1274,10 +1274,12 @@ $('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');
 /* ══ TICKER ══ */
 function buildTicker(){const a=[...TICK_ITEMS,...TICK_ITEMS];$('ticker').innerHTML=a.map(ti=>`<span class="t-item"><b>▸</b>${ti}</span>`).join('');}
 
-/* ══ GCODE PARSER ══ */
+/* ══ GCODE PARSER — Prusa Slicer / Bambu Studio / Cura ══ */
 function parseGCode(txt){
   let mins=0,grams=0;
-  /* Prusa Slicer / Bambu: "; estimated printing time (normal mode) = 1h 23m 45s" */
+
+  /* ── TIMP ── */
+  /* Prusa Slicer: "; estimated printing time (normal mode) = 1h 23m 45s" */
   const pt=txt.match(/; estimated printing time(?:\s*\([^)]*\))?\s*=\s*(.+)/i);
   if(pt){
     const t=pt[1];
@@ -1285,18 +1287,30 @@ function parseGCode(txt){
     mins+=parseInt((t.match(/(\d+)\s*h/)||[,0])[1]||0)*60;
     mins+=parseInt((t.match(/(\d+)\s*m/)||[,0])[1]||0);
   } else {
-    /* Cura: ";TIME:8130" (secunde) */
-    const ct=txt.match(/^;TIME:(\d+)/m);
-    if(ct)mins=Math.round(parseInt(ct[1])/60);
+    /* Bambu Studio: "; estimated_printing_seconds = 11892"
+       sau "; estimated_printing_time_normal_mode = 11892" */
+    const bs=txt.match(/; estimated_printing_(?:seconds|time_normal_mode)\s*=\s*(\d+)/i);
+    if(bs){mins=Math.round(parseInt(bs[1])/60);}
+    else {
+      /* Cura: ";TIME:8130" (secunde) */
+      const ct=txt.match(/^;TIME:(\d+)/m);
+      if(ct)mins=Math.round(parseInt(ct[1])/60);
+    }
   }
+
+  /* ── GRAME ── */
   /* Prusa: "; total filament used [g] = 14.82" */
   const pw=txt.match(/; (?:total )?filament used \[g\]\s*=\s*([\d.]+)/i);
-  if(pw){
-    grams=parseFloat(pw[1]);
-  } else {
-    /* Cura: ";Filament used: 4.32789m" → convertit în grame pt filament 1.75mm ABS */
-    const cf=txt.match(/^;Filament used:\s*([\d.]+)m/m);
-    if(cf){const v=Math.PI*0.0875*0.0875*parseFloat(cf[1])*100;grams=v*1.04;}
+  if(pw){grams=parseFloat(pw[1]);}
+  else {
+    /* Bambu Studio: "; filament_used_g = 30.03" sau "; total_weight = 30.03" */
+    const bw=txt.match(/; (?:filament_used_g|total_weight)\s*=\s*([\d.]+)/i);
+    if(bw){grams=parseFloat(bw[1]);}
+    else {
+      /* Cura: ";Filament used: 4.32789m" → convertat în grame (1.75mm ABS) */
+      const cf=txt.match(/^;Filament used:\s*([\d.]+)m/m);
+      if(cf){const v=Math.PI*0.0875*0.0875*parseFloat(cf[1])*100;grams=v*1.04;}
+    }
   }
   return {mins,grams};
 }
@@ -1347,7 +1361,7 @@ function setUploadFile(f){
   $('uploadContent').innerHTML=`<span class="upload-icon">${isGcode?'⚙️':'✅'}</span><div class="upload-title" style="color:var(--green)">${isGcode?'GCode încărcat — calculez prețul...':'Fișier încărcat!'}</div><div class="upload-fname">${f.name}</div><div class="upload-sub" style="margin-top:.35rem">${(f.size/1024/1024).toFixed(2)} MB · Apasă pentru a schimba</div>`;
   if(isGcode){
     /* citim primii + ultimii 16KB — acolo sunt headerele Prusa/Cura */
-    const blob=f.size>32768?new Blob([f.slice(0,16384),f.slice(-16384)]):f;
+    const blob=f.size>65536?new Blob([f.slice(0,32768),f.slice(-32768)]):f;
     const reader=new FileReader();
     reader.onload=e=>{
       const {mins,grams}=parseGCode(e.target.result);
