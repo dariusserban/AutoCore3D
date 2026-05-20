@@ -668,9 +668,9 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       <div><div class="logo-name">AUTOCORE<span>3D</span></div><div class="logo-tag">3D PRINTING & ENGINEERING · SINCE 2023</div></div>
     </div>
     <nav>
-      <a href="#configurator" class="nav-link">Configurator</a>
-      <a href="#produse" class="nav-link">Produse</a>
-      <a href="#filamente" class="nav-link">Filamente</a>
+      <a href="#configurator" class="nav-link" data-i18n="nav_configurator">Configurator</a>
+      <a href="#produse" class="nav-link" data-i18n="nav_products">Produse</a>
+      <a href="#filamente" class="nav-link" data-i18n="nav_filaments">Filamente</a>
       <button class="nav-admin" id="admBtn">⚙</button>
       <a href="https://wa.me/40771119423" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
     </nav>
@@ -700,9 +700,9 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 <!-- ══ SECTION 1: CERERE PRINTARE 3D ══ -->
 <section id="configurator" class="conf-section">
   <div class="conf-inner">
-    <div class="conf-eyebrow">// 01 · CERERE PRINTARE 3D PERSONALIZATĂ</div>
-    <h2 class="conf-title">Trimite <span>Fișierul Tău</span> 3D</h2>
-    <p class="conf-sub">Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.</p>
+    <div class="conf-eyebrow" data-i18n="conf_eyebrow">// 01 · CERERE PRINTARE 3D PERSONALIZATĂ</div>
+    <h2 class="conf-title" data-i18n="conf_title_html">Trimite <span>Fișierul Tău</span> 3D</h2>
+    <p class="conf-sub" data-i18n="conf_sub">Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.</p>
     <div class="conf-panels">
       <!-- STÂNGA: upload + formulare -->
       <div class="conf-panel-left">
@@ -717,28 +717,28 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
         </div>
         <div class="conf-form-grid">
           <div class="conf-form-group">
-            <label class="conf-form-lbl" for="selZone">// ZONA PIESEI</label>
+            <label class="conf-form-lbl" for="selZone" data-i18n="zone_label">// ZONA PIESEI</label>
             <select class="conf-select" id="selZone">
-              <option value="motor">🔧 Compartiment Motor</option>
-              <option value="exterior">🚗 Exterior Caroserie</option>
-              <option value="interior">🪑 Interior / Habitaclu</option>
+              <option value="motor" data-i18n="zone_motor">🔧 Compartiment Motor</option>
+              <option value="exterior" data-i18n="zone_exterior">🚗 Exterior Caroserie</option>
+              <option value="interior" data-i18n="zone_interior">🪑 Interior / Habitaclu</option>
             </select>
           </div>
           <div class="conf-form-group">
-            <label class="conf-form-lbl" for="selStress">// NIVEL STRES MECANIC</label>
+            <label class="conf-form-lbl" for="selStress" data-i18n="stress_label">// NIVEL STRES MECANIC</label>
             <select class="conf-select" id="selStress">
-              <option value="low">⬡ Scăzut — uz interior, decorativ</option>
-              <option value="mid">◈ Mediu — vibrații, temperaturi moderate</option>
-              <option value="crit">⚠ Critic — motor, impact, temp. ridicate</option>
+              <option value="low" data-i18n="stress_low">⬡ Scăzut — uz interior, decorativ</option>
+              <option value="mid" data-i18n="stress_mid">◈ Mediu — vibrații, temperaturi moderate</option>
+              <option value="crit" data-i18n="stress_crit">⚠ Critic — motor, impact, temp. ridicate</option>
             </select>
           </div>
           <div class="conf-form-group">
-            <label class="conf-form-lbl" for="orderName">// NUMELE TĂU</label>
-            <input class="conf-input" id="orderName" type="text" placeholder="Cum te cheamă...">
+            <label class="conf-form-lbl" for="orderName" data-i18n="name_label">// NUMELE TĂU</label>
+            <input class="conf-input" id="orderName" type="text" placeholder="Cum te cheamă..." data-i18n-ph="name_ph">
           </div>
           <div class="conf-form-group">
-            <label class="conf-form-lbl" for="orderContact">// TELEFON SAU EMAIL</label>
-            <input class="conf-input" id="orderContact" type="text" placeholder="07XX... sau email@...">
+            <label class="conf-form-lbl" for="orderContact" data-i18n="contact_label">// TELEFON SAU EMAIL</label>
+            <input class="conf-input" id="orderContact" type="text" placeholder="07XX... sau email@..." data-i18n-ph="contact_ph">
           </div>
         </div>
       </div>
@@ -762,8 +762,8 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
           </div>
         </div>
         <div class="conf-cta-wrap">
-          <button class="conf-cta-btn" id="confCtaBtn">📲 Trimite Comanda pe WhatsApp</button>
-          <span class="conf-cta-sub">Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT</span>
+          <button class="conf-cta-btn" id="confCtaBtn" data-i18n="cta_btn">📲 Trimite Comanda pe WhatsApp</button>
+          <span class="conf-cta-sub" data-i18n="cta_sub">Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT</span>
         </div>
       </div>
     </div>
@@ -774,28 +774,28 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 <section id="produse">
   <div class="sect-wrap">
     <div class="sect-top">
-      <span class="sect-num">02 / CATALOG</span>
-      <span class="sect-title">PIESE <span>AUTO</span> 3D</span>
+      <span class="sect-num" data-i18n="prod_sect_num">02 / CATALOG</span>
+      <span class="sect-title" data-i18n="prod_sect_title_html">PIESE <span>AUTO</span> 3D</span>
       <div class="sect-line"></div>
     </div>
-    <div class="sect-desc">Componente auto printate 3D din workshopul nostru · Materiale tehnice industriale · Comandă direct cu livrare rapidă</div>
+    <div class="sect-desc" data-i18n="prod_sect_desc">Componente auto printate 3D din workshopul nostru · Materiale tehnice industriale · Comandă direct cu livrare rapidă</div>
   </div>
   <div class="filters-wrap" style="padding-top:.75rem;">
-    <div class="section-label">// FILTRARE RAPIDĂ</div>
+    <div class="section-label" data-i18n="filter_label">// FILTRARE RAPIDĂ</div>
     <div class="fbar" id="fbar"></div>
   </div>
   <div class="search-sort-wrap">
     <div class="search-main-wrap">
       <span class="search-main-ico">🔍</span>
-      <input class="search-main-inp" id="searchMainInp" placeholder="Caută produs, material, categorie..." autocomplete="off" spellcheck="false"/>
+      <input class="search-main-inp" id="searchMainInp" placeholder="Caută produs, material, categorie..." data-i18n-ph="search_ph" autocomplete="off" spellcheck="false"/>
       <button class="search-main-clear" id="searchMainClear">✕</button>
     </div>
     <div class="sort-wrap">
-      <span class="sort-label">// SORT</span>
-      <button class="sort-btn on" data-sort="newest">Cele mai noi</button>
-      <button class="sort-btn" data-sort="price-asc">Preț ↑</button>
-      <button class="sort-btn" data-sort="price-desc">Preț ↓</button>
-      <button class="sort-btn" data-sort="stock">Stoc ↑</button>
+      <span class="sort-label" data-i18n="sort_label">// SORT</span>
+      <button class="sort-btn on" data-sort="newest" data-i18n="sort_newest">Cele mai noi</button>
+      <button class="sort-btn" data-sort="price-asc" data-i18n="sort_price_asc">Preț ↑</button>
+      <button class="sort-btn" data-sort="price-desc" data-i18n="sort_price_desc">Preț ↓</button>
+      <button class="sort-btn" data-sort="stock" data-i18n="sort_stock">Stoc ↑</button>
     </div>
   </div>
   <div class="products-wrap">
@@ -808,27 +808,27 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 <section id="filamente" class="fil-section">
   <div class="sect-wrap">
     <div class="sect-top">
-      <span class="sect-num">03 / CATALOG</span>
-      <span class="sect-title">FILAMENTE <span>TEHNICE</span></span>
+      <span class="sect-num" data-i18n="fil_sect_num">03 / CATALOG</span>
+      <span class="sect-title" data-i18n="fil_sect_title_html">FILAMENTE <span>TEHNICE</span></span>
       <div class="sect-line"></div>
     </div>
-    <div class="sect-desc">Materie primă pentru printare 3D · ABS · ASA · Carbon · PETG · Nylon · Stoc actualizat din Google Sheets în timp real</div>
+    <div class="sect-desc" data-i18n="fil_sect_desc">Materie primă pentru printare 3D · ABS · ASA · Carbon · PETG · Nylon · Stoc actualizat din timp real</div>
   </div>
   <div class="fil-subfilters active" id="filSubFilters">
-    <div class="section-label" style="margin-bottom:.6rem;">// FILTRE FILAMENTE</div>
+    <div class="section-label" style="margin-bottom:.6rem;" data-i18n="fil_filter_label">// FILTRE FILAMENTE</div>
     <div class="fil-sub-row">
-      <span class="fil-sub-lbl">BRAND</span>
+      <span class="fil-sub-lbl" data-i18n="fil_brand_label">BRAND</span>
       <div id="filBrandBar" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
     </div>
     <div class="fil-sub-row">
-      <span class="fil-sub-lbl">TIP</span>
+      <span class="fil-sub-lbl" data-i18n="fil_type_label">TIP</span>
       <div id="filCatBar" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
     </div>
     <div class="fil-sub-row">
-      <span class="fil-sub-lbl">STOC</span>
-      <button class="fb on" id="filSAll">Toate</button>
-      <button class="fb" id="filSIn">În stoc</button>
-      <button class="fb" id="filSOut">Fără stoc</button>
+      <span class="fil-sub-lbl" data-i18n="fil_stock_label">STOC</span>
+      <button class="fb on" id="filSAll" data-i18n="fil_all_stock">Toate</button>
+      <button class="fb" id="filSIn" data-i18n="fil_in_stock_btn">În stoc</button>
+      <button class="fb" id="filSOut" data-i18n="fil_out_stock_btn">Fără stoc</button>
     </div>
     <div class="fil-sync-badge loading" id="filSyncBadge">
       <div class="fil-sync-dot"></div>
@@ -838,7 +838,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
   <div class="search-sort-wrap">
     <div class="search-main-wrap">
       <span class="search-main-ico">🔍</span>
-      <input class="search-main-inp" id="filSearchInp" placeholder="Caută filament după culoare, brand, tip..." autocomplete="off" spellcheck="false"/>
+      <input class="search-main-inp" id="filSearchInp" placeholder="Caută filament după culoare, brand, tip..." data-i18n-ph="fil_search_ph" autocomplete="off" spellcheck="false"/>
       <button class="search-main-clear" id="filSearchClear">✕</button>
     </div>
   </div>
@@ -1089,26 +1089,28 @@ const PRINTER_WATTS   = 130;   /* W consum mediu printer FDM */
 const TRANSPORT_RON   = 20;    /* RON transport, inclus în preț, afișat ca "gratuit" */
 const MARKUP          = 2.5;   /* multiplicator manoperă + profit */
 const TVA             = 1.21;  /* 21% impozit */
+const EUR_RATE        = 5.20;  /* RON per 1 EUR */
+function fmtPrice(ron){if(lang==='en')return`€${Math.ceil(+ron/EUR_RATE)}`;return`${Math.round(+ron)} RON`;}
 
 /* ══ CONFIGURATOR DATA ══ */
 const CONF_DATA = {
   motor:{
-    name:'Compartiment Motor',
-    low: {mat:'ABS/ASA',     color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'90°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],     base:120},
-    mid: {mat:'ASA Premium', color:'#f59e0b', specs:[{i:'🌡',l:'Termic',v:'110°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Excelent'}],base:185},
-    crit:{mat:'ABS Carbon Fiber',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'150°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Extrem'}],  base:290}
+    name:'Compartiment Motor', name_en:'Engine Compartment',
+    low: {mat:'ABS/ASA',      color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'90°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],      specs_en:[{i:'🌡',l:'Thermal',v:'90°C'},{i:'☀',l:'UV',v:'Medium'},{i:'⬡',l:'Impact',v:'Good'}],      base:120},
+    mid: {mat:'ASA Premium',  color:'#f59e0b', specs:[{i:'🌡',l:'Termic',v:'110°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Excelent'}],specs_en:[{i:'🌡',l:'Thermal',v:'110°C'},{i:'☀',l:'UV',v:'High'},{i:'⬡',l:'Impact',v:'Excellent'}],base:185},
+    crit:{mat:'ABS Carbon Fiber',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'150°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Extrem'}],  specs_en:[{i:'🌡',l:'Thermal',v:'150°C'},{i:'☀',l:'UV',v:'High'},{i:'⬡',l:'Impact',v:'Extreme'}],   base:290}
   },
   exterior:{
-    name:'Exterior Caroserie',
-    low: {mat:'ASA',          color:'#25D366', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Bun'}],     base:95},
-    mid: {mat:'ASA Carbon Fiber',color:'#a3a3a3', specs:[{i:'🌡',l:'Termic',v:'105°C'},{i:'☀',l:'UV',v:'Excelent'},{i:'⬡',l:'Impact',v:'Ridicat'}],base:165},
-    crit:{mat:'ASA Carbon Fiber',color:'#a3a3a3', specs:[{i:'🌡',l:'Termic',v:'130°C'},{i:'☀',l:'UV',v:'Maxim'},{i:'⬡',l:'Impact',v:'Extrem'}],   base:265}
+    name:'Exterior Caroserie', name_en:'Exterior Bodywork',
+    low: {mat:'ASA',          color:'#25D366', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Bun'}],     specs_en:[{i:'🌡',l:'Thermal',v:'95°C'},{i:'☀',l:'UV',v:'High'},{i:'⬡',l:'Impact',v:'Good'}],      base:95},
+    mid: {mat:'ASA Carbon Fiber',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'105°C'},{i:'☀',l:'UV',v:'Excelent'},{i:'⬡',l:'Impact',v:'Ridicat'}],specs_en:[{i:'🌡',l:'Thermal',v:'105°C'},{i:'☀',l:'UV',v:'Excellent'},{i:'⬡',l:'Impact',v:'High'}],base:165},
+    crit:{mat:'ASA Carbon Fiber',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'130°C'},{i:'☀',l:'UV',v:'Maxim'},{i:'⬡',l:'Impact',v:'Extrem'}],   specs_en:[{i:'🌡',l:'Thermal',v:'130°C'},{i:'☀',l:'UV',v:'Maximum'},{i:'⬡',l:'Impact',v:'Extreme'}],  base:265}
   },
   interior:{
-    name:'Interior / Habitaclu',
-    low: {mat:'PLA+ / ABS',   color:'#8b5cf6', specs:[{i:'🌡',l:'Termic',v:'70°C'},{i:'☀',l:'UV',v:'Scăzut'},{i:'⬡',l:'Impact',v:'Moderat'}], base:70},
-    mid: {mat:'ABS Premium',  color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],       base:130},
-    crit:{mat:'ABS / PA12',   color:'#E01A1A', specs:[{i:'🌡',l:'Termic',v:'120°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Ridicat'}],  base:220}
+    name:'Interior / Habitaclu', name_en:'Interior / Cabin',
+    low: {mat:'PLA+ / ABS',  color:'#8b5cf6', specs:[{i:'🌡',l:'Termic',v:'70°C'},{i:'☀',l:'UV',v:'Scăzut'},{i:'⬡',l:'Impact',v:'Moderat'}], specs_en:[{i:'🌡',l:'Thermal',v:'70°C'},{i:'☀',l:'UV',v:'Low'},{i:'⬡',l:'Impact',v:'Moderate'}],  base:70},
+    mid: {mat:'ABS Premium', color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],       specs_en:[{i:'🌡',l:'Thermal',v:'95°C'},{i:'☀',l:'UV',v:'Medium'},{i:'⬡',l:'Impact',v:'Good'}],     base:130},
+    crit:{mat:'ABS / PA12',  color:'#E01A1A', specs:[{i:'🌡',l:'Termic',v:'120°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Ridicat'}],  specs_en:[{i:'🌡',l:'Thermal',v:'120°C'},{i:'☀',l:'UV',v:'Medium'},{i:'⬡',l:'Impact',v:'High'}],    base:220}
   }
 };
 
@@ -1273,13 +1275,69 @@ function setFilSync(state,msg){const b=$('filSyncBadge');if(!b)return;b.classNam
 
 /* ══ I18N ══ */
 const T={
-  ro:{hero_eyebrow:"// PIESE AUTO · PRINTARE 3D · ROMANIA",hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport si taxe incluse in pret",nav_contact:"Contact",stat_products:"Produse",shipping_included:"Transport si taxe incluse in pret",prod_found:"PRODUSE GASITE",fil_found:"FILAMENTE GASITE",order_btn:"Comanda",unavailable:"Indisponibil",toast_saved:"Salvat cu succes!",policy_privacy_title:"Politica de Confidentialitate",policy_terms_title:"Termeni si Conditii",policy_return_title:"Politica de Retur",policy_cookies_title:"Politica Cookies"},
-  en:{hero_eyebrow:"// AUTO PARTS · 3D PRINTING · ROMANIA",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",nav_contact:"Contact",stat_products:"Products",shipping_included:"Shipping and taxes included in price",prod_found:"PRODUCTS FOUND",fil_found:"FILAMENTS FOUND",order_btn:"Order",unavailable:"Unavailable",toast_saved:"Saved successfully!",policy_privacy_title:"Privacy Policy",policy_terms_title:"Terms & Conditions",policy_return_title:"Return Policy",policy_cookies_title:"Cookie Policy"}
+  ro:{
+    hero_eyebrow:"// PIESE AUTO · PRINTARE 3D · ROMANIA",hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport si taxe incluse in pret",stat_products:"Produse",
+    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Produse",nav_filaments:"Filamente",
+    conf_eyebrow:"// 01 · CERERE PRINTARE 3D PERSONALIZATĂ",conf_title_html:"Trimite <span>Fișierul Tău</span> 3D",conf_sub:"Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.",
+    upload_title:"Trage fișierul 3D aici",upload_sub:"sau apasă pentru a selecta",upload_hint:"STL / STEP — ofertă personalizată pe WhatsApp · GCODE — preț calculat automat",
+    zone_label:"// ZONA PIESEI",stress_label:"// NIVEL STRES MECANIC",name_label:"// NUMELE TĂU",contact_label:"// TELEFON SAU EMAIL",name_ph:"Cum te cheamă...",contact_ph:"07XX... sau email@...",
+    zone_motor:"🔧 Compartiment Motor",zone_exterior:"🚗 Exterior Caroserie",zone_interior:"🪑 Interior / Habitaclu",
+    stress_low:"⬡ Scăzut — uz interior, decorativ",stress_mid:"◈ Mediu — vibrații, temperaturi moderate",stress_crit:"⚠ Critic — motor, impact, temp. ridicate",
+    mat_eyebrow:"// MATERIAL RECOMANDAT",price_badge:"⬡ PREȚ ESTIMAT AUTOCORE3D",price_empty:"— RON",price_save_empty:"✓ Transport GRATUIT inclus · Încarcă fișierul pentru preț",
+    price_badge_gcode:"⬡ PREȚ CALCULAT DIN GCODE ✓",price_save_gcode:"✓ Preț calculat exact din fișier · Transport GRATUIT inclus",
+    price_badge_manual:"⬡ OFERTĂ PERSONALIZATĂ",price_save_manual:"Prețul depinde de dimensiune, complexitate și timp de printare.<br>Trimite cererea pe WhatsApp — îți calculăm și confirmăm în 24h.",
+    cta_btn:"📲 Trimite Comanda pe WhatsApp",cta_sub:"Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT",
+    prod_sect_num:"02 / CATALOG",prod_sect_title_html:"PIESE <span>AUTO</span> 3D",prod_sect_desc:"Componente auto printate 3D din workshopul nostru · Materiale tehnice industriale · Comandă direct cu livrare rapidă",
+    filter_label:"// FILTRARE RAPIDĂ",sort_label:"// SORT",sort_newest:"Cele mai noi",sort_price_asc:"Preț ↑",sort_price_desc:"Preț ↓",sort_stock:"Stoc ↑",search_ph:"Caută produs, material, categorie...",
+    fil_sect_num:"03 / CATALOG",fil_sect_title_html:"FILAMENTE <span>TEHNICE</span>",fil_sect_desc:"Materie primă pentru printare 3D · ABS · ASA · Carbon · PETG · Nylon · Stoc actualizat din timp real",
+    fil_filter_label:"// FILTRE FILAMENTE",fil_brand_label:"BRAND",fil_type_label:"TIP",fil_stock_label:"STOC",fil_all_stock:"Toate",fil_in_stock_btn:"În stoc",fil_out_stock_btn:"Fără stoc",fil_search_ph:"Caută filament după culoare, brand, tip...",
+    shipping_included:"Transport si taxe incluse in pret",prod_found:"PRODUSE GASITE",fil_found:"FILAMENTE GASITE",order_btn:"Comanda",unavailable:"Indisponibil",in_stock:"In stoc",out_stock:"Epuizat",low_stock:"⚠ Stoc mic",pcs:"buc",fil_card_cat:"// FILAMENTE 3D",
+    toast_saved:"Salvat cu succes!",policy_privacy_title:"Politica de Confidentialitate",policy_terms_title:"Termeni si Conditii",policy_return_title:"Politica de Retur",policy_cookies_title:"Politica Cookies",
+    zone_motor_name:"Compartiment Motor",zone_exterior_name:"Exterior Caroserie",zone_interior_name:"Interior / Habitaclu",
+    stress_low_name:"Scăzut",stress_mid_name:"Mediu",stress_crit_name:"Critic",
+    gcode_loaded:"GCode încărcat — calculez prețul...",file_loaded:"Fișier încărcat!",file_change:"Apasă pentru a schimba",
+    gcode_err:"Nu am găsit datele în GCode — verifică că fișierul conține timp și greutate filament",
+    wa_price_label:"Preț",wa_transport_note:"transport gratuit inclus",wa_to_calc:"de calculat",
+    wa_greeting:"Buna ziua!\n\nDoresc o ofertă pentru printare 3D:",wa_name_lbl:"Nume",wa_contact_lbl:"Contact",wa_file_lbl:"Fișier",wa_zone_lbl:"Zona",wa_stress_lbl:"Stres mecanic",wa_mat_lbl:"Material recomandat",wa_attach:"Voi atașa fișierul la acest mesaj.\n\nVă mulțumesc!"
+  },
+  en:{
+    hero_eyebrow:"// AUTO PARTS · 3D PRINTING · ROMANIA",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",stat_products:"Products",
+    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Products",nav_filaments:"Filaments",
+    conf_eyebrow:"// 01 · CUSTOM 3D PRINTING REQUEST",conf_title_html:"Send Your <span>3D File</span>",conf_sub:"Upload your STL/STEP model, choose the zone and stress level — get an instant estimated price. If you like it, send your order directly on WhatsApp.",
+    upload_title:"Drag your 3D file here",upload_sub:"or tap to select",upload_hint:"STL / STEP — custom quote on WhatsApp · GCODE — price auto-calculated",
+    zone_label:"// PART ZONE",stress_label:"// MECHANICAL STRESS",name_label:"// YOUR NAME",contact_label:"// PHONE OR EMAIL",name_ph:"Your name...",contact_ph:"07XX... or email@...",
+    zone_motor:"🔧 Engine Compartment",zone_exterior:"🚗 Exterior Bodywork",zone_interior:"🪑 Interior / Cabin",
+    stress_low:"⬡ Low — interior use, decorative",stress_mid:"◈ Medium — vibrations, moderate temps",stress_crit:"⚠ Critical — engine, impact, high temps",
+    mat_eyebrow:"// RECOMMENDED MATERIAL",price_badge:"⬡ ESTIMATED PRICE AUTOCORE3D",price_empty:"— €",price_save_empty:"✓ FREE Shipping included · Upload file for price",
+    price_badge_gcode:"⬡ PRICE FROM GCODE ✓",price_save_gcode:"✓ Price calculated from file · FREE Shipping included",
+    price_badge_manual:"⬡ CUSTOM QUOTE",price_save_manual:"Price depends on size, complexity and print time.<br>Send your request on WhatsApp — we calculate and confirm in 24h.",
+    cta_btn:"📲 Send Order on WhatsApp",cta_sub:"Attach file in WhatsApp · Offer confirmed in 24h · FREE Shipping",
+    prod_sect_num:"02 / CATALOG",prod_sect_title_html:"3D <span>AUTO</span> PARTS",prod_sect_desc:"3D printed auto components from our workshop · Industrial technical materials · Order directly with fast delivery",
+    filter_label:"// QUICK FILTER",sort_label:"// SORT",sort_newest:"Newest",sort_price_asc:"Price ↑",sort_price_desc:"Price ↓",sort_stock:"Stock ↑",search_ph:"Search product, material, category...",
+    fil_sect_num:"03 / CATALOG",fil_sect_title_html:"<span>TECHNICAL</span> FILAMENTS",fil_sect_desc:"Raw material for 3D printing · ABS · ASA · Carbon · PETG · Nylon · Stock updated in real time",
+    fil_filter_label:"// FILAMENT FILTERS",fil_brand_label:"BRAND",fil_type_label:"TYPE",fil_stock_label:"STOCK",fil_all_stock:"All",fil_in_stock_btn:"In stock",fil_out_stock_btn:"Out of stock",fil_search_ph:"Search filament by color, brand, type...",
+    shipping_included:"Shipping & taxes included",prod_found:"PRODUCTS FOUND",fil_found:"FILAMENTS FOUND",order_btn:"Order",unavailable:"Unavailable",in_stock:"In stock",out_stock:"Out of stock",low_stock:"⚠ Low stock",pcs:"pcs",fil_card_cat:"// 3D FILAMENTS",
+    toast_saved:"Saved successfully!",policy_privacy_title:"Privacy Policy",policy_terms_title:"Terms & Conditions",policy_return_title:"Return Policy",policy_cookies_title:"Cookie Policy",
+    zone_motor_name:"Engine Compartment",zone_exterior_name:"Exterior Bodywork",zone_interior_name:"Interior / Cabin",
+    stress_low_name:"Low",stress_mid_name:"Medium",stress_crit_name:"Critical",
+    gcode_loaded:"GCode loaded — calculating price...",file_loaded:"File loaded!",file_change:"Tap to change",
+    gcode_err:"Could not find data in GCode — verify the file contains print time and filament weight",
+    wa_price_label:"Price",wa_transport_note:"free shipping included",wa_to_calc:"to be calculated",
+    wa_greeting:"Hello!\n\nI would like a quote for 3D printing:",wa_name_lbl:"Name",wa_contact_lbl:"Contact",wa_file_lbl:"File",wa_zone_lbl:"Zone",wa_stress_lbl:"Mechanical stress",wa_mat_lbl:"Recommended material",wa_attach:"I will attach the file to this message.\n\nThank you!"
+  }
 };
 const t=k=>T[lang][k]||T.ro[k]||k;
 function applyI18n(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(k==='hero_h1_html')el.innerHTML=t(k);else el.textContent=t(k);});
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.dataset.i18n;
+    if(k.endsWith('_html'))el.innerHTML=t(k);else el.textContent=t(k);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.placeholder=t(el.dataset.i18nPh);});
   document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
+  if(!orderFile){
+    $('uploadContent').innerHTML=`<span class="upload-icon">📁</span><div class="upload-title">${t('upload_title')}</div><div class="upload-sub">${t('upload_sub')}</div><div class="upload-hint">${t('upload_hint')}</div>`;
+  }
+  updateEstimate();
   renderFilters();renderGrid();renderFilaments();renderPolicyCards();
 }
 $('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');if(!b)return;lang=b.dataset.lang;applyI18n();});
@@ -1380,12 +1438,12 @@ function calcGCodePrice(mins,grams,matName){
   return{filCost,elecCost,total,h:Math.floor(mins/60),m:mins%60,grams};
 }
 function showGCodePrice(p){
-  $('priceBadge').textContent='⬡ PREȚ CALCULAT DIN GCODE ✓';
+  $('priceBadge').textContent=t('price_badge_gcode');
   $('priceBadge').style.color='var(--green)';
   $('priceBreakdown').style.display='none';
-  $('priceMain').textContent=`${p.total} RON`;
+  $('priceMain').textContent=fmtPrice(p.total);
   $('priceMain').style.fontSize='';
-  $('priceSave').textContent='✓ Preț calculat exact din fișier · Transport GRATUIT inclus';
+  $('priceSave').textContent=t('price_save_gcode');
 }
 
 /* ══ CONFIGURATOR — UPLOAD + ESTIMATE ══ */
@@ -1393,29 +1451,30 @@ function updateEstimate(){
   const zone=$('selZone').value,stress=$('selStress').value;
   if(!zone||!stress)return;
   const zd=CONF_DATA[zone],sd=zd[stress];
-  $('matEyebrow').textContent=`// MATERIAL RECOMANDAT · ${zd.name.toUpperCase()}`;
+  const zoneName=lang==='en'?(zd.name_en||zd.name):zd.name;
+  $('matEyebrow').textContent=`${t('mat_eyebrow')} · ${zoneName.toUpperCase()}`;
   $('matName').textContent=sd.mat;
   $('matName').style.color=sd.color;
-  $('specBadges').innerHTML=sd.specs.map(s=>`<div class="conf-spec-badge"><span class="conf-spec-icon">${s.i}</span><span class="conf-spec-lbl">${s.l}</span><span class="conf-spec-val">${s.v}</span></div>`).join('');
+  const specs=lang==='en'?(sd.specs_en||sd.specs):sd.specs;
+  $('specBadges').innerHTML=specs.map(s=>`<div class="conf-spec-badge"><span class="conf-spec-icon">${s.i}</span><span class="conf-spec-lbl">${s.l}</span><span class="conf-spec-val">${s.v}</span></div>`).join('');
   const isGcode=orderFile&&['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase());
   if(!isGcode){
-    /* STL/STEP sau fără fișier — ofertă personalizată, fără preț afișat */
-    $('priceBadge').textContent='⬡ OFERTĂ PERSONALIZATĂ';
+    $('priceBadge').textContent=t('price_badge_manual');
     $('priceBadge').style.color='var(--sub)';
     $('priceBreakdown').style.display='none';
-    $('priceMain').textContent='— RON';
+    $('priceMain').textContent=t('price_empty');
     $('priceMain').style.fontSize='1.2rem';
-    $('priceSave').innerHTML='Prețul depinde de dimensiune, complexitate și timp de printare.<br>Trimite cererea pe WhatsApp — îți calculăm și confirmăm în 24h.';
+    $('priceSave').innerHTML=t('price_save_manual');
   }
 }
 function setUploadFile(f){
   const ext=(f.name.split('.').pop()||'').toLowerCase();
   const isGcode=['gcode','gco','gc'].includes(ext);
   const isModel=['stl','step','stp'].includes(ext);
-  if(!isGcode&&!isModel){toast('Formate: .STL .STEP .STP .GCODE',true);return;}
+  if(!isGcode&&!isModel){toast(lang==='en'?'Formats: .STL .STEP .STP .GCODE':'Formate: .STL .STEP .STP .GCODE',true);return;}
   orderFile=f;
   $('uploadZone').classList.add('has-file');
-  $('uploadContent').innerHTML=`<span class="upload-icon">${isGcode?'⚙️':'✅'}</span><div class="upload-title" style="color:var(--green)">${isGcode?'GCode încărcat — calculez prețul...':'Fișier încărcat!'}</div><div class="upload-fname">${f.name}</div><div class="upload-sub" style="margin-top:.35rem">${(f.size/1024/1024).toFixed(2)} MB · Apasă pentru a schimba</div>`;
+  $('uploadContent').innerHTML=`<span class="upload-icon">${isGcode?'⚙️':'✅'}</span><div class="upload-title" style="color:var(--green)">${isGcode?t('gcode_loaded'):t('file_loaded')}</div><div class="upload-fname">${f.name}</div><div class="upload-sub" style="margin-top:.35rem">${(f.size/1024/1024).toFixed(2)} MB · ${t('file_change')}</div>`;
   if(isGcode){
     /* citim primii + ultimii 16KB — acolo sunt headerele Prusa/Cura */
     const blob=f.size>131072?new Blob([f.slice(0,65536),f.slice(-65536)]):f;
@@ -1427,7 +1486,7 @@ function setUploadFile(f){
         showGCodePrice(calcGCodePrice(mins,grams,matName));
         $('uploadContent').querySelector('.upload-title').textContent='GCode încărcat ✓';
       } else {
-        toast('Nu am găsit datele în GCode — verifică că fișierul conține timp și greutate filament',true);
+        toast(t('gcode_err'),true);
         updateEstimate();
       }
     };
@@ -1448,16 +1507,17 @@ $('selStress').addEventListener('change',updateEstimate);
 $('confCtaBtn').addEventListener('click',()=>{
   const zone=$('selZone').value,stress=$('selStress').value;
   const zd=CONF_DATA[zone],sd=zd[stress];
-  const sLabel={low:'Scăzut',mid:'Mediu',crit:'Critic'}[stress];
+  const sLabel=t(`stress_${stress}_name`);
   const name=$('orderName').value.trim()||'—';
   const contact=$('orderContact').value.trim()||'—';
-  const fName=orderFile?orderFile.name:'(fișierul nu a fost încărcat)';
+  const fName=orderFile?orderFile.name:(lang==='en'?'(file not attached)':'(fișierul nu a fost încărcat)');
   const isGcode=orderFile&&['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase());
   const priceShown=$('priceMain').textContent;
   const priceLine=isGcode
-    ?`💰 Preț calculat din GCode: ${priceShown} (transport gratuit inclus)`
-    :`💰 Preț: de calculat — aștept oferta dumneavoastră`;
-  const msg=`Buna ziua!\n\nDoresc o ofertă pentru printare 3D:\n\n👤 Nume: ${name}\n📞 Contact: ${contact}\n📁 Fișier: ${fName}\n\n🚗 Zona: ${zd.name}\n⚡ Stres mecanic: ${sLabel}\n🔧 Material recomandat: ${sd.mat}\n${priceLine}\n\nVoi atașa fișierul la acest mesaj.\n\nVă mulțumesc!`;
+    ?`💰 ${t('wa_price_label')}: ${priceShown} (${t('wa_transport_note')})`
+    :`💰 ${t('wa_price_label')}: ${t('wa_to_calc')}`;
+  const zoneName=lang==='en'?(zd.name_en||zd.name):zd.name;
+  const msg=`${t('wa_greeting')}\n\n👤 ${t('wa_name_lbl')}: ${name}\n📞 ${t('wa_contact_lbl')}: ${contact}\n📁 ${t('wa_file_lbl')}: ${fName}\n\n🚗 ${t('wa_zone_lbl')}: ${zoneName}\n⚡ ${t('wa_stress_lbl')}: ${sLabel}\n🔧 ${t('wa_mat_lbl')}: ${sd.mat}\n${priceLine}\n\n${t('wa_attach')}`;
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
@@ -1498,10 +1558,10 @@ function renderCard(p){
   const mats=getProdMats(p);
   const bgs=(p.badges||[]).map(b=>{const bc=BC.find(x=>x.k===b)||{i:"·",c:"#E01A1A"};return`<span class="badge" style="border-color:${bc.c}44;color:${bc.c}"><span>${bc.i}</span> ${b}</span>`;}).join('');
   let priceStr;
-  if(!mats.length){priceStr=`${p.price||0} RON`;}
-  else if(mats.length===1){priceStr=`${mats[0].price} RON`;}
-  else{const ps=mats.map(m=>Number(m.price)).sort((a,b)=>a-b);priceStr=`${ps[0]} – ${ps[ps.length-1]} RON`;}
-  const matsHtml=mats.length?`<div class="card-mats">${mats.map(m=>{const mc=getMatColor(m.name),mtxt=contrastColor(mc);return`<span class="card-mat-tag" style="border-color:${mc};background:${mc};color:${mtxt}">${m.name}<span class="card-mat-price">${m.price} RON</span></span>`;}).join('')}</div>`:'';
+  if(!mats.length){priceStr=fmtPrice(p.price||0);}
+  else if(mats.length===1){priceStr=fmtPrice(mats[0].price);}
+  else{const ps=mats.map(m=>Number(m.price)).sort((a,b)=>a-b);priceStr=lang==='en'?`€${Math.ceil(ps[0]/EUR_RATE)} – €${Math.ceil(ps[ps.length-1]/EUR_RATE)}`:`${ps[0]} – ${ps[ps.length-1]} RON`;}
+  const matsHtml=mats.length?`<div class="card-mats">${mats.map(m=>{const mc=getMatColor(m.name),mtxt=contrastColor(mc);return`<span class="card-mat-tag" style="border-color:${mc};background:${mc};color:${mtxt}">${m.name}<span class="card-mat-price">${fmtPrice(m.price)}</span></span>`;}).join('')}</div>`:'';
   return `<div class="card${p.stock?'':' card-oos'}" data-id="${p.id}">
     <div class="card-glow"></div>
     <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
@@ -1529,7 +1589,7 @@ function renderFilamentCard(p,idx){
   const metal=isFilMetal(p.col),trans=isFilTrans(p.col);
   const swatchStyle=metal?'background:linear-gradient(135deg,#C0C0C0 0%,#E8E8E8 40%,#A0A0A0 60%,#D0D0D0 100%)':`background:${color}`;
   const badgeSty=oos?'border-color:rgba(239,68,68,.3);color:#ef4444':low?'border-color:rgba(240,180,41,.3);color:#f0b429':'border-color:rgba(37,211,102,.3);color:#25D366';
-  const badgeTxt=oos?t('unavailable'):`${p.stoc} buc`;
+  const badgeTxt=oos?t('unavailable'):`${p.stoc} ${t('pcs')}`;
   return `<div class="card${oos?' card-oos':''}" data-fil-idx="${idx}">
     <div class="card-glow"></div>
     <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
@@ -1542,15 +1602,15 @@ function renderFilamentCard(p,idx){
       ${p.cod?`<div class="fil-tag tr">#${p.cod}</div>`:''}
     </div>
     <div class="card-body">
-      <div class="card-cat" style="color:var(--red)">// FILAMENTE 3D</div>
+      <div class="card-cat" style="color:var(--red)">${t('fil_card_cat')}</div>
       <div class="card-name">${p.col}</div>
       <div class="card-brand">⬡ ${p.brand} · ${p.cat}</div>
       <div class="badges">
         <span class="badge" style="${badgeSty}">${badgeTxt}</span>
-        ${low&&!oos?`<span class="badge" style="border-color:rgba(240,180,41,.3);color:#f0b429">⚠ Stoc mic</span>`:''}
+        ${low&&!oos?`<span class="badge" style="border-color:rgba(240,180,41,.3);color:#f0b429">${t('low_stock')}</span>`:''}
       </div>
       <div class="card-foot">
-        <div><div class="price">${p.pret||'—'} RON</div><div class="price-sub">${t('shipping_included')}</div></div>
+        <div><div class="price">${p.pret&&!isNaN(p.pret)?fmtPrice(+p.pret):(p.pret||'—')}</div><div class="price-sub">${t('shipping_included')}</div></div>
         ${!oos?`<button class="order-btn" data-fil-order="${idx}">● ${t('order_btn')}</button>`:`<button class="order-btn dis" disabled>${t('unavailable')}</button>`}
       </div>
     </div>
@@ -2035,11 +2095,11 @@ function openCheckout(id){
   $('coProdName').textContent=coProd.name;
   const mats=getProdMats(coProd);
   const sel=$('coMatSelect');
-  sel.innerHTML=mats.map(m=>`<option value="${m.name}" data-price="${m.price}">${m.name} — ${m.price} RON</option>`).join('');
+  sel.innerHTML=mats.map(m=>`<option value="${m.name}" data-price="${m.price}">${m.name} — ${fmtPrice(m.price)}</option>`).join('');
   sel.classList.remove('invalid');
   const firstPrice=mats.length?mats[0].price:coProd.price;
-  $('coProdPrice').textContent=`${firstPrice} RON — ${t('shipping_included')}`;
-  sel.onchange=()=>{const opt=sel.options[sel.selectedIndex];$('coProdPrice').textContent=`${opt.dataset.price} RON — ${t('shipping_included')}`;};
+  $('coProdPrice').textContent=`${fmtPrice(firstPrice)} — ${t('shipping_included')}`;
+  sel.onchange=()=>{const opt=sel.options[sel.selectedIndex];$('coProdPrice').textContent=`${fmtPrice(opt.dataset.price)} — ${t('shipping_included')}`;};
   const firstImg=(coProd.images||[])[0];
   $('coThumb').innerHTML=firstImg?`<img src="${firstImg}" alt=""/>`:`<div style="font-size:1.4rem;color:#333">⬡</div>`;
   ['coFname','coLname','coPhone','coEmail','coAddress'].forEach(id=>{const el=$(id);el.value='';el.classList.remove('invalid');});
@@ -2055,9 +2115,10 @@ function openFilamentCheckout(idx){
   $('coMatTitle').textContent='// DETALII FILAMENT';
   $('coMatLabel').textContent='Tip filament';
   $('coProdName').textContent=fil.col;
-  $('coProdPrice').textContent=`${fil.pret||'—'} RON / rola — ${t('shipping_included')}`;
+  const filPretFmt=fil.pret&&!isNaN(fil.pret)?fmtPrice(+fil.pret):(fil.pret||'—');
+  $('coProdPrice').textContent=`${filPretFmt} / ${lang==='en'?'roll':'rolă'} — ${t('shipping_included')}`;
   const sel=$('coMatSelect');
-  sel.innerHTML=`<option value="${fil.cat}" data-price="${fil.pret}">${fil.cat} · ${fil.brand} — ${fil.pret} RON</option>`;
+  sel.innerHTML=`<option value="${fil.cat}" data-price="${fil.pret}">${fil.cat} · ${fil.brand} — ${filPretFmt}</option>`;
   sel.onchange=null;sel.classList.remove('invalid');
   const color=getFilColor(fil.col);const metal=isFilMetal(fil.col);
   $('coThumb').innerHTML=`<div style="width:100%;height:100%;${metal?'background:linear-gradient(135deg,#C0C0C0,#E8E8E8,#A0A0A0,#D0D0D0)':`background:${color}`};border-radius:4px;"></div>`;
