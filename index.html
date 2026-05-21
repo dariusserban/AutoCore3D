@@ -645,11 +645,16 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 .conf-cta-sub{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.12em;}
 @media(max-width:960px){.conf-panels{grid-template-columns:1fr;}}
 /* ── TABS ── */
-.tabs-bar{display:flex;background:var(--surf);border-bottom:2px solid var(--bdr);position:sticky;top:0;z-index:100;overflow-x:auto;scrollbar-width:none;}
+.tabs-bar{display:flex;background:#06101A;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:100;overflow-x:auto;scrollbar-width:none;box-shadow:0 4px 24px rgba(0,0,0,.6);}
 .tabs-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:1;min-width:110px;padding:.85rem 1rem;font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);background:transparent;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;transition:color .2s,border-color .2s,background .2s;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:.4rem;}
-.tab-btn:hover{color:var(--text);background:rgba(255,255,255,.04);}
-.tab-btn.active{color:var(--red);border-bottom-color:var(--red);background:rgba(232,75,26,.06);}
+.tab-btn{flex:1;min-width:100px;padding:.9rem .5rem .75rem;font-family:var(--mono);font-size:.55rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);background:transparent;border:none;border-right:1px solid rgba(30,61,80,.5);cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:.3rem;position:relative;overflow:hidden;}
+.tab-btn:last-child{border-right:none;}
+.tab-icon{font-size:1.5rem;line-height:1;transition:transform .2s;}
+.tab-btn:hover{background:rgba(232,75,26,.07);color:var(--sub);}
+.tab-btn:hover .tab-icon{transform:scale(1.15);}
+.tab-btn.active{background:var(--red);color:#fff;box-shadow:inset 0 0 40px rgba(0,0,0,.25);}
+.tab-btn.active .tab-icon{transform:scale(1.1);}
+.tab-btn.active::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,.4);}
 .tab-section{display:none;}
 .tab-section.active{display:block;}
 @media(max-width:768px){
@@ -706,9 +711,9 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 </div>
 
 <div class="tabs-bar" id="tabsBar">
-  <button class="tab-btn active" data-tab="configurator">⬡ <span data-i18n="nav_configurator">Configurator</span></button>
-  <button class="tab-btn" data-tab="produse">🚗 <span data-i18n="nav_products">Produse</span></button>
-  <button class="tab-btn" data-tab="filamente">🧵 <span data-i18n="nav_filaments">Filamente</span></button>
+  <button class="tab-btn active" data-tab="configurator"><span class="tab-icon">⬡</span><span data-i18n="nav_configurator">Configurator</span></button>
+  <button class="tab-btn" data-tab="produse"><span class="tab-icon">🚗</span><span data-i18n="nav_products">Produse</span></button>
+  <button class="tab-btn" data-tab="filamente"><span class="tab-icon">🧵</span><span data-i18n="nav_filaments">Filamente</span></button>
 </div>
 
 <!-- ══ SECTION 1: CERERE PRINTARE 3D ══ -->
