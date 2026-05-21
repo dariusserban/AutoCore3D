@@ -999,7 +999,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       </div>
       <div id="fileInputArea">
         <div class="dropzone" id="dropzone">Click sau trage imagini aici<br><span style="font-size:.5rem;opacity:.6;">Se salvează în Supabase Storage</span></div>
-        <input type="file" id="fileInput" accept="image/*" multiple style="display:none"/>
+        <input type="file" id="adminImgInput" accept="image/*" multiple style="display:none"/>
         <div id="uploadProgress" style="display:none">
           <div class="upload-progress">
             <div class="upload-progress-label" id="uploadLabel">Se încărcă...</div>
@@ -1950,8 +1950,8 @@ $('imgUrlBtn').onclick=()=>{imgMode='url';$('urlInputArea').style.display='block
 $('imgFileBtn').onclick=()=>{imgMode='file';$('urlInputArea').style.display='none';$('fileInputArea').style.display='block';$('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');};
 $('addUrlBtn').onclick=()=>{const u=$('fImgUrl').value.trim();if(!u)return;formImgs.push(u);$('fImgUrl').value='';renderImgsList();};
 $('fImgUrl').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('addUrlBtn').click();}};
-$('dropzone').onclick=()=>$('fileInput').click();
-$('fileInput').onchange=async e=>{const files=Array.from(e.target.files);if(!files.length)return;const urls=await uploadFilesToSupabase(files);formImgs.push(...urls);renderImgsList();e.target.value='';};
+$('dropzone').onclick=()=>$('adminImgInput').click();
+$('adminImgInput').onchange=async e=>{const files=Array.from(e.target.files);if(!files.length)return;const urls=await uploadFilesToSupabase(files);formImgs.push(...urls);renderImgsList();e.target.value='';};
 $('dropzone').ondragover=e=>{e.preventDefault();$('dropzone').classList.add('drag');};
 $('dropzone').ondragleave=()=>$('dropzone').classList.remove('drag');
 $('dropzone').ondrop=async e=>{e.preventDefault();$('dropzone').classList.remove('drag');const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));if(!files.length)return;const urls=await uploadFilesToSupabase(files);formImgs.push(...urls);renderImgsList();};
