@@ -696,7 +696,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
   <h1 data-i18n="hero_h1_html">PIESE AUTO<br><em>3D</em> PREMIUM</h1>
   <p class="hero-sub" data-i18n="hero_sub">Inginerie de precizie · Materiale tehnice industriale · Transport şi taxe incluse în preț</p>
   <div class="stats">
-    <div class="stat-card anim-ready"><span class="stat-val" id="heroCount">—</span><span class="stat-lbl" id="heroCountLbl" data-i18n="stat_products">Produse</span></div>
+    <div class="stat-card anim-ready" style="cursor:pointer" onclick="showMainTab('configurator')"><span class="stat-val">3D</span><span class="stat-lbl">Configurator</span></div>
     <div class="stat-card anim-ready"><span class="stat-val">ABS/ASA</span><span class="stat-lbl">Material</span></div>
     <div class="stat-card anim-ready"><span class="stat-val">CARBON</span><span class="stat-lbl">Compozit</span></div>
     <div class="stat-card anim-ready"><span class="stat-val">100%</span><span class="stat-lbl">Transport inclus</span></div>
@@ -704,11 +704,6 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 </section>
 
 <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
-
-<div class="db-status">
-  <div class="db-badge loading" id="dbBadge"><div class="db-dot"></div><span id="dbText">Conectare Supabase...</span></div>
-  <div class="db-badge loading" id="filBadge"><div class="db-dot"></div><span id="filBadgeText">Inventar filamente...</span></div>
-</div>
 
 <div class="tabs-bar" id="tabsBar">
   <button class="tab-btn active" data-tab="configurator"><span class="tab-icon">⬡</span><span data-i18n="nav_configurator">Configurator</span></button>
@@ -867,10 +862,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
   </div>
 </section>
 
-<div class="policy-section">
-  <div class="section-label">// POLITICI &amp; CONFIDENŢIALITATE</div>
-  <div class="policy-grid" id="policyGrid"></div>
-</div>
+<div id="policyGrid" style="display:none"></div>
 
 <footer>
   <div class="footer-inner">
@@ -969,7 +961,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
 <div class="ap-overlay" id="apOverlay" style="display:none">
   <div class="ap-panel">
     <div class="ap-hdr">
-      <div class="ap-hdr-l"><span class="ap-ico">⬡</span><div><div class="ap-title">ADMIN PANEL</div><div class="ap-sub">// AUTOCORE3D · Supabase</div></div></div>
+      <div class="ap-hdr-l"><span class="ap-ico">⬡</span><div><div class="ap-title">ADMIN PANEL</div><div class="ap-sub" style="display:flex;gap:.5rem;align-items:center;margin-top:.2rem;"><div class="db-badge loading" id="dbBadge" style="font-size:.48rem;padding:.18rem .5rem;"><div class="db-dot"></div><span id="dbText">Supabase...</span></div><div class="db-badge loading" id="filBadge" style="font-size:.48rem;padding:.18rem .5rem;"><div class="db-dot"></div><span id="filBadgeText">Filamente...</span></div></div></div></div>
       <button class="ap-close" id="apClose">✕</button>
     </div>
     <div class="ap-tabs">
@@ -1705,7 +1697,6 @@ function renderGrid(){
     });
   }
   $('prodCount').textContent=`${list.length} ${t('prod_found')}`;
-  $('heroCount').textContent=`${products.length}+`;
   $('tabCount').textContent=products.length;
 }
 
