@@ -2236,14 +2236,14 @@ function initScrollReveal(){
 })();
 
 /* ══ TABS ══ */
-function showTab(id){
+function showMainTab(id){
   document.querySelectorAll('.tab-section').forEach(s=>s.classList.toggle('active',s.id===id));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
   document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.classList.toggle('active',a.dataset.tab===id));
   window.scrollTo({top:0,behavior:'smooth'});
 }
-document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
-document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showTab(a.dataset.tab);}));
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showMainTab(b.dataset.tab)));
+document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showMainTab(a.dataset.tab);}));
 
 /* ══ INIT ══ */
 buildTicker();
