@@ -2230,7 +2230,7 @@ function openFilamentCheckout(idx){
 $('grid').addEventListener('click',e=>{
   const b=e.target.closest('[data-cart]');
   if(b){
-    const p=products.find(x=>x.id===b.dataset.cart);if(!p)return;
+    const p=products.find(x=>x.id===+b.dataset.cart);if(!p)return;
     const mats=getProdMats(p);
     const mat=mats.length?mats[0]:{name:p.material||'Standard',price:p.price||0};
     cartAdd({uid:`prod-${p.id}-${mat.name}`,name:p.name,material:mat.name,price:+mat.price,image:(p.images||[])[0]||null});
