@@ -497,6 +497,27 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .cart-submit{width:100%;background:var(--red);color:#fff;font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.12em;padding:.82rem;border:none;cursor:pointer;transition:all .25s;text-transform:uppercase;}
 .cart-submit:hover{box-shadow:0 0 24px rgba(232,75,26,.5);}
 .cart-submit:disabled{opacity:.5;cursor:not-allowed;}
+/* ── MAT PICKER ── */
+.mat-picker-box{background:var(--surf);border:1px solid var(--bdr);width:100%;max-width:400px;max-height:88vh;overflow-y:auto;position:relative;transform:translateY(28px) scale(.96);transition:transform .38s var(--ease);}
+.mat-picker-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.modal-overlay.open .mat-picker-box{transform:translateY(0) scale(1);}
+.mp-hdr{padding:1.2rem 1.4rem .9rem;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;}
+.mp-title{font-family:var(--mono);font-size:.6rem;color:var(--red);letter-spacing:.2em;text-transform:uppercase;}
+.mp-prod{font-family:var(--disp);font-size:1rem;font-weight:800;color:var(--text);margin-top:.2rem;}
+.mp-opts{padding:.9rem 1.4rem;}
+.mp-opt{display:flex;align-items:center;justify-content:space-between;gap:.75rem;border:1px solid var(--bdr);padding:.8rem 1rem;cursor:pointer;transition:all .22s;margin-bottom:.45rem;position:relative;overflow:hidden;}
+.mp-opt::before{content:'';position:absolute;inset:0;background:rgba(232,75,26,.04);opacity:0;transition:opacity .2s;}
+.mp-opt:hover{border-color:rgba(232,75,26,.35);}
+.mp-opt:hover::before,.mp-opt.sel::before{opacity:1;}
+.mp-opt.sel{border-color:var(--red);}
+.mp-opt-l{display:flex;align-items:center;gap:.65rem;}
+.mp-radio{width:14px;height:14px;border:1.5px solid var(--bdr);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:border-color .2s;}
+.mp-opt.sel .mp-radio{border-color:var(--red);}
+.mp-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);opacity:0;transform:scale(0);transition:all .18s;}
+.mp-opt.sel .mp-radio::after{opacity:1;transform:scale(1);}
+.mp-opt-name{font-family:var(--disp);font-size:.88rem;font-weight:700;color:var(--text);}
+.mp-opt-price{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--red);white-space:nowrap;}
+.mp-foot{padding:.2rem 1.4rem 1.4rem;}
 /* ── ADMIN ORDERS ── */
 .order-card{background:var(--card);border:1px solid var(--bdr);padding:.9rem 1rem;margin-bottom:.6rem;}
 .order-card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;gap:.5rem;flex-wrap:wrap;}
@@ -994,6 +1015,23 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
     <div class="co-actions">
       <button class="btn-wa" id="btnWA">✓ Plasează Comanda</button>
       <button class="btn-outline-cancel" id="btnC">Anulează</button>
+    </div>
+  </div>
+</div>
+
+<!-- MATERIAL PICKER -->
+<div class="modal-overlay" id="matPicker">
+  <div class="mat-picker-box">
+    <button class="modal-close" id="mpClose">✕</button>
+    <div class="mp-hdr">
+      <div>
+        <div class="mp-title">// Selectează Material</div>
+        <div class="mp-prod" id="mpProdName"></div>
+      </div>
+    </div>
+    <div class="mp-opts" id="mpOpts"></div>
+    <div class="mp-foot">
+      <button class="cart-submit" id="mpAdd">🛒 Adaugă în coș</button>
     </div>
   </div>
 </div>
@@ -2226,14 +2264,41 @@ function openFilamentCheckout(idx){
   $('coModal').classList.add('open');
 }
 
+/* ── MATERIAL PICKER ── */
+let mpProd=null,mpSelIdx=0;
+function openMatPicker(p){
+  mpProd=p;mpSelIdx=0;
+  const mats=getProdMats(p);
+  $('mpProdName').textContent=p.name;
+  $('mpOpts').innerHTML=mats.map((m,i)=>`
+    <div class="mp-opt${i===0?' sel':''}" data-mpi="${i}">
+      <div class="mp-opt-l"><div class="mp-radio"></div><span class="mp-opt-name">${m.name}</span></div>
+      <span class="mp-opt-price">${fmtPrice(m.price)}</span>
+    </div>`).join('');
+  $('matPicker').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeMatPicker(){$('matPicker').classList.remove('open');document.body.style.overflow='';}
+$('mpClose').onclick=closeMatPicker;
+$('matPicker').onclick=e=>{if(e.target===e.currentTarget)closeMatPicker();};
+$('mpOpts').addEventListener('click',e=>{
+  const o=e.target.closest('[data-mpi]');if(!o)return;
+  mpSelIdx=+o.dataset.mpi;
+  $('mpOpts').querySelectorAll('.mp-opt').forEach((el,i)=>el.classList.toggle('sel',i===mpSelIdx));
+});
+$('mpAdd').onclick=()=>{
+  if(!mpProd)return;
+  const mats=getProdMats(mpProd);
+  const mat=mats[mpSelIdx]||mats[0]||{name:mpProd.material||'Standard',price:mpProd.price||0};
+  cartAdd({uid:`prod-${mpProd.id}-${mat.name}`,name:mpProd.name,material:mat.name,price:+mat.price,image:(mpProd.images||[])[0]||null});
+  closeMatPicker();
+};
+
 /* Grid click — products */
 $('grid').addEventListener('click',e=>{
   const b=e.target.closest('[data-cart]');
   if(b){
     const p=products.find(x=>x.id===+b.dataset.cart);if(!p)return;
-    const mats=getProdMats(p);
-    const mat=mats.length?mats[0]:{name:p.material||'Standard',price:p.price||0};
-    cartAdd({uid:`prod-${p.id}-${mat.name}`,name:p.name,material:mat.name,price:+mat.price,image:(p.images||[])[0]||null});
+    openMatPicker(p);
   }
 });
 /* Grid click — filaments */
