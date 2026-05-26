@@ -730,6 +730,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
   .sect-wrap{padding:2rem 1rem .5rem;}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 
 <body>
@@ -1081,7 +1082,6 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       <button class="ap-tab" id="tabCat">◈ Grupe</button>
       <button class="ap-tab" id="tabMat">⬡ Materiale</button>
       <button class="ap-tab" id="tabPolicy">⚖ Politici</button>
-      <button class="ap-tab" id="tabOrders">📋 Cereri (<span id="ordersCount">0</span>)</button>
     </div>
     <div class="ap-ok" id="apOk" style="display:none"></div>
     <div class="ap-form" id="formView">
@@ -1180,13 +1180,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       <div class="field"><label>Cookies (EN)</label><textarea class="ftx" id="pCookiesEn" rows="4"></textarea></div>
       <div class="form-actions"><button class="btn-submit" id="savePolicies">✓ Salvează Politicile</button></div>
     </div>
-    <div id="ordersView" style="display:none;flex-direction:column;gap:.5rem;padding:1rem;overflow-y:auto;flex:1;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
-        <div class="ap-sec" style="margin:0">// COMENZI & CERERI</div>
-        <button class="list-btn" id="refreshOrders" style="font-size:.55rem;padding:.3rem .6rem;">↻ Reîncarcă</button>
-      </div>
-      <div id="ordersList"></div>
-    </div>
+
     <div class="del-overlay" id="delConfirm" style="display:none">
       <div class="del-box">
         <div class="del-title" id="delTitle">Ștergi?</div>
@@ -1206,6 +1200,10 @@ const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const BUCKET = "product-images";
 const WA     = "40775695029";
 const PWD    = "Darius12@";
+/* ── EmailJS (emailjs.com → free 200/lună) ── */
+const EJS_KEY = "YOUR_PUBLIC_KEY";   // Account → API Keys
+const EJS_SVC = "YOUR_SERVICE_ID";   // Email Services → Service ID
+const EJS_TPL = "YOUR_TEMPLATE_ID";  // Email Templates → Template ID
 
 /* ══ FILAMENTE CONFIG ══ */
 const SHEET_ID         = "1-_i4yL6UbWsbr1GPyCoALnODXlz3SOtBEqcLBhqANOk";
@@ -1655,6 +1653,7 @@ $('confCtaBtn').addEventListener('click',()=>{
     :`💰 ${t('wa_price_label')}: ${t('wa_to_calc')}`;
   const msg=`${t('wa_greeting')}\n\n👤 ${t('wa_name_lbl')}: ${name}\n📞 ${t('wa_contact_lbl')}: ${contact}\n📁 ${t('wa_file_lbl')}: ${fName}\n\n🚗 ${t('wa_zone_lbl')}: ${zoneName}\n⚡ ${t('wa_stress_lbl')}: ${sLabel}\n🔧 ${t('wa_mat_lbl')}: ${sd.mat}\n${priceLine}\n\n${t('wa_attach')}`;
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
+  sendNotifEmail(`[AUTOCORE3D] Cerere printare — ${name}`,`Nume: ${name}\nContact: ${contact}\nFișier: ${fName}\nZonă: ${zoneName}\nStres: ${sLabel}\nMaterial: ${sd.mat}\n${priceLine}`);
 });
 
 /* ══ SVG ══ */
@@ -2003,15 +2002,14 @@ $('apOverlay').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.style.d
 
 /* ══ TABS ══ */
 function showTab(tab){
-  ['formView','listView','catView','matView','policyView','ordersView'].forEach(id=>$(id).style.display='none');
+  ['formView','listView','catView','matView','policyView'].forEach(id=>$(id).style.display='none');
   document.querySelectorAll('.ap-tab').forEach(b=>b.classList.remove('on'));
-  const map={add:['formView','tabAdd'],list:['listView','tabList'],cat:['catView','tabCat'],mat:['matView','tabMat'],policy:['policyView','tabPolicy'],orders:['ordersView','tabOrders']};
+  const map={add:['formView','tabAdd'],list:['listView','tabList'],cat:['catView','tabCat'],mat:['matView','tabMat'],policy:['policyView','tabPolicy']};
   const[v,tb]=map[tab];$(v).style.display='flex';$(tb).classList.add('on');
   if(tab==='list')renderList();
   if(tab==='cat'){catEditId=null;renderCatList();resetCatForm();}
   if(tab==='mat'){matEditId=null;renderMatList();resetMatForm();}
   if(tab==='policy')loadPolFields();
-  if(tab==='orders')loadOrders();
   if(tab!=='add')resetForm();
 }
 $('tabAdd').onclick=()=>showTab('add');
@@ -2019,7 +2017,6 @@ $('tabList').onclick=()=>showTab('list');
 $('tabCat').onclick=()=>showTab('cat');
 $('tabMat').onclick=()=>showTab('mat');
 $('tabPolicy').onclick=()=>showTab('policy');
-$('tabOrders').onclick=()=>showTab('orders');
 
 /* ══ FORM MATERIALS ══ */
 function populateFMatSel(){const sel=$('fMatSel');sel.innerHTML=getMatNames().map(n=>`<option>${n}</option>`).join('');}
@@ -2329,6 +2326,10 @@ $('btnWA').onclick=()=>{
     msg=`Buna ziua! Doresc sa plasez o comanda:\n\n🛒 *Produs:* ${coProd.name}\n🔧 *Material:* ${matName}\n💰 *Pret:* ${matPrice} RON (transport inclus)\n${payLabel}\n\n👤 *Nume:* ${d.fname} ${d.lname}\n📞 *Telefon:* ${d.phone}\n📧 *Email:* ${d.email||'—'}\n📍 *Adresa:* ${d.address}\n\nVa multumesc!`;
   }
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
+  const subj=coProd&&coProd._filament
+    ?`[AUTOCORE3D] Filament — ${d.fname} ${d.lname}`
+    :`[AUTOCORE3D] Produs — ${coProd?.name||'—'} — ${d.fname} ${d.lname}`;
+  sendNotifEmail(subj, msg.replace(/\*/g,''));
   $('coModal').classList.remove('open');
 };
 $('btnC').onclick=()=>$('coModal').classList.remove('open');
@@ -2434,51 +2435,12 @@ $('cartSubmit').onclick=()=>{
   const total=fmtPrice(cart.reduce((s,c)=>s+c.price*c.qty,0));
   const msg=`Buna ziua! Doresc sa plasez o comanda:\n\n${itemLines}\n\n💰 Total: ${total} (transport inclus)\n${payLabel}\n\n👤 Nume: ${name}\n📞 Telefon: ${phone}\n📍 Adresa: ${address}\n\nVa multumesc!`;
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
+  sendNotifEmail(`[AUTOCORE3D] Comandă nouă — ${name} · ${total}`,`Nume: ${name}\nTelefon: ${phone}\nAdresă: ${address}\nPlată: ${payLabel}\n\n${itemLines}\n\nTotal: ${total}`);
   cart=[];cartRenderCount();cartRenderItems();
   $('cartName').value='';$('cartPhone').value='';$('cartAddress').value='';
   closeCart();
 };
 
-/* ══ ADMIN ORDERS ══ */
-const ORDER_STATUSES=['nou','confirmat','în lucru','finalizat','anulat'];
-async function loadOrders(){
-  try{
-    const orders=await sb.getOrders();
-    $('ordersCount').textContent=orders.filter(o=>o.status==='nou').length||0;
-    $('ordersList').innerHTML=orders.length?orders.map(o=>{
-      const d=new Date(o.created_at);
-      const time=`${d.toLocaleDateString('ro-RO')} ${d.toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'})}`;
-      const isShop=o.type==='shop';
-      const details=isShop
-        ?(o.items||[]).map(i=>`${i.qty}× ${i.name} (${i.material}) — ${fmtPrice(i.price*i.qty)}`).join('<br>')
-        :`📁 ${o.file_name||'—'} · ${o.zone||''} · ${o.stress||''} · ${o.material||''}${o.estimated_price?` · ${o.estimated_price}`:''}`;
-      return`<div class="order-card">
-        <div class="order-card-hdr">
-          <div style="display:flex;gap:.4rem;align-items:center">
-            <span class="order-type-badge ${isShop?'order-type-shop':'order-type-print'}">${isShop?'SHOP':'PRINT'}</span>
-            <span class="order-card-name">${o.name||'—'}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:.5rem">
-            <select class="order-status-sel" data-oid="${o.id}" onchange="updateOrderStatus(this)">
-              ${ORDER_STATUSES.map(s=>`<option${o.status===s?' selected':''}>${s}</option>`).join('')}
-            </select>
-            <span class="order-card-time">${time}</span>
-          </div>
-        </div>
-        <div class="order-card-contact">📞 ${o.contact||'—'}</div>
-        ${o.shipping_address?`<div class="order-card-detail">📍 ${o.shipping_address} · ${o.payment_method||''}</div>`:''}
-        <div class="order-card-detail">${details}</div>
-        ${isShop&&o.total_price?`<div style="font-family:var(--disp);font-size:.9rem;font-weight:900;color:var(--red);margin-top:.3rem">TOTAL: ${fmtPrice(o.total_price)}</div>`:''}
-      </div>`;
-    }).join(''):`<div class="cart-empty">Nu există comenzi încă.</div>`;
-  }catch(e){$('ordersList').innerHTML=`<div class="cart-empty" style="color:#ef4444">Eroare la încărcare — creează tabelul orders în Supabase.</div>`;}
-}
-async function updateOrderStatus(sel){
-  const id=sel.dataset.oid,status=sel.value;
-  try{await sb.updateOrderStatus(id,status);toast('Status actualizat');}
-  catch(e){toast('Eroare la actualizare',true);}
-}
-$('refreshOrders').onclick=loadOrders;
 
 /* ══ CURSOR ══ */
 document.addEventListener('mousemove',e=>{const c=$('cg');c.style.left=e.clientX+'px';c.style.top=e.clientY+'px';});
@@ -2510,6 +2472,17 @@ function showMainTab(id){
 }
 document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showMainTab(b.dataset.tab)));
 document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showMainTab(a.dataset.tab);}));
+
+/* ══ EMAIL NOTIF ══ */
+if(EJS_KEY!=='YOUR_PUBLIC_KEY') emailjs.init(EJS_KEY);
+function sendNotifEmail(subject, body){
+  if(EJS_KEY==='YOUR_PUBLIC_KEY') return;
+  emailjs.send(EJS_SVC, EJS_TPL, {
+    to_email:'darioprint3d@icloud.com',
+    subject,
+    message: body
+  }).catch(()=>{});
+}
 
 /* ══ INIT ══ */
 buildTicker();
