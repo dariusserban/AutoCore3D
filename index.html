@@ -2478,7 +2478,7 @@ if(EJS_KEY!=='YOUR_PUBLIC_KEY') emailjs.init(EJS_KEY);
 function sendNotifEmail(subject, body){
   if(EJS_KEY==='YOUR_PUBLIC_KEY') return;
   emailjs.send(EJS_SVC, EJS_TPL, {
-    to_email:'darioprint3d@icloud.com',
+    to_email:'darius.madness2001@gmail.com',
     subject,
     message: body
   }).catch(()=>{});
