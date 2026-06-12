@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ro" style="color-scheme:dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="color-scheme" content="dark"/>
+<meta name="robots" content="noindex"/>
+<title>AUTOCORE3D — Concept Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Barlow+Condensed:wght@600;800;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  color-scheme:dark!important;
+  --bg:#06090c;
+  --red:#E84B1A;
+  --text:#F0DDB0;
+  --sub:#B0A48C;
+  --muted:#5C7080;
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Barlow Condensed',sans-serif;
+  --body:'Barlow',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:var(--bg)!important;}
+body{background:var(--bg)!important;color:var(--text)!important;font-family:var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: no-preference){
+  html{scroll-snap-type:y mandatory;}
+}
+
+/* ── HUD chrome ── */
+.hud{position:fixed;z-index:50;font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;color:rgba(240,221,176,.55);pointer-events:none;mix-blend-mode:screen;}
+.hud-tl{top:1.4rem;left:1.4rem;display:flex;align-items:center;gap:.5rem;}
+.hud-rec{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1.6s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.hud-br{bottom:1.4rem;right:1.4rem;text-align:right;}
+@media(max-width:640px){.hud{font-size:.52rem;}}
+
+.progress{position:fixed;top:0;left:0;height:2px;background:var(--red);box-shadow:0 0 10px var(--red);z-index:60;width:0%;transition:width .1s linear;}
+
+/* ── nav ── */
+.cine-nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 1.6rem;font-family:var(--mono);}
+.cine-logo{display:flex;align-items:center;gap:10px;}
+.cine-hex{font-size:1.5rem;color:var(--red);line-height:1;text-shadow:0 0 14px rgba(232,75,26,.6);}
+.cine-name{font-family:var(--disp);font-size:1.2rem;font-weight:900;letter-spacing:.08em;color:var(--text);}
+.cine-name span{color:var(--red);}
+.cine-back{font-size:.6rem;letter-spacing:.2em;color:var(--sub);text-transform:uppercase;text-decoration:none;border:1px solid rgba(240,221,176,.18);padding:.5rem .9rem;transition:all .25s var(--ease);}
+.cine-back:hover{border-color:var(--red);color:var(--red);}
+
+/* ── side dots ── */
+.dots{position:fixed;right:1.6rem;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:.9rem;}
+.dot{width:9px;height:9px;border:1px solid rgba(240,221,176,.35);border-radius:50%;cursor:pointer;transition:all .3s var(--ease);background:transparent;padding:0;}
+.dot:hover{border-color:var(--red);}
+.dot.on{background:var(--red);border-color:var(--red);box-shadow:0 0 10px rgba(232,75,26,.7);transform:scale(1.3);}
+@media(max-width:640px){.dots{display:none;}}
+
+/* ── scenes ── */
+.scene{position:relative;height:100vh;height:100dvh;scroll-snap-align:start;overflow:hidden;display:flex;align-items:flex-end;}
+.scene-media{position:absolute;top:-12%;left:0;width:100%;height:124%;object-fit:cover;will-change:transform;}
+.scene-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,9,12,.25) 0%,rgba(6,9,12,.45) 45%,rgba(6,9,12,.96) 100%);}
+.scene-vignette{position:absolute;inset:0;box-shadow:inset 0 0 18vw rgba(0,0,0,.65);pointer-events:none;}
+.scene-content{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:0 1.6rem 6.5rem;width:100%;}
+.scene-text{max-width:680px;}
+.align-r .scene-text{margin-left:auto;text-align:right;}
+
+.scene-num{font-family:var(--mono);font-size:.7rem;color:var(--red);letter-spacing:.35em;margin-bottom:1rem;text-transform:uppercase;
+  opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+.scene-title{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(2.8rem,11vw,8.5rem);line-height:.96;letter-spacing:.01em;margin-bottom:1.3rem;color:var(--text);
+  opacity:0;transform:translateY(46px);transition:opacity .9s var(--ease) .08s,transform .9s var(--ease) .08s;}
+.scene-title em{font-style:normal;color:var(--red);}
+.scene-body{font-family:var(--body);font-size:1rem;color:var(--sub);max-width:460px;line-height:1.75;
+  opacity:0;transform:translateY(32px);transition:opacity .8s var(--ease) .2s,transform .8s var(--ease) .2s;}
+.align-r .scene-body{margin-left:auto;}
+.scene.in-view .scene-num,.scene.in-view .scene-title,.scene.in-view .scene-body{opacity:1;transform:translateY(0);}
+
+/* ── hero ── */
+.scene-hero{align-items:center;justify-content:center;text-align:center;}
+.scene-hero .scene-content{padding-bottom:0;display:flex;flex-direction:column;align-items:center;}
+.hero-eyebrow{font-family:var(--mono);font-size:.7rem;color:var(--red);letter-spacing:.4em;margin-bottom:1.5rem;text-transform:uppercase;
+  opacity:0;transform:translateY(20px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+.hero-title{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(3.6rem,15vw,11rem);line-height:.94;letter-spacing:.01em;color:var(--text);
+  opacity:0;transform:translateY(50px);transition:opacity 1s var(--ease) .12s,transform 1s var(--ease) .12s;}
+.hero-title em{font-style:normal;color:var(--red);}
+.hero-sub{font-family:var(--body);font-size:1rem;color:var(--sub);max-width:520px;margin-top:1.6rem;line-height:1.75;
+  opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease) .26s,transform .9s var(--ease) .26s;}
+.scene.in-view .hero-eyebrow,.scene.in-view .hero-title,.scene.in-view .hero-sub{opacity:1;transform:translateY(0);}
+.scroll-cue{position:absolute;bottom:2.4rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.6rem;z-index:2;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.3em;color:var(--sub);text-transform:uppercase;animation:cue-bob 2.4s ease-in-out infinite;}
+.scroll-cue::after{content:'';width:1px;height:32px;background:linear-gradient(180deg,var(--red),transparent);}
+@keyframes cue-bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,10px)}}
+
+/* ── final scene ── */
+.scene-final{align-items:center;justify-content:center;text-align:center;}
+.scene-final .scene-content{display:flex;flex-direction:column;align-items:center;padding-bottom:0;}
+.final-logo{display:flex;align-items:center;gap:12px;margin-bottom:2rem;
+  opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+.final-hex{font-size:2.2rem;color:var(--red);text-shadow:0 0 18px rgba(232,75,26,.6);}
+.final-name{font-family:var(--disp);font-size:1.8rem;font-weight:900;letter-spacing:.1em;color:var(--text);}
+.final-name span{color:var(--red);}
+.final-title{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(2.4rem,9vw,6.5rem);line-height:1.05;letter-spacing:.01em;color:var(--text);margin-bottom:2.2rem;
+  opacity:0;transform:translateY(40px);transition:opacity .9s var(--ease) .1s,transform .9s var(--ease) .1s;}
+.final-title em{font-style:normal;color:var(--red);}
+.final-cta{display:inline-flex;align-items:center;gap:.6rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:1rem 2rem;text-decoration:none;position:relative;overflow:hidden;transition:all .25s var(--ease);
+  opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease) .22s,transform .9s var(--ease) .22s,box-shadow .25s,transform .25s;}
+.final-cta:hover{box-shadow:0 0 28px rgba(232,75,26,.55);transform:translateY(-2px);}
+.final-foot{margin-top:2.4rem;font-family:var(--mono);font-size:.55rem;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;
+  opacity:0;transition:opacity 1s var(--ease) .35s;}
+.scene.in-view .final-logo,.scene.in-view .final-title,.scene.in-view .final-cta,.scene.in-view .final-foot{opacity:1;transform:translateY(0);}
+
+/* ── reduced motion ── */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-snap-type:none;}
+  .scene-num,.scene-title,.scene-body,.hero-eyebrow,.hero-title,.hero-sub,.final-logo,.final-title,.final-cta,.final-foot{
+    opacity:1!important;transform:none!important;transition:none!important;}
+  .scroll-cue{animation:none;}
+}
+@media(max-width:640px){
+  .cine-name{font-size:1rem;}
+  .cine-back{font-size:.52rem;padding:.42rem .7rem;}
+  .scene-content{padding-bottom:4rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="hud hud-tl"><span class="hud-rec"></span> REC · AUTOCORE3D FEED</div>
+<div class="hud hud-br">CONCEPT REEL // 01–05<br/>AUTOCORE3D.COM</div>
+
+<header class="cine-nav">
+  <div class="cine-logo">
+    <span class="cine-hex">⬡</span>
+    <span class="cine-name">AUTOCORE<span>3D</span></span>
+  </div>
+  <a class="cine-back" href="../index.html">← Înapoi la site</a>
+</header>
+
+<nav class="dots" aria-label="Navigare scene">
+  <button class="dot" data-index="0" aria-label="Scena 1"></button>
+  <button class="dot" data-index="1" aria-label="Scena 2"></button>
+  <button class="dot" data-index="2" aria-label="Scena 3"></button>
+  <button class="dot" data-index="3" aria-label="Scena 4"></button>
+  <button class="dot" data-index="4" aria-label="Scena 5"></button>
+</nav>
+
+<main>
+
+  <!-- SCENE 0 — HERO -->
+  <section class="scene scene-hero" id="scene-0" data-index="0">
+    <video class="scene-media" autoplay muted loop playsinline poster="../assets/story/proj-process-poster.jpg">
+      <source src="../assets/story/proj-process.mp4" type="video/mp4"/>
+    </video>
+    <div class="scene-overlay"></div>
+    <div class="scene-vignette"></div>
+    <div class="scene-content">
+      <div class="hero-eyebrow">Atelier de printare 3D & inginerie auto</div>
+      <h1 class="hero-title">Fabricat<br/>pentru <em>drum.</em></h1>
+      <p class="hero-sub">De la fișierul CAD la piesa montată pe mașina ta — proiectare pe măsură, printare 3D industrială și control al calității, sub același acoperiș.</p>
+    </div>
+    <div class="scroll-cue">Derulează</div>
+  </section>
+
+  <!-- SCENE 1 — PROIECTARE -->
+  <section class="scene" id="scene-1" data-index="1">
+    <img class="scene-media" src="../assets/story/proj-bracket.jpg" alt="Suport auto proiectat CAD, printat 3D"/>
+    <div class="scene-overlay"></div>
+    <div class="scene-vignette"></div>
+    <div class="scene-content">
+      <div class="scene-text">
+        <div class="scene-num">01 — Proiectare</div>
+        <h2 class="scene-title">Desenat<br/>pe <em>măsură.</em></h2>
+        <p class="scene-body">Fiecare suport și consolă pleacă dintr-un model CAD parametric, adaptat exact pe șasiul și motorul tău. Toleranțele se verifică digital, înainte ca imprimanta să pornească.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 2 — PRINTARE -->
+  <section class="scene" id="scene-2" data-index="2">
+    <img class="scene-media" src="../assets/story/proj-process-poster.jpg" alt="Procesul de printare 3D, strat cu strat"/>
+    <div class="scene-overlay"></div>
+    <div class="scene-vignette"></div>
+    <div class="scene-content">
+      <div class="scene-text align-r">
+        <div class="scene-num">02 — Printare</div>
+        <h2 class="scene-title">Strat<br/>cu <em>strat.</em></h2>
+        <p class="scene-body">Filamente tehnice — PETG-CF, ABS, Nylon — printate cu precizie industrială, rezistente la temperatura motorului, vibrații și factori UV.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 3 — MONTAJ -->
+  <section class="scene" id="scene-3" data-index="3">
+    <img class="scene-media" src="../assets/story/proj-bigintake.jpg" alt="Sistem de admisie 3D printat montat pe motor"/>
+    <div class="scene-overlay"></div>
+    <div class="scene-vignette"></div>
+    <div class="scene-content">
+      <div class="scene-text">
+        <div class="scene-num">03 — Montaj</div>
+        <h2 class="scene-title">Montat.<br/>Testat.<br/><em>Live.</em></h2>
+        <p class="scene-body">Fiecare piesă este verificată direct pe mașină reală — fitment perfect, fără ajustări ulterioare, fără compromisuri.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 4 — FINAL / CTA -->
+  <section class="scene scene-final" id="scene-4" data-index="4">
+    <img class="scene-media" src="../assets/story/proj-interior.jpg" alt="Interior auto cu piese 3D printate"/>
+    <div class="scene-overlay"></div>
+    <div class="scene-vignette"></div>
+    <div class="scene-content">
+      <div class="final-logo">
+        <span class="final-hex">⬡</span>
+        <span class="final-name">AUTOCORE<span>3D</span></span>
+      </div>
+      <h2 class="final-title">Piesa ta e în desen.<br/>Noi o facem <em>realitate.</em></h2>
+      <a class="final-cta" href="../index.html">Vezi catalogul →</a>
+      <div class="final-foot">Concept vizual — AutoCore3D.com</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var scenes = document.querySelectorAll('.scene');
+  var dots = document.querySelectorAll('.dot');
+  var progress = document.getElementById('progress');
+
+  // Reveal text when scene enters viewport
+  var revealObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      entry.target.classList.toggle('in-view', entry.isIntersecting);
+    });
+  }, {threshold: 0.4});
+  scenes.forEach(function(s){ revealObserver.observe(s); });
+
+  // Active dot tracking
+  var dotObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        var idx = entry.target.getAttribute('data-index');
+        dots.forEach(function(d){ d.classList.toggle('on', d.getAttribute('data-index') === idx); });
+      }
+    });
+  }, {threshold: 0.6});
+  scenes.forEach(function(s){ dotObserver.observe(s); });
+
+  dots.forEach(function(dot){
+    dot.addEventListener('click', function(){
+      var target = document.getElementById('scene-' + dot.getAttribute('data-index'));
+      if(target) target.scrollIntoView({behavior: reduced ? 'auto' : 'smooth'});
+    });
+  });
+
+  // Parallax + scroll progress
+  var ticking = false;
+  function update(){
+    var vh = window.innerHeight;
+    if(!reduced){
+      scenes.forEach(function(scene){
+        var media = scene.querySelector('.scene-media');
+        if(!media) return;
+        var rect = scene.getBoundingClientRect();
+        var p = rect.top / vh; // -1..0..1
+        media.style.transform = 'translateY(' + (p * -50) + 'px)';
+      });
+    }
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - vh;
+    var pct = max > 0 ? (doc.scrollTop || window.scrollY) / max * 100 : 0;
+    progress.style.width = pct + '%';
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(update); ticking = true; }
+  }, {passive: true});
+  update();
+})();
+</script>
+
+</body>
+</html>
