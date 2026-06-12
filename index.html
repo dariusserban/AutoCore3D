@@ -116,9 +116,7 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .proj-card{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;border:1px solid rgba(240,221,176,.12);box-shadow:0 24px 50px -22px rgba(0,0,0,.7);transform-style:preserve-3d;transition:transform .4s var(--ease),box-shadow .4s var(--ease);will-change:transform;}
 .proj-card img,.proj-card video{display:block;width:100%;height:100%;object-fit:cover;}
 .proj-card:hover{box-shadow:0 30px 60px -18px rgba(232,75,26,.35);}
-.proj-cap{position:absolute;bottom:0;left:0;right:0;padding:.9rem 1.1rem;background:linear-gradient(to top,rgba(8,16,22,.88) 0%,rgba(8,16,22,.2) 70%,transparent 100%);}
-.proj-cap-main{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;color:var(--red);text-transform:uppercase;margin-bottom:.2rem;}
-.proj-cap-sub{font-family:var(--body);font-size:.8rem;color:var(--text);line-height:1.4;}
+.proj-cap{position:absolute;bottom:0;left:0;right:0;padding:.8rem 1rem;background:linear-gradient(to top,rgba(8,16,22,.88) 0%,rgba(8,16,22,.15) 75%,transparent 100%);font-family:var(--mono);font-size:.7rem;letter-spacing:.03em;color:var(--text);}
 
 /* ── ABOUT / CE FACEM ── */
 .about-section{position:relative;overflow:hidden;max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem;}
@@ -126,8 +124,9 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .about-head .story-desc{margin-top:1rem;margin-bottom:1.6rem;}
 .about-manifesto{position:relative;z-index:1;display:flex;flex-direction:column;gap:1.1rem;max-width:780px;margin-bottom:3.5rem;}
 .about-manifesto p{font-family:var(--body);font-size:.9rem;color:var(--sub);line-height:1.8;}
-.proj-gallery{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:3.5rem;}
-@media(max-width:760px){.proj-gallery{grid-template-columns:1fr;}}
+.proj-gallery{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3.5rem;}
+@media(max-width:900px){.proj-gallery{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.proj-gallery{grid-template-columns:1fr;}}
 .service-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-bottom:3.5rem;border-radius:14px;overflow:hidden;border:1px solid rgba(240,221,176,.1);}
 .service-card{background:rgba(20,40,56,.45);backdrop-filter:blur(14px) saturate(140%);padding:1.75rem;position:relative;overflow:hidden;transition:background .3s;}
 .service-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,75,26,.07) 0%,transparent 60%);opacity:0;transition:opacity .3s;}
@@ -862,11 +861,8 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       <div class="story-media">
         <div class="proj-float">
           <div class="proj-card">
-            <img src="assets/story/proj-mirror.jpg" alt="Capac oglindă retrovizoare — original vs. piesă printată" loading="lazy">
-            <div class="proj-cap">
-              <div class="proj-cap-main" data-i18n="story_2023_tag">// PRINT #001 · 2023</div>
-              <div class="proj-cap-sub" data-i18n="story_2023_cap">Capac oglindă reprodus 1:1, montat direct</div>
-            </div>
+            <img src="assets/story/proj-interior.jpg" alt="Console interior printate 3D" loading="lazy">
+            <div class="proj-cap" data-i18n="story_2023_cap">Console interior — printate la cerere</div>
           </div>
         </div>
       </div>
@@ -881,10 +877,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
         <div class="proj-float" style="animation-delay:-2.3s">
           <div class="proj-card">
             <video src="assets/story/proj-process.mp4" poster="assets/story/proj-process-poster.jpg" autoplay muted loop playsinline></video>
-            <div class="proj-cap">
-              <div class="proj-cap-main" data-i18n="story_growth_tag">// R&D · 2024</div>
-              <div class="proj-cap-sub" data-i18n="story_growth_cap">Recondiționare și finisare, manual, piesă cu piesă</div>
-            </div>
+            <div class="proj-cap" data-i18n="story_growth_cap">Recondiționare piese, manual</div>
           </div>
         </div>
       </div>
@@ -898,11 +891,8 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       <div class="story-media">
         <div class="proj-float" style="animation-delay:-4.6s">
           <div class="proj-card">
-            <img src="assets/story/proj-intake.jpg" alt="Admisii custom montate în compartimentul motor" loading="lazy">
-            <div class="proj-cap">
-              <div class="proj-cap-main" data-i18n="story_today_tag">// CATALOG · LIVE</div>
-              <div class="proj-cap-sub" data-i18n="story_today_cap">Admisii custom, montate și funcționale sub capotă</div>
-            </div>
+            <img src="assets/story/proj-bigintake.jpg" alt="Kit admisie dublu custom montat pe motor" loading="lazy">
+            <div class="proj-cap" data-i18n="story_today_cap">Kit admisie dublu — proiect complet</div>
           </div>
         </div>
       </div>
@@ -938,19 +928,19 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
     <div class="proj-float" style="animation-delay:-1.5s">
       <div class="proj-card">
         <img src="assets/story/proj-bracket.jpg" alt="Suport printat 3D — proiect mic" loading="lazy">
-        <div class="proj-cap">
-          <div class="proj-cap-main" data-i18n="proj_small_tag">// PROIECT MIC</div>
-          <div class="proj-cap-sub" data-i18n="proj_small_cap">Suport custom, printat și finisat rapid</div>
-        </div>
+        <div class="proj-cap" data-i18n="proj_small_cap">Suport mic, printat rapid</div>
       </div>
     </div>
-    <div class="proj-float" style="animation-delay:-4s">
+    <div class="proj-float" style="animation-delay:-3.2s">
       <div class="proj-card">
-        <img src="assets/story/proj-finish.jpg" alt="Finisare manuală a unei piese printate 3D" loading="lazy">
-        <div class="proj-cap">
-          <div class="proj-cap-main" data-i18n="proj_big_tag">// PROIECT MARE</div>
-          <div class="proj-cap-sub" data-i18n="proj_big_cap">Finisare manuală — fiecare piesă, lustruită la detaliu</div>
-        </div>
+        <img src="assets/story/proj-singleintake.jpg" alt="Admisie custom montată pe motor" loading="lazy">
+        <div class="proj-cap" data-i18n="proj_mid_cap">Admisie custom, montată</div>
+      </div>
+    </div>
+    <div class="proj-float" style="animation-delay:-5s">
+      <div class="proj-card">
+        <img src="assets/story/proj-airbox.jpg" alt="Airbox cu filtru conic" loading="lazy">
+        <div class="proj-cap" data-i18n="proj_big_cap">Airbox cu filtru conic</div>
       </div>
     </div>
   </div>
@@ -1671,11 +1661,12 @@ const T={
     story_2023_year:"2023 · ÎNCEPUTUL",story_2023_title:"Primul Print",story_2023_text:"Totul a început cu o piesă spartă, greu de găsit pe piață. Am proiectat-o și am printat-o noi — și a funcționat perfect. Așa s-a născut ideea AUTOCORE3D: piese auto printate 3D, la cerere, mai rapide și mai accesibile decât cele originale.",
     story_growth_year:"2024 · EVOLUȚIE",story_growth_title:"Materiale Tehnice",story_growth_text:"Am trecut de la materiale standard la ABS, ASA și compozite cu fibră de carbon — testate pentru rezistență la căldură, vibrații și impact. Fiecare piesă e gândită pentru condițiile reale dintr-un automobil.",
     story_today_year:"ASTĂZI",story_today_title:"Atelier & Configurator",story_today_text:"Avem un catalog complet de piese auto, un configurator de prețuri instant și livrare în toată țara, cu transport inclus. Continuăm să printăm — și să rezolvăm problema piesă cu piesă.",
-    story_2023_tag:"// PRINT #001 · 2023",story_2023_cap:"Capac oglindă reprodus 1:1, montat direct",
-    story_growth_tag:"// R&D · 2024",story_growth_cap:"Recondiționare și finisare, manual, piesă cu piesă",
-    story_today_tag:"// CATALOG · LIVE",story_today_cap:"Admisii custom, montate și funcționale sub capotă",
-    proj_small_tag:"// PROIECT MIC",proj_small_cap:"Suport custom, printat și finisat rapid",
-    proj_big_tag:"// PROIECT MARE",proj_big_cap:"Finisare manuală — fiecare piesă, lustruită la detaliu",
+    story_2023_cap:"Console interior — printate la cerere",
+    story_growth_cap:"Recondiționare piese, manual",
+    story_today_cap:"Kit admisie dublu — proiect complet",
+    proj_small_cap:"Suport mic, printat rapid",
+    proj_mid_cap:"Admisie custom, montată",
+    proj_big_cap:"Airbox cu filtru conic",
     about_eyebrow:"// CINE SUNTEM · CE FACEM",about_title_html:"DE LA FIȘIER CAD,<br>LA <span>PIESĂ DE COMPETIȚIE</span>",about_sub:"Componente auto funcționale, printate din compozite ranforsate cu fibră de carbon. Proiectate pentru sarcini mecanice și termice extreme — nu doar pentru a încăpea.",about_cta:"⬡ Cere analiză tehnică",
     about_manifesto_1:"AUTOCORE3D operează la intersecția dintre proiectare CAD, scanare 3D și producție aditivă industrială. Pornim de la o piesă uzată, o schiță sau o specificație tehnică și o transformăm într-o componentă finală — dimensionată corect, optimizată structural și printată din materiale compozite cu performanțe verificate.",
     about_manifesto_2:"Nu există etapă de „prototip decorativ\". Fiecare piesă care iese din atelier este gândită pentru montaj direct, pentru sarcini mecanice reale și pentru expunere termică prelungită — sub capotă sau pe exteriorul caroseriei.",
@@ -1716,11 +1707,12 @@ const T={
     story_2023_year:"2023 · THE BEGINNING",story_2023_title:"The First Print",story_2023_text:"It all started with a broken part that was nearly impossible to find. We designed and printed it ourselves — and it worked perfectly. That's how the AUTOCORE3D idea was born: 3D printed auto parts, on demand, faster and more affordable than the originals.",
     story_growth_year:"2024 · EVOLUTION",story_growth_title:"Technical Materials",story_growth_text:"We moved from standard filaments to ABS, ASA and carbon-fiber composites — tested for heat, vibration and impact resistance. Every part is engineered for the real conditions inside a car.",
     story_today_year:"TODAY",story_today_title:"Workshop & Configurator",story_today_text:"We now run a full catalog of auto parts, an instant price configurator, and nationwide delivery with shipping included. We're still printing — solving problems, one part at a time.",
-    story_2023_tag:"// PRINT #001 · 2023",story_2023_cap:"Mirror cover, 1:1 reproduction, direct fit",
-    story_growth_tag:"// R&D · 2024",story_growth_cap:"Manual reconditioning & finishing, part by part",
-    story_today_tag:"// CATALOG · LIVE",story_today_cap:"Custom intakes, fitted and functional under the hood",
-    proj_small_tag:"// SMALL PROJECT",proj_small_cap:"Custom bracket, printed and finished fast",
-    proj_big_tag:"// BIG PROJECT",proj_big_cap:"Manual finishing — every part, polished to detail",
+    story_2023_cap:"Custom interior consoles, printed to order",
+    story_growth_cap:"Manual part reconditioning",
+    story_today_cap:"Dual intake kit — full project",
+    proj_small_cap:"Small bracket, printed fast",
+    proj_mid_cap:"Custom intake, installed",
+    proj_big_cap:"Cone filter airbox",
     about_eyebrow:"// WHO WE ARE · WHAT WE DO",about_title_html:"FROM CAD FILE<br>TO <span>RACE-READY PART</span>",about_sub:"Functional automotive components, printed from carbon-fiber reinforced composites. Engineered for extreme mechanical and thermal loads — not just to fit.",about_cta:"⬡ Request technical analysis",
     about_manifesto_1:"AUTOCORE3D operates at the intersection of CAD design, 3D scanning, and industrial additive manufacturing. We take a worn part, a sketch, or a technical spec and turn it into a final component — correctly dimensioned, structurally optimized, and printed from composite materials with verified performance.",
     about_manifesto_2:"There is no \"decorative prototype\" stage. Every part that leaves the workshop is built for direct installation, real mechanical loads, and sustained thermal exposure — under the hood or on the exterior of the body.",
