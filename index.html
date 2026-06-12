@@ -79,6 +79,33 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 @keyframes grad-move{0%{background-position:0%}100%{background-position:200%}}
 .stat-lbl{font-family:var(--mono);font-size:.5rem;color:var(--muted);letter-spacing:.14em;margin-top:3px;display:block;}
 
+/* ── STORY / POVESTEA ── */
+.story-section{--p:0;position:relative;overflow:hidden;max-width:1280px;margin:0 auto;padding:5rem 1.5rem 6rem;}
+.story-portal{position:absolute;top:35%;left:50%;width:120vmax;height:120vmax;transform:translate(-50%,-50%) scale(calc(.35 + var(--p) * 1.05)) rotate(calc(var(--p) * 220deg));border-radius:50%;background:radial-gradient(circle,rgba(157,123,255,.22) 0%,rgba(232,75,26,.14) 35%,rgba(27,107,123,.08) 60%,transparent 75%);filter:blur(70px);opacity:calc(.2 + var(--p) * .85);pointer-events:none;z-index:0;}
+.story-stars{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:var(--p);transition:opacity .6s var(--ease);}
+.story-star{position:absolute;width:3px;height:3px;border-radius:50%;color:var(--c,var(--red));background:currentColor;box-shadow:0 0 6px currentColor;animation:star-tw 3.4s ease-in-out infinite;}
+@keyframes star-tw{0%,100%{opacity:.15}50%{opacity:.9}}
+.story-head{position:relative;z-index:1;max-width:760px;margin-bottom:3.5rem;}
+.story-eyebrow{font-family:var(--mono);font-size:.65rem;color:var(--red);letter-spacing:.25em;margin-bottom:.9rem;}
+.story-title{font-family:var(--disp);font-size:clamp(2rem,5vw,3.4rem);font-weight:900;text-transform:uppercase;line-height:1.05;letter-spacing:.02em;margin-bottom:1.2rem;color:var(--text);}
+.story-title span{color:var(--red);}
+.story-desc{font-family:var(--body);font-size:.95rem;color:var(--sub);line-height:1.75;}
+.story-timeline{position:relative;z-index:1;display:flex;flex-direction:column;gap:3rem;}
+.story-item{display:flex;gap:2.5rem;align-items:center;}
+.story-item:nth-child(even){flex-direction:row-reverse;}
+.story-media{flex:1;position:relative;aspect-ratio:4/3;border:1px solid var(--bdr);overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--card) 0%,var(--surf) 100%);}
+.story-media::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(27,107,123,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(27,107,123,.08) 1px,transparent 1px);background-size:26px 26px;}
+.story-media::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.story-media-icon{position:relative;font-size:3.5rem;filter:drop-shadow(0 0 18px rgba(232,75,26,.5));z-index:1;}
+.story-media-tag{position:absolute;bottom:.8rem;left:.8rem;font-family:var(--mono);font-size:.55rem;letter-spacing:.18em;color:var(--muted);background:rgba(12,24,32,.7);padding:.3rem .6rem;border:1px solid var(--bdr);z-index:1;}
+.story-text{flex:1.3;}
+.story-year{font-family:var(--mono);font-size:.6rem;color:var(--red);letter-spacing:.22em;margin-bottom:.6rem;}
+.story-text h3{font-family:var(--disp);font-size:1.5rem;font-weight:800;text-transform:uppercase;color:var(--text);margin-bottom:.6rem;letter-spacing:.02em;}
+.story-text p{font-family:var(--body);font-size:.88rem;color:var(--sub);line-height:1.7;}
+@media(max-width:760px){
+  .story-item,.story-item:nth-child(even){flex-direction:column;}
+}
+
 .ticker-wrap{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);background:var(--surf);padding:.45rem 0;}
 .ticker{display:flex;white-space:nowrap;animation:tick 30s linear infinite;}
 .ticker:hover{animation-play-state:paused;}
@@ -771,6 +798,52 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
   </div>
 </section>
 
+<!-- ══ POVESTEA AUTOCORE3D ══ -->
+<section class="story-section anim-ready" id="story">
+  <div class="story-portal"></div>
+  <div class="story-stars" id="storyStars"></div>
+  <div class="story-head">
+    <div class="story-eyebrow" data-i18n="story_eyebrow">// POVESTEA AUTOCORE3D · DIN 2023</div>
+    <h2 class="story-title" data-i18n="story_title_html">DE LA UN <span>HOBBY</span>, LA UN ATELIER DE PRECIZIE</h2>
+    <p class="story-desc" data-i18n="story_desc">AUTOCORE3D a pornit în 2023 dintr-o pasiune pentru mașini și tehnologie — o imprimantă 3D, un garaj și ideea că orice piesă auto poate fi reproiectată și printată mai bine. Astăzi suntem un atelier specializat în piese auto printate 3D din materiale tehnice industriale, cu clienți din toată România.</p>
+  </div>
+  <div class="story-timeline">
+    <div class="story-item anim-ready">
+      <div class="story-media">
+        <span class="story-media-icon">🖨️</span>
+        <span class="story-media-tag">// PRINT #001 · 2023</span>
+      </div>
+      <div class="story-text">
+        <div class="story-year" data-i18n="story_2023_year">2023 · ÎNCEPUTUL</div>
+        <h3 data-i18n="story_2023_title">Primul Print</h3>
+        <p data-i18n="story_2023_text">Totul a început cu o piesă spartă, greu de găsit pe piață. Am proiectat-o și am printat-o noi — și a funcționat perfect. Așa s-a născut ideea AUTOCORE3D: piese auto printate 3D, la cerere, mai rapide și mai accesibile decât cele originale.</p>
+      </div>
+    </div>
+    <div class="story-item anim-ready">
+      <div class="story-media">
+        <span class="story-media-icon">⚙️</span>
+        <span class="story-media-tag">// R&D · 2024</span>
+      </div>
+      <div class="story-text">
+        <div class="story-year" data-i18n="story_growth_year">2024 · EVOLUȚIE</div>
+        <h3 data-i18n="story_growth_title">Materiale Tehnice</h3>
+        <p data-i18n="story_growth_text">Am trecut de la materiale standard la ABS, ASA și compozite cu fibră de carbon — testate pentru rezistență la căldură, vibrații și impact. Fiecare piesă e gândită pentru condițiile reale dintr-un automobil.</p>
+      </div>
+    </div>
+    <div class="story-item anim-ready">
+      <div class="story-media">
+        <span class="story-media-icon">🚗</span>
+        <span class="story-media-tag">// CATALOG · LIVE</span>
+      </div>
+      <div class="story-text">
+        <div class="story-year" data-i18n="story_today_year">ASTĂZI</div>
+        <h3 data-i18n="story_today_title">Atelier & Configurator</h3>
+        <p data-i18n="story_today_text">Avem un catalog complet de piese auto, un configurator de prețuri instant și livrare în toată țara, cu transport inclus. Continuăm să printăm — și să rezolvăm problema piesă cu piesă.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
 
 <div class="tabs-bar" id="tabsBar">
@@ -1410,6 +1483,10 @@ function setFilSync(state,msg){const b=$('filSyncBadge');if(!b)return;b.classNam
 const T={
   ro:{
     hero_eyebrow:"// PIESE AUTO · PRINTARE 3D · ROMANIA",hero_h1_html:"PIESE AUTO<br><em>3D</em> PREMIUM",hero_sub:"Inginerie de precizie · Materiale tehnice industriale · Transport si taxe incluse in pret",stat_products:"Produse",
+    story_eyebrow:"// POVESTEA AUTOCORE3D · DIN 2023",story_title_html:"DE LA UN <span>HOBBY</span>, LA UN ATELIER DE PRECIZIE",story_desc:"AUTOCORE3D a pornit în 2023 dintr-o pasiune pentru mașini și tehnologie — o imprimantă 3D, un garaj și ideea că orice piesă auto poate fi reproiectată și printată mai bine. Astăzi suntem un atelier specializat în piese auto printate 3D din materiale tehnice industriale, cu clienți din toată România.",
+    story_2023_year:"2023 · ÎNCEPUTUL",story_2023_title:"Primul Print",story_2023_text:"Totul a început cu o piesă spartă, greu de găsit pe piață. Am proiectat-o și am printat-o noi — și a funcționat perfect. Așa s-a născut ideea AUTOCORE3D: piese auto printate 3D, la cerere, mai rapide și mai accesibile decât cele originale.",
+    story_growth_year:"2024 · EVOLUȚIE",story_growth_title:"Materiale Tehnice",story_growth_text:"Am trecut de la materiale standard la ABS, ASA și compozite cu fibră de carbon — testate pentru rezistență la căldură, vibrații și impact. Fiecare piesă e gândită pentru condițiile reale dintr-un automobil.",
+    story_today_year:"ASTĂZI",story_today_title:"Atelier & Configurator",story_today_text:"Avem un catalog complet de piese auto, un configurator de prețuri instant și livrare în toată țara, cu transport inclus. Continuăm să printăm — și să rezolvăm problema piesă cu piesă.",
     nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Produse",nav_filaments:"Filamente",
     conf_eyebrow:"// 01 · CERERE PRINTARE 3D PERSONALIZATĂ",conf_title_html:"Trimite <span>Fișierul Tău</span> 3D",conf_sub:"Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.",
     upload_title:"Trage fișierul 3D aici",upload_sub:"sau apasă pentru a selecta",upload_hint:"STL / STEP — ofertă personalizată pe WhatsApp · GCODE — preț calculat automat",
@@ -1435,6 +1512,10 @@ const T={
   },
   en:{
     hero_eyebrow:"// AUTO PARTS · 3D PRINTING · ROMANIA",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",stat_products:"Products",
+    story_eyebrow:"// THE AUTOCORE3D STORY · SINCE 2023",story_title_html:"FROM A <span>HOBBY</span> TO A PRECISION WORKSHOP",story_desc:"AUTOCORE3D started in 2023 out of a passion for cars and technology — one 3D printer, a garage, and the idea that any car part could be redesigned and printed better. Today we're a specialized workshop for 3D printed auto parts made from industrial technical materials, with customers across Romania.",
+    story_2023_year:"2023 · THE BEGINNING",story_2023_title:"The First Print",story_2023_text:"It all started with a broken part that was nearly impossible to find. We designed and printed it ourselves — and it worked perfectly. That's how the AUTOCORE3D idea was born: 3D printed auto parts, on demand, faster and more affordable than the originals.",
+    story_growth_year:"2024 · EVOLUTION",story_growth_title:"Technical Materials",story_growth_text:"We moved from standard filaments to ABS, ASA and carbon-fiber composites — tested for heat, vibration and impact resistance. Every part is engineered for the real conditions inside a car.",
+    story_today_year:"TODAY",story_today_title:"Workshop & Configurator",story_today_text:"We now run a full catalog of auto parts, an instant price configurator, and nationwide delivery with shipping included. We're still printing — solving problems, one part at a time.",
     nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Products",nav_filaments:"Filaments",
     conf_eyebrow:"// 01 · CUSTOM 3D PRINTING REQUEST",conf_title_html:"Send Your <span>3D File</span>",conf_sub:"Upload your STL/STEP model, choose the zone and stress level — get an instant estimated price. If you like it, send your order on WhatsApp.",
     upload_title:"Drag your 3D file here",upload_sub:"or tap to select",upload_hint:"STL / STEP — custom quote on WhatsApp · GCODE — price auto-calculated",
@@ -2461,6 +2542,33 @@ function initScrollReveal(){
     p.style.cssText=`width:${sz}px;height:${sz}px;background:${col};left:${left}%;animation-duration:${dur}s;animation-delay:${delay}s;`;
     document.body.appendChild(p);
   }
+})();
+
+/* ══ STORY PORTAL EFFECT ══ */
+(function(){
+  const sec=document.getElementById('story');
+  if(!sec)return;
+  const starsBox=document.getElementById('storyStars');
+  for(let i=0;i<18;i++){
+    const s=document.createElement('span');
+    s.className='story-star';
+    s.style.top=Math.random()*100+'%';
+    s.style.left=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*3.4)+'s';
+    s.style.setProperty('--c',i%2?'#9D7BFF':'var(--red)');
+    starsBox.appendChild(s);
+  }
+  let raf=null;
+  function update(){
+    const rect=sec.getBoundingClientRect();
+    const vh=window.innerHeight;
+    let p=(vh-rect.top)/(rect.height+vh);
+    p=Math.max(0,Math.min(1,p));
+    sec.style.setProperty('--p',p);
+    raf=null;
+  }
+  window.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(update);},{passive:true});
+  update();
 })();
 
 /* ══ TABS ══ */
