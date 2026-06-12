@@ -106,6 +106,37 @@ nav{display:flex;align-items:center;gap:1.4rem;}
   .story-item,.story-item:nth-child(even){flex-direction:column;}
 }
 
+/* ── ABOUT / CE FACEM ── */
+.about-section{max-width:1280px;margin:0 auto;padding:0 1.5rem 5rem;}
+.about-head{margin-bottom:3rem;}
+.about-head .story-desc{margin-top:1rem;margin-bottom:1.6rem;}
+.about-manifesto{display:flex;flex-direction:column;gap:1.1rem;max-width:780px;margin-bottom:3.5rem;}
+.about-manifesto p{font-family:var(--body);font-size:.9rem;color:var(--sub);line-height:1.8;}
+.service-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);margin-bottom:3.5rem;}
+.service-card{background:var(--card);padding:1.75rem;position:relative;overflow:hidden;transition:background .3s;}
+.service-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,75,26,.07) 0%,transparent 60%);opacity:0;transition:opacity .3s;}
+.service-card:hover::before{opacity:1;}
+.service-icon{font-size:1.8rem;margin-bottom:.9rem;filter:drop-shadow(0 0 12px rgba(232,75,26,.35));position:relative;}
+.service-card h3{font-family:var(--disp);font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--text);margin-bottom:.6rem;position:relative;}
+.service-card p{font-family:var(--body);font-size:.82rem;color:var(--sub);line-height:1.7;position:relative;}
+@media(max-width:760px){.service-grid{grid-template-columns:1fr;}}
+.matrix-block{margin-bottom:3.5rem;}
+.matrix-h{font-family:var(--disp);font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:900;text-transform:uppercase;color:var(--text);letter-spacing:.02em;margin-bottom:.7rem;}
+.matrix-intro{font-family:var(--body);font-size:.88rem;color:var(--sub);line-height:1.75;max-width:720px;margin-bottom:1.5rem;}
+.matrix-table-wrap{overflow-x:auto;border:1px solid var(--bdr);}
+.matrix-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.72rem;min-width:540px;}
+.matrix-table th,.matrix-table td{padding:.85rem 1rem;border-bottom:1px solid var(--bdr);text-align:left;}
+.matrix-table th{color:var(--muted);letter-spacing:.12em;font-size:.6rem;text-transform:uppercase;font-weight:700;background:var(--bg);}
+.matrix-table td{color:var(--sub);}
+.matrix-table tr:last-child td{border-bottom:none;}
+.matrix-table td:first-child,.matrix-table th:first-child{color:var(--text);font-weight:700;}
+.matrix-table th.hl,.matrix-table td.hl{color:var(--red);font-weight:700;border-left:2px solid var(--red);background:rgba(232,75,26,.05);}
+.matrix-table .cnt{font-weight:700;color:var(--text);}
+.matrix-table td.hl .cnt{color:var(--red);}
+.about-final-cta{text-align:center;padding:3rem 1.5rem;max-width:680px;margin:0 auto;border:1px solid var(--bdr);background:var(--surf);}
+.about-final-cta h3{font-family:var(--disp);font-size:clamp(1.4rem,3vw,2.1rem);font-weight:900;text-transform:uppercase;color:var(--text);margin-bottom:.8rem;letter-spacing:.02em;}
+.about-final-cta p{font-family:var(--body);font-size:.88rem;color:var(--sub);line-height:1.7;margin-bottom:1.6rem;}
+
 .ticker-wrap{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);background:var(--surf);padding:.45rem 0;}
 .ticker{display:flex;white-space:nowrap;animation:tick 30s linear infinite;}
 .ticker:hover{animation-play-state:paused;}
@@ -844,6 +875,93 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
   </div>
 </section>
 
+<!-- ══ CINE SUNTEM · CE FACEM ══ -->
+<section class="about-section" id="about">
+  <div class="about-head anim-ready">
+    <div class="story-eyebrow" data-i18n="about_eyebrow">// CINE SUNTEM · CE FACEM</div>
+    <h2 class="story-title" data-i18n="about_title_html">DE LA FIȘIER CAD,<br>LA <span>PIESĂ DE COMPETIȚIE</span></h2>
+    <p class="story-desc" data-i18n="about_sub">Componente auto funcționale, printate din compozite ranforsate cu fibră de carbon. Proiectate pentru sarcini mecanice și termice extreme — nu doar pentru a încăpea.</p>
+    <button class="conf-cta-btn" onclick="showMainTab('configurator')" data-i18n="about_cta">⬡ Cere analiză tehnică</button>
+  </div>
+
+  <div class="about-manifesto anim-ready">
+    <p data-i18n="about_manifesto_1">AUTOCORE3D operează la intersecția dintre proiectare CAD, scanare 3D și producție aditivă industrială. Pornim de la o piesă uzată, o schiță sau o specificație tehnică și o transformăm într-o componentă finală — dimensionată corect, optimizată structural și printată din materiale compozite cu performanțe verificate.</p>
+    <p data-i18n="about_manifesto_2">Nu există etapă de „prototip decorativ". Fiecare piesă care iese din atelier este gândită pentru montaj direct, pentru sarcini mecanice reale și pentru expunere termică prelungită — sub capotă sau pe exteriorul caroseriei.</p>
+  </div>
+
+  <div class="service-grid">
+    <div class="service-card anim-ready">
+      <div class="service-icon">🖨️</div>
+      <h3 data-i18n="svc1_title">Printare 3D Industrială</h3>
+      <p data-i18n="svc1_text">Producție aditivă FDM cu materiale tehnice — ABS, ASA, ABS-CF, ASA-CF. Toleranțe dimensionale controlate, finisaj fără defecte de strat vizibile, geometrie validată pentru montaj direct.</p>
+    </div>
+    <div class="service-card anim-ready">
+      <div class="service-icon">📡</div>
+      <h3 data-i18n="svc2_title">Reverse Engineering & Scanare 3D</h3>
+      <p data-i18n="svc2_text">Scanare 3D de înaltă rezoluție pentru piese uzate, deformate sau retrase din producție. Reconstrucție digitală cu corecție de geometrie și toleranțe — fără planuri originale necesare.</p>
+    </div>
+    <div class="service-card anim-ready">
+      <div class="service-icon">📐</div>
+      <h3 data-i18n="svc3_title">Proiectare & Optimizare CAD</h3>
+      <p data-i18n="svc3_text">Modelare parametrică de la zero sau optimizare topologică a unui design existent. Reducere de greutate, întărire structurală direcționată și pregătire completă pentru producție aditivă.</p>
+    </div>
+    <div class="service-card anim-ready">
+      <div class="service-icon">🚗</div>
+      <h3 data-i18n="svc4_title">Soluții Custom Automotive</h3>
+      <p data-i18n="svc4_text">Admisii, suporturi de compartiment motor, console interioare și elemente structurale — proiectate pentru aplicația specifică, validate pentru vibrații, temperatură și sarcină mecanică reală.</p>
+    </div>
+  </div>
+
+  <div class="matrix-block anim-ready">
+    <h3 class="matrix-h" data-i18n="matrix_title">De ce ASA-CF / ABS-CF, nu PLA/PETG?</h3>
+    <p class="matrix-intro" data-i18n="matrix_intro">PLA și PETG sunt materiale de prototipare, nu de producție. La 55-60°C — temperatura uzuală sub capotă sau pe bord, la soare — PLA se deformează permanent sub sarcină, iar PETG devine fragil după expunere UV prelungită. ASA, ABS și variantele ranforsate cu fibră de carbon (ASA-CF / ABS-CF) sunt gândite exact pentru aceste condiții.</p>
+    <div class="matrix-table-wrap">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th data-i18n="matrix_col0">Parametru</th>
+            <th>PLA / PETG</th>
+            <th>ABS / ASA</th>
+            <th class="hl">ABS-CF / ASA-CF</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-i18n="matrix_row1">Temp. deformare (HDT)</td>
+            <td><span class="cnt" data-target="60">0</span>°C</td>
+            <td><span class="cnt" data-target="95">0</span>°C</td>
+            <td class="hl"><span class="cnt" data-target="110">0</span>°C</td>
+          </tr>
+          <tr>
+            <td data-i18n="matrix_row2">Rezistență UV</td>
+            <td data-i18n="matrix_uv_low">Scăzută</td>
+            <td data-i18n="matrix_uv_high">Ridicată</td>
+            <td class="hl" data-i18n="matrix_uv_high">Ridicată</td>
+          </tr>
+          <tr>
+            <td data-i18n="matrix_row3">Rigiditate (modul elastic)</td>
+            <td><span class="cnt" data-target="1.0" data-decimals="1">0</span>×</td>
+            <td><span class="cnt" data-target="1.4" data-decimals="1">0</span>×</td>
+            <td class="hl"><span class="cnt" data-target="2.1" data-decimals="1">0</span>×</td>
+          </tr>
+          <tr>
+            <td data-i18n="matrix_row4">Rezistență la impact</td>
+            <td data-i18n="matrix_impact_low">Fragil</td>
+            <td data-i18n="matrix_impact_high">Ridicată</td>
+            <td class="hl" data-i18n="matrix_impact_vhigh">Foarte ridicată</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="about-final-cta anim-ready">
+    <h3 data-i18n="final_title">Trimite fișierul. Începem analiza.</h3>
+    <p data-i18n="final_text">Încarcă un model 3D (STL/STEP), o scanare sau fotografii ale piesei. Primești o evaluare tehnică: material recomandat, timp de producție și cost.</p>
+    <button class="conf-cta-btn" onclick="showMainTab('configurator')" data-i18n="final_btn">📁 Încarcă fișierul</button>
+  </div>
+</section>
+
 <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
 
 <div class="tabs-bar" id="tabsBar">
@@ -1487,6 +1605,17 @@ const T={
     story_2023_year:"2023 · ÎNCEPUTUL",story_2023_title:"Primul Print",story_2023_text:"Totul a început cu o piesă spartă, greu de găsit pe piață. Am proiectat-o și am printat-o noi — și a funcționat perfect. Așa s-a născut ideea AUTOCORE3D: piese auto printate 3D, la cerere, mai rapide și mai accesibile decât cele originale.",
     story_growth_year:"2024 · EVOLUȚIE",story_growth_title:"Materiale Tehnice",story_growth_text:"Am trecut de la materiale standard la ABS, ASA și compozite cu fibră de carbon — testate pentru rezistență la căldură, vibrații și impact. Fiecare piesă e gândită pentru condițiile reale dintr-un automobil.",
     story_today_year:"ASTĂZI",story_today_title:"Atelier & Configurator",story_today_text:"Avem un catalog complet de piese auto, un configurator de prețuri instant și livrare în toată țara, cu transport inclus. Continuăm să printăm — și să rezolvăm problema piesă cu piesă.",
+    about_eyebrow:"// CINE SUNTEM · CE FACEM",about_title_html:"DE LA FIȘIER CAD,<br>LA <span>PIESĂ DE COMPETIȚIE</span>",about_sub:"Componente auto funcționale, printate din compozite ranforsate cu fibră de carbon. Proiectate pentru sarcini mecanice și termice extreme — nu doar pentru a încăpea.",about_cta:"⬡ Cere analiză tehnică",
+    about_manifesto_1:"AUTOCORE3D operează la intersecția dintre proiectare CAD, scanare 3D și producție aditivă industrială. Pornim de la o piesă uzată, o schiță sau o specificație tehnică și o transformăm într-o componentă finală — dimensionată corect, optimizată structural și printată din materiale compozite cu performanțe verificate.",
+    about_manifesto_2:"Nu există etapă de „prototip decorativ\". Fiecare piesă care iese din atelier este gândită pentru montaj direct, pentru sarcini mecanice reale și pentru expunere termică prelungită — sub capotă sau pe exteriorul caroseriei.",
+    svc1_title:"Printare 3D Industrială",svc1_text:"Producție aditivă FDM cu materiale tehnice — ABS, ASA, ABS-CF, ASA-CF. Toleranțe dimensionale controlate, finisaj fără defecte de strat vizibile, geometrie validată pentru montaj direct.",
+    svc2_title:"Reverse Engineering & Scanare 3D",svc2_text:"Scanare 3D de înaltă rezoluție pentru piese uzate, deformate sau retrase din producție. Reconstrucție digitală cu corecție de geometrie și toleranțe — fără planuri originale necesare.",
+    svc3_title:"Proiectare & Optimizare CAD",svc3_text:"Modelare parametrică de la zero sau optimizare topologică a unui design existent. Reducere de greutate, întărire structurală direcționată și pregătire completă pentru producție aditivă.",
+    svc4_title:"Soluții Custom Automotive",svc4_text:"Admisii, suporturi de compartiment motor, console interioare și elemente structurale — proiectate pentru aplicația specifică, validate pentru vibrații, temperatură și sarcină mecanică reală.",
+    matrix_title:"De ce ASA-CF / ABS-CF, nu PLA/PETG?",matrix_intro:"PLA și PETG sunt materiale de prototipare, nu de producție. La 55-60°C — temperatura uzuală sub capotă sau pe bord, la soare — PLA se deformează permanent sub sarcină, iar PETG devine fragil după expunere UV prelungită. ASA, ABS și variantele ranforsate cu fibră de carbon (ASA-CF / ABS-CF) sunt gândite exact pentru aceste condiții.",
+    matrix_col0:"Parametru",matrix_row1:"Temp. deformare (HDT)",matrix_row2:"Rezistență UV",matrix_row3:"Rigiditate (modul elastic)",matrix_row4:"Rezistență la impact",
+    matrix_uv_low:"Scăzută",matrix_uv_high:"Ridicată",matrix_impact_low:"Fragil",matrix_impact_high:"Ridicată",matrix_impact_vhigh:"Foarte ridicată",
+    final_title:"Trimite fișierul. Începem analiza.",final_text:"Încarcă un model 3D (STL/STEP), o scanare sau fotografii ale piesei. Primești o evaluare tehnică: material recomandat, timp de producție și cost.",final_btn:"📁 Încarcă fișierul",
     nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Produse",nav_filaments:"Filamente",
     conf_eyebrow:"// 01 · CERERE PRINTARE 3D PERSONALIZATĂ",conf_title_html:"Trimite <span>Fișierul Tău</span> 3D",conf_sub:"Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.",
     upload_title:"Trage fișierul 3D aici",upload_sub:"sau apasă pentru a selecta",upload_hint:"STL / STEP — ofertă personalizată pe WhatsApp · GCODE — preț calculat automat",
@@ -1516,6 +1645,17 @@ const T={
     story_2023_year:"2023 · THE BEGINNING",story_2023_title:"The First Print",story_2023_text:"It all started with a broken part that was nearly impossible to find. We designed and printed it ourselves — and it worked perfectly. That's how the AUTOCORE3D idea was born: 3D printed auto parts, on demand, faster and more affordable than the originals.",
     story_growth_year:"2024 · EVOLUTION",story_growth_title:"Technical Materials",story_growth_text:"We moved from standard filaments to ABS, ASA and carbon-fiber composites — tested for heat, vibration and impact resistance. Every part is engineered for the real conditions inside a car.",
     story_today_year:"TODAY",story_today_title:"Workshop & Configurator",story_today_text:"We now run a full catalog of auto parts, an instant price configurator, and nationwide delivery with shipping included. We're still printing — solving problems, one part at a time.",
+    about_eyebrow:"// WHO WE ARE · WHAT WE DO",about_title_html:"FROM CAD FILE<br>TO <span>RACE-READY PART</span>",about_sub:"Functional automotive components, printed from carbon-fiber reinforced composites. Engineered for extreme mechanical and thermal loads — not just to fit.",about_cta:"⬡ Request technical analysis",
+    about_manifesto_1:"AUTOCORE3D operates at the intersection of CAD design, 3D scanning, and industrial additive manufacturing. We take a worn part, a sketch, or a technical spec and turn it into a final component — correctly dimensioned, structurally optimized, and printed from composite materials with verified performance.",
+    about_manifesto_2:"There is no \"decorative prototype\" stage. Every part that leaves the workshop is built for direct installation, real mechanical loads, and sustained thermal exposure — under the hood or on the exterior of the body.",
+    svc1_title:"Industrial 3D Printing",svc1_text:"FDM additive manufacturing with technical-grade materials — ABS, ASA, ABS-CF, ASA-CF. Controlled dimensional tolerances, layer-free surface finish, geometry validated for direct fitment.",
+    svc2_title:"Reverse Engineering & 3D Scanning",svc2_text:"High-resolution 3D scanning for worn, deformed, or discontinued parts. Digital reconstruction with geometry and tolerance correction — no original blueprints required.",
+    svc3_title:"CAD Design & Optimization",svc3_text:"Parametric modeling from scratch or topology optimization of an existing design. Directional weight reduction, targeted structural reinforcement, and full design-for-additive-manufacturing preparation.",
+    svc4_title:"Custom Automotive Solutions",svc4_text:"Intakes, engine bay brackets, interior consoles, and structural elements — engineered for the specific application, validated for vibration, temperature, and real mechanical load.",
+    matrix_title:"Why ASA-CF / ABS-CF, not PLA/PETG?",matrix_intro:"PLA and PETG are prototyping materials, not production materials. At 55-60°C — a normal temperature under the hood or on a dashboard in direct sun — PLA deforms permanently under load, and PETG becomes brittle after prolonged UV exposure. ASA, ABS, and carbon-fiber reinforced variants (ASA-CF / ABS-CF) are built exactly for these conditions.",
+    matrix_col0:"Parameter",matrix_row1:"Heat deflection temp (HDT)",matrix_row2:"UV resistance",matrix_row3:"Stiffness (elastic modulus)",matrix_row4:"Impact resistance",
+    matrix_uv_low:"Low",matrix_uv_high:"High",matrix_impact_low:"Brittle",matrix_impact_high:"High",matrix_impact_vhigh:"Very high",
+    final_title:"Send the file. We start the analysis.",final_text:"Upload a 3D model (STL/STEP), a scan, or photos of the part. You'll get a technical assessment: recommended material, production time, and cost.",final_btn:"📁 Upload file",
     nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Products",nav_filaments:"Filaments",
     conf_eyebrow:"// 01 · CUSTOM 3D PRINTING REQUEST",conf_title_html:"Send Your <span>3D File</span>",conf_sub:"Upload your STL/STEP model, choose the zone and stress level — get an instant estimated price. If you like it, send your order on WhatsApp.",
     upload_title:"Drag your 3D file here",upload_sub:"or tap to select",upload_hint:"STL / STEP — custom quote on WhatsApp · GCODE — price auto-calculated",
@@ -2532,6 +2672,22 @@ function initScrollReveal(){
   document.querySelectorAll('.anim-ready').forEach(el=>io.observe(el));
 }
 
+/* ══ MATRIX COUNTERS ══ */
+function initCounters(){
+  const io=new IntersectionObserver(entries=>{entries.forEach(en=>{
+    if(!en.isIntersecting)return;
+    const el=en.target,target=parseFloat(el.dataset.target),dec=+(el.dataset.decimals||0),dur=1200,start=performance.now();
+    function step(now){
+      const p=Math.min(1,(now-start)/dur),eased=1-Math.pow(1-p,3);
+      el.textContent=(target*eased).toFixed(dec);
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    io.unobserve(el);
+  });},{threshold:0.4});
+  document.querySelectorAll('.cnt').forEach(el=>io.observe(el));
+}
+
 /* ══ PARTICLES ══ */
 (function(){
   const colors=['rgba(232,75,26,.35)','rgba(232,75,26,.2)','rgba(255,80,80,.25)','rgba(200,200,200,.1)'];
@@ -2599,4 +2755,5 @@ updateEstimate();
 loadAll();
 loadFilaments();
 initScrollReveal();
+initCounters();
 </script></body></html>
