@@ -27,6 +27,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;}
 input,select,textarea{font-family:inherit;background:#0C1820!important;color:#F0DDB0!important;color-scheme:dark!important;}
 input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 30px #0C1820 inset!important;-webkit-text-fill-color:#F0DDB0!important;}
 
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+}
+
 #cg{pointer-events:none;position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(232,75,26,.07) 0%,rgba(27,107,123,.04) 40%,transparent 70%);transform:translate(-50%,-50%);z-index:0;}
 #gb{position:fixed;inset:0;background-image:linear-gradient(rgba(27,107,123,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(27,107,123,.04) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0;}
 #gb::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 45% at 50% 0%,rgba(27,107,123,.1) 0%,transparent 65%);}
@@ -235,6 +240,28 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .card:hover .c-tr{top:-2px;right:-2px;}
 .card:hover .c-bl{bottom:-2px;left:-2px;}
 .card:hover .c-br{bottom:-2px;right:-2px;}
+
+/* ── TECHNICAL FRAME (CAD-style corner brackets, reused across functional panels) ── */
+.tech-frame{position:relative;}
+.tech-frame>.corner{border-color:rgba(240,221,176,.18);pointer-events:none;}
+.tech-frame:hover>.corner{border-color:var(--red);width:15px;height:15px;}
+.tech-frame:hover>.c-tl{top:-2px;left:-2px;}
+.tech-frame:hover>.c-tr{top:-2px;right:-2px;}
+.tech-frame:hover>.c-bl{bottom:-2px;left:-2px;}
+.tech-frame:hover>.c-br{bottom:-2px;right:-2px;}
+.tech-frame.inset>.c-tl{top:6px;left:6px;}
+.tech-frame.inset>.c-tr{top:6px;right:6px;}
+.tech-frame.inset>.c-bl{bottom:6px;left:6px;}
+.tech-frame.inset>.c-br{bottom:6px;right:6px;}
+.tech-frame.inset:hover>.c-tl{top:5px;left:5px;}
+.tech-frame.inset:hover>.c-tr{top:5px;right:5px;}
+.tech-frame.inset:hover>.c-bl{bottom:5px;left:5px;}
+.tech-frame.inset:hover>.c-br{bottom:5px;right:5px;}
+.hero-tag{position:absolute;font-family:var(--mono);font-size:.5rem;letter-spacing:.22em;color:var(--muted);white-space:nowrap;opacity:.55;}
+.hero-tag.tl{top:6px;left:24px;}
+.hero-tag.br{bottom:6px;right:24px;}
+@media(max-width:760px){.hero-tag{display:none;}}
+
 .card-oos{opacity:.5;}
 .stock-badge{position:absolute;top:.85rem;left:50%;transform:translateX(-50%);background:#0d0d0d;border:1px solid #252525;color:#555;font-family:var(--mono);font-size:.52rem;letter-spacing:.22em;padding:.22rem .7rem;z-index:10;}
 
@@ -301,6 +328,8 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .footer-links{display:flex;gap:1.5rem;}
 .footer-link{font-family:var(--mono);font-size:.58rem;color:var(--muted);letter-spacing:.1em;cursor:pointer;transition:color .2s;}
 .footer-link:hover{color:var(--red);}
+.footer-status{display:flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.5rem;letter-spacing:.2em;color:var(--green);text-transform:uppercase;margin-bottom:.7rem;}
+.footer-status .db-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
 .footer-bottom{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.08em;line-height:1.8;}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s;}
@@ -824,23 +853,38 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       <a href="#" class="nav-link" data-tab="configurator" data-i18n="nav_configurator">Configurator</a>
       <a href="#" class="nav-link" data-tab="produse" data-i18n="nav_products">Produse</a>
       <a href="#" class="nav-link" data-tab="filamente" data-i18n="nav_filaments">Filamente</a>
-      <button class="nav-cart" id="cartBtn">🛒<span class="cart-badge" id="cartBadge"></span></button>
-      <button class="nav-admin" id="admBtn">⚙</button>
+      <button class="nav-cart" id="cartBtn" aria-label="Coș de cumpărături"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span class="cart-badge" id="cartBadge"></span></button>
+      <button class="nav-admin" id="admBtn" aria-label="Panou administrare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <a href="https://wa.me/40775695029" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
     </nav>
   </div>
   <div class="hbar"></div>
 </header>
 
-<section class="hero">
+<section class="hero tech-frame">
+  <span class="corner c-tl" aria-hidden="true"></span><span class="corner c-tr" aria-hidden="true"></span><span class="corner c-bl" aria-hidden="true"></span><span class="corner c-br" aria-hidden="true"></span>
+  <span class="hero-tag tl" aria-hidden="true">AC3D // SYS.ONLINE</span>
+  <span class="hero-tag br" aria-hidden="true">REV.2026.06 — RO</span>
   <div class="hero-eyebrow" data-i18n="hero_eyebrow">// PIESE AUTO · PRINTARE 3D · ROMÂNIA</div>
   <h1 data-i18n="hero_h1_html">PIESE AUTO<br><em>3D</em> PREMIUM</h1>
   <p class="hero-sub" data-i18n="hero_sub">Inginerie de precizie · Materiale tehnice industriale · Transport şi taxe incluse în preț</p>
   <div class="stats">
-    <div class="stat-card anim-ready" style="cursor:pointer" onclick="showMainTab('configurator')"><span class="stat-val">3D</span><span class="stat-lbl">Configurator</span></div>
-    <div class="stat-card anim-ready"><span class="stat-val">ABS/ASA</span><span class="stat-lbl">Material</span></div>
-    <div class="stat-card anim-ready"><span class="stat-val">CARBON</span><span class="stat-lbl">Compozit</span></div>
-    <div class="stat-card anim-ready"><span class="stat-val">100%</span><span class="stat-lbl">Transport inclus</span></div>
+    <div class="stat-card tech-frame inset anim-ready" style="cursor:pointer" onclick="showMainTab('configurator')">
+      <span class="corner c-tl" aria-hidden="true"></span><span class="corner c-tr" aria-hidden="true"></span><span class="corner c-bl" aria-hidden="true"></span><span class="corner c-br" aria-hidden="true"></span>
+      <span class="stat-val">3D</span><span class="stat-lbl">Configurator</span>
+    </div>
+    <div class="stat-card tech-frame inset anim-ready">
+      <span class="corner c-tl" aria-hidden="true"></span><span class="corner c-tr" aria-hidden="true"></span><span class="corner c-bl" aria-hidden="true"></span><span class="corner c-br" aria-hidden="true"></span>
+      <span class="stat-val">ABS/ASA</span><span class="stat-lbl">Material</span>
+    </div>
+    <div class="stat-card tech-frame inset anim-ready">
+      <span class="corner c-tl" aria-hidden="true"></span><span class="corner c-tr" aria-hidden="true"></span><span class="corner c-bl" aria-hidden="true"></span><span class="corner c-br" aria-hidden="true"></span>
+      <span class="stat-val">CARBON</span><span class="stat-lbl">Compozit</span>
+    </div>
+    <div class="stat-card tech-frame inset anim-ready">
+      <span class="corner c-tl" aria-hidden="true"></span><span class="corner c-tr" aria-hidden="true"></span><span class="corner c-bl" aria-hidden="true"></span><span class="corner c-br" aria-hidden="true"></span>
+      <span class="stat-val">100%</span><span class="stat-lbl">Transport inclus</span>
+    </div>
   </div>
 </section>
 
@@ -1035,7 +1079,8 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
     <div class="conf-panels">
       <!-- STÂNGA: upload + formulare -->
       <div class="conf-panel-left">
-        <div class="upload-zone" id="uploadZone">
+        <div class="upload-zone tech-frame" id="uploadZone">
+          <span class="corner c-tl" aria-hidden="true"></span><span class="corner c-tr" aria-hidden="true"></span><span class="corner c-bl" aria-hidden="true"></span><span class="corner c-br" aria-hidden="true"></span>
           <input type="file" id="fileInput" accept=".stl,.step,.stp,.gcode,.gco,.gc" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;">
           <div id="uploadContent">
             <span class="upload-icon">📁</span>
@@ -1073,7 +1118,8 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
       </div>
       <!-- DREAPTA: rezultat + CTA -->
       <div class="conf-panel-right">
-        <div class="conf-result">
+        <div class="conf-result tech-frame inset">
+          <span class="corner c-tl" aria-hidden="true"></span><span class="corner c-tr" aria-hidden="true"></span><span class="corner c-bl" aria-hidden="true"></span><span class="corner c-br" aria-hidden="true"></span>
           <div class="conf-result-inner">
             <div class="conf-left">
               <div class="conf-mat-eyebrow" id="matEyebrow">// MATERIAL RECOMANDAT</div>
@@ -1190,6 +1236,7 @@ footer{background:linear-gradient(0deg,#070F14,#0C1820);border-color:var(--bdr);
         <span class="footer-link" id="fpCookies">Cookies</span>
       </div>
     </div>
+    <div class="footer-status"><span class="db-dot" aria-hidden="true"></span><span data-i18n="footer_status">SISTEM OPERAȚIONAL · ATELIER ACTIV</span></div>
     <div class="footer-bottom">© 2026 AUTOCORE3D · Inginerie Auto &amp; Printare 3D · România · Transport şi taxe incluse în toate prețurile afişate.</div>
   </div>
 </footer>
@@ -1699,7 +1746,8 @@ const T={
     gcode_loaded:"GCode încărcat — calculez prețul...",file_loaded:"Fișier încărcat!",file_change:"Apasă pentru a schimba",
     gcode_err:"Nu am găsit datele în GCode — verifică că fișierul conține timp și greutate filament",
     wa_price_label:"Preț",wa_transport_note:"transport gratuit inclus",wa_to_calc:"de calculat",
-    wa_greeting:"Buna ziua!\n\nDoresc o ofertă pentru printare 3D:",wa_name_lbl:"Nume",wa_contact_lbl:"Contact",wa_file_lbl:"Fișier",wa_zone_lbl:"Zona",wa_stress_lbl:"Stres mecanic",wa_mat_lbl:"Material recomandat",wa_attach:"Voi atașa fișierul la acest mesaj.\n\nVă mulțumesc!"
+    wa_greeting:"Buna ziua!\n\nDoresc o ofertă pentru printare 3D:",wa_name_lbl:"Nume",wa_contact_lbl:"Contact",wa_file_lbl:"Fișier",wa_zone_lbl:"Zona",wa_stress_lbl:"Stres mecanic",wa_mat_lbl:"Material recomandat",wa_attach:"Voi atașa fișierul la acest mesaj.\n\nVă mulțumesc!",
+    footer_status:"SISTEM OPERAȚIONAL · ATELIER ACTIV"
   },
   en:{
     hero_eyebrow:"// AUTO PARTS · 3D PRINTING · ROMANIA",hero_h1_html:"AUTO PARTS<br><em>3D</em> PREMIUM",hero_sub:"Precision engineering · Industrial technical materials · Shipping & taxes included",stat_products:"Products",
@@ -1745,7 +1793,8 @@ const T={
     gcode_loaded:"GCode loaded — calculating price...",file_loaded:"File loaded!",file_change:"Tap to change",
     gcode_err:"Could not find data in GCode — verify the file contains print time and filament weight",
     wa_price_label:"Price",wa_transport_note:"free shipping included",wa_to_calc:"to be calculated",
-    wa_greeting:"Hello!\n\nI would like a quote for 3D printing:",wa_name_lbl:"Name",wa_contact_lbl:"Contact",wa_file_lbl:"File",wa_zone_lbl:"Zone",wa_stress_lbl:"Mechanical stress",wa_mat_lbl:"Recommended material",wa_attach:"I will attach the file to this message.\n\nThank you!"
+    wa_greeting:"Hello!\n\nI would like a quote for 3D printing:",wa_name_lbl:"Name",wa_contact_lbl:"Contact",wa_file_lbl:"File",wa_zone_lbl:"Zone",wa_stress_lbl:"Mechanical stress",wa_mat_lbl:"Recommended material",wa_attach:"I will attach the file to this message.\n\nThank you!",
+    footer_status:"SYSTEM OPERATIONAL · WORKSHOP ACTIVE"
   }
 };
 const t=k=>T[lang][k]||T.ro[k]||k;
