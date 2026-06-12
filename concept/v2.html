@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ro" style="color-scheme:dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="color-scheme" content="dark"/>
+<meta name="robots" content="noindex"/>
+<title>AUTOCORE3D — Prezentare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  color-scheme:dark!important;
+  --bg:#06080f;
+  --bg2:#0a0e18;
+  --ink:#F2F5FA;
+  --sub:#8B93A8;
+  --muted:#4A5266;
+  --line:rgba(255,255,255,.08);
+  --cyan:#00E6FF;
+  --mag:#FF3366;
+  --violet:#8C6BFF;
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Barlow Condensed',sans-serif;
+  --body:'Barlow',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:var(--bg)!important;}
+body{background:var(--bg)!important;color:var(--ink)!important;font-family:var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: no-preference){
+  html{scroll-snap-type:y proximity;}
+}
+img,video{display:block;max-width:100%;}
+
+/* ── particle network bg ── */
+#bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* ── progress bar ── */
+.progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--mag));box-shadow:0 0 12px rgba(0,230,255,.6);z-index:60;width:0%;transition:width .1s linear;}
+
+/* ── nav ── */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1.3rem 1.6rem;font-family:var(--mono);}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.brand-hex{font-size:1.4rem;color:var(--cyan);line-height:1;text-shadow:0 0 14px rgba(0,230,255,.65);}
+.brand-name{font-family:var(--disp);font-size:1.15rem;font-weight:900;letter-spacing:.07em;color:var(--ink);}
+.brand-name span{color:var(--cyan);}
+.nav-counter{font-size:.6rem;letter-spacing:.28em;color:var(--sub);text-transform:uppercase;display:flex;align-items:center;gap:.7rem;}
+.nav-counter b{color:var(--cyan);font-weight:700;}
+.nav-back{font-size:.6rem;letter-spacing:.2em;color:var(--sub);text-transform:uppercase;text-decoration:none;border:1px solid var(--line);padding:.5rem .9rem;transition:all .25s var(--ease);}
+.nav-back:hover{border-color:var(--cyan);color:var(--cyan);}
+@media(max-width:760px){.nav-counter{display:none;}}
+
+/* ── side dots ── */
+.dots{position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:.85rem;}
+.dot{width:9px;height:9px;border:1px solid var(--line);border-radius:50%;cursor:pointer;transition:all .3s var(--ease);background:transparent;padding:0;position:relative;}
+.dot:hover{border-color:var(--cyan);}
+.dot.on{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 10px rgba(0,230,255,.75);transform:scale(1.3);}
+.dot .lbl{position:absolute;right:140%;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--sub);white-space:nowrap;opacity:0;transition:opacity .25s;text-transform:uppercase;}
+.dot:hover .lbl{opacity:1;}
+@media(max-width:760px){.dots{display:none;}}
+
+/* ── scene base ── */
+.scene{position:relative;min-height:100vh;min-height:100dvh;scroll-snap-align:start;z-index:1;display:flex;align-items:center;}
+.scene-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto;width:100%;padding:7.5rem 1.6rem 4rem;}
+.scene.translucent{background:rgba(6,8,15,.74);}
+.scene.solidish{background:rgba(6,8,15,.94);}
+
+/* ── reveal utilities ── */
+.r{opacity:0;transform:translateY(34px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+.r2{transition-delay:.1s;} .r3{transition-delay:.2s;} .r4{transition-delay:.3s;} .r5{transition-delay:.4s;}
+.scene.in-view .r{opacity:1;transform:translateY(0);}
+
+.eyebrow{font-family:var(--mono);font-size:.7rem;color:var(--cyan);letter-spacing:.4em;text-transform:uppercase;margin-bottom:1.2rem;}
+.eyebrow::before{content:'// ';color:var(--mag);}
+.lede{font-family:var(--body);font-size:1rem;color:var(--sub);line-height:1.75;max-width:520px;}
+
+/* ── glitch headings ── */
+.glitch{position:relative;font-family:var(--disp);font-weight:900;text-transform:uppercase;line-height:.98;letter-spacing:.01em;color:var(--ink);}
+.glitch em{font-style:normal;background:linear-gradient(100deg,var(--cyan),var(--violet) 55%,var(--mag));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;width:100%;opacity:0;pointer-events:none;mix-blend-mode:screen;}
+.glitch::before{color:var(--cyan);}
+.glitch::after{color:var(--mag);}
+.scene.in-view .glitch::before{animation:glitchA .9s var(--ease) forwards;}
+.scene.in-view .glitch::after{animation:glitchB .9s var(--ease) forwards;}
+@keyframes glitchA{
+  0%{opacity:.85;transform:translate(-8px,-3px);clip-path:inset(8% 0 64% 0);}
+  18%{transform:translate(6px,2px);clip-path:inset(54% 0 12% 0);}
+  38%{transform:translate(-4px,3px);clip-path:inset(22% 0 44% 0);}
+  60%{transform:translate(3px,-2px);clip-path:inset(74% 0 4% 0);}
+  100%{opacity:0;transform:translate(0,0);clip-path:inset(0 0 0 0);}
+}
+@keyframes glitchB{
+  0%{opacity:.85;transform:translate(8px,3px);clip-path:inset(64% 0 8% 0);}
+  18%{transform:translate(-6px,-2px);clip-path:inset(12% 0 54% 0);}
+  38%{transform:translate(4px,-3px);clip-path:inset(44% 0 22% 0);}
+  60%{transform:translate(-3px,2px);clip-path:inset(4% 0 74% 0);}
+  100%{opacity:0;transform:translate(0,0);clip-path:inset(0 0 0 0);}
+}
+
+.hero-title{font-size:clamp(2.8rem,8.8vw,6rem);}
+.h2{font-size:clamp(2.4rem,6.5vw,4.6rem);margin-bottom:1.1rem;}
+
+/* ── hero ── */
+.scene-hero{justify-content:center;}
+.hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:2rem;align-items:center;width:100%;}
+.hero-text{max-width:680px;}
+.hero-title{margin-bottom:1.3rem;}
+.hero-sub{margin-bottom:2.1rem;}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:3.2rem;}
+.btn{font-family:var(--mono);font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:1rem 1.9rem;text-decoration:none;border:1px solid var(--line);color:var(--ink);transition:all .25s var(--ease);position:relative;}
+.btn-primary{background:var(--cyan);color:#021014;border-color:var(--cyan);}
+.btn-primary:hover{box-shadow:0 0 28px rgba(0,230,255,.55);transform:translateY(-2px);}
+.btn-ghost:hover{border-color:var(--mag);color:var(--mag);}
+.hero-stats{display:flex;gap:2.4rem;flex-wrap:wrap;}
+.stat-num{font-family:var(--disp);font-size:clamp(1.8rem,3.2vw,2.6rem);font-weight:900;color:var(--ink);}
+.stat-lbl{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;color:var(--sub);text-transform:uppercase;margin-top:.3rem;}
+.scroll-cue{position:absolute;bottom:1.6rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.6rem;z-index:2;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.3em;color:var(--sub);text-transform:uppercase;animation:cue-bob 2.4s ease-in-out infinite;}
+.scroll-cue::after{content:'';width:1px;height:32px;background:linear-gradient(180deg,var(--cyan),transparent);}
+@keyframes cue-bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,10px)}}
+
+/* ── car illustration ── */
+.car-illo{position:relative;width:100%;}
+.car-illo svg{width:100%;display:block;overflow:visible;}
+.car-outline{fill:rgba(255,255,255,.02);stroke:#2c3650;stroke-width:2;}
+.car-detail{fill:none;stroke:#222b42;stroke-width:1.5;}
+.car-wheel{fill:none;stroke:#2c3650;stroke-width:2;}
+.car-spoke{stroke:#222b42;stroke-width:1.5;}
+.glow-cyan{fill:var(--cyan);filter:drop-shadow(0 0 8px var(--cyan)) drop-shadow(0 0 20px rgba(0,230,255,.6));animation:pulse 2.6s ease-in-out infinite;}
+.glow-mag{fill:var(--mag);filter:drop-shadow(0 0 7px var(--mag)) drop-shadow(0 0 16px rgba(255,51,102,.55));animation:pulse 2.6s ease-in-out infinite 1.3s;}
+@keyframes pulse{0%,100%{opacity:.75;}50%{opacity:1;}}
+.car-scan{position:absolute;top:0;bottom:0;width:18%;background:linear-gradient(90deg,transparent,rgba(0,230,255,.28),transparent);mix-blend-mode:screen;filter:blur(6px);pointer-events:none;animation:scan 5s linear infinite;}
+@keyframes scan{0%{transform:translateX(-30%);}100%{transform:translateX(560%);}}
+
+/* ── about ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;width:100%;}
+.feat-list{display:flex;flex-direction:column;gap:1.4rem;margin-top:2.2rem;}
+.feat{display:flex;gap:1rem;align-items:flex-start;}
+.feat-dot{width:10px;height:10px;border-radius:50%;margin-top:.4rem;flex-shrink:0;box-shadow:0 0 10px currentColor;}
+.feat-dot.c1{background:var(--cyan);color:var(--cyan);}
+.feat-dot.c2{background:var(--mag);color:var(--mag);}
+.feat-dot.c3{background:var(--violet);color:var(--violet);}
+.feat h4{font-family:var(--disp);font-weight:800;font-size:1.15rem;text-transform:uppercase;letter-spacing:.02em;margin-bottom:.25rem;}
+.feat p{font-size:.92rem;color:var(--sub);line-height:1.6;max-width:380px;}
+
+/* ── services ── */
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;width:100%;margin-top:2.5rem;}
+.svc-card{border:1px solid var(--line);padding:2.2rem 1.8rem;background:rgba(255,255,255,.015);transition:all .35s var(--ease);position:relative;overflow:hidden;}
+.svc-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,230,255,.08),rgba(255,51,102,.08));opacity:0;transition:opacity .35s;}
+.svc-card:hover{border-color:var(--cyan);transform:translateY(-6px);}
+.svc-card:hover::before{opacity:1;}
+.svc-icon{width:46px;height:46px;stroke:var(--cyan);fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;margin-bottom:1.4rem;position:relative;z-index:1;transition:stroke .3s;}
+.svc-card:hover .svc-icon{stroke:var(--mag);}
+.svc-num{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.3em;margin-bottom:.6rem;position:relative;z-index:1;}
+.svc-card h3{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:1.4rem;margin-bottom:.7rem;position:relative;z-index:1;}
+.svc-card p{font-size:.9rem;color:var(--sub);line-height:1.65;position:relative;z-index:1;}
+
+/* ── process ── */
+.scene-process{align-items:flex-end;overflow:hidden;}
+.proc-media{position:absolute;top:-12%;left:0;width:100%;height:124%;object-fit:cover;will-change:transform;}
+.proc-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,15,.35) 0%,rgba(6,8,15,.55) 40%,rgba(6,8,15,.97) 100%);}
+.proc-content{position:relative;z-index:2;max-width:1280px;margin:0 auto;width:100%;padding:0 1.6rem 4.5rem;}
+.steps{display:flex;flex-direction:column;gap:1.1rem;margin-top:2rem;max-width:560px;}
+.step{display:flex;gap:1.1rem;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:1rem;}
+.step-num{font-family:var(--mono);font-size:1.1rem;color:var(--cyan);font-weight:700;flex-shrink:0;width:2.4rem;}
+.step h4{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:1.15rem;letter-spacing:.02em;margin-bottom:.2rem;}
+.step p{font-size:.85rem;color:var(--sub);}
+
+/* ── compatibility ── */
+.marquee-wrap{width:100%;margin-top:2.6rem;display:flex;flex-direction:column;gap:1.2rem;}
+.marquee{display:flex;gap:1.1rem;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);}
+.marquee-track{display:flex;gap:1.1rem;flex-shrink:0;animation:marquee 38s linear infinite;}
+.marquee-track.rev{animation-direction:reverse;animation-duration:32s;}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.badge{display:flex;align-items:center;gap:.7rem;border:1px solid var(--line);padding:.7rem 1.2rem;border-radius:999px;background:rgba(255,255,255,.02);flex-shrink:0;transition:border-color .25s,color .25s;}
+.badge:hover{border-color:var(--cyan);}
+.badge-mark{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--muted);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:.7rem;letter-spacing:.02em;color:var(--sub);flex-shrink:0;}
+.badge:hover .badge-mark{border-color:var(--cyan);color:var(--cyan);}
+.badge-name{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;color:var(--sub);text-transform:uppercase;white-space:nowrap;}
+.compat-note{margin-top:2.4rem;max-width:560px;}
+
+/* ── portfolio ── */
+.scene-portfolio{align-items:center;}
+.port-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,minmax(160px,1fr));gap:.9rem;width:100%;margin-top:2.2rem;height:60vh;max-height:560px;}
+.port-item{position:relative;overflow:hidden;border:1px solid var(--line);}
+.port-item img,.port-item video{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease);}
+.port-item:hover img,.port-item:hover video{transform:scale(1.08);}
+.port-item .tag{position:absolute;left:0;right:0;bottom:0;padding:.9rem 1rem;background:linear-gradient(180deg,transparent,rgba(6,8,15,.95));font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);transform:translateY(8px);opacity:.85;transition:all .3s var(--ease);}
+.port-item:hover .tag{color:var(--cyan);transform:translateY(0);opacity:1;}
+.p-a{grid-column:1/3;grid-row:1/3;}
+.p-b{grid-column:3/5;grid-row:1/2;}
+.p-c{grid-column:3/4;grid-row:2/3;}
+.p-d{grid-column:4/5;grid-row:2/3;}
+
+/* ── contact / final ── */
+.scene-final{justify-content:center;text-align:center;}
+.scene-final .scene-inner{display:flex;flex-direction:column;align-items:center;}
+.final-title{margin-bottom:1.6rem;}
+.final-lede{margin:0 auto 2.4rem;text-align:center;}
+.final-ctas{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;}
+.contact-row{display:flex;gap:2.6rem;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;color:var(--sub);margin-bottom:2.4rem;}
+.contact-row a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);transition:color .25s,border-color .25s;}
+.contact-row a:hover{color:var(--cyan);border-color:var(--cyan);}
+.final-foot{font-family:var(--mono);font-size:.58rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;}
+
+/* ── reduced motion ── */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-snap-type:none;}
+  .r{opacity:1!important;transform:none!important;transition:none!important;}
+  .glitch::before,.glitch::after{display:none;}
+  .scroll-cue{animation:none;}
+  .car-scan{animation:none;display:none;}
+  .glow-cyan,.glow-mag{animation:none;}
+  .marquee-track{animation:none;}
+}
+
+/* ── responsive ── */
+@media(max-width:980px){
+  .hero-grid,.about-grid{grid-template-columns:1fr;gap:2.5rem;}
+  .car-illo{max-width:480px;margin:0 auto;}
+  .svc-grid{grid-template-columns:1fr;}
+  .port-grid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,minmax(140px,1fr));height:auto;max-height:none;}
+  .p-a{grid-column:1/3;grid-row:1/2;}
+  .p-b{grid-column:1/2;grid-row:2/3;}
+  .p-c{grid-column:2/3;grid-row:2/3;}
+  .p-d{grid-column:1/3;grid-row:3/4;}
+}
+@media(max-width:640px){
+  .scene-inner{padding:6.5rem 1.2rem 3.5rem;}
+  .brand-name{font-size:1rem;}
+  .nav-back{font-size:.52rem;padding:.42rem .7rem;}
+  .hero-stats{gap:1.6rem;}
+  .contact-row{flex-direction:column;gap:1rem;align-items:center;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="progress" id="progress"></div>
+
+<header class="topnav">
+  <a class="brand" href="../index.html">
+    <span class="brand-hex">⬡</span>
+    <span class="brand-name">AUTOCORE<span>3D</span></span>
+  </a>
+  <div class="nav-counter"><b id="secNum">01</b> / 07 — <span id="secName">INTRO</span></div>
+  <a class="nav-back" href="../index.html">← Înapoi la site</a>
+</header>
+
+<nav class="dots" aria-label="Navigare secțiuni">
+  <button class="dot" data-index="0" aria-label="Intro"><span class="lbl">Intro</span></button>
+  <button class="dot" data-index="1" aria-label="Despre noi"><span class="lbl">Despre noi</span></button>
+  <button class="dot" data-index="2" aria-label="Servicii"><span class="lbl">Servicii</span></button>
+  <button class="dot" data-index="3" aria-label="Proces"><span class="lbl">Proces</span></button>
+  <button class="dot" data-index="4" aria-label="Compatibilitate"><span class="lbl">Compatibilitate</span></button>
+  <button class="dot" data-index="5" aria-label="Proiecte"><span class="lbl">Proiecte</span></button>
+  <button class="dot" data-index="6" aria-label="Contact"><span class="lbl">Contact</span></button>
+</nav>
+
+<main>
+
+  <!-- 0 — HERO -->
+  <section class="scene scene-hero translucent" id="s0" data-index="0" data-name="INTRO">
+    <div class="scene-inner">
+      <div class="hero-grid">
+        <div class="hero-text">
+          <div class="eyebrow r">Atelier de inginerie &amp; printare 3D · auto</div>
+          <h1 class="glitch hero-title r r2" data-text="DE LA CAD LA STRADĂ.">DE LA CAD<br/>LA <em>STRADĂ.</em></h1>
+          <p class="lede hero-sub r r3">Proiectăm, printăm și montăm piese auto custom — console, suporturi, sisteme de admisie și elemente aero — din materiale tehnice de performanță, gata de drum.</p>
+          <div class="hero-ctas r r4">
+            <a class="btn btn-primary" href="#s2">Vezi ce facem</a>
+            <a class="btn btn-ghost" href="#s6">Pornește un proiect</a>
+          </div>
+          <div class="hero-stats r r5">
+            <div><div class="stat-num" data-target="500" data-suffix="+">0</div><div class="stat-lbl">Piese livrate</div></div>
+            <div><div class="stat-num" data-target="30" data-suffix="+">0</div><div class="stat-lbl">Mărci compatibile</div></div>
+            <div><div class="stat-num" data-target="72" data-suffix="h">0</div><div class="stat-lbl">Timp mediu producție</div></div>
+            <div><div class="stat-num" data-target="100" data-suffix="%">0</div><div class="stat-lbl">Testat pe mașină</div></div>
+          </div>
+        </div>
+        <div class="car-illo r r3" data-car></div>
+      </div>
+    </div>
+    <div class="scroll-cue">Derulează</div>
+  </section>
+
+  <!-- 1 — ABOUT -->
+  <section class="scene translucent" id="s1" data-index="1" data-name="DESPRE NOI">
+    <div class="scene-inner">
+      <div class="about-grid">
+        <div>
+          <div class="eyebrow r">01 — Despre noi</div>
+          <h2 class="glitch h2 r r2" data-text="INGINERIE CARE SE VEDE PE MAȘINĂ.">Inginerie care<br/>se vede pe <em>mașină.</em></h2>
+          <p class="lede r r3">AutoCore3D e un atelier românesc de inginerie și printare 3D specializat în piese auto custom — de la prototipuri funcționale la kituri complete de performanță. Pornim de la fișierul tău CAD sau de la zero: scanăm, proiectăm, printăm și finisăm fiecare piesă pentru montaj direct.</p>
+          <div class="feat-list">
+            <div class="feat r r3"><span class="feat-dot c1"></span><div><h4>100% custom</h4><p>Fiecare piesă e adaptată exact pe șasiul, motorul și spațiul tău de montaj.</p></div></div>
+            <div class="feat r r4"><span class="feat-dot c2"></span><div><h4>Materiale tehnice</h4><p>PETG-CF, ASA, Nylon-CF — rezistente la temperatură, vibrații și UV.</p></div></div>
+            <div class="feat r r5"><span class="feat-dot c3"></span><div><h4>Testat pe mașină reală</h4><p>Fitment verificat fizic înainte de livrare — fără ajustări pe care le faci tu.</p></div></div>
+          </div>
+        </div>
+        <div class="car-illo r r3" data-car></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 — SERVICES -->
+  <section class="scene solidish" id="s2" data-index="2" data-name="SERVICII">
+    <div class="scene-inner">
+      <div class="eyebrow r">02 — Ce facem</div>
+      <h2 class="glitch h2 r r2" data-text="DE LA IDEE LA PIESA MONTATĂ.">De la idee la<br/>piesa <em>montată.</em></h2>
+      <div class="svc-grid">
+        <div class="svc-card r r2">
+          <svg class="svc-icon" viewBox="0 0 48 48"><path d="M24 4 L42 14 V34 L24 44 L6 34 V14 Z M24 4 V24 M6 14 L24 24 L42 14 M24 24 V44"/></svg>
+          <div class="svc-num">01</div>
+          <h3>Proiectare CAD</h3>
+          <p>Modelare 3D parametrică pe baza scanării sau a cotelor mașinii tale. Verificăm toleranțe și fitment digital, înainte să pornească imprimanta.</p>
+        </div>
+        <div class="svc-card r r3">
+          <svg class="svc-icon" viewBox="0 0 48 48"><path d="M16 8 L32 8 L26 18 L22 18 Z M24 18 L24 24 M10 26 L38 26 L38 31 L10 31 Z M8 33 L40 33 L40 38 L8 38 Z M6 40 L42 40 L42 45 L6 45 Z"/></svg>
+          <div class="svc-num">02</div>
+          <h3>Printare industrială</h3>
+          <p>FDM industrial cu filamente tehnice — PETG-CF, ASA, Nylon-CF — straturi fine, rezistență mecanică ridicată, geometrii complexe.</p>
+        </div>
+        <div class="svc-card r r4">
+          <svg class="svc-icon" viewBox="0 0 48 48"><path d="M24 4 L40 10 V24 C40 34 32 42 24 44 C16 42 8 34 8 24 V10 Z M16 24 L22 30 L34 16"/></svg>
+          <div class="svc-num">03</div>
+          <h3>Finisare &amp; montaj</h3>
+          <p>Șlefuire, vopsire, izolare termică și control de calitate — urmate de montaj și testare directă pe mașină, înainte de livrare.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 — PROCESS -->
+  <section class="scene scene-process" id="s3" data-index="3" data-name="PROCES">
+    <video class="proc-media" autoplay muted loop playsinline poster="../assets/story/proj-process-poster.jpg">
+      <source src="../assets/story/proj-process.mp4" type="video/mp4"/>
+    </video>
+    <div class="proc-overlay"></div>
+    <div class="proc-content">
+      <div class="eyebrow r">03 — Procesul</div>
+      <h2 class="glitch h2 r r2" data-text="STRAT CU STRAT, SPRE PERFECȚIUNE.">Strat cu strat,<br/>spre <em>perfecțiune.</em></h2>
+      <div class="steps">
+        <div class="step r r2"><span class="step-num">01</span><div><h4>Scanare &amp; proiectare</h4><p>Pornim de la fișierul tău sau scanăm piesa veche pentru un model 1:1.</p></div></div>
+        <div class="step r r3"><span class="step-num">02</span><div><h4>Printare strat-cu-strat</h4><p>Producție industrială, monitorizată, cu materiale tehnice de performanță.</p></div></div>
+        <div class="step r r4"><span class="step-num">03</span><div><h4>Control &amp; finisare</h4><p>Verificare dimensională, șlefuire și tratamente de suprafață.</p></div></div>
+        <div class="step r r5"><span class="step-num">04</span><div><h4>Montaj pe mașină</h4><p>Testăm fitment-ul real, direct pe vehicul, înainte de livrare.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 — COMPATIBILITY -->
+  <section class="scene translucent" id="s4" data-index="4" data-name="COMPATIBILITATE">
+    <div class="scene-inner">
+      <div class="eyebrow r">04 — Compatibilitate</div>
+      <h2 class="glitch h2 r r2" data-text="COMPATIBIL CU ORICE MARCĂ.">Compatibil cu<br/>orice <em>marcă.</em></h2>
+      <div class="marquee-wrap r r3">
+        <div class="marquee"><div class="marquee-track" id="m1"></div></div>
+        <div class="marquee"><div class="marquee-track rev" id="m2"></div></div>
+      </div>
+      <p class="lede compat-note r r4">Lucrăm cu fișierul tău CAD sau proiectăm de la zero pentru orice model — de la hatchback-uri de zi cu zi la build-uri de performanță. Dacă mașina ta nu e pe listă, hai să o adăugăm noi.</p>
+    </div>
+  </section>
+
+  <!-- 5 — PORTFOLIO -->
+  <section class="scene scene-portfolio solidish" id="s5" data-index="5" data-name="PROIECTE">
+    <div class="scene-inner">
+      <div class="eyebrow r">05 — Proiecte recente</div>
+      <h2 class="glitch h2 r r2" data-text="CONSTRUITE. TESTATE. LIVRATE.">Construite.<br/>Testate. <em>Livrate.</em></h2>
+      <div class="port-grid r r3">
+        <div class="port-item p-a"><img src="../assets/story/proj-bigintake.jpg" alt="Sistem de admisie performance, printat 3D"/><div class="tag">Admisie performance — PETG-CF</div></div>
+        <div class="port-item p-b"><img src="../assets/story/proj-singleintake.jpg" alt="Admisie single, spec de pistă"/><div class="tag">Admisie single — track spec</div></div>
+        <div class="port-item p-c"><img src="../assets/story/proj-airbox.jpg" alt="Airbox custom printat 3D"/><div class="tag">Airbox custom</div></div>
+        <div class="port-item p-d"><img src="../assets/story/proj-bracket.jpg" alt="Suport motor printat 3D"/><div class="tag">Suport / bracket motor</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 — CONTACT / FINAL -->
+  <section class="scene scene-final translucent" id="s6" data-index="6" data-name="CONTACT">
+    <div class="scene-inner">
+      <div class="eyebrow r">06 — Hai să vorbim</div>
+      <h2 class="glitch h2 final-title r r2" data-text="PIESA TA, PRINTATĂ PERFECT.">Piesa ta,<br/><em>printată perfect.</em></h2>
+      <p class="lede final-lede r r3">Trimite-ne fișierul CAD, o poză a piesei vechi sau pur și simplu ideea ta. Îți răspundem cu un plan și o estimare de preț în 24h.</p>
+      <div class="final-ctas r r4">
+        <a class="btn btn-primary" href="mailto:contact@autocore3d.com">Trimite un proiect →</a>
+        <a class="btn btn-ghost" href="../index.html">Vezi catalogul</a>
+      </div>
+      <div class="contact-row r r5">
+        <a href="mailto:contact@autocore3d.com">contact@autocore3d.com</a>
+        <a href="tel:+40700000000">+40 700 000 000</a>
+        <a href="#">@autocore3d</a>
+      </div>
+      <div class="final-foot r r5">AUTOCORE3D © 2026 — Prezentare concept v2</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── CAR ILLUSTRATION (injected into all .car-illo containers) ── */
+  var CAR_SVG = '<svg viewBox="0 0 1200 480" xmlns="http://www.w3.org/2000/svg">'
+    + '<path class="car-outline" d="M 80,232 C 60,238 45,255 38,278 C 33,296 36,318 50,345 L 70,348 L 980,348 L 1000,346 C 1020,330 1038,308 1040,282 C 1042,262 1032,250 1010,248 L 940,248 C 920,200 880,150 800,122 C 730,98 600,92 540,94 C 440,98 360,118 300,150 C 240,180 170,222 100,230 Z"/>'
+    + '<path class="car-detail" d="M 100,228 C 160,210 230,182 290,152 C 350,122 440,100 540,98"/>'
+    + '<path class="car-detail" d="M 540,98 C 600,96 680,100 730,118 C 790,142 850,196 870,248"/>'
+    + '<path class="car-detail" d="M 690,108 L 705,348"/>'
+    + '<path class="car-detail" d="M 150,288 L 990,288"/>'
+    + '<path class="car-detail" d="M 600,108 L 632,100 L 640,116 L 612,124 Z"/>'
+    + '<path class="car-detail" d="M 905,144 C 925,138 945,140 958,150 L 952,160 C 938,153 922,152 908,156 Z"/>'
+    + '<path class="car-detail" d="M 102,238 L 145,232 L 150,244 L 108,250 Z"/>'
+    + '<path class="car-detail" d="M 1000,254 L 1032,250 L 1034,262 L 1004,266 Z"/>'
+    + '<circle class="car-wheel" cx="245" cy="350" r="76"/><circle class="car-wheel" cx="245" cy="350" r="36"/>'
+    + '<g class="car-spoke"><line x1="245" y1="274" x2="245" y2="426"/><line x1="169" y1="350" x2="321" y2="350"/><line x1="193" y1="298" x2="297" y2="402"/><line x1="297" y1="298" x2="193" y2="402"/></g>'
+    + '<circle class="car-wheel" cx="880" cy="350" r="76"/><circle class="car-wheel" cx="880" cy="350" r="36"/>'
+    + '<g class="car-spoke"><line x1="880" y1="274" x2="880" y2="426"/><line x1="804" y1="350" x2="956" y2="350"/><line x1="828" y1="298" x2="932" y2="402"/><line x1="932" y1="298" x2="828" y2="402"/></g>'
+    + '<path class="glow-cyan" d="M 50,345 L 165,348 L 162,356 C 130,364 75,362 46,353 Z"/>'
+    + '<g class="glow-mag"><rect x="430" y="270" width="18" height="34" rx="2"/><rect x="456" y="270" width="18" height="34" rx="2"/><rect x="482" y="270" width="18" height="34" rx="2"/></g>'
+    + '<path class="glow-cyan" d="M 985,346 L 1030,335 C 1038,328 1040,318 1038,308 L 1000,318 L 970,346 Z"/>'
+    + '</svg>'
+    + (reduced ? '' : '<div class="car-scan"></div>');
+  document.querySelectorAll('[data-car]').forEach(function(el){ el.innerHTML = CAR_SVG; });
+
+  /* ── BRAND MARQUEE ── */
+  var brands = [
+    ['BM','BMW'],['AU','AUDI'],['VW','VOLKSWAGEN'],['MB','MERCEDES-BENZ'],['PO','PORSCHE'],['SK','ŠKODA'],
+    ['SE','SEAT'],['FD','FORD'],['OP','OPEL'],['RN','RENAULT'],['DA','DACIA'],['TY','TOYOTA']
+  ];
+  function badgeHTML(b){ return '<div class="badge"><div class="badge-mark">'+b[0]+'</div><div class="badge-name">'+b[1]+'</div></div>'; }
+  var row1 = brands.slice(0,6), row2 = brands.slice(6);
+  function fillTrack(id, list){
+    var html = list.map(badgeHTML).join('') + list.map(badgeHTML).join('');
+    document.getElementById(id).innerHTML = html;
+  }
+  fillTrack('m1', row1);
+  fillTrack('m2', row2);
+
+  /* ── reveal + active section tracking ── */
+  var scenes = document.querySelectorAll('.scene');
+  var dots = document.querySelectorAll('.dot');
+  var secNum = document.getElementById('secNum');
+  var secName = document.getElementById('secName');
+
+  var revealObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting) entry.target.classList.add('in-view');
+    });
+  }, {threshold: 0.32});
+  scenes.forEach(function(s){ revealObserver.observe(s); });
+
+  var navObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        var idx = entry.target.getAttribute('data-index');
+        dots.forEach(function(d){ d.classList.toggle('on', d.getAttribute('data-index') === idx); });
+        secNum.textContent = String(Number(idx)+1).padStart(2,'0');
+        secName.textContent = entry.target.getAttribute('data-name');
+      }
+    });
+  }, {threshold: 0.55});
+  scenes.forEach(function(s){ navObserver.observe(s); });
+
+  dots.forEach(function(dot){
+    dot.addEventListener('click', function(){
+      var target = document.getElementById('s' + dot.getAttribute('data-index'));
+      if(target) target.scrollIntoView({behavior: reduced ? 'auto' : 'smooth'});
+    });
+  });
+
+  /* ── stat counters ── */
+  var counted = false;
+  var statObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting && !counted){
+        counted = true;
+        document.querySelectorAll('.stat-num').forEach(function(el){
+          var target = parseInt(el.getAttribute('data-target'),10);
+          var suffix = el.getAttribute('data-suffix') || '';
+          if(reduced){ el.textContent = target + suffix; return; }
+          var start = performance.now(), dur = 1200;
+          function tick(now){
+            var p = Math.min(1,(now-start)/dur);
+            var eased = 1 - Math.pow(1-p,3);
+            el.textContent = Math.round(target*eased) + suffix;
+            if(p<1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        });
+      }
+    });
+  }, {threshold: 0.4});
+  statObserver.observe(document.getElementById('s0'));
+
+  /* ── progress bar + parallax ── */
+  var progress = document.getElementById('progress');
+  var procMedia = document.querySelector('.proc-media');
+  var ticking = false;
+  function update(){
+    var vh = window.innerHeight;
+    if(!reduced && procMedia){
+      var rect = document.getElementById('s3').getBoundingClientRect();
+      var p = rect.top / vh;
+      procMedia.style.transform = 'translateY(' + (p * -50) + 'px)';
+    }
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - vh;
+    var pct = max > 0 ? (doc.scrollTop || window.scrollY) / max * 100 : 0;
+    progress.style.width = pct + '%';
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(update); ticking = true; }
+  }, {passive: true});
+  update();
+
+  /* ── particle network background ── */
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [], W, H;
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    var count = Math.min(90, Math.floor((W*H)/22000));
+    particles = [];
+    for(var i=0;i<count;i++){
+      particles.push({
+        x: Math.random()*W, y: Math.random()*H,
+        vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.25,
+        r: Math.random()*1.6+0.6
+      });
+    }
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<particles.length;i++){
+      var p = particles[i];
+      if(!reduced){
+        p.x += p.vx; p.y += p.vy;
+        if(p.x<0) p.x=W; if(p.x>W) p.x=0;
+        if(p.y<0) p.y=H; if(p.y>H) p.y=0;
+      }
+      for(var j=i+1;j<particles.length;j++){
+        var q = particles[j];
+        var dx=p.x-q.x, dy=p.y-q.y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<140){
+          ctx.strokeStyle = 'rgba(0,230,255,' + (0.12*(1-d/140)) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
+        }
+      }
+    }
+    for(var k=0;k<particles.length;k++){
+      var pt = particles[k];
+      ctx.fillStyle = 'rgba(140,107,255,0.55)';
+      ctx.beginPath(); ctx.arc(pt.x,pt.y,pt.r,0,Math.PI*2); ctx.fill();
+    }
+    if(!reduced) requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+</script>
+
+</body>
+</html>
