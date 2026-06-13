@@ -125,25 +125,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:30;
 }
 .btn:hover{transform:translateY(-3px);box-shadow:0 16px 50px rgba(220,38,38,.5)}
 
-/* hotspot */
-.hotspot{
-  position:fixed;z-index:19;pointer-events:none;
-  opacity:0;transition:opacity .4s;
-  transform:translate(-50%,-50%);
-}
-.hotspot.on{opacity:1}
-.hotspot .dot{
-  width:10px;height:10px;border-radius:50%;background:var(--red);
-  box-shadow:0 0 0 4px rgba(220,38,38,.2);
-  animation:ping 1.8s infinite;
-}
-@keyframes ping{0%,100%{box-shadow:0 0 0 4px rgba(220,38,38,.2)}50%{box-shadow:0 0 0 14px rgba(220,38,38,0)}}
-.hotspot .hl{
-  position:absolute;left:14px;top:-8px;white-space:nowrap;
-  font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);
-  background:rgba(8,8,10,.85);border:1px solid var(--line);padding:5px 10px;border-radius:2px;
-}
-
 /* side rail */
 .rail{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:30;
   display:flex;flex-direction:column;gap:18px}
@@ -212,66 +193,63 @@ nav{position:fixed;top:0;left:0;right:0;z-index:30;
   </div>
 </nav>
 
-<!-- HOTSPOT -->
-<div class="hotspot" id="hotspot"><div class="dot"></div><span class="hl" id="hl-label"></span></div>
-
 <!-- CARD HERO (step 0) -->
 <div class="card card-hero" data-step="0">
   <span class="eyebrow">/// STUDIU DE CAZ 001 — BMW M3 E46</span>
   <h1>Reconstruit<br>strat <span>cu strat.</span></h1>
-  <p class="sub">Un BMW E46 GTR negru, readus la viață cu piese printate 3D. Dă scroll și ocolim mașina împreună — îți arătăm fiecare piesă, materialul ales și de ce.</p>
+  <p class="sub">Un BMW E46 GTR negru, readus la viață cu piese printate 3D. Dă scroll și descoperă materialele, procesul și serviciile din spatele AutoCore3D.</p>
   <div class="scroll-cue"><span>Scroll</span><span class="wheel"></span></div>
 </div>
 
-<!-- CARD 1 — Oglinzi (step 1) -->
+<!-- CARD 1 — Materiale (step 1) -->
 <div class="card card-info" data-step="1">
-  <span class="step-idx">01 / EXTERIOR</span>
-  <h2>Capace oglinzi</h2>
-  <span class="mat-pill">ASA</span>
-  <p>Originalele decolorate de soare și crăpate la prindere. ASA e formulat special pentru exterior: rezistă la UV fără să îngălbenească, ține structural până la 95°C — exact cât prinde caroseria neagră vara în parcare.</p>
+  <span class="step-idx">01 / MATERIALE</span>
+  <h2>Plasticul potrivit, pentru fiecare piesă</h2>
+  <span class="mat-pill">ABS · ASA · ABS-CF · ASA-CF</span>
+  <p>Nu folosim un singur filament pentru tot. ASA rezistă la UV și intemperii — perfect pentru exterior. ABS ține structural la temperaturi ridicate. Variantele cu fibră de carbon (ABS-CF / ASA-CF) dublează rigiditatea pentru piese care chiar lucrează: suporturi, console, elemente din zona motorului.</p>
   <div class="spec-row">
-    <div class="spec-item">UV<b>Excelent</b></div>
-    <div class="spec-item">Temp. max<b>95°C</b></div>
-    <div class="spec-item">Finisaj<b>Texturat OEM</b></div>
+    <div class="spec-item">UV<b>Excelent (ASA)</b></div>
+    <div class="spec-item">Rigiditate<b>+ Carbon (CF)</b></div>
+    <div class="spec-item">Compatibil<b>Orice marcă</b></div>
   </div>
 </div>
 
-<!-- CARD 2 — Grilă (step 2) -->
+<!-- CARD 2 — Scanare 3D (step 2) -->
 <div class="card card-info" data-step="2">
-  <span class="step-idx">02 / FAȚĂ</span>
-  <h2>Grilă kidney dublu</h2>
-  <span class="mat-pill">ASA + clipsuri PA-CF</span>
-  <p>Reprodusă 1:1 după scanare, cu lamele în profilul GTR dorit de client. Corpul e ASA pentru UV, dar clipsurile de prindere sunt PA-CF — nylon cu fibră de carbon. Tot stresul mecanic la montare e acolo, și PA-CF nu cedează ca plasticul OEM de 24 de ani.</p>
+  <span class="step-idx">02 / SCANARE 3D</span>
+  <h2>Reverse Engineering &amp; Scanare 3D</h2>
+  <span class="mat-pill">Precizie ±0,1 mm</span>
+  <p>Piesa originală e spartă, decolorată sau pur și simplu nu mai e în catalogul producătorului? O scanăm 3D la rezoluție mare, reconstruim geometria digital și corectăm tot ce s-a deformat în timp — fără planuri originale, fără ghicit.</p>
   <div class="spec-row">
     <div class="spec-item">Metodă<b>Scanare 3D</b></div>
     <div class="spec-item">Toleranță<b>±0,1 mm</b></div>
-    <div class="spec-item">Montaj<b>Clip OEM</b></div>
+    <div class="spec-item">Output<b>Print-ready</b></div>
   </div>
 </div>
 
-<!-- CARD 3 — Rear (step 3) -->
+<!-- CARD 3 — Proiectare CAD (step 3) -->
 <div class="card card-info" data-step="3">
-  <span class="step-idx">03 / STRUCTURAL</span>
-  <h2>Difuzor spate &amp; suporți</h2>
-  <span class="mat-pill">PA-CF</span>
-  <p>Piesele pe care nu le vezi, dar care țin tot. PA-CF — nylon armat cu fibră de carbon — e cel mai rigid material al nostru. Stabil la 150°C, deci poate sta în imediata vecinătate a evacuării. Față de originalul de plastic virgin: +40% rigiditate, zero deformare termică.</p>
+  <span class="step-idx">03 / PROIECTARE CAD</span>
+  <h2>Proiectare &amp; Optimizare CAD</h2>
+  <span class="mat-pill">De la idee la print-ready</span>
+  <p>Modelăm de la zero sau optimizăm un design existent: reducem greutatea, întărim exact zonele care cedează și pregătim piesa pentru producție aditivă. Rezultatul — o piesă mai bună decât originalul, gândită pentru mașina ta.</p>
   <div class="spec-row">
-    <div class="spec-item">Temp. max<b>150°C</b></div>
-    <div class="spec-item">Rigiditate<b>Extremă</b></div>
-    <div class="spec-item">vs OEM<b>+40% rezist.</b></div>
+    <div class="spec-item">Optimizare<b>Topologică</b></div>
+    <div class="spec-item">Greutate<b>Redusă</b></div>
+    <div class="spec-item">Pregătire<b>Print-ready</b></div>
   </div>
 </div>
 
-<!-- CARD 4 — Interior (step 4) -->
+<!-- CARD 4 — Soluții custom (step 4) -->
 <div class="card card-info" data-step="4">
-  <span class="step-idx">04 / INTERIOR</span>
-  <h2>Trim consolă &amp; grile difuzor</h2>
-  <span class="mat-pill">PETG</span>
-  <p>În interior regulile se schimbă: fără UV direct, temperaturi mai blânde. PETG se printează cu detalii fine, are un finisaj satinat identic plasticului de bord și costă sensibil mai puțin decât materialele tehnice. De ce ai plăti PA-CF acolo unde nu e nevoie?</p>
+  <span class="step-idx">04 / SOLUȚII CUSTOM</span>
+  <h2>Soluții Custom Automotive</h2>
+  <span class="mat-pill">Admisii · Suporturi · Console</span>
+  <p>Admisii de aer, suporturi de motor, console interioare, elemente structurale — proiectate pentru aplicația ta specifică și validate pentru vibrații, temperatură și sarcină mecanică reală. Dacă piesa nu există, o construim noi.</p>
   <div class="spec-row">
-    <div class="spec-item">Temp. max<b>75°C</b></div>
-    <div class="spec-item">Detaliu<b>Foarte fin</b></div>
-    <div class="spec-item">Cost<b>Optim</b></div>
+    <div class="spec-item">Validare<b>Vibrații &amp; Temp.</b></div>
+    <div class="spec-item">Aplicabil<b>Orice model</b></div>
+    <div class="spec-item">Producție<b>Locală, RO</b></div>
   </div>
 </div>
 
@@ -476,22 +454,41 @@ function overrideMaterials(model){
   });
 }
 
+// Sketchfab exports often bundle a giant studio floor/backdrop with the car —
+// strip those so the bounding box (and thus S, the camera scale) reflects
+// the car itself, not a 14m-wide background plane.
+function removeBackdrop(model){
+  const drop=[];
+  model.traverse(child=>{
+    if(!child.isMesh) return;
+    const n=(child.material?.name||'').toLowerCase();
+    if(n==='floor'||n==='back') drop.push(child);
+  });
+  drop.forEach(m=>m.parent && m.parent.remove(m));
+}
+
 /* ─── SCROLL KEYFRAMES (defined after model load, using S = car half-length) ─── */
 let K=[], car=null, S=2;
 
 function buildKeyframes(){
   // H = car height fraction for look targets; distances scale with S
+  // On narrow/portrait screens the bottom info card covers a large share
+  // of the viewport — lift the car higher in frame for those steps (1-4)
+  // so it stays the focal point above the card. Centered hero/final cards
+  // (0, 5) need no lift.
+  const aspect=innerWidth/innerHeight;
+  const lift=aspect<1 ? S*.55*(1-aspect) : 0;
   K=[
     // 0 hero — front 3/4 right, wide
     {ry:.55, cam:[S*1.6, S*.85, S*2.0], look:[0, S*.42, 0]},
-    // 1 oglinzi — pull to right side, mid height
-    {ry:-.7, cam:[S*1.9, S*.7, S*1.1], look:[0, S*.5, 0], hsWorld:[S*.62, S*.62, S*.34]},
-    // 2 grila — straight on the front, low
-    {ry:.02, cam:[S*.15, S*.55, S*2.1], look:[0, S*.42, 0], hsWorld:[0, S*.45, S*.92]},
-    // 3 difuzor — rear 3/4 left
-    {ry:Math.PI-.35, cam:[-S*1.7, S*.7, S*1.7], look:[0, S*.4, 0], hsWorld:[0, S*.30, -S*.92]},
-    // 4 interior — high front side, closer
-    {ry:.5, cam:[S*1.5, S*1.0, S*1.2], look:[0, S*.55, 0], hsWorld:[S*.18, S*.62, 0]},
+    // 1 materiale — pull to right side, mid height
+    {ry:-.7, cam:[S*1.9, S*.7-lift, S*1.1], look:[0, S*.5-lift, 0]},
+    // 2 scanare 3D — straight on the front, low
+    {ry:.02, cam:[S*.15, S*.55-lift, S*2.1], look:[0, S*.42-lift, 0]},
+    // 3 proiectare CAD — rear 3/4 left
+    {ry:Math.PI-.35, cam:[-S*1.7, S*.7-lift, S*1.7], look:[0, S*.4-lift, 0]},
+    // 4 soluții custom — high front side, closer
+    {ry:.5, cam:[S*1.5, S*1.0-lift, S*1.2], look:[0, S*.55-lift, 0]},
     // 5 finale — dramatic high orbit
     {ry:.8, cam:[S*1.3, S*1.9, S*2.0], look:[0, S*.35, 0]},
   ];
@@ -514,23 +511,17 @@ loader.load(
   (gltf)=>{
     const model=gltf.scene;
     overrideMaterials(model);
-
-    // Detect up-axis: many Blender/Sketchfab exports are Z-up. Rotate to Y-up if so.
-    let box=new THREE.Box3().setFromObject(model);
-    let size=box.getSize(new THREE.Vector3());
-    if(size.z > size.y){          // taller in Z than Y => Z-up, lay it down
-      model.rotation.x=-Math.PI/2;
-    }
+    removeBackdrop(model);
 
     // wrap in a pivot so we can rotate cleanly around world Y
     car=new THREE.Group();
     car.add(model);
     scene.add(car);
 
-    // recompute box after rotation, then center on origin & drop onto floor
-    box=new THREE.Box3().setFromObject(car);
+    // center on origin & drop onto floor
+    let box=new THREE.Box3().setFromObject(car);
     const center=box.getCenter(new THREE.Vector3());
-    size=box.getSize(new THREE.Vector3());
+    let size=box.getSize(new THREE.Vector3());
     model.position.x-=center.x;
     model.position.z-=center.z;
     model.position.y-=box.min.y;        // sit on the floor (y=0)
@@ -583,11 +574,9 @@ function onScroll(){
 }
 addEventListener('scroll',onScroll,{passive:true});
 
-/* ─── UI: cards / hotspot / rail ─── */
+/* ─── UI: cards / rail ─── */
 const cards=[...document.querySelectorAll('.card')];
-const hsEl=document.getElementById('hotspot');
-const hlLab=document.getElementById('hl-label');
-const stepNames=['Intro','Oglinzi','Grilă','Difuzor','Interior','Ofertă'];
+const stepNames=['Intro','Materiale','Scanare','Proiectare','Custom','Ofertă'];
 
 function initUI(){
   const rail=document.getElementById('rail');
@@ -604,21 +593,12 @@ function initUI(){
   updateCards();
 }
 
-const hotspotLabels=['','Capac oglindă · ASA','Grilă kidney · ASA+PA-CF','Difuzor · PA-CF','Trim interior · PETG',''];
-
 function updateCards(){
   cards.forEach(c=>c.classList.toggle('on',+c.dataset.step===activeStep));
   document.querySelectorAll('.rail-dot').forEach((r,i)=>r.classList.toggle('on',i===activeStep));
-  const lab=hotspotLabels[activeStep]||'';
-  const hasHs=!!(car && K.length && K[activeStep] && K[activeStep].hsWorld);
-  hsEl.classList.toggle('on',!!lab && hasHs);
-  if(lab) hlLab.textContent=lab;
 }
 
 /* ─── RENDER LOOP ─── */
-const tmpV=new THREE.Vector3();
-const clock=new THREE.Clock();
-
 function frame(){
   requestAnimationFrame(frame);
   const d=reduced?.1:.065;
@@ -631,20 +611,6 @@ function frame(){
   camera.position.set(...curCam);
   camera.lookAt(...curLook);
 
-  // project hotspot to screen
-  if(car && hsEl.classList.contains('on') && K.length && K[activeStep]?.hsWorld){
-    const hw=K[activeStep].hsWorld;
-    tmpV.set(hw[0],hw[1],hw[2]);
-    // rotate with car
-    const cosR=Math.cos(curRy),sinR=Math.sin(curRy);
-    const rx=tmpV.x*cosR+tmpV.z*sinR;
-    const rz=-tmpV.x*sinR+tmpV.z*cosR;
-    tmpV.set(rx,tmpV.y,rz);
-    tmpV.project(camera);
-    hsEl.style.left=((tmpV.x*.5+.5)*innerWidth)+'px';
-    hsEl.style.top =((-tmpV.y*.5+.5)*innerHeight)+'px';
-  }
-
   renderer.render(scene,camera);
 }
 frame();
@@ -653,6 +619,7 @@ addEventListener('resize',()=>{
   camera.aspect=innerWidth/innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight);
+  if(K.length){ buildKeyframes(); onScroll(); }
 });
 }
 </script>
