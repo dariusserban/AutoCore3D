@@ -338,9 +338,9 @@ function buildEnv(){
   };
   soft(50,50,800,90,.92); soft(1100,40,880,110,.85);
   soft(300,200,400,40,.45); soft(1500,160,400,40,.35);
-  // brand red practical on right side
+  // brand red practical on right side (subtle accent only)
   const rg=x.createRadialGradient(1900,350,20,1900,350,280);
-  rg.addColorStop(0,'rgba(220,38,38,.55)');rg.addColorStop(1,'rgba(220,38,38,0)');
+  rg.addColorStop(0,'rgba(220,38,38,.18)');rg.addColorStop(1,'rgba(220,38,38,0)');
   x.fillStyle=rg;x.fillRect(1600,100,480,520);
   // cool rim light left
   const bl=x.createRadialGradient(40,380,10,40,380,300);
@@ -395,7 +395,7 @@ const rimBlue = new THREE.PointLight(0x8ab2ff, 1.1, 60);
 rimBlue.position.set(-18,7,-12);
 scene.add(rimBlue);
 
-const rimRed = new THREE.PointLight(0xdc2626, .8, 50);
+const rimRed = new THREE.PointLight(0xdc2626, .25, 50);
 rimRed.position.set(12,3,-16);
 scene.add(rimRed);
 
@@ -407,7 +407,7 @@ scene.add(fillBot);
 const BLACK_CLEARCOAT = new THREE.MeshPhysicalMaterial({
   color:0x050508, metalness:.9, roughness:.32,
   clearcoat:1, clearcoatRoughness:.04,
-  envMap, envMapIntensity:2.0,
+  envMap, envMapIntensity:.9,
 });
 const CHROME = new THREE.MeshPhysicalMaterial({
   color:0xdcdce0, metalness:1, roughness:.05,
