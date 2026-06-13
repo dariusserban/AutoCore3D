@@ -381,6 +381,56 @@ const shadowMesh=new THREE.Mesh(
 shadowMesh.rotation.x=-Math.PI/2; shadowMesh.position.y=.005;
 scene.add(shadowMesh);
 
+/* ─── AMBIENT PARTICLES ───
+   Drifting motes that rise and sway continuously on their own, and pick up
+   an extra swirl whenever the page is scrolled — a bit of constant life
+   in the scene, independent of the car/camera. */
+function buildDotTex(){
+  const c=document.createElement('canvas'); c.width=c.height=64;
+  const x=c.getContext('2d');
+  const g=x.createRadialGradient(32,32,0,32,32,32);
+  g.addColorStop(0,'rgba(255,255,255,1)');
+  g.addColorStop(.5,'rgba(180,210,255,.45)');
+  g.addColorStop(1,'rgba(180,210,255,0)');
+  x.fillStyle=g; x.fillRect(0,0,64,64);
+  return new THREE.CanvasTexture(c);
+}
+const PCOUNT=260, PHEIGHT=7;
+const pBaseXZ=new Float32Array(PCOUNT*2);
+const pBaseY=new Float32Array(PCOUNT);
+const pSpeed=new Float32Array(PCOUNT);
+const pPhase=new Float32Array(PCOUNT);
+const pPos=new Float32Array(PCOUNT*3);
+for(let i=0;i<PCOUNT;i++){
+  const r=1.5+Math.random()*9, a=Math.random()*Math.PI*2;
+  pBaseXZ[i*2]=Math.cos(a)*r;
+  pBaseXZ[i*2+1]=Math.sin(a)*r;
+  pBaseY[i]=Math.random()*PHEIGHT;
+  pSpeed[i]=.15+Math.random()*.35;
+  pPhase[i]=Math.random()*Math.PI*2;
+  pPos[i*3]=pBaseXZ[i*2]; pPos[i*3+1]=pBaseY[i]; pPos[i*3+2]=pBaseXZ[i*2+1];
+}
+const pGeo=new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+const particles=new THREE.Points(pGeo, new THREE.PointsMaterial({
+  size:.07, map:buildDotTex(), transparent:true, depthWrite:false,
+  blending:THREE.AdditiveBlending, color:0x9fc2ff, opacity:.55,
+}));
+scene.add(particles);
+
+function animateParticles(t){
+  if(reduced) return;
+  const sway=.2+Math.abs(scrollSpin)*4;
+  const pos=pGeo.attributes.position.array;
+  for(let i=0;i<PCOUNT;i++){
+    pos[i*3]  =pBaseXZ[i*2]  +Math.sin(t*.4+pPhase[i])*sway;
+    pos[i*3+1]=(pBaseY[i]+t*pSpeed[i])%PHEIGHT;
+    pos[i*3+2]=pBaseXZ[i*2+1]+Math.cos(t*.4+pPhase[i])*sway;
+  }
+  pGeo.attributes.position.needsUpdate=true;
+  particles.rotation.y=t*.025+scrollSpin;
+}
+
 /* ─── LIGHTS ─── */
 scene.add(new THREE.AmbientLight(0x1a1c24, .4));
 
@@ -424,10 +474,6 @@ const GLASS = new THREE.MeshPhysicalMaterial({
 const RED_CALIPER = new THREE.MeshStandardMaterial({
   color:0xcc2020, metalness:.3, roughness:.45,
   emissive:0x550808, emissiveIntensity:.3,
-});
-const PART_PLASTIC = new THREE.MeshStandardMaterial({
-  color:0x26262c, metalness:.2, roughness:.5,
-  envMap, envMapIntensity:.55,
 });
 
 function overrideMaterials(model){
@@ -473,55 +519,6 @@ function removeBackdrop(model){
 
 /* ─── SCROLL KEYFRAMES (defined after model load, using S = car half-length) ─── */
 let K=[], car=null, S=2;
-
-/* ─── SHOWCASE PARTS (printed parts shown alongside the car, one per step) ─── */
-// Each step shows exactly one "hero" object. The car bookends the journey
-// (intro + final CTA); the 4 service steps each showcase a real printed part.
-const STEP_MODEL=['car','velocity','brake','scoop','dimple','car'];
-const PART_FILES={
-  velocity:{path:'parts/velocity_smooth.glb', ry:.6},
-  brake:{path:'parts/brake_duct.glb', ry:.15},
-  scoop:{path:'parts/scoop.glb', ry:-.4, mul:.72},
-  dimple:{path:'parts/velocity_dimple.glb', ry:-.6},
-};
-const modelEntries={}; // key -> {group, rawRadius, baseScale, ryOffset, mul}
-
-function rescaleAllParts(){
-  Object.values(modelEntries).forEach(e=>{
-    if(e.rawRadius) e.baseScale=S/e.rawRadius*(e.mul||1);
-  });
-}
-
-function loadPart(key, path, ryOffset, mul){
-  loader.load(path, (gltf)=>{
-    const model=gltf.scene;
-    model.traverse(c=>{
-      if(c.isMesh){ c.material=PART_PLASTIC; c.castShadow=true; c.receiveShadow=true; }
-    });
-
-    const group=new THREE.Group();
-    group.add(model);
-    scene.add(group);
-
-    let box=new THREE.Box3().setFromObject(group);
-    const center=box.getCenter(new THREE.Vector3());
-    let size=box.getSize(new THREE.Vector3());
-    model.position.x-=center.x;
-    model.position.z-=center.z;
-    model.position.y-=box.min.y; // sit on the floor (y=0)
-
-    // contact shadow sized to this part's footprint
-    const disc=new THREE.Mesh(new THREE.PlaneGeometry(1,1),
-      new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false}));
-    disc.rotation.x=-Math.PI/2; disc.position.y=.005;
-    disc.scale.set(size.x*1.15, size.z*1.15, 1);
-    group.add(disc);
-
-    const rawRadius=size.length()/2;
-    modelEntries[key]={group, rawRadius, baseScale:S/rawRadius*(mul||1), ryOffset, mul};
-    rescaleAllParts();
-  }, undefined, (err)=>console.error('Nu am putut încărca piesa', key, err));
-}
 
 function buildKeyframes(){
   // H = car height fraction for look targets; distances scale with S
@@ -586,9 +583,6 @@ loader.load(
     car.add(shadowMesh);
     shadowMesh.scale.set(size.x*1.15,size.z*1.15,1);
 
-    modelEntries.car={group:car, baseScale:1, ryOffset:0};
-    rescaleAllParts();
-
     revealScene();
   },
   (xhr)=>{
@@ -604,25 +598,30 @@ loader.load(
   }
 );
 
-Object.entries(PART_FILES).forEach(([key,p])=>loadPart(key,p.path,p.ry,p.mul));
-
 /* ─── SCROLL STATE ─── */
 const N=5; // number of steps (0..5)
 let activeStep=0;
 let curRy=.52, tarRy=.52;
 let curCam=[11,6,14], tarCam=[11,6,14];
 let curLook=[0,3,0], tarLook=[0,3,0];
-let curP=0, tarP=0;
+
+// extra rotation "kick" from scroll velocity — decays back to 0, giving the
+// car a little spin whenever you scroll, on top of its constant idle sway
+let scrollSpin=0, lastScrollY=0;
 
 const lerp=(a,b,t)=>a+(b-a)*t;
 const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 
 function onScroll(){
+  if(!reduced){
+    const dy=scrollY-lastScrollY;
+    scrollSpin+=Math.max(-.15,Math.min(.15,dy*.0008));
+  }
+  lastScrollY=scrollY;
   if(!K.length) return;
   const max=document.documentElement.scrollHeight-innerHeight;
   if(max<=0) return;
   const p=Math.min(Math.max(scrollY/max,0),1)*N;
-  tarP=p;
   const i=Math.min(Math.floor(p),N-1);
   const t=ease(p-i);
   const a=K[i],b=K[i+1];
@@ -660,36 +659,25 @@ function updateCards(){
   document.querySelectorAll('.rail-dot').forEach((r,i)=>r.classList.toggle('on',i===activeStep));
 }
 
-/* ─── CROSSFADE: each step's hero object scales in/out as you scroll past it ─── */
-const FADE_W=1; // how many "steps" wide the crossfade window is
-function smooth01(x){ x=Math.min(Math.max(x,0),1); return x*x*(3-2*x); }
-function modelDist(p,key){
-  let d=Infinity;
-  STEP_MODEL.forEach((k,i)=>{ if(k===key) d=Math.min(d,Math.abs(p-i)); });
-  return d;
-}
-
 /* ─── RENDER LOOP ─── */
 function frame(){
   requestAnimationFrame(frame);
   const d=reduced?.1:.065;
   curRy=lerp(curRy,tarRy,d);
-  curP=lerp(curP,tarP,d);
   for(let j=0;j<3;j++){
     curCam[j]=lerp(curCam[j],tarCam[j],d);
     curLook[j]=lerp(curLook[j],tarLook[j],d);
   }
-  for(const key in modelEntries){
-    const e=modelEntries[key];
-    const vis=smooth01(1-modelDist(curP,key)/FADE_W);
-    if(vis>0.003){
-      e.group.visible=true;
-      e.group.scale.setScalar(e.baseScale*vis);
-      e.group.rotation.y=curRy+(e.ryOffset||0);
-    } else {
-      e.group.visible=false;
-    }
+
+  const t=performance.now()*.001;
+  scrollSpin*=.92;
+
+  if(car){
+    const idleSway=reduced?0:Math.sin(t*.35)*.035;
+    car.rotation.y=curRy+idleSway+scrollSpin;
   }
+  animateParticles(t);
+
   camera.position.set(...curCam);
   camera.lookAt(...curLook);
 
