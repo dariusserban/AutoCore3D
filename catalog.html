@@ -39,7 +39,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 
 header{position:sticky;top:0;z-index:100;background:rgba(10,22,30,.97)!important;backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);}
 .hdr{max-width:1280px;margin:0 auto;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;}
-.logo{display:flex;align-items:center;gap:10px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;}
 .logo-hex{font-size:1.75rem;color:var(--red);line-height:1;animation:pulse-r 3s ease-in-out infinite;}
 @keyframes pulse-r{0%,100%{text-shadow:0 0 12px rgba(0,230,255,.6),0 0 22px rgba(0,230,255,.3)}50%{text-shadow:0 0 22px rgba(0,230,255,1),0 0 50px rgba(0,230,255,.5),0 0 80px rgba(0,230,255,.2)}}
 .logo-name{font-family:var(--disp);font-size:1.4rem;font-weight:900;letter-spacing:.06em;color:var(--text);}
@@ -816,10 +816,10 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
 <div id="app">
 <header>
   <div class="hdr">
-    <div class="logo">
+    <a class="logo" href="index.html">
       <span class="logo-hex">⬡</span>
       <div><div class="logo-name">AUTOCORE<span>3D</span></div><div class="logo-tag">3D PRINTING & ENGINEERING · SINCE 2023</div></div>
-    </div>
+    </a>
     <nav>
       <a href="#" class="nav-link" data-tab="configurator" data-i18n="nav_configurator">Configurator</a>
       <a href="#" class="nav-link" data-tab="produse" data-i18n="nav_products">Produse</a>

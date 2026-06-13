@@ -1,599 +1,660 @@
 <!DOCTYPE html>
-<html lang="ro" style="color-scheme:dark">
+<html lang="ro">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<meta name="color-scheme" content="dark"/>
-<title>AUTOCORE3D — Piese Auto Printate 3D pe Comandă</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoCore3D — BMW E46 · Piese printate 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  color-scheme:dark!important;
-  --bg:#06080f;
-  --bg2:#0a0e18;
-  --ink:#F2F5FA;
-  --sub:#8B93A8;
-  --muted:#4A5266;
-  --line:rgba(255,255,255,.08);
-  --cyan:#00E6FF;
-  --mag:#FF3366;
-  --violet:#8C6BFF;
-  --mono:'JetBrains Mono',monospace;
-  --disp:'Barlow Condensed',sans-serif;
-  --body:'Barlow',sans-serif;
-  --ease:cubic-bezier(.16,1,.3,1);
+  --bg:#08080a;
+  --panel:rgba(12,12,16,.82);
+  --ink:#EDEAE4;
+  --dim:#7A7670;
+  --red:#DC2626;
+  --line:rgba(237,234,228,.12);
+  --display:'Syncopate',sans-serif;
+  --mono:'Space Mono',monospace;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;background:var(--bg)!important;}
-body{background:var(--bg)!important;color:var(--ink)!important;font-family:var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
-@media (prefers-reduced-motion: no-preference){
-  html{scroll-snap-type:y proximity;}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);overflow-x:hidden}
+::selection{background:var(--red);color:#fff}
+a{color:inherit;text-decoration:none}
+canvas{display:block}
+
+/* fixed 3D canvas */
+#scene{position:fixed;inset:0;z-index:0}
+
+/* vignette */
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 80% 70% at 50% 50%,transparent 40%,rgba(0,0,0,.85) 100%)}
+
+/* grain overlay */
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:30;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:22px 34px;background:linear-gradient(to bottom,rgba(8,8,10,.9),transparent)}
+.logo{font-family:var(--display);font-weight:700;font-size:.8rem;letter-spacing:.24em}
+.logo b{color:var(--red)}
+.nav-right{display:flex;align-items:center;gap:18px}
+.nav-tag{font-size:.58rem;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+.nav-shop{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);
+  border:1px solid rgba(220,38,38,.45);border-radius:2px;padding:7px 14px;white-space:nowrap;
+  transition:background .25s,color .25s,border-color .25s}
+.nav-shop:hover{background:var(--red);border-color:var(--red);color:#fff}
+
+/* cards (fixed, shown/hidden by scroll) */
+.card{
+  position:fixed;z-index:20;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s ease, transform .5s ease;
 }
-img,video{display:block;max-width:100%;}
+.card.on{opacity:1;pointer-events:auto}
 
-/* ── moving cars bg ── */
-#bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
-
-/* ── progress bar ── */
-.progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--mag));box-shadow:0 0 12px rgba(0,230,255,.6);z-index:60;width:0%;transition:width .1s linear;}
-
-/* ── nav ── */
-.topnav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1.3rem 1.6rem;font-family:var(--mono);}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.brand-hex{font-size:1.4rem;color:var(--cyan);line-height:1;text-shadow:0 0 14px rgba(0,230,255,.65);}
-.brand-name{font-family:var(--disp);font-size:1.15rem;font-weight:900;letter-spacing:.07em;color:var(--ink);}
-.brand-name span{color:var(--cyan);}
-.nav-counter{font-size:.6rem;letter-spacing:.28em;color:var(--sub);text-transform:uppercase;display:flex;align-items:center;gap:.7rem;}
-.nav-counter b{color:var(--cyan);font-weight:700;}
-.nav-back{font-size:.6rem;letter-spacing:.2em;color:var(--sub);text-transform:uppercase;text-decoration:none;border:1px solid var(--line);padding:.5rem .9rem;transition:all .25s var(--ease);}
-.nav-back:hover{border-color:var(--cyan);color:var(--cyan);}
-@media(max-width:760px){.nav-counter{display:none;}}
-
-/* ── side dots ── */
-.dots{position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:.85rem;}
-.dot{width:9px;height:9px;border:1px solid var(--line);border-radius:50%;cursor:pointer;transition:all .3s var(--ease);background:transparent;padding:0;position:relative;}
-.dot:hover{border-color:var(--cyan);}
-.dot.on{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 10px rgba(0,230,255,.75);transform:scale(1.3);}
-.dot .lbl{position:absolute;right:140%;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--sub);white-space:nowrap;opacity:0;transition:opacity .25s;text-transform:uppercase;}
-.dot:hover .lbl{opacity:1;}
-@media(max-width:760px){.dots{display:none;}}
-
-/* ── scene base ── */
-.scene{position:relative;min-height:100vh;min-height:100dvh;scroll-snap-align:start;z-index:1;display:flex;align-items:center;}
-.scene-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto;width:100%;padding:7.5rem 1.6rem 4rem;}
-.scene.translucent{background:rgba(6,8,15,.74);}
-.scene.solidish{background:rgba(6,8,15,.94);}
-
-/* ── reveal utilities ── */
-.r{opacity:0;transform:translateY(34px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
-.r2{transition-delay:.1s;} .r3{transition-delay:.2s;} .r4{transition-delay:.3s;} .r5{transition-delay:.4s;}
-.scene.in-view .r{opacity:1;transform:translateY(0);}
-
-.eyebrow{font-family:var(--mono);font-size:.7rem;color:var(--cyan);letter-spacing:.4em;text-transform:uppercase;margin-bottom:1.2rem;}
-.eyebrow::before{content:'// ';color:var(--mag);}
-.lede{font-family:var(--body);font-size:1rem;color:var(--sub);line-height:1.75;max-width:520px;}
-
-/* ── glitch headings ── */
-.glitch{position:relative;font-family:var(--disp);font-weight:900;text-transform:uppercase;line-height:.98;letter-spacing:.01em;color:var(--ink);}
-.glitch em{font-style:normal;background:linear-gradient(100deg,var(--cyan),var(--violet) 55%,var(--mag));-webkit-background-clip:text;background-clip:text;color:transparent;}
-.glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;width:100%;opacity:0;pointer-events:none;mix-blend-mode:screen;}
-.glitch::before{color:var(--cyan);}
-.glitch::after{color:var(--mag);}
-.scene.in-view .glitch::before{animation:glitchA .9s var(--ease) forwards;}
-.scene.in-view .glitch::after{animation:glitchB .9s var(--ease) forwards;}
-@keyframes glitchA{
-  0%{opacity:.85;transform:translate(-8px,-3px);clip-path:inset(8% 0 64% 0);}
-  18%{transform:translate(6px,2px);clip-path:inset(54% 0 12% 0);}
-  38%{transform:translate(-4px,3px);clip-path:inset(22% 0 44% 0);}
-  60%{transform:translate(3px,-2px);clip-path:inset(74% 0 4% 0);}
-  100%{opacity:0;transform:translate(0,0);clip-path:inset(0 0 0 0);}
+/* hero card — centered */
+.card-hero{
+  left:50%;top:46%;transform:translate(-50%,-50%) translateY(20px);
+  width:min(680px,90vw);text-align:center;
 }
-@keyframes glitchB{
-  0%{opacity:.85;transform:translate(8px,3px);clip-path:inset(64% 0 8% 0);}
-  18%{transform:translate(-6px,-2px);clip-path:inset(12% 0 54% 0);}
-  38%{transform:translate(4px,-3px);clip-path:inset(44% 0 22% 0);}
-  60%{transform:translate(-3px,2px);clip-path:inset(4% 0 74% 0);}
-  100%{opacity:0;transform:translate(0,0);clip-path:inset(0 0 0 0);}
+.card-hero.on{transform:translate(-50%,-50%)}
+.eyebrow{
+  display:inline-block;font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--red);border:1px solid rgba(220,38,38,.35);border-radius:2px;padding:6px 12px;margin-bottom:22px;
 }
+.card-hero h1{
+  font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,5.5vw,3.4rem);
+  letter-spacing:.08em;line-height:1.18;text-transform:uppercase;
+  text-shadow:0 4px 60px rgba(0,0,0,.9),0 0 100px rgba(0,0,0,.6);
+}
+.card-hero h1 span{color:var(--red)}
+.card-hero .sub{
+  margin-top:20px;font-size:.78rem;line-height:1.8;color:#B0ACA4;
+  text-shadow:0 2px 20px rgba(0,0,0,.95);
+}
+.card-hero .scroll-cue{
+  margin-top:34px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dim);
+}
+.wheel{width:1px;height:36px;background:linear-gradient(var(--red),transparent);animation:drop 1.7s infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 
-.hero-title{font-size:clamp(2.8rem,8.8vw,6rem);}
-.h2{font-size:clamp(2.4rem,6.5vw,4.6rem);margin-bottom:1.1rem;}
+/* info card — bottom left */
+.card-info{
+  left:34px;bottom:34px;width:min(370px,calc(100vw - 68px));
+  transform:translateY(18px);
+  background:var(--panel);border:1px solid var(--line);border-radius:4px;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  padding:24px 26px;
+}
+.card-info.on{transform:translateY(0)}
+.card-info .step-idx{font-size:.58rem;letter-spacing:.3em;color:var(--red);display:block;margin-bottom:12px;text-transform:uppercase}
+.card-info h2{font-family:var(--display);font-weight:700;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;line-height:1.45;margin-bottom:12px}
+.mat-pill{display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(220,38,38,.45);color:var(--red);border-radius:2px;
+  font-size:.58rem;letter-spacing:.22em;padding:5px 10px;margin-bottom:14px;text-transform:uppercase}
+.mat-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red)}
+.card-info p{font-size:.76rem;line-height:1.75;color:#B0ACA4}
+.spec-row{display:flex;gap:18px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.spec-item{font-size:.58rem;letter-spacing:.06em;color:var(--dim);line-height:1.8}
+.spec-item b{display:block;color:var(--ink);font-size:.76rem;letter-spacing:0}
 
-/* ── hero ── */
-.scene-hero{justify-content:center;}
-.hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:2rem;align-items:center;width:100%;}
-.hero-text{max-width:680px;}
-.hero-title{margin-bottom:1.3rem;}
-.hero-sub{margin-bottom:2.1rem;}
-.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:3.2rem;}
-.btn{font-family:var(--mono);font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:1rem 1.9rem;text-decoration:none;border:1px solid var(--line);color:var(--ink);transition:all .25s var(--ease);position:relative;}
-.btn-primary{background:var(--cyan);color:#021014;border-color:var(--cyan);}
-.btn-primary:hover{box-shadow:0 0 28px rgba(0,230,255,.55);transform:translateY(-2px);}
-.btn-ghost:hover{border-color:var(--mag);color:var(--mag);}
-.hero-stats{display:flex;gap:2.4rem;flex-wrap:wrap;}
-.stat-num{font-family:var(--disp);font-size:clamp(1.8rem,3.2vw,2.6rem);font-weight:900;color:var(--ink);}
-.stat-lbl{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;color:var(--sub);text-transform:uppercase;margin-top:.3rem;}
-.scroll-cue{position:absolute;bottom:1.6rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.6rem;z-index:2;
-  font-family:var(--mono);font-size:.6rem;letter-spacing:.3em;color:var(--sub);text-transform:uppercase;animation:cue-bob 2.4s ease-in-out infinite;}
-.scroll-cue::after{content:'';width:1px;height:32px;background:linear-gradient(180deg,var(--cyan),transparent);}
-@keyframes cue-bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,10px)}}
+/* finale card — centered */
+.card-final{
+  left:50%;top:46%;transform:translate(-50%,-50%) translateY(20px);
+  width:min(540px,90vw);text-align:center;
+}
+.card-final.on{transform:translate(-50%,-50%)}
+.card-final h2{
+  font-family:var(--display);font-weight:700;font-size:clamp(1.3rem,4vw,2.2rem);
+  letter-spacing:.08em;text-transform:uppercase;line-height:1.25;
+  text-shadow:0 4px 40px rgba(0,0,0,.9);
+}
+.card-final p{margin-top:16px;font-size:.76rem;line-height:1.8;color:#B0ACA4}
+.btn{
+  display:inline-flex;align-items:center;gap:12px;margin-top:28px;cursor:pointer;
+  font-family:var(--display);font-weight:700;font-size:.66rem;letter-spacing:.22em;
+  text-transform:uppercase;color:#fff;background:var(--red);border:1px solid var(--red);
+  border-radius:3px;padding:17px 32px;
+  transition:transform .25s,box-shadow .25s;
+}
+.btn:hover{transform:translateY(-3px);box-shadow:0 16px 50px rgba(220,38,38,.5)}
 
-/* ── car illustration ── */
-.car-illo{position:relative;width:100%;}
-.car-illo svg{width:100%;display:block;overflow:visible;}
-.car-outline{fill:rgba(255,255,255,.02);stroke:#2c3650;stroke-width:2;}
-.car-detail{fill:none;stroke:#222b42;stroke-width:1.5;}
-.car-wheel{fill:none;stroke:#2c3650;stroke-width:2;}
-.car-spoke{stroke:#222b42;stroke-width:1.5;}
-.glow-cyan{fill:var(--cyan);filter:drop-shadow(0 0 8px var(--cyan)) drop-shadow(0 0 20px rgba(0,230,255,.6));animation:pulse 2.6s ease-in-out infinite;}
-.glow-mag{fill:var(--mag);filter:drop-shadow(0 0 7px var(--mag)) drop-shadow(0 0 16px rgba(255,51,102,.55));animation:pulse 2.6s ease-in-out infinite 1.3s;}
-@keyframes pulse{0%,100%{opacity:.75;}50%{opacity:1;}}
-.car-scan{position:absolute;top:0;bottom:0;width:18%;background:linear-gradient(90deg,transparent,rgba(0,230,255,.28),transparent);mix-blend-mode:screen;filter:blur(6px);pointer-events:none;animation:scan 5s linear infinite;}
-@keyframes scan{0%{transform:translateX(-30%);}100%{transform:translateX(560%);}}
-
-/* ── about ── */
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;width:100%;}
-.feat-list{display:flex;flex-direction:column;gap:1.4rem;margin-top:2.2rem;}
-.feat{display:flex;gap:1rem;align-items:flex-start;}
-.feat-dot{width:10px;height:10px;border-radius:50%;margin-top:.4rem;flex-shrink:0;box-shadow:0 0 10px currentColor;}
-.feat-dot.c1{background:var(--cyan);color:var(--cyan);}
-.feat-dot.c2{background:var(--mag);color:var(--mag);}
-.feat-dot.c3{background:var(--violet);color:var(--violet);}
-.feat h4{font-family:var(--disp);font-weight:800;font-size:1.15rem;text-transform:uppercase;letter-spacing:.02em;margin-bottom:.25rem;}
-.feat p{font-size:.92rem;color:var(--sub);line-height:1.6;max-width:380px;}
-
-/* ── services ── */
-.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;width:100%;margin-top:2.5rem;}
-.svc-card{border:1px solid var(--line);padding:2.2rem 1.8rem;background:rgba(255,255,255,.015);transition:all .35s var(--ease);position:relative;overflow:hidden;}
-.svc-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,230,255,.08),rgba(255,51,102,.08));opacity:0;transition:opacity .35s;}
-.svc-card:hover{border-color:var(--cyan);transform:translateY(-6px);}
-.svc-card:hover::before{opacity:1;}
-.svc-icon{width:46px;height:46px;stroke:var(--cyan);fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;margin-bottom:1.4rem;position:relative;z-index:1;transition:stroke .3s;}
-.svc-card:hover .svc-icon{stroke:var(--mag);}
-.svc-num{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.3em;margin-bottom:.6rem;position:relative;z-index:1;}
-.svc-card h3{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:1.4rem;margin-bottom:.7rem;position:relative;z-index:1;}
-.svc-card p{font-size:.9rem;color:var(--sub);line-height:1.65;position:relative;z-index:1;}
-
-/* ── process ── */
-.scene-process{align-items:flex-end;overflow:hidden;}
-.proc-media{position:absolute;top:-12%;left:0;width:100%;height:124%;object-fit:cover;will-change:transform;}
-.proc-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,15,.35) 0%,rgba(6,8,15,.55) 40%,rgba(6,8,15,.97) 100%);}
-.proc-content{position:relative;z-index:2;max-width:1280px;margin:0 auto;width:100%;padding:0 1.6rem 4.5rem;}
-.steps{display:flex;flex-direction:column;gap:1.1rem;margin-top:2rem;max-width:560px;}
-.step{display:flex;gap:1.1rem;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:1rem;}
-.step-num{font-family:var(--mono);font-size:1.1rem;color:var(--cyan);font-weight:700;flex-shrink:0;width:2.4rem;}
-.step h4{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:1.15rem;letter-spacing:.02em;margin-bottom:.2rem;}
-.step p{font-size:.85rem;color:var(--sub);}
-
-/* ── compatibility ── */
-.marquee-wrap{width:100%;margin-top:2.6rem;display:flex;flex-direction:column;gap:1.2rem;}
-.marquee{display:flex;gap:1.1rem;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);}
-.marquee-track{display:flex;gap:1.1rem;flex-shrink:0;animation:marquee 38s linear infinite;}
-.marquee-track.rev{animation-direction:reverse;animation-duration:32s;}
-@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-.badge{display:flex;align-items:center;gap:.7rem;border:1px solid var(--line);padding:.7rem 1.2rem;border-radius:999px;background:rgba(255,255,255,.02);flex-shrink:0;transition:border-color .25s,color .25s;}
-.badge:hover{border-color:var(--cyan);}
-.badge-mark{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--muted);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:.7rem;letter-spacing:.02em;color:var(--sub);flex-shrink:0;}
-.badge:hover .badge-mark{border-color:var(--cyan);color:var(--cyan);}
-.badge-name{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;color:var(--sub);text-transform:uppercase;white-space:nowrap;}
-.compat-note{margin-top:2.4rem;max-width:560px;}
-
-/* ── portfolio ── */
-.scene-portfolio{align-items:center;}
-.port-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,minmax(200px,1fr));gap:.9rem;width:100%;margin-top:2.2rem;height:60vh;max-height:560px;}
-.port-item{position:relative;overflow:hidden;border:1px solid var(--line);}
-.port-item img,.port-item video{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease);}
-.port-item:hover img,.port-item:hover video{transform:scale(1.08);}
-.port-item .tag{position:absolute;left:0;right:0;bottom:0;padding:.9rem 1rem;background:linear-gradient(180deg,transparent,rgba(6,8,15,.95));font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);transform:translateY(8px);opacity:.85;transition:all .3s var(--ease);}
-.port-item:hover .tag{color:var(--cyan);transform:translateY(0);opacity:1;}
-.p-a{grid-column:1/3;grid-row:1/2;}
-.p-b{grid-column:3/4;grid-row:1/2;}
-.p-c{grid-column:1/2;grid-row:2/3;}
-.p-d{grid-column:2/3;grid-row:2/3;}
-.p-e{grid-column:3/4;grid-row:2/3;}
-
-/* ── contact / final ── */
-.scene-final{justify-content:center;text-align:center;}
-.scene-final .scene-inner{display:flex;flex-direction:column;align-items:center;}
-.final-title{margin-bottom:1.6rem;}
-.final-lede{margin:0 auto 2.4rem;text-align:center;}
-.final-ctas{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;}
-.contact-row{display:flex;gap:2.6rem;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;color:var(--sub);margin-bottom:2.4rem;}
-.contact-row a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);transition:color .25s,border-color .25s;}
-.contact-row a:hover{color:var(--cyan);border-color:var(--cyan);}
-.final-foot{font-family:var(--mono);font-size:.58rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;}
-
-/* ── reduced motion ── */
-@media (prefers-reduced-motion: reduce){
-  html{scroll-snap-type:none;}
-  .r{opacity:1!important;transform:none!important;transition:none!important;}
-  .glitch::before,.glitch::after{display:none;}
-  .scroll-cue{animation:none;}
-  .car-scan{animation:none;display:none;}
-  .glow-cyan,.glow-mag{animation:none;}
-  .marquee-track{animation:none;}
-  #bg-canvas{display:none;}
+/* hotspot */
+.hotspot{
+  position:fixed;z-index:19;pointer-events:none;
+  opacity:0;transition:opacity .4s;
+  transform:translate(-50%,-50%);
+}
+.hotspot.on{opacity:1}
+.hotspot .dot{
+  width:10px;height:10px;border-radius:50%;background:var(--red);
+  box-shadow:0 0 0 4px rgba(220,38,38,.2);
+  animation:ping 1.8s infinite;
+}
+@keyframes ping{0%,100%{box-shadow:0 0 0 4px rgba(220,38,38,.2)}50%{box-shadow:0 0 0 14px rgba(220,38,38,0)}}
+.hotspot .hl{
+  position:absolute;left:14px;top:-8px;white-space:nowrap;
+  font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);
+  background:rgba(8,8,10,.85);border:1px solid var(--line);padding:5px 10px;border-radius:2px;
 }
 
-/* ── responsive ── */
-@media(max-width:980px){
-  .hero-grid,.about-grid{grid-template-columns:1fr;gap:2.5rem;}
-  .car-illo{max-width:480px;margin:0 auto;}
-  .svc-grid{grid-template-columns:1fr;}
-  .port-grid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,minmax(140px,1fr));height:auto;max-height:none;}
-  .p-a{grid-column:1/3;grid-row:1/2;}
-  .p-b{grid-column:1/3;grid-row:2/3;}
-  .p-c{grid-column:1/2;grid-row:3/4;}
-  .p-d{grid-column:2/3;grid-row:3/4;}
-  .p-e{grid-column:1/3;grid-row:4/5;}
+/* side rail */
+.rail{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:30;
+  display:flex;flex-direction:column;gap:18px}
+.rail-dot{
+  display:flex;align-items:center;gap:10px;justify-content:flex-end;cursor:pointer;
+  background:none;border:none;padding:2px 0;
 }
-@media(max-width:640px){
-  .scene-inner{padding:6.5rem 1.2rem 3.5rem;}
-  .brand-name{font-size:1rem;}
-  .nav-back{font-size:.52rem;padding:.42rem .7rem;}
-  .hero-stats{gap:1.6rem;}
-  .contact-row{flex-direction:column;gap:1rem;align-items:center;}
+.rail-dot .t{font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim);opacity:0;transform:translateX(6px);transition:.3s;white-space:nowrap}
+.rail-dot .p{width:6px;height:6px;border-radius:50%;border:1px solid var(--dim);transition:.3s}
+.rail-dot.on .p{background:var(--red);border-color:var(--red);box-shadow:0 0 14px rgba(220,38,38,.9)}
+.rail-dot.on .t{opacity:1;transform:none;color:var(--ink)}
+.rail-dot:hover .t{opacity:1;transform:none}
+
+/* loader */
+#loader{position:fixed;inset:0;z-index:99;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  transition:opacity .8s;}
+#loader.off{opacity:0;pointer-events:none}
+.l-logo{font-family:var(--display);font-weight:700;font-size:.9rem;letter-spacing:.3em}
+.l-logo b{color:var(--red)}
+.l-prog{width:200px;height:1px;background:rgba(255,255,255,.1);overflow:hidden}
+.l-bar{height:100%;width:0;background:var(--red);transition:width .25s ease}
+.l-pct{font-size:.58rem;letter-spacing:.2em;color:var(--dim)}
+
+/* scroll track */
+.track{position:relative;z-index:0}
+.track section{height:100vh}
+.track section.tall{height:140vh}
+
+/* mobile */
+@media(max-width:680px){
+  nav{padding:16px 20px}
+  .nav-tag{display:none}
+  .card-info{left:16px;right:16px;bottom:20px;width:auto}
+  .rail{right:14px}
+  .rail-dot .t{display:none}
 }
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important}
+  .card,.card-hero,.card-info,.card-final{transition:opacity .2s!important;transform:none!important}
+}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
 </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
-<div class="progress" id="progress"></div>
+<!-- LOADER -->
+<div id="loader">
+  <div class="l-logo">AUTO<b>CORE</b>3D</div>
+  <div class="l-prog"><div class="l-bar" id="lbar"></div></div>
+  <div class="l-pct" id="lpct">Se încarcă modelul…</div>
+</div>
 
-<header class="topnav">
-  <a class="brand" href="#s0">
-    <span class="brand-hex">⬡</span>
-    <span class="brand-name">AUTOCORE<span>3D</span></span>
-  </a>
-  <div class="nav-counter"><b id="secNum">01</b> / 07 — <span id="secName">INTRO</span></div>
-  <a class="nav-back" href="catalog.html">Catalog →</a>
-</header>
+<!-- 3D CANVAS -->
+<div id="scene"></div>
+<div class="vignette"></div>
+<div class="grain"></div>
 
-<nav class="dots" aria-label="Navigare secțiuni">
-  <button class="dot" data-index="0" aria-label="Intro"><span class="lbl">Intro</span></button>
-  <button class="dot" data-index="1" aria-label="Despre noi"><span class="lbl">Despre noi</span></button>
-  <button class="dot" data-index="2" aria-label="Servicii"><span class="lbl">Servicii</span></button>
-  <button class="dot" data-index="3" aria-label="Proces"><span class="lbl">Proces</span></button>
-  <button class="dot" data-index="4" aria-label="Compatibilitate"><span class="lbl">Compatibilitate</span></button>
-  <button class="dot" data-index="5" aria-label="Proiecte"><span class="lbl">Proiecte</span></button>
-  <button class="dot" data-index="6" aria-label="Contact"><span class="lbl">Contact</span></button>
+<!-- NAV -->
+<nav>
+  <span class="logo">AUTO<b>CORE</b>3D</span>
+  <div class="nav-right">
+    <span class="nav-tag">BMW E46 · Studiu de caz</span>
+    <a class="nav-shop" href="catalog.html">Shop →</a>
+  </div>
 </nav>
 
-<main>
+<!-- HOTSPOT -->
+<div class="hotspot" id="hotspot"><div class="dot"></div><span class="hl" id="hl-label"></span></div>
 
-  <!-- 0 — HERO -->
-  <section class="scene scene-hero translucent" id="s0" data-index="0" data-name="INTRO">
-    <div class="scene-inner">
-      <div class="hero-grid">
-        <div class="hero-text">
-          <div class="eyebrow r">Atelier de inginerie &amp; printare 3D · auto</div>
-          <h1 class="glitch hero-title r r2" data-text="DE LA CAD LA STRADĂ.">DE LA CAD<br/>LA <em>STRADĂ.</em></h1>
-          <p class="lede hero-sub r r3">Proiectăm, printăm și montăm piese auto custom — console, suporturi, sisteme de admisie și elemente aero — din materiale tehnice de performanță, gata de drum.</p>
-          <div class="hero-ctas r r4">
-            <a class="btn btn-primary" href="#s2">Vezi ce facem</a>
-            <a class="btn btn-ghost" href="#s6">Pornește un proiect</a>
-          </div>
-          <div class="hero-stats r r5">
-            <div><div class="stat-num" data-target="500" data-suffix="+">0</div><div class="stat-lbl">Piese livrate</div></div>
-            <div><div class="stat-num" data-target="30" data-suffix="+">0</div><div class="stat-lbl">Mărci compatibile</div></div>
-            <div><div class="stat-num" data-target="72" data-suffix="h">0</div><div class="stat-lbl">Timp mediu producție</div></div>
-            <div><div class="stat-num" data-target="100" data-suffix="%">0</div><div class="stat-lbl">Testat pe mașină</div></div>
-          </div>
-        </div>
-        <div class="car-illo r r3" data-car></div>
-      </div>
-    </div>
-    <div class="scroll-cue">Derulează</div>
-  </section>
+<!-- CARD HERO (step 0) -->
+<div class="card card-hero" data-step="0">
+  <span class="eyebrow">/// STUDIU DE CAZ 001 — BMW M3 E46</span>
+  <h1>Reconstruit<br>strat <span>cu strat.</span></h1>
+  <p class="sub">Un BMW E46 GTR negru, readus la viață cu piese printate 3D. Dă scroll și ocolim mașina împreună — îți arătăm fiecare piesă, materialul ales și de ce.</p>
+  <div class="scroll-cue"><span>Scroll</span><span class="wheel"></span></div>
+</div>
 
-  <!-- 1 — ABOUT -->
-  <section class="scene translucent" id="s1" data-index="1" data-name="DESPRE NOI">
-    <div class="scene-inner">
-      <div class="about-grid">
-        <div>
-          <div class="eyebrow r">01 — Despre noi</div>
-          <h2 class="glitch h2 r r2" data-text="INGINERIE CARE SE VEDE PE MAȘINĂ.">Inginerie care<br/>se vede pe <em>mașină.</em></h2>
-          <p class="lede r r3">AutoCore3D e un atelier românesc de inginerie și printare 3D specializat în piese auto custom — de la prototipuri funcționale la kituri complete de performanță. Pornim de la fișierul tău CAD sau de la zero: scanăm, proiectăm, printăm și finisăm fiecare piesă pentru montaj direct.</p>
-          <div class="feat-list">
-            <div class="feat r r3"><span class="feat-dot c1"></span><div><h4>100% custom</h4><p>Fiecare piesă e adaptată exact pe șasiul, motorul și spațiul tău de montaj.</p></div></div>
-            <div class="feat r r4"><span class="feat-dot c2"></span><div><h4>Materiale tehnice</h4><p>PETG-CF, ASA, Nylon-CF — rezistente la temperatură, vibrații și UV.</p></div></div>
-            <div class="feat r r5"><span class="feat-dot c3"></span><div><h4>Testat pe mașină reală</h4><p>Fitment verificat fizic înainte de livrare — fără ajustări pe care le faci tu.</p></div></div>
-          </div>
-        </div>
-        <div class="car-illo r r3" data-car></div>
-      </div>
-    </div>
-  </section>
+<!-- CARD 1 — Oglinzi (step 1) -->
+<div class="card card-info" data-step="1">
+  <span class="step-idx">01 / EXTERIOR</span>
+  <h2>Capace oglinzi</h2>
+  <span class="mat-pill">ASA</span>
+  <p>Originalele decolorate de soare și crăpate la prindere. ASA e formulat special pentru exterior: rezistă la UV fără să îngălbenească, ține structural până la 95°C — exact cât prinde caroseria neagră vara în parcare.</p>
+  <div class="spec-row">
+    <div class="spec-item">UV<b>Excelent</b></div>
+    <div class="spec-item">Temp. max<b>95°C</b></div>
+    <div class="spec-item">Finisaj<b>Texturat OEM</b></div>
+  </div>
+</div>
 
-  <!-- 2 — SERVICES -->
-  <section class="scene solidish" id="s2" data-index="2" data-name="SERVICII">
-    <div class="scene-inner">
-      <div class="eyebrow r">02 — Ce facem</div>
-      <h2 class="glitch h2 r r2" data-text="DE LA IDEE LA PIESA MONTATĂ.">De la idee la<br/>piesa <em>montată.</em></h2>
-      <div class="svc-grid">
-        <div class="svc-card r r2">
-          <svg class="svc-icon" viewBox="0 0 48 48"><path d="M24 4 L42 14 V34 L24 44 L6 34 V14 Z M24 4 V24 M6 14 L24 24 L42 14 M24 24 V44"/></svg>
-          <div class="svc-num">01</div>
-          <h3>Proiectare CAD</h3>
-          <p>Modelare 3D parametrică pe baza scanării sau a cotelor mașinii tale. Verificăm toleranțe și fitment digital, înainte să pornească imprimanta.</p>
-        </div>
-        <div class="svc-card r r3">
-          <svg class="svc-icon" viewBox="0 0 48 48"><path d="M16 8 L32 8 L26 18 L22 18 Z M24 18 L24 24 M10 26 L38 26 L38 31 L10 31 Z M8 33 L40 33 L40 38 L8 38 Z M6 40 L42 40 L42 45 L6 45 Z"/></svg>
-          <div class="svc-num">02</div>
-          <h3>Printare industrială</h3>
-          <p>FDM industrial cu filamente tehnice — PETG-CF, ASA, Nylon-CF — straturi fine, rezistență mecanică ridicată, geometrii complexe.</p>
-        </div>
-        <div class="svc-card r r4">
-          <svg class="svc-icon" viewBox="0 0 48 48"><path d="M24 4 L40 10 V24 C40 34 32 42 24 44 C16 42 8 34 8 24 V10 Z M16 24 L22 30 L34 16"/></svg>
-          <div class="svc-num">03</div>
-          <h3>Finisare &amp; montaj</h3>
-          <p>Șlefuire, vopsire, izolare termică și control de calitate — urmate de montaj și testare directă pe mașină, înainte de livrare.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- CARD 2 — Grilă (step 2) -->
+<div class="card card-info" data-step="2">
+  <span class="step-idx">02 / FAȚĂ</span>
+  <h2>Grilă kidney dublu</h2>
+  <span class="mat-pill">ASA + clipsuri PA-CF</span>
+  <p>Reprodusă 1:1 după scanare, cu lamele în profilul GTR dorit de client. Corpul e ASA pentru UV, dar clipsurile de prindere sunt PA-CF — nylon cu fibră de carbon. Tot stresul mecanic la montare e acolo, și PA-CF nu cedează ca plasticul OEM de 24 de ani.</p>
+  <div class="spec-row">
+    <div class="spec-item">Metodă<b>Scanare 3D</b></div>
+    <div class="spec-item">Toleranță<b>±0,1 mm</b></div>
+    <div class="spec-item">Montaj<b>Clip OEM</b></div>
+  </div>
+</div>
 
-  <!-- 3 — PROCESS -->
-  <section class="scene scene-process" id="s3" data-index="3" data-name="PROCES">
-    <video class="proc-media" autoplay muted loop playsinline poster="assets/story/proj-process-poster.jpg">
-      <source src="assets/story/proj-process.mp4" type="video/mp4"/>
-    </video>
-    <div class="proc-overlay"></div>
-    <div class="proc-content">
-      <div class="eyebrow r">03 — Procesul</div>
-      <h2 class="glitch h2 r r2" data-text="STRAT CU STRAT, SPRE PERFECȚIUNE.">Strat cu strat,<br/>spre <em>perfecțiune.</em></h2>
-      <div class="steps">
-        <div class="step r r2"><span class="step-num">01</span><div><h4>Scanare &amp; proiectare</h4><p>Pornim de la fișierul tău sau scanăm piesa veche pentru un model 1:1.</p></div></div>
-        <div class="step r r3"><span class="step-num">02</span><div><h4>Printare strat-cu-strat</h4><p>Producție industrială, monitorizată, cu materiale tehnice de performanță.</p></div></div>
-        <div class="step r r4"><span class="step-num">03</span><div><h4>Control &amp; finisare</h4><p>Verificare dimensională, șlefuire și tratamente de suprafață.</p></div></div>
-        <div class="step r r5"><span class="step-num">04</span><div><h4>Montaj pe mașină</h4><p>Testăm fitment-ul real, direct pe vehicul, înainte de livrare.</p></div></div>
-      </div>
-    </div>
-  </section>
+<!-- CARD 3 — Rear (step 3) -->
+<div class="card card-info" data-step="3">
+  <span class="step-idx">03 / STRUCTURAL</span>
+  <h2>Difuzor spate &amp; suporți</h2>
+  <span class="mat-pill">PA-CF</span>
+  <p>Piesele pe care nu le vezi, dar care țin tot. PA-CF — nylon armat cu fibră de carbon — e cel mai rigid material al nostru. Stabil la 150°C, deci poate sta în imediata vecinătate a evacuării. Față de originalul de plastic virgin: +40% rigiditate, zero deformare termică.</p>
+  <div class="spec-row">
+    <div class="spec-item">Temp. max<b>150°C</b></div>
+    <div class="spec-item">Rigiditate<b>Extremă</b></div>
+    <div class="spec-item">vs OEM<b>+40% rezist.</b></div>
+  </div>
+</div>
 
-  <!-- 4 — COMPATIBILITY -->
-  <section class="scene translucent" id="s4" data-index="4" data-name="COMPATIBILITATE">
-    <div class="scene-inner">
-      <div class="eyebrow r">04 — Compatibilitate</div>
-      <h2 class="glitch h2 r r2" data-text="COMPATIBIL CU ORICE MARCĂ.">Compatibil cu<br/>orice <em>marcă.</em></h2>
-      <div class="marquee-wrap r r3">
-        <div class="marquee"><div class="marquee-track" id="m1"></div></div>
-        <div class="marquee"><div class="marquee-track rev" id="m2"></div></div>
-      </div>
-      <p class="lede compat-note r r4">Lucrăm cu fișierul tău CAD sau proiectăm de la zero pentru orice model — de la hatchback-uri de zi cu zi la build-uri de performanță. Dacă mașina ta nu e pe listă, hai să o adăugăm noi.</p>
-    </div>
-  </section>
+<!-- CARD 4 — Interior (step 4) -->
+<div class="card card-info" data-step="4">
+  <span class="step-idx">04 / INTERIOR</span>
+  <h2>Trim consolă &amp; grile difuzor</h2>
+  <span class="mat-pill">PETG</span>
+  <p>În interior regulile se schimbă: fără UV direct, temperaturi mai blânde. PETG se printează cu detalii fine, are un finisaj satinat identic plasticului de bord și costă sensibil mai puțin decât materialele tehnice. De ce ai plăti PA-CF acolo unde nu e nevoie?</p>
+  <div class="spec-row">
+    <div class="spec-item">Temp. max<b>75°C</b></div>
+    <div class="spec-item">Detaliu<b>Foarte fin</b></div>
+    <div class="spec-item">Cost<b>Optim</b></div>
+  </div>
+</div>
 
-  <!-- 5 — PORTFOLIO -->
-  <section class="scene scene-portfolio solidish" id="s5" data-index="5" data-name="PROIECTE">
-    <div class="scene-inner">
-      <div class="eyebrow r">05 — Proiecte recente</div>
-      <h2 class="glitch h2 r r2" data-text="CONSTRUITE. TESTATE. LIVRATE.">Construite.<br/>Testate. <em>Livrate.</em></h2>
-      <div class="port-grid r r3">
-        <div class="port-item p-a"><img src="assets/products/proj-intake-kit.jpg" alt="Kit complet de admisie printat 3D — montat pe mașină și piese separate"/><div class="tag">Kit admisie complet — montat &amp; piese</div></div>
-        <div class="port-item p-b"><img src="assets/products/proj-gascap.jpg" alt="Capac rezervor original uzat lângă piesa printată 3D de schimb"/><div class="tag">Capac rezervor — înainte / după</div></div>
-        <div class="port-item p-c"><img src="assets/products/proj-clips.jpg" alt="Set cleme și suporturi printate 3D, roșii"/><div class="tag">Cleme &amp; suporturi custom</div></div>
-        <div class="port-item p-d"><img src="assets/products/proj-gauges.jpg" alt="Cluster ceasuri auxiliare montat în bord"/><div class="tag">Cluster ceasuri — montaj bord</div></div>
-        <div class="port-item p-e"><img src="assets/products/proj-trim.jpg" alt="Panouri interior printate 3D"/><div class="tag">Panouri interior custom</div></div>
-      </div>
-    </div>
-  </section>
+<!-- CARD FINALE (step 5) -->
+<div class="card card-final" data-step="5">
+  <span class="eyebrow">/// MAȘINA TA URMEAZĂ</span>
+  <h2>Orice piesă.<br>Materialul potrivit.</h2>
+  <p>Orice piesă ruptă, decolorată sau de negăsit — o scanăm, o regândim și o printăm în materialul corect pentru locul ei în mașină.</p>
+  <a class="btn" href="catalog.html">
+    Cere ofertă gratuită
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </a>
+</div>
 
-  <!-- 6 — CONTACT / FINAL -->
-  <section class="scene scene-final translucent" id="s6" data-index="6" data-name="CONTACT">
-    <div class="scene-inner">
-      <div class="eyebrow r">06 — Hai să vorbim</div>
-      <h2 class="glitch h2 final-title r r2" data-text="PIESA TA, PRINTATĂ PERFECT.">Piesa ta,<br/><em>printată perfect.</em></h2>
-      <p class="lede final-lede r r3">Trimite-ne fișierul CAD, o poză a piesei vechi sau pur și simplu ideea ta. Îți răspundem cu un plan și o estimare de preț în 24h.</p>
-      <div class="final-ctas r r4">
-        <a class="btn btn-primary" href="mailto:contact@autocore3d.com">Trimite un proiect →</a>
-        <a class="btn btn-ghost" href="catalog.html">Vezi catalogul complet →</a>
-      </div>
-      <div class="contact-row r r5">
-        <a href="mailto:contact@autocore3d.com">contact@autocore3d.com</a>
-        <a href="tel:+40700000000">+40 700 000 000</a>
-        <a href="#">@autocore3d</a>
-      </div>
-      <div class="final-foot r r5">AUTOCORE3D © 2026</div>
-    </div>
-  </section>
+<!-- SIDE RAIL -->
+<div class="rail" id="rail"></div>
 
-</main>
+<!-- SCROLL TRACK (invisible — provides scroll height) -->
+<div class="track">
+  <section></section>
+  <section class="tall"></section>
+  <section class="tall"></section>
+  <section class="tall"></section>
+  <section class="tall"></section>
+  <section></section>
+</div>
 
+<!-- THREE.JS (with fallbacks) -->
 <script>
-(function(){
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(src);document.head.appendChild(s);});}
+async function loadThree(){
+  // core THREE
+  try{ await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'); }
+  catch(e){ await loadScript('https://unpkg.com/three@0.128.0/build/three.min.js'); }
+  // GLTFLoader (must come after THREE)
+  try{ await loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js'); }
+  catch(e){ await loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js'); }
+}
+loadThree().then(init).catch(src=>{
+  document.getElementById('lpct').textContent='Nu am putut încărca librăriile 3D (verifică conexiunea la internet).';
+  console.error('Failed to load',src);
+});
 
-  /* ── CAR ILLUSTRATION (injected into all .car-illo containers) ── */
-  var CAR_SVG = '<svg viewBox="0 0 1200 480" xmlns="http://www.w3.org/2000/svg">'
-    + '<path class="car-outline" d="M 80,232 C 60,238 45,255 38,278 C 33,296 36,318 50,345 L 70,348 L 980,348 L 1000,346 C 1020,330 1038,308 1040,282 C 1042,262 1032,250 1010,248 L 940,248 C 920,200 880,150 800,122 C 730,98 600,92 540,94 C 440,98 360,118 300,150 C 240,180 170,222 100,230 Z"/>'
-    + '<path class="car-detail" d="M 100,228 C 160,210 230,182 290,152 C 350,122 440,100 540,98"/>'
-    + '<path class="car-detail" d="M 540,98 C 600,96 680,100 730,118 C 790,142 850,196 870,248"/>'
-    + '<path class="car-detail" d="M 690,108 L 705,348"/>'
-    + '<path class="car-detail" d="M 150,288 L 990,288"/>'
-    + '<path class="car-detail" d="M 600,108 L 632,100 L 640,116 L 612,124 Z"/>'
-    + '<path class="car-detail" d="M 905,144 C 925,138 945,140 958,150 L 952,160 C 938,153 922,152 908,156 Z"/>'
-    + '<path class="car-detail" d="M 102,238 L 145,232 L 150,244 L 108,250 Z"/>'
-    + '<path class="car-detail" d="M 1000,254 L 1032,250 L 1034,262 L 1004,266 Z"/>'
-    + '<circle class="car-wheel" cx="245" cy="350" r="76"/><circle class="car-wheel" cx="245" cy="350" r="36"/>'
-    + '<g class="car-spoke"><line x1="245" y1="274" x2="245" y2="426"/><line x1="169" y1="350" x2="321" y2="350"/><line x1="193" y1="298" x2="297" y2="402"/><line x1="297" y1="298" x2="193" y2="402"/></g>'
-    + '<circle class="car-wheel" cx="880" cy="350" r="76"/><circle class="car-wheel" cx="880" cy="350" r="36"/>'
-    + '<g class="car-spoke"><line x1="880" y1="274" x2="880" y2="426"/><line x1="804" y1="350" x2="956" y2="350"/><line x1="828" y1="298" x2="932" y2="402"/><line x1="932" y1="298" x2="828" y2="402"/></g>'
-    + '<path class="glow-cyan" d="M 50,345 L 165,348 L 162,356 C 130,364 75,362 46,353 Z"/>'
-    + '<g class="glow-mag"><rect x="430" y="270" width="18" height="34" rx="2"/><rect x="456" y="270" width="18" height="34" rx="2"/><rect x="482" y="270" width="18" height="34" rx="2"/></g>'
-    + '<path class="glow-cyan" d="M 985,346 L 1030,335 C 1038,328 1040,318 1038,308 L 1000,318 L 970,346 Z"/>'
-    + '</svg>'
-    + (reduced ? '' : '<div class="car-scan"></div>');
-  document.querySelectorAll('[data-car]').forEach(function(el){ el.innerHTML = CAR_SVG; });
+function init(){
+'use strict';
+if(!window.THREE || !THREE.GLTFLoader){
+  document.getElementById('lpct').textContent='Librăriile 3D nu s-au încărcat complet. Reîncarcă pagina.';
+  return;
+}
+const reduced = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const GLB_PATH = 'bmw_e46.glb';
 
-  /* ── BRAND MARQUEE ── */
-  var brands = [
-    ['BM','BMW'],['AU','AUDI'],['VW','VOLKSWAGEN'],['MB','MERCEDES-BENZ'],['PO','PORSCHE'],['SK','ŠKODA'],
-    ['SE','SEAT'],['FD','FORD'],['OP','OPEL'],['RN','RENAULT'],['DA','DACIA'],['TY','TOYOTA']
-  ];
-  function badgeHTML(b){ return '<div class="badge"><div class="badge-mark">'+b[0]+'</div><div class="badge-name">'+b[1]+'</div></div>'; }
-  var row1 = brands.slice(0,6), row2 = brands.slice(6);
-  function fillTrack(id, list){
-    var html = list.map(badgeHTML).join('') + list.map(badgeHTML).join('');
-    document.getElementById(id).innerHTML = html;
-  }
-  fillTrack('m1', row1);
-  fillTrack('m2', row2);
+/* ─── RENDERER ─── */
+const container = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.25;
+container.appendChild(renderer.domElement);
 
-  /* ── reveal + active section tracking ── */
-  var scenes = document.querySelectorAll('.scene');
-  var dots = document.querySelectorAll('.dot');
-  var secNum = document.getElementById('secNum');
-  var secName = document.getElementById('secName');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x08080a);
 
-  var revealObserver = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting) entry.target.classList.add('in-view');
-    });
-  }, {threshold: 0.32});
-  scenes.forEach(function(s){ revealObserver.observe(s); });
+const camera = new THREE.PerspectiveCamera(36, innerWidth/innerHeight, .01, 100);
+camera.position.set(11, 6, 14);
 
-  var navObserver = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){
-        var idx = entry.target.getAttribute('data-index');
-        dots.forEach(function(d){ d.classList.toggle('on', d.getAttribute('data-index') === idx); });
-        secNum.textContent = String(Number(idx)+1).padStart(2,'0');
-        secName.textContent = entry.target.getAttribute('data-name');
+/* ─── STUDIO ENV MAP ─── */
+const pmrem = new THREE.PMREMGenerator(renderer);
+pmrem.compileEquirectangularShader();
+
+function buildEnv(){
+  const c = document.createElement('canvas'); c.width=2048; c.height=1024;
+  const x = c.getContext('2d');
+  x.fillStyle='#060608'; x.fillRect(0,0,2048,1024);
+  // top key softboxes (streak across black paint)
+  const soft=(px,py,w,h,a)=>{
+    const g=x.createLinearGradient(px,py,px,py+h);
+    g.addColorStop(0,'rgba(255,252,245,0)');
+    g.addColorStop(.45,'rgba(255,252,245,'+a+')');
+    g.addColorStop(1,'rgba(255,252,245,0)');
+    x.fillStyle=g;x.fillRect(px,py,w,h);
+  };
+  soft(50,50,800,90,.92); soft(1100,40,880,110,.85);
+  soft(300,200,400,40,.45); soft(1500,160,400,40,.35);
+  // brand red practical on right side
+  const rg=x.createRadialGradient(1900,350,20,1900,350,280);
+  rg.addColorStop(0,'rgba(220,38,38,.55)');rg.addColorStop(1,'rgba(220,38,38,0)');
+  x.fillStyle=rg;x.fillRect(1600,100,480,520);
+  // cool rim light left
+  const bl=x.createRadialGradient(40,380,10,40,380,300);
+  bl.addColorStop(0,'rgba(130,160,255,.4)');bl.addColorStop(1,'rgba(130,160,255,0)');
+  x.fillStyle=bl;x.fillRect(0,100,420,560);
+  // floor bounce
+  const fg=x.createLinearGradient(0,860,0,1024);
+  fg.addColorStop(0,'rgba(30,32,38,0)');fg.addColorStop(1,'rgba(55,58,70,.8)');
+  x.fillStyle=fg;x.fillRect(0,860,2048,164);
+  const t=new THREE.CanvasTexture(c);
+  t.mapping=THREE.EquirectangularReflectionMapping;
+  return pmrem.fromEquirectangular(t).texture;
+}
+const envMap = buildEnv();
+scene.environment = envMap;
+
+/* ─── FLOOR ─── */
+const floorMat = new THREE.MeshStandardMaterial({
+  color:0x0d0d10, metalness:.7, roughness:.35,
+  envMap, envMapIntensity:.6
+});
+const floor = new THREE.Mesh(new THREE.CircleGeometry(60,72), floorMat);
+floor.rotation.x=-Math.PI/2; floor.receiveShadow=true;
+scene.add(floor);
+
+// contact shadow (soft disc)
+const shadowCanvas = document.createElement('canvas');
+shadowCanvas.width=shadowCanvas.height=512;
+const sc=shadowCanvas.getContext('2d');
+const sg=sc.createRadialGradient(256,256,8,256,256,256);
+sg.addColorStop(0,'rgba(0,0,0,.92)');sg.addColorStop(1,'rgba(0,0,0,0)');
+sc.fillStyle=sg;sc.fillRect(0,0,512,512);
+const shadowTex=new THREE.CanvasTexture(shadowCanvas);
+const shadowMesh=new THREE.Mesh(
+  new THREE.PlaneGeometry(1,1),
+  new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false})
+);
+shadowMesh.rotation.x=-Math.PI/2; shadowMesh.position.y=.005;
+scene.add(shadowMesh);
+
+/* ─── LIGHTS ─── */
+scene.add(new THREE.AmbientLight(0x1a1c24, .4));
+
+const keyLight = new THREE.SpotLight(0xfff5ea, 3.0, 120, .6, .55, 1.0);
+keyLight.position.set(14, 26, 12);
+keyLight.castShadow=true;
+keyLight.shadow.mapSize.set(2048,2048);
+keyLight.shadow.bias=-.0005;
+scene.add(keyLight);
+
+const rimBlue = new THREE.PointLight(0x8ab2ff, 1.1, 60);
+rimBlue.position.set(-18,7,-12);
+scene.add(rimBlue);
+
+const rimRed = new THREE.PointLight(0xdc2626, .8, 50);
+rimRed.position.set(12,3,-16);
+scene.add(rimRed);
+
+const fillBot = new THREE.PointLight(0x2a2c36, .4, 12);
+fillBot.position.set(0,-1,3);
+scene.add(fillBot);
+
+/* ─── MODEL MATERIALS OVERRIDE ─── */
+const BLACK_CLEARCOAT = new THREE.MeshPhysicalMaterial({
+  color:0x050508, metalness:.9, roughness:.32,
+  clearcoat:1, clearcoatRoughness:.04,
+  envMap, envMapIntensity:2.0,
+});
+const CHROME = new THREE.MeshPhysicalMaterial({
+  color:0xdcdce0, metalness:1, roughness:.05,
+  envMap, envMapIntensity:2.4,
+});
+const DARK_CHROME = new THREE.MeshStandardMaterial({
+  color:0x1a1a1e, metalness:1, roughness:.1,
+  envMap, envMapIntensity:1.8,
+});
+const GLASS = new THREE.MeshPhysicalMaterial({
+  color:0x050710, metalness:.1, roughness:.05, transparent:true, opacity:.7,
+  transmission:.5, envMap, envMapIntensity:1.5,
+});
+const RED_CALIPER = new THREE.MeshStandardMaterial({
+  color:0xcc2020, metalness:.3, roughness:.45,
+  emissive:0x550808, emissiveIntensity:.3,
+});
+
+function overrideMaterials(model){
+  model.traverse(child=>{
+    if(!child.isMesh) return;
+    child.castShadow=true; child.receiveShadow=true;
+    const n=(child.material?.name||'').toLowerCase();
+    if(n.includes('body')||n==='bmw_m3_gtr_e46_street_acschnitzer_blackedition_by_alex_ka'){
+      child.material=BLACK_CLEARCOAT;
+    } else if(n==='chrome'||n==='detailschrome'||n==='rimbolts'){
+      child.material=CHROME;
+    } else if(n==='blackchrome'||n==='blackaluminium'||n==='rim2'){
+      child.material=DARK_CHROME;
+    } else if(n.startsWith('windo')||n==='headlightglass'||n==='mirror'){
+      child.material=GLASS;
+    } else if(n==='brakedisc'){
+      child.material=new THREE.MeshStandardMaterial({color:0x303033,metalness:.8,roughness:.55,envMap,envMapIntensity:.9});
+    } else if(n.includes('caliper')){
+      child.material=RED_CALIPER;
+    } else {
+      // preserve original but boost env
+      if(child.material && child.material.isMaterial){
+        child.material.envMap=envMap;
+        child.material.envMapIntensity=.8;
+        child.material.needsUpdate=true;
       }
-    });
-  }, {threshold: 0.55});
-  scenes.forEach(function(s){ navObserver.observe(s); });
-
-  dots.forEach(function(dot){
-    dot.addEventListener('click', function(){
-      var target = document.getElementById('s' + dot.getAttribute('data-index'));
-      if(target) target.scrollIntoView({behavior: reduced ? 'auto' : 'smooth'});
-    });
+    }
   });
+}
 
-  /* ── stat counters ── */
-  var counted = false;
-  var statObserver = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting && !counted){
-        counted = true;
-        document.querySelectorAll('.stat-num').forEach(function(el){
-          var target = parseInt(el.getAttribute('data-target'),10);
-          var suffix = el.getAttribute('data-suffix') || '';
-          if(reduced){ el.textContent = target + suffix; return; }
-          var start = performance.now(), dur = 1200;
-          function tick(now){
-            var p = Math.min(1,(now-start)/dur);
-            var eased = 1 - Math.pow(1-p,3);
-            el.textContent = Math.round(target*eased) + suffix;
-            if(p<1) requestAnimationFrame(tick);
-          }
-          requestAnimationFrame(tick);
-        });
-      }
-    });
-  }, {threshold: 0.4});
-  statObserver.observe(document.getElementById('s0'));
+/* ─── SCROLL KEYFRAMES (defined after model load, using S = car half-length) ─── */
+let K=[], car=null, S=2;
 
-  /* ── progress bar + parallax ── */
-  var progress = document.getElementById('progress');
-  var procMedia = document.querySelector('.proc-media');
-  var ticking = false;
-  function update(){
-    var vh = window.innerHeight;
-    if(!reduced && procMedia){
-      var rect = document.getElementById('s3').getBoundingClientRect();
-      var p = rect.top / vh;
-      procMedia.style.transform = 'translateY(' + (p * -50) + 'px)';
+function buildKeyframes(){
+  // H = car height fraction for look targets; distances scale with S
+  K=[
+    // 0 hero — front 3/4 right, wide
+    {ry:.55, cam:[S*1.6, S*.85, S*2.0], look:[0, S*.42, 0]},
+    // 1 oglinzi — pull to right side, mid height
+    {ry:-.7, cam:[S*1.9, S*.7, S*1.1], look:[0, S*.5, 0], hsWorld:[S*.62, S*.62, S*.34]},
+    // 2 grila — straight on the front, low
+    {ry:.02, cam:[S*.15, S*.55, S*2.1], look:[0, S*.42, 0], hsWorld:[0, S*.45, S*.92]},
+    // 3 difuzor — rear 3/4 left
+    {ry:Math.PI-.35, cam:[-S*1.7, S*.7, S*1.7], look:[0, S*.4, 0], hsWorld:[0, S*.30, -S*.92]},
+    // 4 interior — high front side, closer
+    {ry:.5, cam:[S*1.5, S*1.0, S*1.2], look:[0, S*.55, 0], hsWorld:[S*.18, S*.62, 0]},
+    // 5 finale — dramatic high orbit
+    {ry:.8, cam:[S*1.3, S*1.9, S*2.0], look:[0, S*.35, 0]},
+  ];
+}
+
+/* ─── LOAD MODEL ─── */
+const lbar=document.getElementById('lbar');
+const lpct=document.getElementById('lpct');
+const loader=new THREE.GLTFLoader();
+
+function revealScene(){
+  buildKeyframes();
+  onScroll();
+  initUI();
+  document.getElementById('loader').classList.add('off');
+}
+
+loader.load(
+  GLB_PATH,
+  (gltf)=>{
+    const model=gltf.scene;
+    overrideMaterials(model);
+
+    // Detect up-axis: many Blender/Sketchfab exports are Z-up. Rotate to Y-up if so.
+    let box=new THREE.Box3().setFromObject(model);
+    let size=box.getSize(new THREE.Vector3());
+    if(size.z > size.y){          // taller in Z than Y => Z-up, lay it down
+      model.rotation.x=-Math.PI/2;
     }
-    var doc = document.documentElement;
-    var max = doc.scrollHeight - vh;
-    var pct = max > 0 ? (doc.scrollTop || window.scrollY) / max * 100 : 0;
-    progress.style.width = pct + '%';
-    ticking = false;
-  }
-  window.addEventListener('scroll', function(){
-    if(!ticking){ requestAnimationFrame(update); ticking = true; }
-  }, {passive: true});
-  update();
 
-  /* ── moving cars background ── */
-  var canvas = document.getElementById('bg-canvas');
-  var ctx = canvas.getContext('2d');
-  var W, H, cars = [];
-  var carColors = ['rgba(0,230,255,', 'rgba(255,51,102,', 'rgba(140,107,255,'];
-  var laneFracs = [0.08, 0.22, 0.38, 0.5, 0.64, 0.78, 0.92];
+    // wrap in a pivot so we can rotate cleanly around world Y
+    car=new THREE.Group();
+    car.add(model);
+    scene.add(car);
 
-  function initCars(){
-    cars = laneFracs.map(function(frac, i){
-      var dir = i % 2 === 0 ? 1 : -1;
-      var scale = 0.4 + (i % 4) * 0.2;
-      return {
-        y: H * frac,
-        scale: scale,
-        dir: dir,
-        speed: (0.2 + scale * 0.4) * dir,
-        color: carColors[i % carColors.length],
-        alpha: 0.04 + scale * 0.09,
-        x: Math.random() * (W + 320) - 160
-      };
-    });
+    // recompute box after rotation, then center on origin & drop onto floor
+    box=new THREE.Box3().setFromObject(car);
+    const center=box.getCenter(new THREE.Vector3());
+    size=box.getSize(new THREE.Vector3());
+    model.position.x-=center.x;
+    model.position.z-=center.z;
+    model.position.y-=box.min.y;        // sit on the floor (y=0)
+
+    S=Math.max(size.x,size.z)/2;
+
+    // shadow disc sized to car footprint
+    shadowMesh.scale.set(size.x*1.15,size.z*1.15,1);
+
+    revealScene();
+  },
+  (xhr)=>{
+    const p=xhr.total?xhr.loaded/xhr.total:0;
+    lbar.style.width=(p*100)+'%';
+    lpct.textContent='Se încarcă… '+(p*100|0)+'%';
+  },
+  (err)=>{
+    // Model missing or failed to load — still show the scroll experience,
+    // just without the 3D car in the scene (studio floor/lights remain).
+    console.error('Nu am putut încărca bmw_e46.glb:', err);
+    revealScene();
   }
-  function resize(){
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    initCars();
+);
+
+/* ─── SCROLL STATE ─── */
+const N=5; // number of steps (0..5)
+let activeStep=0;
+let curRy=.52, tarRy=.52;
+let curCam=[11,6,14], tarCam=[11,6,14];
+let curLook=[0,3,0], tarLook=[0,3,0];
+
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+
+function onScroll(){
+  if(!K.length) return;
+  const max=document.documentElement.scrollHeight-innerHeight;
+  if(max<=0) return;
+  const p=Math.min(Math.max(scrollY/max,0),1)*N;
+  const i=Math.min(Math.floor(p),N-1);
+  const t=ease(p-i);
+  const a=K[i],b=K[i+1];
+  tarRy=lerp(a.ry,b.ry,t);
+  for(let j=0;j<3;j++){
+    tarCam[j]=lerp(a.cam[j],b.cam[j],t);
+    tarLook[j]=lerp(a.look[j],b.look[j],t);
   }
-  function drawCar(c){
-    ctx.save();
-    ctx.translate(c.x, c.y);
-    ctx.scale(c.dir < 0 ? -c.scale : c.scale, c.scale);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = c.color + c.alpha + ')';
-    ctx.fillStyle = c.color + c.alpha + ')';
-    ctx.beginPath();
-    ctx.moveTo(0,40);
-    ctx.lineTo(6,40);
-    ctx.bezierCurveTo(8,26,16,16,30,16);
-    ctx.lineTo(48,16);
-    ctx.bezierCurveTo(54,4,70,2,80,6);
-    ctx.lineTo(96,16);
-    ctx.lineTo(112,16);
-    ctx.bezierCurveTo(118,16,122,22,122,30);
-    ctx.lineTo(122,40);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.beginPath(); ctx.arc(28,40,9,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(98,40,9,0,Math.PI*2); ctx.fill();
-    var grad = ctx.createLinearGradient(122,24,196,24);
-    grad.addColorStop(0, c.color + (c.alpha*1.6) + ')');
-    grad.addColorStop(1, c.color + '0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(120, 13, 76, 22);
-    ctx.restore();
+  const step=Math.round(p);
+  if(step!==activeStep){activeStep=step;updateCards();}
+}
+addEventListener('scroll',onScroll,{passive:true});
+
+/* ─── UI: cards / hotspot / rail ─── */
+const cards=[...document.querySelectorAll('.card')];
+const hsEl=document.getElementById('hotspot');
+const hlLab=document.getElementById('hl-label');
+const stepNames=['Intro','Oglinzi','Grilă','Difuzor','Interior','Ofertă'];
+
+function initUI(){
+  const rail=document.getElementById('rail');
+  stepNames.forEach((name,i)=>{
+    const btn=document.createElement('button');
+    btn.className='rail-dot'; btn.setAttribute('aria-label',name);
+    btn.innerHTML=`<span class="t">${name}</span><span class="p"></span>`;
+    btn.onclick=()=>{
+      const max=document.documentElement.scrollHeight-innerHeight;
+      scrollTo({top:max*(i/N),behavior:reduced?'auto':'smooth'});
+    };
+    rail.appendChild(btn);
+  });
+  updateCards();
+}
+
+const hotspotLabels=['','Capac oglindă · ASA','Grilă kidney · ASA+PA-CF','Difuzor · PA-CF','Trim interior · PETG',''];
+
+function updateCards(){
+  cards.forEach(c=>c.classList.toggle('on',+c.dataset.step===activeStep));
+  document.querySelectorAll('.rail-dot').forEach((r,i)=>r.classList.toggle('on',i===activeStep));
+  const lab=hotspotLabels[activeStep]||'';
+  const hasHs=!!(car && K.length && K[activeStep] && K[activeStep].hsWorld);
+  hsEl.classList.toggle('on',!!lab && hasHs);
+  if(lab) hlLab.textContent=lab;
+}
+
+/* ─── RENDER LOOP ─── */
+const tmpV=new THREE.Vector3();
+const clock=new THREE.Clock();
+
+function frame(){
+  requestAnimationFrame(frame);
+  const d=reduced?.1:.065;
+  curRy=lerp(curRy,tarRy,d);
+  for(let j=0;j<3;j++){
+    curCam[j]=lerp(curCam[j],tarCam[j],d);
+    curLook[j]=lerp(curLook[j],tarLook[j],d);
   }
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    for(var i=0;i<cars.length;i++){
-      var c = cars[i];
-      if(!reduced){
-        c.x += c.speed;
-        var span = 200 * c.scale;
-        if(c.dir > 0 && c.x > W + span) c.x = -span;
-        if(c.dir < 0 && c.x < -span) c.x = W + span;
-      }
-      drawCar(c);
-    }
-    if(!reduced) requestAnimationFrame(draw);
+  if(car) car.rotation.y=curRy;
+  camera.position.set(...curCam);
+  camera.lookAt(...curLook);
+
+  // project hotspot to screen
+  if(car && hsEl.classList.contains('on') && K.length && K[activeStep]?.hsWorld){
+    const hw=K[activeStep].hsWorld;
+    tmpV.set(hw[0],hw[1],hw[2]);
+    // rotate with car
+    const cosR=Math.cos(curRy),sinR=Math.sin(curRy);
+    const rx=tmpV.x*cosR+tmpV.z*sinR;
+    const rz=-tmpV.x*sinR+tmpV.z*cosR;
+    tmpV.set(rx,tmpV.y,rz);
+    tmpV.project(camera);
+    hsEl.style.left=((tmpV.x*.5+.5)*innerWidth)+'px';
+    hsEl.style.top =((-tmpV.y*.5+.5)*innerHeight)+'px';
   }
-  window.addEventListener('resize', resize);
-  resize();
-  draw();
-})();
+
+  renderer.render(scene,camera);
+}
+frame();
+
+addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+}
 </script>
-
 </body>
 </html>
