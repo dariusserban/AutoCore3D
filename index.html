@@ -132,6 +132,18 @@ img,video{display:block;max-width:100%;}
 .car-scan{position:absolute;top:0;bottom:0;width:18%;background:linear-gradient(90deg,transparent,rgba(0,230,255,.28),transparent);mix-blend-mode:screen;filter:blur(6px);pointer-events:none;animation:scan 5s linear infinite;}
 @keyframes scan{0%{transform:translateX(-30%);}100%{transform:translateX(560%);}}
 
+/* ── hero media (live build video) ── */
+.hero-media{position:relative;width:100%;aspect-ratio:1/1.08;overflow:hidden;border:1px solid var(--line);background:#000;box-shadow:0 40px 100px -30px rgba(0,0,0,.85),0 0 70px rgba(0,230,255,.08);}
+.hero-media video{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-media::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,15,0) 45%,rgba(6,8,15,.94) 100%);pointer-events:none;}
+.hero-corner{position:absolute;width:26px;height:26px;border:2px solid var(--cyan);opacity:.85;pointer-events:none;filter:drop-shadow(0 0 6px rgba(0,230,255,.5));}
+.hero-corner.tl{top:16px;left:16px;border-right:none;border-bottom:none;}
+.hero-corner.br{bottom:16px;right:16px;border-left:none;border-top:none;border-color:var(--mag);filter:drop-shadow(0 0 6px rgba(255,51,102,.5));}
+.hero-live{position:absolute;top:1.3rem;right:1.5rem;z-index:2;display:flex;align-items:center;gap:.55rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.3em;color:var(--ink);text-transform:uppercase;}
+.hero-live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--mag);box-shadow:0 0 8px var(--mag);animation:pulse 1.8s ease-in-out infinite;}
+.hero-media-tag{position:absolute;left:1.5rem;right:1.5rem;bottom:1.3rem;z-index:2;font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);}
+.hero-media-tag b{display:block;font-family:var(--disp);font-weight:800;font-size:1.15rem;letter-spacing:.02em;color:var(--ink);text-transform:none;margin-top:.3rem;}
+
 /* ── about ── */
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;width:100%;}
 .feat-list{display:flex;flex-direction:column;gap:1.4rem;margin-top:2.2rem;}
@@ -179,20 +191,6 @@ img,video{display:block;max-width:100%;}
 .badge-name{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;color:var(--sub);text-transform:uppercase;white-space:nowrap;}
 .compat-note{margin-top:2.4rem;max-width:560px;}
 
-/* ── portfolio ── */
-.scene-portfolio{align-items:center;}
-.port-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,minmax(200px,1fr));gap:.9rem;width:100%;margin-top:2.2rem;height:60vh;max-height:560px;}
-.port-item{position:relative;overflow:hidden;border:1px solid var(--line);}
-.port-item img,.port-item video{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease);}
-.port-item:hover img,.port-item:hover video{transform:scale(1.08);}
-.port-item .tag{position:absolute;left:0;right:0;bottom:0;padding:.9rem 1rem;background:linear-gradient(180deg,transparent,rgba(6,8,15,.95));font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);transform:translateY(8px);opacity:.85;transition:all .3s var(--ease);}
-.port-item:hover .tag{color:var(--cyan);transform:translateY(0);opacity:1;}
-.p-a{grid-column:1/3;grid-row:1/2;}
-.p-b{grid-column:3/4;grid-row:1/2;}
-.p-c{grid-column:1/2;grid-row:2/3;}
-.p-d{grid-column:2/3;grid-row:2/3;}
-.p-e{grid-column:3/4;grid-row:2/3;}
-
 /* ── contact / final ── */
 .scene-final{justify-content:center;text-align:center;}
 .scene-final .scene-inner{display:flex;flex-direction:column;align-items:center;}
@@ -219,14 +217,8 @@ img,video{display:block;max-width:100%;}
 /* ── responsive ── */
 @media(max-width:980px){
   .hero-grid,.about-grid{grid-template-columns:1fr;gap:2.5rem;}
-  .car-illo{max-width:480px;margin:0 auto;}
+  .car-illo,.hero-media{max-width:480px;margin:0 auto;}
   .svc-grid{grid-template-columns:1fr;}
-  .port-grid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,minmax(140px,1fr));height:auto;max-height:none;}
-  .p-a{grid-column:1/3;grid-row:1/2;}
-  .p-b{grid-column:1/3;grid-row:2/3;}
-  .p-c{grid-column:1/2;grid-row:3/4;}
-  .p-d{grid-column:2/3;grid-row:3/4;}
-  .p-e{grid-column:1/3;grid-row:4/5;}
 }
 @media(max-width:640px){
   .scene-inner{padding:6.5rem 1.2rem 3.5rem;}
@@ -247,7 +239,7 @@ img,video{display:block;max-width:100%;}
     <span class="brand-hex">⬡</span>
     <span class="brand-name">AUTOCORE<span>3D</span></span>
   </a>
-  <div class="nav-counter"><b id="secNum">01</b> / 07 — <span id="secName">INTRO</span></div>
+  <div class="nav-counter"><b id="secNum">01</b> / 06 — <span id="secName">INTRO</span></div>
   <a class="nav-back" href="catalog.html">Catalog →</a>
 </header>
 
@@ -257,8 +249,7 @@ img,video{display:block;max-width:100%;}
   <button class="dot" data-index="2" aria-label="Servicii"><span class="lbl">Servicii</span></button>
   <button class="dot" data-index="3" aria-label="Proces"><span class="lbl">Proces</span></button>
   <button class="dot" data-index="4" aria-label="Compatibilitate"><span class="lbl">Compatibilitate</span></button>
-  <button class="dot" data-index="5" aria-label="Proiecte"><span class="lbl">Proiecte</span></button>
-  <button class="dot" data-index="6" aria-label="Contact"><span class="lbl">Contact</span></button>
+  <button class="dot" data-index="5" aria-label="Contact"><span class="lbl">Contact</span></button>
 </nav>
 
 <main>
@@ -273,7 +264,7 @@ img,video{display:block;max-width:100%;}
           <p class="lede hero-sub r r3">Proiectăm, printăm și montăm piese auto custom — console, suporturi, sisteme de admisie și elemente aero — din materiale tehnice de performanță, gata de drum.</p>
           <div class="hero-ctas r r4">
             <a class="btn btn-primary" href="#s2">Vezi ce facem</a>
-            <a class="btn btn-ghost" href="#s6">Pornește un proiect</a>
+            <a class="btn btn-ghost" href="#s5">Pornește un proiect</a>
           </div>
           <div class="hero-stats r r5">
             <div><div class="stat-num" data-target="500" data-suffix="+">0</div><div class="stat-lbl">Piese livrate</div></div>
@@ -282,7 +273,15 @@ img,video{display:block;max-width:100%;}
             <div><div class="stat-num" data-target="100" data-suffix="%">0</div><div class="stat-lbl">Testat pe mașină</div></div>
           </div>
         </div>
-        <div class="car-illo r r3" data-car></div>
+        <div class="hero-media r r3">
+          <video autoplay muted loop playsinline poster="assets/story/hero-build-poster.jpg">
+            <source src="assets/story/hero-build.mp4" type="video/mp4"/>
+          </video>
+          <div class="hero-live">Live</div>
+          <span class="hero-corner tl"></span>
+          <span class="hero-corner br"></span>
+          <div class="hero-media-tag">// Direct din atelier<b>Admisie 3D montată pe BMW</b></div>
+        </div>
       </div>
     </div>
     <div class="scroll-cue">Derulează</div>
@@ -366,25 +365,10 @@ img,video{display:block;max-width:100%;}
     </div>
   </section>
 
-  <!-- 5 — PORTFOLIO -->
-  <section class="scene scene-portfolio solidish" id="s5" data-index="5" data-name="PROIECTE">
+  <!-- 5 — CONTACT / FINAL -->
+  <section class="scene scene-final solidish" id="s5" data-index="5" data-name="CONTACT">
     <div class="scene-inner">
-      <div class="eyebrow r">05 — Proiecte recente</div>
-      <h2 class="glitch h2 r r2" data-text="CONSTRUITE. TESTATE. LIVRATE.">Construite.<br/>Testate. <em>Livrate.</em></h2>
-      <div class="port-grid r r3">
-        <div class="port-item p-a"><img src="assets/products/proj-intake-kit.jpg" alt="Kit complet de admisie printat 3D — montat pe mașină și piese separate"/><div class="tag">Kit admisie complet — montat &amp; piese</div></div>
-        <div class="port-item p-b"><img src="assets/products/proj-gascap.jpg" alt="Capac rezervor original uzat lângă piesa printată 3D de schimb"/><div class="tag">Capac rezervor — înainte / după</div></div>
-        <div class="port-item p-c"><img src="assets/products/proj-clips.jpg" alt="Set cleme și suporturi printate 3D, roșii"/><div class="tag">Cleme &amp; suporturi custom</div></div>
-        <div class="port-item p-d"><img src="assets/products/proj-gauges.jpg" alt="Cluster ceasuri auxiliare montat în bord"/><div class="tag">Cluster ceasuri — montaj bord</div></div>
-        <div class="port-item p-e"><img src="assets/products/proj-trim.jpg" alt="Panouri interior printate 3D"/><div class="tag">Panouri interior custom</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6 — CONTACT / FINAL -->
-  <section class="scene scene-final translucent" id="s6" data-index="6" data-name="CONTACT">
-    <div class="scene-inner">
-      <div class="eyebrow r">06 — Hai să vorbim</div>
+      <div class="eyebrow r">05 — Hai să vorbim</div>
       <h2 class="glitch h2 final-title r r2" data-text="PIESA TA, PRINTATĂ PERFECT.">Piesa ta,<br/><em>printată perfect.</em></h2>
       <p class="lede final-lede r r3">Trimite-ne fișierul CAD, o poză a piesei vechi sau pur și simplu ideea ta. Îți răspundem cu un plan și o estimare de preț în 24h.</p>
       <div class="final-ctas r r4">
