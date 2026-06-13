@@ -359,7 +359,7 @@ scene.environment = envMap;
 
 /* ─── FLOOR ─── */
 const floorMat = new THREE.MeshStandardMaterial({
-  color:0x0d0d10, metalness:.7, roughness:.35,
+  color:0x0d0d10, metalness:.35, roughness:.55,
   envMap, envMapIntensity:.6
 });
 const floor = new THREE.Mesh(new THREE.CircleGeometry(60,72), floorMat);
@@ -425,6 +425,10 @@ const RED_CALIPER = new THREE.MeshStandardMaterial({
   color:0xcc2020, metalness:.3, roughness:.45,
   emissive:0x550808, emissiveIntensity:.3,
 });
+const PART_PLASTIC = new THREE.MeshStandardMaterial({
+  color:0x26262c, metalness:.2, roughness:.5,
+  envMap, envMapIntensity:.55,
+});
 
 function overrideMaterials(model){
   model.traverse(child=>{
@@ -469,6 +473,55 @@ function removeBackdrop(model){
 
 /* ─── SCROLL KEYFRAMES (defined after model load, using S = car half-length) ─── */
 let K=[], car=null, S=2;
+
+/* ─── SHOWCASE PARTS (printed parts shown alongside the car, one per step) ─── */
+// Each step shows exactly one "hero" object. The car bookends the journey
+// (intro + final CTA); the 4 service steps each showcase a real printed part.
+const STEP_MODEL=['car','velocity','brake','scoop','dimple','car'];
+const PART_FILES={
+  velocity:{path:'parts/velocity_smooth.glb', ry:.6},
+  brake:{path:'parts/brake_duct.glb', ry:.15},
+  scoop:{path:'parts/scoop.glb', ry:-.4, mul:.72},
+  dimple:{path:'parts/velocity_dimple.glb', ry:-.6},
+};
+const modelEntries={}; // key -> {group, rawRadius, baseScale, ryOffset, mul}
+
+function rescaleAllParts(){
+  Object.values(modelEntries).forEach(e=>{
+    if(e.rawRadius) e.baseScale=S/e.rawRadius*(e.mul||1);
+  });
+}
+
+function loadPart(key, path, ryOffset, mul){
+  loader.load(path, (gltf)=>{
+    const model=gltf.scene;
+    model.traverse(c=>{
+      if(c.isMesh){ c.material=PART_PLASTIC; c.castShadow=true; c.receiveShadow=true; }
+    });
+
+    const group=new THREE.Group();
+    group.add(model);
+    scene.add(group);
+
+    let box=new THREE.Box3().setFromObject(group);
+    const center=box.getCenter(new THREE.Vector3());
+    let size=box.getSize(new THREE.Vector3());
+    model.position.x-=center.x;
+    model.position.z-=center.z;
+    model.position.y-=box.min.y; // sit on the floor (y=0)
+
+    // contact shadow sized to this part's footprint
+    const disc=new THREE.Mesh(new THREE.PlaneGeometry(1,1),
+      new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false}));
+    disc.rotation.x=-Math.PI/2; disc.position.y=.005;
+    disc.scale.set(size.x*1.15, size.z*1.15, 1);
+    group.add(disc);
+
+    const rawRadius=size.length()/2;
+    modelEntries[key]={group, rawRadius, baseScale:S/rawRadius*(mul||1), ryOffset, mul};
+    rescaleAllParts();
+  }, undefined, (err)=>console.error('Nu am putut încărca piesa', key, err));
+}
 
 function buildKeyframes(){
   // H = car height fraction for look targets; distances scale with S
@@ -528,8 +581,13 @@ loader.load(
 
     S=Math.max(size.x,size.z)/2;
 
-    // shadow disc sized to car footprint
+    // shadow disc sized to car footprint — lives inside the car's pivot so
+    // it shows/hides and scales together with the car
+    car.add(shadowMesh);
     shadowMesh.scale.set(size.x*1.15,size.z*1.15,1);
+
+    modelEntries.car={group:car, baseScale:1, ryOffset:0};
+    rescaleAllParts();
 
     revealScene();
   },
@@ -546,12 +604,15 @@ loader.load(
   }
 );
 
+Object.entries(PART_FILES).forEach(([key,p])=>loadPart(key,p.path,p.ry,p.mul));
+
 /* ─── SCROLL STATE ─── */
 const N=5; // number of steps (0..5)
 let activeStep=0;
 let curRy=.52, tarRy=.52;
 let curCam=[11,6,14], tarCam=[11,6,14];
 let curLook=[0,3,0], tarLook=[0,3,0];
+let curP=0, tarP=0;
 
 const lerp=(a,b,t)=>a+(b-a)*t;
 const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
@@ -561,6 +622,7 @@ function onScroll(){
   const max=document.documentElement.scrollHeight-innerHeight;
   if(max<=0) return;
   const p=Math.min(Math.max(scrollY/max,0),1)*N;
+  tarP=p;
   const i=Math.min(Math.floor(p),N-1);
   const t=ease(p-i);
   const a=K[i],b=K[i+1];
@@ -598,16 +660,36 @@ function updateCards(){
   document.querySelectorAll('.rail-dot').forEach((r,i)=>r.classList.toggle('on',i===activeStep));
 }
 
+/* ─── CROSSFADE: each step's hero object scales in/out as you scroll past it ─── */
+const FADE_W=1; // how many "steps" wide the crossfade window is
+function smooth01(x){ x=Math.min(Math.max(x,0),1); return x*x*(3-2*x); }
+function modelDist(p,key){
+  let d=Infinity;
+  STEP_MODEL.forEach((k,i)=>{ if(k===key) d=Math.min(d,Math.abs(p-i)); });
+  return d;
+}
+
 /* ─── RENDER LOOP ─── */
 function frame(){
   requestAnimationFrame(frame);
   const d=reduced?.1:.065;
   curRy=lerp(curRy,tarRy,d);
+  curP=lerp(curP,tarP,d);
   for(let j=0;j<3;j++){
     curCam[j]=lerp(curCam[j],tarCam[j],d);
     curLook[j]=lerp(curLook[j],tarLook[j],d);
   }
-  if(car) car.rotation.y=curRy;
+  for(const key in modelEntries){
+    const e=modelEntries[key];
+    const vis=smooth01(1-modelDist(curP,key)/FADE_W);
+    if(vis>0.003){
+      e.group.visible=true;
+      e.group.scale.setScalar(e.baseScale*vis);
+      e.group.rotation.y=curRy+(e.ryOffset||0);
+    } else {
+      e.group.visible=false;
+    }
+  }
   camera.position.set(...curCam);
   camera.lookAt(...curLook);
 
