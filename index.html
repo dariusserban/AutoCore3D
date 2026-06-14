@@ -288,6 +288,7 @@ const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const BUCKET = "product-images";
 const SHEET_ID   = "1-_i4yL6UbWsbr1GPyCoALnODXlz3SOtBEqcLBhqANOk";
 const SHEET_NAME = "Marketplace";
+const FILAMENT_MARKUP = 15; /* RON adăugați automat per rolă */
 const ADMIN_PASS = "Darius12@"; /* aceeasi parola ca in catalog.html */
 
 let CONFIG = { videoUrl:"" };
@@ -447,7 +448,7 @@ async function loadFilaments(){
     const data=rows.slice(1).filter(r=>/abs|asa/i.test(r[1]||''));
     if(!data.length)throw new Error('Niciun filament ABS/ASA găsit');
     body.innerHTML='<div class="fil-table-scroll"><table class="fil"><thead><tr>'+head.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr></thead><tbody>'+
-      data.map(r=>'<tr>'+head.map((_,i)=>`<td>${esc(r[i]||'')}</td>`).join('')+'</tr>').join('')+'</tbody></table></div>';
+      data.map(r=>'<tr>'+head.map((_,i)=>`<td>${esc(i===4?String((parseInt(r[i])||0)+FILAMENT_MARKUP):(r[i]||''))}</td>`).join('')+'</tr>').join('')+'</tbody></table></div>';
     status.classList.add('live');stxt.textContent='Live · '+data.length+' filamente ABS/ASA · '+new Date().toLocaleTimeString();
   }catch(e){
     status.classList.remove('live');stxt.textContent='Eroare la încărcare';
