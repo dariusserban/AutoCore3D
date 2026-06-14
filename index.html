@@ -1,697 +1,508 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AutoCore3D — BMW E46 · Piese printate 3D</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoCore3D — Piese auto printate 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#08080a;
-  --panel:rgba(12,12,16,.82);
-  --ink:#EDEAE4;
-  --dim:#7A7670;
-  --red:#DC2626;
-  --line:rgba(237,234,228,.12);
-  --display:'Syncopate',sans-serif;
-  --mono:'Space Mono',monospace;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:auto}
-body{background:var(--bg);color:var(--ink);font-family:var(--mono);overflow-x:hidden}
-::selection{background:var(--red);color:#fff}
-a{color:inherit;text-decoration:none}
-canvas{display:block}
+  :root{
+    --bg:#05070a;--bg-soft:#0a0e14;--panel:#0c1119;--panel-2:#0f151e;
+    --text:#e9eef5;--muted:#8a97a6;--muted-2:#5e6b7a;
+    --cyan:#00e5ff;--cyan-dim:#0a8ca0;--orange:#ff6a00;--orange-dim:#b34a00;
+    --line:rgba(255,255,255,.08);--line-2:rgba(0,229,255,.18);
+    --display:'Rajdhani',system-ui,sans-serif;--body:'Inter',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--cyan);color:#001014}
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:300;background:linear-gradient(90deg,var(--cyan),var(--orange));box-shadow:0 0 12px var(--cyan)}
 
-/* fixed 3D canvas */
-#scene{position:fixed;inset:0;z-index:0}
+  #loader{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .8s,visibility .8s}
+  #loader.hide{opacity:0;visibility:hidden}
+  .load-mark{font-family:var(--display);font-weight:700;font-size:clamp(26px,6vw,52px);letter-spacing:.16em}
+  .load-mark span{color:var(--cyan)}
+  .load-bar{width:min(260px,60vw);height:2px;background:rgba(255,255,255,.1);overflow:hidden;border-radius:2px}
+  .load-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--orange));animation:loadfill 1.8s ease forwards;box-shadow:0 0 10px var(--cyan)}
+  @keyframes loadfill{0%{width:0}70%{width:78%}100%{width:100%}}
+  .load-txt{font-family:var(--display);letter-spacing:.32em;font-size:12px;color:var(--muted)}
 
-/* vignette */
-.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
-  background:radial-gradient(ellipse 80% 70% at 50% 50%,transparent 40%,rgba(0,0,0,.85) 100%)}
+  nav{position:fixed;top:0;left:0;width:100%;z-index:200;padding:20px clamp(18px,5vw,56px);display:flex;align-items:center;justify-content:space-between;transition:background .4s,padding .4s,border-color .4s;border-bottom:1px solid transparent}
+  nav.scrolled{background:rgba(5,7,10,.72);backdrop-filter:blur(14px);padding:14px clamp(18px,5vw,56px);border-bottom:1px solid var(--line)}
+  .logo{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.12em;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+  .logo b{color:var(--cyan)}
+  .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px var(--orange);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .nav-links{display:flex;gap:28px;align-items:center}
+  .nav-links a,.nav-links button{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:color .25s;position:relative;background:none;border:none;font-family:var(--body);cursor:pointer}
+  .nav-links a:hover,.nav-links button:hover{color:var(--text)}
+  .nav-links a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--cyan);transition:width .3s}
+  .nav-links a:hover::after{width:100%}
+  .nav-admin{padding:9px 18px;border:1px solid var(--orange)!important;color:var(--orange)!important;border-radius:2px;transition:all .25s}
+  .nav-admin:hover{background:var(--orange);color:#1a0a00!important;box-shadow:0 0 20px rgba(255,106,0,.4)}
+  .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:201}
+  .burger span{width:24px;height:2px;background:var(--text);transition:.3s}
 
-/* grain overlay */
-.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+  #hero{position:relative;height:100vh;min-height:620px;width:100%;overflow:hidden}
+  #heroCanvas,#heroVideo{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
+  #heroVideo{display:none;background:#000}
+  .hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,10,.85),rgba(5,7,10,.3) 60%,transparent),linear-gradient(transparent 55%,var(--bg));pointer-events:none;z-index:2}
+  .hero-content{position:absolute;z-index:3;left:clamp(18px,6vw,72px);top:50%;transform:translateY(-50%);max-width:720px;pointer-events:none}
+  .kicker{font-family:var(--display);letter-spacing:.32em;font-size:13px;color:var(--cyan);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:12px;opacity:0;animation:fadeUp .8s .3s forwards}
+  .kicker::before{content:'';width:34px;height:1px;background:var(--cyan)}
+  h1{font-family:var(--display);font-weight:700;line-height:1.02;letter-spacing:-.01em;font-size:clamp(38px,6.4vw,82px);text-transform:uppercase;margin-bottom:22px}
+  h1 .l1{display:block;opacity:0;animation:fadeUp .9s .45s forwards}
+  h1 .l2{display:block;opacity:0;animation:fadeUp .9s .6s forwards}
+  h1 em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-sub{font-size:clamp(15px,1.5vw,18px);color:var(--muted);max-width:520px;margin-bottom:34px;opacity:0;animation:fadeUp .9s .78s forwards}
+  .hero-btns{display:flex;gap:16px;flex-wrap:wrap;pointer-events:auto;opacity:0;animation:fadeUp .9s .92s forwards}
+  .btn{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:14px;padding:15px 30px;border-radius:2px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all .25s;border:1px solid transparent}
+  .btn-primary{background:var(--cyan);color:#001014}
+  .btn-primary:hover{box-shadow:0 0 28px rgba(0,229,255,.45);transform:translateY(-2px)}
+  .btn-ghost{border-color:var(--line);color:var(--text);background:rgba(255,255,255,.02)}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+  .btn svg{width:16px;height:16px}
+  .scroll-hint{position:absolute;z-index:3;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted-2);font-family:var(--display);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:0;animation:fadeUp 1s 1.3s forwards}
+  .mouse{width:22px;height:34px;border:1px solid var(--muted-2);border-radius:12px;position:relative}
+  .mouse::after{content:'';position:absolute;left:50%;top:7px;transform:translateX(-50%);width:3px;height:7px;border-radius:2px;background:var(--cyan);animation:scrolldot 1.6s infinite}
+  @keyframes scrolldot{0%{opacity:0;top:7px}40%{opacity:1}80%{opacity:0;top:18px}100%{opacity:0}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
-/* nav */
-nav{position:fixed;top:0;left:0;right:0;z-index:30;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:22px 34px;background:linear-gradient(to bottom,rgba(8,8,10,.9),transparent)}
-.logo{font-family:var(--display);font-weight:700;font-size:.8rem;letter-spacing:.24em}
-.logo b{color:var(--red)}
-.nav-right{display:flex;align-items:center;gap:18px}
-.nav-tag{font-size:.58rem;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
-.nav-shop{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);
-  border:1px solid rgba(220,38,38,.45);border-radius:2px;padding:7px 14px;white-space:nowrap;
-  transition:background .25s,color .25s,border-color .25s}
-.nav-shop:hover{background:var(--red);border-color:var(--red);color:#fff}
+  section{position:relative;z-index:5}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(18px,5vw,56px)}
+  .sec-head{margin-bottom:50px;max-width:680px}
+  .sec-tag{font-family:var(--display);letter-spacing:.3em;font-size:13px;color:var(--orange);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+  .sec-tag::before{content:'';width:30px;height:1px;background:var(--orange)}
+  .sec-title{font-family:var(--display);font-weight:700;text-transform:uppercase;line-height:1.05;font-size:clamp(30px,4.4vw,52px);margin-bottom:18px}
+  .sec-title em{font-style:normal;color:var(--cyan)}
+  .sec-desc{color:var(--muted);font-size:16px}
 
-/* cards (fixed, shown/hidden by scroll) */
-.card{
-  position:fixed;z-index:20;
-  opacity:0;pointer-events:none;
-  transition:opacity .5s ease, transform .5s ease;
-}
-.card.on{opacity:1;pointer-events:auto}
+  #gallery{padding:110px 0;background:linear-gradient(180deg,var(--bg),var(--bg-soft),var(--bg))}
+  .parts{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .card{background:linear-gradient(155deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:8px;padding:28px;position:relative;overflow:hidden;transition:box-shadow .3s,border-color .3s,transform .15s}
+  .card:hover{border-color:var(--line-2);box-shadow:0 24px 60px -20px rgba(0,229,255,.25);transform:translateY(-6px)}
+  .card .art{height:150px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;border-radius:6px;overflow:hidden;background:rgba(0,0,0,.25)}
+  .card .art img{width:100%;height:100%;object-fit:cover}
+  .card .art svg{width:110px;height:110px;color:var(--cyan);filter:drop-shadow(0 0 10px rgba(0,229,255,.25))}
+  .card .tag{display:inline-block;font-family:var(--display);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--orange);border:1px solid var(--orange-dim);padding:3px 10px;border-radius:2px;margin-bottom:12px}
+  .card .cat{font-size:11px;color:var(--muted-2);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+  .card h3{font-family:var(--display);font-weight:600;font-size:22px;text-transform:uppercase;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:14px}
+  .empty-note{grid-column:1/-1;text-align:center;padding:50px 20px;border:1px dashed var(--line);border-radius:8px;color:var(--muted)}
+  .empty-note b{color:var(--cyan)}
+  .card-more{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;text-decoration:none;color:var(--cyan);font-family:var(--display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:16px;border:1px dashed var(--line-2)}
+  .card-more:hover{color:var(--text)}
+  .card-more svg{width:28px;height:28px}
 
-/* hero card — centered */
-.card-hero{
-  left:50%;top:46%;transform:translate(-50%,-50%) translateY(20px);
-  width:min(680px,90vw);text-align:center;
-}
-.card-hero.on{transform:translate(-50%,-50%)}
-.eyebrow{
-  display:inline-block;font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;
-  color:var(--red);border:1px solid rgba(220,38,38,.35);border-radius:2px;padding:6px 12px;margin-bottom:22px;
-}
-.card-hero h1{
-  font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,5.5vw,3.4rem);
-  letter-spacing:.08em;line-height:1.18;text-transform:uppercase;
-  text-shadow:0 4px 60px rgba(0,0,0,.9),0 0 100px rgba(0,0,0,.6);
-}
-.card-hero h1 span{color:var(--red)}
-.card-hero .sub{
-  margin-top:20px;font-size:.78rem;line-height:1.8;color:#B0ACA4;
-  text-shadow:0 2px 20px rgba(0,0,0,.95);
-}
-.card-hero .scroll-cue{
-  margin-top:34px;display:flex;flex-direction:column;align-items:center;gap:10px;
-  font-size:.56rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dim);
-}
-.wheel{width:1px;height:36px;background:linear-gradient(var(--red),transparent);animation:drop 1.7s infinite}
-@keyframes drop{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+  #materials{padding:110px 0}
+  .fil-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+  .fil-status{padding:14px 20px;border-bottom:1px solid var(--line);font-family:var(--display);letter-spacing:.1em;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:10px}
+  .fil-status .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange)}
+  .fil-status.live .dot{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+  .fil-table-scroll{overflow-x:auto}
+  table.fil{width:100%;border-collapse:collapse;min-width:560px}
+  table.fil th{text-align:left;font-family:var(--display);letter-spacing:.08em;text-transform:uppercase;font-size:12px;color:var(--cyan);padding:14px 18px;border-bottom:1px solid var(--line-2);background:rgba(0,229,255,.03)}
+  table.fil td{padding:13px 18px;border-bottom:1px solid var(--line);font-size:14.5px;color:var(--text)}
+  table.fil tr:hover td{background:rgba(255,255,255,.02)}
+  .fil-msg{padding:40px 24px;color:var(--muted);text-align:center}
+  .fil-msg b{color:var(--cyan)}
 
-/* info card — bottom left */
-.card-info{
-  left:34px;bottom:34px;width:min(370px,calc(100vw - 68px));
-  transform:translateY(18px);
-  background:var(--panel);border:1px solid var(--line);border-radius:4px;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  padding:24px 26px;
-}
-.card-info.on{transform:translateY(0)}
-.card-info .step-idx{font-size:.58rem;letter-spacing:.3em;color:var(--red);display:block;margin-bottom:12px;text-transform:uppercase}
-.card-info h2{font-family:var(--display);font-weight:700;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;line-height:1.45;margin-bottom:12px}
-.mat-pill{display:inline-flex;align-items:center;gap:8px;
-  border:1px solid rgba(220,38,38,.45);color:var(--red);border-radius:2px;
-  font-size:.58rem;letter-spacing:.22em;padding:5px 10px;margin-bottom:14px;text-transform:uppercase}
-.mat-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red)}
-.card-info p{font-size:.76rem;line-height:1.75;color:#B0ACA4}
-.spec-row{display:flex;gap:18px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
-.spec-item{font-size:.58rem;letter-spacing:.06em;color:var(--dim);line-height:1.8}
-.spec-item b{display:block;color:var(--ink);font-size:.76rem;letter-spacing:0}
+  footer{border-top:1px solid var(--line);padding:40px 0;background:var(--bg)}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .foot .logo{font-size:18px}
+  .foot p{color:var(--muted-2);font-size:13px}
+  .foot .fl{display:flex;gap:22px}
+  .foot .fl a{color:var(--muted);font-size:13px;text-decoration:none;transition:color .2s}
+  .foot .fl a:hover{color:var(--cyan)}
 
-/* finale card — centered */
-.card-final{
-  left:50%;top:46%;transform:translate(-50%,-50%) translateY(20px);
-  width:min(540px,90vw);text-align:center;
-}
-.card-final.on{transform:translate(-50%,-50%)}
-.card-final h2{
-  font-family:var(--display);font-weight:700;font-size:clamp(1.3rem,4vw,2.2rem);
-  letter-spacing:.08em;text-transform:uppercase;line-height:1.25;
-  text-shadow:0 4px 40px rgba(0,0,0,.9);
-}
-.card-final p{margin-top:16px;font-size:.76rem;line-height:1.8;color:#B0ACA4}
-.btn{
-  display:inline-flex;align-items:center;gap:12px;margin-top:28px;cursor:pointer;
-  font-family:var(--display);font-weight:700;font-size:.66rem;letter-spacing:.22em;
-  text-transform:uppercase;color:#fff;background:var(--red);border:1px solid var(--red);
-  border-radius:3px;padding:17px 32px;
-  transition:transform .25s,box-shadow .25s;
-}
-.btn:hover{transform:translateY(-3px);box-shadow:0 16px 50px rgba(220,38,38,.5)}
+  .reveal{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.22,1,.36,1)}
+  .reveal.in{opacity:1;transform:none}
 
-/* side rail */
-.rail{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:30;
-  display:flex;flex-direction:column;gap:18px}
-.rail-dot{
-  display:flex;align-items:center;gap:10px;justify-content:flex-end;cursor:pointer;
-  background:none;border:none;padding:2px 0;
-}
-.rail-dot .t{font-size:.54rem;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--dim);opacity:0;transform:translateX(6px);transition:.3s;white-space:nowrap}
-.rail-dot .p{width:6px;height:6px;border-radius:50%;border:1px solid var(--dim);transition:.3s}
-.rail-dot.on .p{background:var(--red);border-color:var(--red);box-shadow:0 0 14px rgba(220,38,38,.9)}
-.rail-dot.on .t{opacity:1;transform:none;color:var(--ink)}
-.rail-dot:hover .t{opacity:1;transform:none}
+  /* admin */
+  #adminModal{position:fixed;inset:0;z-index:400;background:rgba(3,5,8,.82);backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:40px 18px;overflow-y:auto}
+  #adminModal.open{display:flex}
+  .admin-box{width:100%;max-width:640px;background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line-2);border-radius:12px;padding:clamp(24px,4vw,40px);position:relative}
+  .admin-box .x{position:absolute;top:18px;right:18px;width:34px;height:34px;border:1px solid var(--line);border-radius:6px;background:none;color:var(--muted);cursor:pointer;font-size:18px;transition:.2s}
+  .admin-box .x:hover{border-color:var(--orange);color:var(--orange)}
+  .admin-h{font-family:var(--display);font-weight:700;font-size:26px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .admin-h span{color:var(--orange)}
+  .admin-sub{color:var(--muted-2);font-size:13px;margin-bottom:26px}
+  .gate{display:flex;flex-direction:column;gap:14px;max-width:380px}
+  .panel{display:none}
+  .panel.show{display:block}
+  .ablock{border:1px solid var(--line);border-radius:8px;padding:22px;margin-bottom:18px}
+  .ablock h4{font-family:var(--display);font-size:17px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+  .ablock .hint{font-size:12.5px;color:var(--muted-2);margin-bottom:16px}
+  label{display:block;font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;margin-top:12px}
+  input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:12px 14px;color:var(--text);font-family:var(--body);font-size:15px;transition:border-color .25s,box-shadow .25s}
+  input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.12)}
+  .arow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .mini{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px;padding:11px 18px;border-radius:4px;cursor:pointer;border:1px solid transparent;transition:.2s}
+  .mini.cy{background:var(--cyan);color:#001014}
+  .mini.cy:hover{box-shadow:0 0 18px rgba(0,229,255,.4)}
+  .mini.gh{background:none;border-color:var(--line);color:var(--text)}
+  .mini.gh:hover{border-color:var(--cyan);color:var(--cyan)}
+  .mini[disabled]{opacity:.5;cursor:default}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--cyan);color:#001014;font-family:var(--display);font-weight:600;letter-spacing:.06em;padding:12px 22px;border-radius:6px;z-index:600;opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .warn{font-size:12px;color:var(--muted-2);margin-top:10px;line-height:1.5}
 
-/* loader */
-#loader{position:fixed;inset:0;z-index:99;background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
-  transition:opacity .8s;}
-#loader.off{opacity:0;pointer-events:none}
-.l-logo{font-family:var(--display);font-weight:700;font-size:.9rem;letter-spacing:.3em}
-.l-logo b{color:var(--red)}
-.l-prog{width:200px;height:1px;background:rgba(255,255,255,.1);overflow:hidden}
-.l-bar{height:100%;width:0;background:var(--red);transition:width .25s ease}
-.l-pct{font-size:.58rem;letter-spacing:.2em;color:var(--dim)}
-
-/* scroll track */
-.track{position:relative;z-index:0}
-.track section{height:100vh}
-.track section.tall{height:140vh}
-
-/* mobile */
-@media(max-width:680px){
-  nav{padding:16px 20px}
-  .nav-tag{display:none}
-  .card-info{left:16px;right:16px;bottom:20px;width:auto}
-  .rail{right:14px}
-  .rail-dot .t{display:none}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important}
-  .card,.card-hero,.card-info,.card-final{transition:opacity .2s!important;transform:none!important}
-}
-:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+  @media(max-width:900px){
+    .nav-links{position:fixed;inset:0;background:rgba(5,7,10,.97);flex-direction:column;justify-content:center;gap:26px;transform:translateX(100%);transition:transform .4s}
+    .nav-links.open{transform:none}
+    .nav-links a,.nav-links button{font-size:18px}
+    .nav-admin{font-size:15px!important}
+    .burger{display:flex}
+    .burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .burger.open span:nth-child(2){opacity:0}
+    .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .parts{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:560px){.parts{grid-template-columns:1fr}.hero-content{top:auto;bottom:110px;transform:none}}
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="l-logo">AUTO<b>CORE</b>3D</div>
-  <div class="l-prog"><div class="l-bar" id="lbar"></div></div>
-  <div class="l-pct" id="lpct">Se încarcă modelul…</div>
-</div>
+<div id="progress"></div>
+<div id="loader"><div class="load-mark">AUTO<span>CORE3D</span></div><div class="load-bar"><div class="load-fill"></div></div><div class="load-txt">INIȚIALIZARE SISTEM</div></div>
 
-<!-- 3D CANVAS -->
-<div id="scene"></div>
-<div class="vignette"></div>
-<div class="grain"></div>
-
-<!-- NAV -->
-<nav>
-  <span class="logo">AUTO<b>CORE</b>3D</span>
-  <div class="nav-right">
-    <span class="nav-tag">BMW E46 · Studiu de caz</span>
-    <a class="nav-shop" href="catalog.html">Shop →</a>
+<nav id="nav">
+  <a class="logo" href="#hero"><span class="dot"></span>AUTO<b>CORE3D</b></a>
+  <div class="nav-links" id="links">
+    <a href="#hero">Acasă</a>
+    <a href="#gallery">Piese</a>
+    <a href="#materials">Materiale</a>
+    <a href="catalog.html">Catalog complet</a>
+    <button class="nav-admin" id="adminBtn">Admin</button>
   </div>
+  <div class="burger" id="burger"><span></span><span></span><span></span></div>
 </nav>
 
-<!-- CARD HERO (step 0) -->
-<div class="card card-hero" data-step="0">
-  <span class="eyebrow">/// STUDIU DE CAZ 001 — BMW M3 E46</span>
-  <h1>Reconstruit<br>strat <span>cu strat.</span></h1>
-  <p class="sub">Un BMW E46 GTR negru, readus la viață cu piese printate 3D — un exemplu real al modului în care lucrăm. Derulează pagina pentru a descoperi materialele, procesul și serviciile AutoCore3D.</p>
-  <div class="scroll-cue"><span>Scroll</span><span class="wheel"></span></div>
-</div>
+<section id="hero">
+  <canvas id="heroCanvas"></canvas>
+  <video id="heroVideo" autoplay muted loop playsinline></video>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="kicker">AUTOCORE3D // Fabricație aditivă auto</div>
+    <h1><span class="l1">Piese auto</span><span class="l2">printate <em>3D</em></span></h1>
+    <p class="hero-sub">Componente funcționale recreate, optimizate și printate din materiale tehnice rezistente la căldură, vibrații și uzură.</p>
+    <div class="hero-btns">
+      <a href="#gallery" class="btn btn-primary">Vezi piesele <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="#materials" class="btn btn-ghost">Materiale</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><div class="mouse"></div>Derulează</div>
+</section>
 
-<!-- CARD 1 — Materiale (step 1) -->
-<div class="card card-info" data-step="1">
-  <span class="step-idx">01 / MATERIALE</span>
-  <h2>Plasticul potrivit, pentru fiecare piesă</h2>
-  <span class="mat-pill">ABS · ASA · ABS-CF · ASA-CF</span>
-  <p>Alegem materialul în funcție de solicitările reale ale piesei. ASA oferă rezistență superioară la UV și la condiții meteo, fiind ideal pentru componente exterioare. ABS asigură stabilitate structurală la temperaturi ridicate. Variantele armate cu fibră de carbon (ABS-CF / ASA-CF) dublează rigiditatea pentru aplicații solicitante mecanic: suporturi, console și componente din compartimentul motor.</p>
-  <div class="spec-row">
-    <div class="spec-item">UV<b>Excelent (ASA)</b></div>
-    <div class="spec-item">Rigiditate<b>+ Carbon (CF)</b></div>
-    <div class="spec-item">Compatibil<b>Orice marcă</b></div>
+<section id="gallery">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Catalog</div>
+      <h2 class="sec-title">Piese & <em>produse</em></h2>
+      <p class="sec-desc">Componente reale, montate și testate.</p>
+    </div>
+    <div class="parts" id="partsGrid"></div>
+  </div>
+</section>
+
+<section id="materials">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Materiale</div>
+      <h2 class="sec-title">Filamente <em>live</em></h2>
+      <p class="sec-desc">Stoc și specificații, preluate în timp real din foaia ta de calcul.</p>
+    </div>
+    <div class="fil-wrap reveal">
+      <div class="fil-status" id="filStatus"><span class="dot"></span><span id="filStatusTxt">Se încarcă...</span></div>
+      <div id="filBody"><div class="fil-msg">Se încarcă filamentele...</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div class="logo"><span class="dot"></span>AUTO<b>CORE3D</b></div>
+    <div class="fl"><a href="#gallery">Piese</a><a href="#materials">Materiale</a><a href="catalog.html">Catalog</a></div>
+    <p>© 2026 AUTOCORE3D — autocore3d.com</p>
+  </div>
+</footer>
+
+<!-- ADMIN -->
+<div id="adminModal">
+  <div class="admin-box">
+    <button class="x" id="adminClose">✕</button>
+    <div class="admin-h">Panou <span>Admin</span></div>
+    <div class="admin-sub">Gestionează videoclipul din pagina principală.</div>
+
+    <div class="gate" id="gate">
+      <label>Parolă</label>
+      <input type="password" id="pass" placeholder="Introdu parola" autocomplete="off">
+      <div class="arow"><button class="mini cy" id="login">Autentificare</button></div>
+      <div class="warn" id="gateErr"></div>
+    </div>
+
+    <div class="panel" id="panel">
+      <!-- VIDEO -->
+      <div class="ablock">
+        <h4>Video showcase</h4>
+        <div class="hint">Rulează nonstop (loop, fără sunet) când se deschide site-ul. Lipește un link către video sau încarcă un fișier — se salvează permanent pentru toți vizitatorii. Dacă nu e setat niciun video, rămâne animația 3D de printare.</div>
+        <label>URL video (mp4 / webm)</label>
+        <input type="text" id="vUrl" placeholder="https://.../clip.mp4">
+        <label>Sau încarcă fișier video</label>
+        <input type="file" id="vFile" accept="video/*">
+        <div class="arow">
+          <button class="mini cy" id="vSave">Salvează & rulează</button>
+          <button class="mini gh" id="vClear">Revino la animația 3D</button>
+        </div>
+        <div class="warn" id="vMsg"></div>
+      </div>
+    </div>
   </div>
 </div>
+<div class="toast" id="toast"></div>
 
-<!-- CARD 2 — Scanare 3D (step 2) -->
-<div class="card card-info" data-step="2">
-  <span class="step-idx">02 / SCANARE 3D</span>
-  <h2>Reverse Engineering &amp; Scanare 3D</h2>
-  <span class="mat-pill">Precizie ±0,1 mm</span>
-  <p>Când piesa originală este deteriorată, decolorată sau nu mai apare în catalogul producătorului, o scanăm 3D la rezoluție ridicată, reconstruim geometria digital și corectăm deformările acumulate în timp — fără a fi necesare planuri originale.</p>
-  <div class="spec-row">
-    <div class="spec-item">Metodă<b>Scanare 3D</b></div>
-    <div class="spec-item">Toleranță<b>±0,1 mm</b></div>
-    <div class="spec-item">Output<b>Print-ready</b></div>
-  </div>
-</div>
-
-<!-- CARD 3 — Proiectare CAD (step 3) -->
-<div class="card card-info" data-step="3">
-  <span class="step-idx">03 / PROIECTARE CAD</span>
-  <h2>Proiectare &amp; Optimizare CAD</h2>
-  <span class="mat-pill">De la idee la print-ready</span>
-  <p>Realizăm proiectare CAD de la zero sau optimizăm un design existent: reducem greutatea, consolidăm zonele expuse uzurii și pregătim piesa pentru producția aditivă. Rezultatul este o componentă superioară originalului, concepută special pentru mașina ta.</p>
-  <div class="spec-row">
-    <div class="spec-item">Optimizare<b>Topologică</b></div>
-    <div class="spec-item">Greutate<b>Redusă</b></div>
-    <div class="spec-item">Pregătire<b>Print-ready</b></div>
-  </div>
-</div>
-
-<!-- CARD 4 — Soluții custom (step 4) -->
-<div class="card card-info" data-step="4">
-  <span class="step-idx">04 / SOLUȚII CUSTOM</span>
-  <h2>Soluții Custom Automotive</h2>
-  <span class="mat-pill">Admisii · Suporturi · Console</span>
-  <p>Admisii de aer, suporturi de motor, console interioare și elemente structurale — proiectate pentru aplicația ta specifică și validate la vibrații, temperatură și sarcină mecanică reală. Dacă piesa de care ai nevoie nu există pe piață, o proiectăm și o producem integral.</p>
-  <div class="spec-row">
-    <div class="spec-item">Validare<b>Vibrații &amp; Temp.</b></div>
-    <div class="spec-item">Aplicabil<b>Orice model</b></div>
-    <div class="spec-item">Producție<b>Locală, RO</b></div>
-  </div>
-</div>
-
-<!-- CARD FINALE (step 5) -->
-<div class="card card-final" data-step="5">
-  <span class="eyebrow">/// MAȘINA TA URMEAZĂ</span>
-  <h2>Orice piesă.<br>Materialul potrivit.</h2>
-  <p>Orice piesă ruptă, decolorată sau de negăsit — o scanăm, o regândim și o printăm în materialul corect pentru locul ei în mașină.</p>
-  <a class="btn" href="catalog.html">
-    Cere ofertă gratuită
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-  </a>
-</div>
-
-<!-- SIDE RAIL -->
-<div class="rail" id="rail"></div>
-
-<!-- SCROLL TRACK (invisible — provides scroll height) -->
-<div class="track">
-  <section></section>
-  <section class="tall"></section>
-  <section class="tall"></section>
-  <section class="tall"></section>
-  <section class="tall"></section>
-  <section></section>
-</div>
-
-<!-- THREE.JS (with fallbacks) -->
 <script>
-function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(src);document.head.appendChild(s);});}
-async function loadThree(){
-  // core THREE
-  try{ await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'); }
-  catch(e){ await loadScript('https://unpkg.com/three@0.128.0/build/three.min.js'); }
-  // GLTFLoader (must come after THREE)
-  try{ await loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js'); }
-  catch(e){ await loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js'); }
+/* ================= SUPABASE (shared cu catalog.html) ================= */
+const SB_URL = "https://jimdpmrsprcpbyacxguj.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbWRwbXJzcHJjcGJ5YWN4Z3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzMwNDcsImV4cCI6MjA5NDQ0OTA0N30.CL0gIG67tokOK2tm7JZgamXb3Dpch-hs2zmqbV6oEBg";
+const BUCKET = "product-images";
+const SHEET_ID   = "1-_i4yL6UbWsbr1GPyCoALnODXlz3SOtBEqcLBhqANOk";
+const SHEET_NAME = "Marketplace";
+const ADMIN_PASS = "Darius12@"; /* aceeasi parola ca in catalog.html */
+
+let CONFIG = { videoUrl:"" };
+let PRODUCTS = [];
+
+function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- site config (persisted in Supabase "policies" table, id=main) ---------- */
+async function fetchSiteConfig(){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/policies?id=eq.main&select=data`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    return (j&&j[0]&&j[0].data)?j[0].data:{};
+  }catch(e){return {};}
 }
-loadThree().then(init).catch(src=>{
-  document.getElementById('lpct').textContent='Nu am putut încărca librăriile 3D (verifică conexiunea la internet).';
-  console.error('Failed to load',src);
-});
-
-function init(){
-'use strict';
-if(!window.THREE || !THREE.GLTFLoader){
-  document.getElementById('lpct').textContent='Librăriile 3D nu s-au încărcat complet. Reîncarcă pagina.';
-  return;
+async function saveSiteConfig(partial){
+  const cur=await fetchSiteConfig();
+  const merged={...cur,...partial};
+  const r=await fetch(`${SB_URL}/rest/v1/policies`,{method:'POST',headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:'main',data:merged})});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return merged;
 }
-const reduced = matchMedia('(prefers-reduced-motion:reduce)').matches;
-const GLB_PATH = 'bmw_e46.glb';
-
-/* ─── RENDERER ─── */
-const container = document.getElementById('scene');
-const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false, powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.25;
-container.appendChild(renderer.domElement);
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x08080a);
-
-const camera = new THREE.PerspectiveCamera(36, innerWidth/innerHeight, .01, 100);
-camera.position.set(11, 6, 14);
-
-/* ─── STUDIO ENV MAP ─── */
-const pmrem = new THREE.PMREMGenerator(renderer);
-pmrem.compileEquirectangularShader();
-
-function buildEnv(){
-  const c = document.createElement('canvas'); c.width=2048; c.height=1024;
-  const x = c.getContext('2d');
-  x.fillStyle='#060608'; x.fillRect(0,0,2048,1024);
-  // top key softboxes (streak across black paint)
-  const soft=(px,py,w,h,a)=>{
-    const g=x.createLinearGradient(px,py,px,py+h);
-    g.addColorStop(0,'rgba(255,252,245,0)');
-    g.addColorStop(.45,'rgba(255,252,245,'+a+')');
-    g.addColorStop(1,'rgba(255,252,245,0)');
-    x.fillStyle=g;x.fillRect(px,py,w,h);
-  };
-  soft(50,50,800,90,.92); soft(1100,40,880,110,.85);
-  soft(300,200,400,40,.45); soft(1500,160,400,40,.35);
-  // brand red practical on right side (subtle accent only)
-  const rg=x.createRadialGradient(1900,350,20,1900,350,280);
-  rg.addColorStop(0,'rgba(220,38,38,.18)');rg.addColorStop(1,'rgba(220,38,38,0)');
-  x.fillStyle=rg;x.fillRect(1600,100,480,520);
-  // cool rim light left
-  const bl=x.createRadialGradient(40,380,10,40,380,300);
-  bl.addColorStop(0,'rgba(130,160,255,.4)');bl.addColorStop(1,'rgba(130,160,255,0)');
-  x.fillStyle=bl;x.fillRect(0,100,420,560);
-  // floor bounce
-  const fg=x.createLinearGradient(0,860,0,1024);
-  fg.addColorStop(0,'rgba(30,32,38,0)');fg.addColorStop(1,'rgba(55,58,70,.8)');
-  x.fillStyle=fg;x.fillRect(0,860,2048,164);
-  const t=new THREE.CanvasTexture(c);
-  t.mapping=THREE.EquirectangularReflectionMapping;
-  return pmrem.fromEquirectangular(t).texture;
+async function uploadHeroVideo(file){
+  const path=`hero/${Date.now()}-${file.name}`.replace(/\s+/g,'_');
+  const r=await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':file.type,'x-upsert':'true'},body:file});
+  if(!r.ok)throw new Error('Upload '+r.status);
+  return `${SB_URL}/storage/v1/object/public/${BUCKET}/${path}`;
 }
-const envMap = buildEnv();
-scene.environment = envMap;
 
-/* ─── FLOOR ─── */
-const floorMat = new THREE.MeshStandardMaterial({
-  color:0x0d0d10, metalness:.35, roughness:.55,
-  envMap, envMapIntensity:.6
-});
-const floor = new THREE.Mesh(new THREE.CircleGeometry(60,72), floorMat);
-floor.rotation.x=-Math.PI/2; floor.receiveShadow=true;
-scene.add(floor);
+/* ---------- UI base ---------- */
+(function(){
+  const nav=document.getElementById('nav'),prog=document.getElementById('progress');
+  const onScroll=()=>{nav.classList.toggle('scrolled',scrollY>40);const h=document.documentElement.scrollHeight-innerHeight;prog.style.width=(scrollY/h*100)+'%';};
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+  const burger=document.getElementById('burger'),links=document.getElementById('links');
+  burger.addEventListener('click',()=>{burger.classList.toggle('open');links.classList.toggle('open')});
+  links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');links.classList.remove('open')}));
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  addEventListener('load',()=>setTimeout(()=>document.getElementById('loader').classList.add('hide'),800));
+  setTimeout(()=>document.getElementById('loader').classList.add('hide'),2800);
+})();
 
-// contact shadow (soft disc)
-const shadowCanvas = document.createElement('canvas');
-shadowCanvas.width=shadowCanvas.height=512;
-const sc=shadowCanvas.getContext('2d');
-const sg=sc.createRadialGradient(256,256,8,256,256,256);
-sg.addColorStop(0,'rgba(0,0,0,.92)');sg.addColorStop(1,'rgba(0,0,0,0)');
-sc.fillStyle=sg;sc.fillRect(0,0,512,512);
-const shadowTex=new THREE.CanvasTexture(shadowCanvas);
-const shadowMesh=new THREE.Mesh(
-  new THREE.PlaneGeometry(1,1),
-  new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false})
-);
-shadowMesh.rotation.x=-Math.PI/2; shadowMesh.position.y=.005;
-scene.add(shadowMesh);
-
-/* ─── AMBIENT PARTICLES ───
-   Drifting motes that rise and sway continuously on their own, and pick up
-   an extra swirl whenever the page is scrolled — a bit of constant life
-   in the scene, independent of the car/camera. */
-function buildDotTex(){
-  const c=document.createElement('canvas'); c.width=c.height=64;
-  const x=c.getContext('2d');
-  const g=x.createRadialGradient(32,32,0,32,32,32);
-  g.addColorStop(0,'rgba(255,255,255,1)');
-  g.addColorStop(.5,'rgba(180,210,255,.45)');
-  g.addColorStop(1,'rgba(180,210,255,0)');
-  x.fillStyle=g; x.fillRect(0,0,64,64);
-  return new THREE.CanvasTexture(c);
-}
-const PCOUNT=260, PHEIGHT=7;
-const pBaseXZ=new Float32Array(PCOUNT*2);
-const pBaseY=new Float32Array(PCOUNT);
-const pSpeed=new Float32Array(PCOUNT);
-const pPhase=new Float32Array(PCOUNT);
-const pPos=new Float32Array(PCOUNT*3);
-for(let i=0;i<PCOUNT;i++){
-  const r=1.5+Math.random()*9, a=Math.random()*Math.PI*2;
-  pBaseXZ[i*2]=Math.cos(a)*r;
-  pBaseXZ[i*2+1]=Math.sin(a)*r;
-  pBaseY[i]=Math.random()*PHEIGHT;
-  pSpeed[i]=.15+Math.random()*.35;
-  pPhase[i]=Math.random()*Math.PI*2;
-  pPos[i*3]=pBaseXZ[i*2]; pPos[i*3+1]=pBaseY[i]; pPos[i*3+2]=pBaseXZ[i*2+1];
-}
-const pGeo=new THREE.BufferGeometry();
-pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
-const particles=new THREE.Points(pGeo, new THREE.PointsMaterial({
-  size:.07, map:buildDotTex(), transparent:true, depthWrite:false,
-  blending:THREE.AdditiveBlending, color:0x9fc2ff, opacity:.55,
-}));
-scene.add(particles);
-
-function animateParticles(t){
-  if(reduced) return;
-  const sway=.2+Math.abs(scrollSpin)*4;
-  const pos=pGeo.attributes.position.array;
-  for(let i=0;i<PCOUNT;i++){
-    pos[i*3]  =pBaseXZ[i*2]  +Math.sin(t*.4+pPhase[i])*sway;
-    pos[i*3+1]=(pBaseY[i]+t*pSpeed[i])%PHEIGHT;
-    pos[i*3+2]=pBaseXZ[i*2+1]+Math.cos(t*.4+pPhase[i])*sway;
+/* ---------- HERO: video or 3D fallback ---------- */
+let threeStarted=false;
+function applyHero(){
+  const v=document.getElementById('heroVideo'),c=document.getElementById('heroCanvas');
+  if(CONFIG.videoUrl){
+    v.src=CONFIG.videoUrl;v.style.display='block';c.style.display='none';
+    v.play().catch(()=>{});
+  }else{
+    v.removeAttribute('src');v.load?.();v.style.display='none';c.style.display='block';
+    if(!threeStarted && typeof THREE!=='undefined'){threeStarted=true;initHero3D();}
   }
-  pGeo.attributes.position.needsUpdate=true;
-  particles.rotation.y=t*.025+scrollSpin;
 }
 
-/* ─── LIGHTS ─── */
-scene.add(new THREE.AmbientLight(0x1a1c24, .4));
+/* ---------- PRODUCTS (date reale din Supabase, ca in catalog.html) ---------- */
+const defaultIcon='<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2"><path d="M30 80V40a14 14 0 0 1 14-14h6a18 18 0 0 0 18-18"/><circle cx="68" cy="8" r="6"/><rect x="20" y="78" width="40" height="10" rx="2"/><path d="M30 50h14M30 60h14"/></svg>';
+function renderProducts(){
+  const g=document.getElementById('partsGrid');
+  if(!PRODUCTS.length){
+    g.innerHTML='<div class="empty-note">Niciun produs încă. Adaugă piese din <b>Catalog → ⚙ Admin</b>.</div>';
+    return;
+  }
+  const list=PRODUCTS.slice(0,9);
+  let html=list.map(p=>{
+    const img=(p.images&&p.images[0])||'';
+    const mat=(p.materials_list&&p.materials_list[0]&&p.materials_list[0].name)||p.material||'';
+    return `<div class="card">
+      <div class="art">${img?`<img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.parentNode.innerHTML='${defaultIcon.replace(/'/g,"&#39;")}'">`:defaultIcon}</div>
+      ${mat?`<span class="tag">${esc(mat)}</span>`:''}
+      ${p.category?`<div class="cat">${esc(p.category)}</div>`:''}
+      <h3>${esc(p.name)}</h3>
+      ${p.description?`<p>${esc(p.description)}</p>`:''}
+    </div>`;
+  }).join('');
+  html+=`<a href="catalog.html" class="card card-more">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    Vezi tot catalogul
+  </a>`;
+  g.innerHTML=html;
+}
+async function fetchProducts(){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/products?select=*&order=created_at.desc`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const data=await r.json();
+    PRODUCTS=(data||[]).map(p=>({...p,images:Array.isArray(p.images)?p.images:(p.image_url?[p.image_url]:[]),materials_list:Array.isArray(p.materials_list)?p.materials_list:[]}));
+  }catch(e){
+    console.warn('Produse eroare:',e);PRODUCTS=[];
+  }
+  renderProducts();
+}
 
-const keyLight = new THREE.SpotLight(0xfff5ea, 3.0, 120, .6, .55, 1.0);
-keyLight.position.set(14, 26, 12);
-keyLight.castShadow=true;
-keyLight.shadow.mapSize.set(2048,2048);
-keyLight.shadow.bias=-.0005;
-scene.add(keyLight);
+/* ---------- FILAMENTS (live CSV — acelasi mecanism ca in catalog.html) ---------- */
+function tinyCSV(t){const rows=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];
+  if(q){if(ch==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=ch}
+  else{if(ch==='"')q=true;else if(ch===','){row.push(f);f=''}else if(ch==='\n'){row.push(f);rows.push(row);row=[];f=''}else if(ch!=='\r')f+=ch}}
+  if(f.length||row.length){row.push(f);rows.push(row)}return rows.filter(r=>r.some(c=>c.trim()!==''));}
+async function loadFilaments(){
+  const status=document.getElementById('filStatus'),stxt=document.getElementById('filStatusTxt'),body=document.getElementById('filBody');
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+  try{
+    const res=await fetch(url,{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const rows=tinyCSV(await res.text());
+    if(rows.length<2)throw new Error('Foaia pare goală');
+    const head=rows[0],data=rows.slice(1);
+    body.innerHTML='<div class="fil-table-scroll"><table class="fil"><thead><tr>'+head.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr></thead><tbody>'+
+      data.map(r=>'<tr>'+head.map((_,i)=>`<td>${esc(r[i]||'')}</td>`).join('')+'</tr>').join('')+'</tbody></table></div>';
+    status.classList.add('live');stxt.textContent='Live · '+data.length+' filamente · '+new Date().toLocaleTimeString();
+  }catch(e){
+    status.classList.remove('live');stxt.textContent='Eroare la încărcare';
+    body.innerHTML='<div class="fil-msg">Nu am putut citi sursa de filamente.<br>Verifică conexiunea sau încearcă din nou mai târziu.</div>';
+  }
+  setTimeout(loadFilaments,90000);
+}
 
-const rimBlue = new THREE.PointLight(0x8ab2ff, 1.1, 60);
-rimBlue.position.set(-18,7,-12);
-scene.add(rimBlue);
+/* ---------- ADMIN wiring ---------- */
+(function(){
+  const modal=document.getElementById('adminModal');
+  document.getElementById('adminBtn').addEventListener('click',()=>{modal.classList.add('open');document.getElementById('burger').classList.remove('open');document.getElementById('links').classList.remove('open');});
+  document.getElementById('adminClose').addEventListener('click',()=>modal.classList.remove('open'));
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open');});
 
-const rimRed = new THREE.PointLight(0xdc2626, .25, 50);
-rimRed.position.set(12,3,-16);
-scene.add(rimRed);
-
-const fillBot = new THREE.PointLight(0x2a2c36, .4, 12);
-fillBot.position.set(0,-1,3);
-scene.add(fillBot);
-
-/* ─── MODEL MATERIALS OVERRIDE ─── */
-const BLACK_CLEARCOAT = new THREE.MeshPhysicalMaterial({
-  color:0x050508, metalness:.9, roughness:.32,
-  clearcoat:1, clearcoatRoughness:.04,
-  envMap, envMapIntensity:.9,
-});
-const CHROME = new THREE.MeshPhysicalMaterial({
-  color:0xdcdce0, metalness:1, roughness:.05,
-  envMap, envMapIntensity:2.4,
-});
-const DARK_CHROME = new THREE.MeshStandardMaterial({
-  color:0x1a1a1e, metalness:1, roughness:.1,
-  envMap, envMapIntensity:1.8,
-});
-const GLASS = new THREE.MeshPhysicalMaterial({
-  color:0x050710, metalness:.1, roughness:.05, transparent:true, opacity:.7,
-  transmission:.5, envMap, envMapIntensity:1.5,
-});
-const RED_CALIPER = new THREE.MeshStandardMaterial({
-  color:0xcc2020, metalness:.3, roughness:.45,
-  emissive:0x550808, emissiveIntensity:.3,
-});
-
-function overrideMaterials(model){
-  model.traverse(child=>{
-    if(!child.isMesh) return;
-    child.castShadow=true; child.receiveShadow=true;
-    const n=(child.material?.name||'').toLowerCase();
-    if(n.includes('body')||n==='bmw_m3_gtr_e46_street_acschnitzer_blackedition_by_alex_ka'){
-      child.material=BLACK_CLEARCOAT;
-    } else if(n==='chrome'||n==='detailschrome'||n==='rimbolts'){
-      child.material=CHROME;
-    } else if(n==='blackchrome'||n==='blackaluminium'||n==='rim2'){
-      child.material=DARK_CHROME;
-    } else if(n.startsWith('windo')||n==='headlightglass'||n==='mirror'){
-      child.material=GLASS;
-    } else if(n==='brakedisc'){
-      child.material=new THREE.MeshStandardMaterial({color:0x303033,metalness:.8,roughness:.55,envMap,envMapIntensity:.9});
-    } else if(n.includes('caliper')){
-      child.material=RED_CALIPER;
-    } else {
-      // preserve original but boost env
-      if(child.material && child.material.isMaterial){
-        child.material.envMap=envMap;
-        child.material.envMapIntensity=.8;
-        child.material.needsUpdate=true;
-      }
-    }
+  document.getElementById('login').addEventListener('click',()=>{
+    if(document.getElementById('pass').value===ADMIN_PASS){
+      document.getElementById('gate').style.display='none';
+      document.getElementById('panel').classList.add('show');
+      document.getElementById('vUrl').value=CONFIG.videoUrl||'';
+    }else document.getElementById('gateErr').textContent='Parolă greșită.';
   });
-}
+  document.getElementById('pass').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login').click();});
 
-// Sketchfab exports often bundle a giant studio floor/backdrop with the car —
-// strip those so the bounding box (and thus S, the camera scale) reflects
-// the car itself, not a 14m-wide background plane.
-function removeBackdrop(model){
-  const drop=[];
-  model.traverse(child=>{
-    if(!child.isMesh) return;
-    const n=(child.material?.name||'').toLowerCase();
-    if(n==='floor'||n==='back') drop.push(child);
+  document.getElementById('vSave').addEventListener('click',async()=>{
+    const btn=document.getElementById('vSave'),msg=document.getElementById('vMsg');
+    const f=document.getElementById('vFile').files[0];
+    btn.disabled=true;msg.textContent='Se salvează...';
+    try{
+      let url=document.getElementById('vUrl').value.trim();
+      if(f) url=await uploadHeroVideo(f);
+      await saveSiteConfig({heroVideoUrl:url});
+      CONFIG.videoUrl=url;document.getElementById('vUrl').value=url;applyHero();
+      msg.textContent=url?'✓ Video salvat și activ pentru toți vizitatorii.':'URL gol — nu s-a salvat niciun video.';
+      toast(url?'Video salvat':'URL gol');
+    }catch(e){msg.textContent='✗ Eroare: '+e.message;toast('Eroare la salvare');}
+    btn.disabled=false;
   });
-  drop.forEach(m=>m.parent && m.parent.remove(m));
-}
-
-/* ─── SCROLL KEYFRAMES (defined after model load, using S = car half-length) ─── */
-let K=[], car=null, S=2;
-
-function buildKeyframes(){
-  // H = car height fraction for look targets; distances scale with S
-  // On narrow/portrait screens the bottom info card covers a large share
-  // of the viewport — lift the car higher in frame for those steps (1-4)
-  // so it stays the focal point above the card. Centered hero/final cards
-  // (0, 5) need no lift.
-  const aspect=innerWidth/innerHeight;
-  const lift=aspect<1 ? S*.55*(1-aspect) : 0;
-  K=[
-    // 0 hero — front 3/4 right, wide
-    {ry:.55, cam:[S*1.6, S*.85, S*2.0], look:[0, S*.42, 0]},
-    // 1 materiale — pull to right side, mid height
-    {ry:-.7, cam:[S*1.9, S*.7-lift, S*1.1], look:[0, S*.5-lift, 0]},
-    // 2 scanare 3D — straight on the front, low
-    {ry:.02, cam:[S*.15, S*.55-lift, S*2.1], look:[0, S*.42-lift, 0]},
-    // 3 proiectare CAD — rear 3/4 left
-    {ry:Math.PI-.35, cam:[-S*1.7, S*.7-lift, S*1.7], look:[0, S*.4-lift, 0]},
-    // 4 soluții custom — high front side, closer
-    {ry:.5, cam:[S*1.5, S*1.0-lift, S*1.2], look:[0, S*.55-lift, 0]},
-    // 5 finale — dramatic high orbit
-    {ry:.8, cam:[S*1.3, S*1.9, S*2.0], look:[0, S*.35, 0]},
-  ];
-}
-
-/* ─── LOAD MODEL ─── */
-const lbar=document.getElementById('lbar');
-const lpct=document.getElementById('lpct');
-const loader=new THREE.GLTFLoader();
-
-function revealScene(){
-  buildKeyframes();
-  onScroll();
-  initUI();
-  document.getElementById('loader').classList.add('off');
-}
-
-loader.load(
-  GLB_PATH,
-  (gltf)=>{
-    const model=gltf.scene;
-    overrideMaterials(model);
-    removeBackdrop(model);
-
-    // wrap in a pivot so we can rotate cleanly around world Y
-    car=new THREE.Group();
-    car.add(model);
-    scene.add(car);
-
-    // center on origin & drop onto floor
-    let box=new THREE.Box3().setFromObject(car);
-    const center=box.getCenter(new THREE.Vector3());
-    let size=box.getSize(new THREE.Vector3());
-    model.position.x-=center.x;
-    model.position.z-=center.z;
-    model.position.y-=box.min.y;        // sit on the floor (y=0)
-
-    S=Math.max(size.x,size.z)/2;
-
-    // shadow disc sized to car footprint — lives inside the car's pivot so
-    // it shows/hides and scales together with the car
-    car.add(shadowMesh);
-    shadowMesh.scale.set(size.x*1.15,size.z*1.15,1);
-
-    revealScene();
-  },
-  (xhr)=>{
-    const p=xhr.total?xhr.loaded/xhr.total:0;
-    lbar.style.width=(p*100)+'%';
-    lpct.textContent='Se încarcă… '+(p*100|0)+'%';
-  },
-  (err)=>{
-    // Model missing or failed to load — still show the scroll experience,
-    // just without the 3D car in the scene (studio floor/lights remain).
-    console.error('Nu am putut încărca bmw_e46.glb:', err);
-    revealScene();
-  }
-);
-
-/* ─── SCROLL STATE ─── */
-const N=5; // number of steps (0..5)
-let activeStep=0;
-let curRy=.52, tarRy=.52;
-let curCam=[11,6,14], tarCam=[11,6,14];
-let curLook=[0,3,0], tarLook=[0,3,0];
-
-// extra rotation "kick" from scroll velocity — decays back to 0, giving the
-// car a little spin whenever you scroll, on top of its constant idle sway
-let scrollSpin=0, lastScrollY=0;
-
-const lerp=(a,b,t)=>a+(b-a)*t;
-const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-
-function onScroll(){
-  if(!reduced){
-    const dy=scrollY-lastScrollY;
-    scrollSpin+=Math.max(-.15,Math.min(.15,dy*.0008));
-  }
-  lastScrollY=scrollY;
-  if(!K.length) return;
-  const max=document.documentElement.scrollHeight-innerHeight;
-  if(max<=0) return;
-  const p=Math.min(Math.max(scrollY/max,0),1)*N;
-  const i=Math.min(Math.floor(p),N-1);
-  const t=ease(p-i);
-  const a=K[i],b=K[i+1];
-  tarRy=lerp(a.ry,b.ry,t);
-  for(let j=0;j<3;j++){
-    tarCam[j]=lerp(a.cam[j],b.cam[j],t);
-    tarLook[j]=lerp(a.look[j],b.look[j],t);
-  }
-  const step=Math.round(p);
-  if(step!==activeStep){activeStep=step;updateCards();}
-}
-addEventListener('scroll',onScroll,{passive:true});
-
-/* ─── UI: cards / rail ─── */
-const cards=[...document.querySelectorAll('.card')];
-const stepNames=['Intro','Materiale','Scanare','Proiectare','Custom','Ofertă'];
-
-function initUI(){
-  const rail=document.getElementById('rail');
-  stepNames.forEach((name,i)=>{
-    const btn=document.createElement('button');
-    btn.className='rail-dot'; btn.setAttribute('aria-label',name);
-    btn.innerHTML=`<span class="t">${name}</span><span class="p"></span>`;
-    btn.onclick=()=>{
-      const max=document.documentElement.scrollHeight-innerHeight;
-      scrollTo({top:max*(i/N),behavior:reduced?'auto':'smooth'});
-    };
-    rail.appendChild(btn);
+  document.getElementById('vClear').addEventListener('click',async()=>{
+    const msg=document.getElementById('vMsg');
+    try{
+      await saveSiteConfig({heroVideoUrl:''});
+      CONFIG.videoUrl='';document.getElementById('vUrl').value='';document.getElementById('vFile').value='';
+      threeStarted=false;applyHero();
+      msg.textContent='✓ Revenit la animația 3D pentru toți vizitatorii.';toast('Revenit la animația 3D');
+    }catch(e){msg.textContent='✗ Eroare: '+e.message;toast('Eroare la salvare');}
   });
-  updateCards();
-}
+})();
 
-function updateCards(){
-  cards.forEach(c=>c.classList.toggle('on',+c.dataset.step===activeStep));
-  document.querySelectorAll('.rail-dot').forEach((r,i)=>r.classList.toggle('on',i===activeStep));
-}
+/* ---------- BOOT ---------- */
+(async function(){
+  const cfg=await fetchSiteConfig();
+  CONFIG.videoUrl=cfg.heroVideoUrl||'';
+  applyHero(); // may wait for THREE; re-applied on three load
+  fetchProducts();
+  loadFilaments();
+})();
 
-/* ─── RENDER LOOP ─── */
-function frame(){
-  requestAnimationFrame(frame);
-  const d=reduced?.1:.065;
-  curRy=lerp(curRy,tarRy,d);
-  for(let j=0;j<3;j++){
-    curCam[j]=lerp(curCam[j],tarCam[j],d);
-    curLook[j]=lerp(curLook[j],tarLook[j],d);
-  }
-
-  const t=performance.now()*.001;
-  scrollSpin*=.92;
-
-  if(car){
-    const idleSway=reduced?0:Math.sin(t*.35)*.035;
-    car.rotation.y=curRy+idleSway+scrollSpin;
-  }
-  animateParticles(t);
-
-  camera.position.set(...curCam);
-  camera.lookAt(...curLook);
-
-  renderer.render(scene,camera);
-}
-frame();
-
-addEventListener('resize',()=>{
-  camera.aspect=innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);
-  if(K.length){ buildKeyframes(); onScroll(); }
-});
+/* ================= THREE.JS HERO FALLBACK (3D print) ================= */
+function initHero3D(){
+  if(typeof THREE==='undefined')return;
+  const canvas=document.getElementById('heroCanvas');
+  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x05070a,0.052);
+  const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,0.1,100);
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setClearColor(0x05070a,1);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.localClippingEnabled=true;
+  const isM=innerWidth<760;
+  function glowTex(){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');const g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(160,235,255,.7)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);}
+  function layerTex(){const c=document.createElement('canvas');c.width=8;c.height=256;const x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,8,256);for(let y=0;y<256;y+=5){x.fillStyle='rgba(120,225,255,.9)';x.fillRect(0,y,8,1.4);}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1,7);return t;}
+  const gtex=glowTex(),lt=layerTex(),MAXH=3.35,clip=new THREE.Plane(new THREE.Vector3(0,-1,0),0);
+  const bodyMat=new THREE.MeshStandardMaterial({color:0x2c3543,metalness:.55,roughness:.42,emissive:0xffffff,emissiveMap:lt,emissiveIntensity:.16,clippingPlanes:[clip],side:THREE.DoubleSide});
+  const flMat=new THREE.MeshStandardMaterial({color:0x39404c,metalness:.7,roughness:.35,emissive:0x2a1400,emissiveIntensity:.25,clippingPlanes:[clip],side:THREE.DoubleSide});
+  const tubeMat=new THREE.MeshStandardMaterial({color:0x262f3b,metalness:.5,roughness:.5,emissive:0xffffff,emissiveMap:lt,emissiveIntensity:.13,clippingPlanes:[clip],side:THREE.DoubleSide});
+  const part=new THREE.Group();
+  const add=(g,m,p,r)=>{const me=new THREE.Mesh(g,m);if(p)me.position.set(...p);if(r)me.rotation.set(...r);part.add(me);};
+  add(new THREE.CylinderGeometry(1.18,1.22,.26,48),flMat,[0,.13,0]);
+  add(new THREE.TorusGeometry(1.18,.05,10,56),flMat,[0,.26,0],[Math.PI/2,0,0]);
+  for(let i=0;i<6;i++){const a=i/6*Math.PI*2;add(new THREE.CylinderGeometry(.14,.14,.34,18),flMat,[Math.cos(a)*.95,.17,Math.sin(a)*.95]);}
+  add(new THREE.CylinderGeometry(.62,.92,2.1,40),bodyMat,[0,1.32,0]);
+  for(let i=0;i<6;i++){const a=i/6*Math.PI*2,r=.82;add(new THREE.BoxGeometry(.07,1.5,.22),bodyMat,[Math.cos(a)*r,1.3,Math.sin(a)*r],[0,-a,0]);}
+  add(new THREE.TorusGeometry(.78,.07,10,48),flMat,[0,1.0,0],[Math.PI/2,0,0]);
+  add(new THREE.CylinderGeometry(.78,.66,.22,40),flMat,[0,2.48,0]);
+  add(new THREE.TorusGeometry(.78,.05,10,48),flMat,[0,2.59,0],[Math.PI/2,0,0]);
+  const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(.55,1.45,.2),new THREE.Vector3(1.35,1.55,.35),new THREE.Vector3(1.95,2.05,.3),new THREE.Vector3(2.05,2.85,.1),new THREE.Vector3(1.95,3.0,-.05)]);
+  add(new THREE.TubeGeometry(curve,60,.4,22,false),tubeMat);
+  const e=curve.getPoint(1);add(new THREE.CylinderGeometry(.5,.46,.18,32),flMat,[e.x,e.y+.05,e.z],[Math.PI*.06,0,0]);
+  scene.add(part);
+  const plat=new THREE.Mesh(new THREE.CylinderGeometry(2,2.05,.08,64),new THREE.MeshStandardMaterial({color:0x0c1218,metalness:.6,roughness:.5,emissive:0x00181f,emissiveIntensity:.4}));plat.position.y=-.04;scene.add(plat);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(2.02,.025,12,80),new THREE.MeshBasicMaterial({color:0x00e5ff}));ring.rotation.x=Math.PI/2;scene.add(ring);
+  const g1=new THREE.GridHelper(40,40,0x0a4654,0x07303a);g1.position.y=-.05;scene.add(g1);
+  const head=new THREE.Group();
+  const plane=new THREE.Mesh(new THREE.PlaneGeometry(4.4,4.4),new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.05,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));plane.rotation.x=-Math.PI/2;head.add(plane);
+  const sq=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-2.2,0,-2.2),new THREE.Vector3(2.2,0,-2.2),new THREE.Vector3(2.2,0,2.2),new THREE.Vector3(-2.2,0,2.2),new THREE.Vector3(-2.2,0,-2.2)]),new THREE.LineBasicMaterial({color:0x66f0ff}));head.add(sq);
+  const noz=new THREE.Sprite(new THREE.SpriteMaterial({map:gtex,color:0x00e5ff,blending:THREE.AdditiveBlending,depthWrite:false}));noz.scale.set(1.2,1.2,1);head.add(noz);scene.add(head);
+  const back=new THREE.Sprite(new THREE.SpriteMaterial({map:gtex,color:0x004a5a,blending:THREE.AdditiveBlending,depthWrite:false}));back.scale.set(9,9,1);back.position.set(0,1.6,-3);scene.add(back);
+  const PN=isM?220:340,pg=new THREE.BufferGeometry(),pos=new Float32Array(PN*3),spd=new Float32Array(PN);
+  for(let i=0;i<PN;i++){const a=Math.random()*Math.PI*2,r=Math.random()*7;pos[i*3]=Math.cos(a)*r;pos[i*3+1]=Math.random()*9-1;pos[i*3+2]=Math.sin(a)*r;spd[i]=.2+Math.random()*.6;}
+  pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const points=new THREE.Points(pg,new THREE.PointsMaterial({size:.06,map:gtex,color:0x9fe9ff,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false}));scene.add(points);
+  scene.add(new THREE.AmbientLight(0x2b3a4a,.5));
+  const k=new THREE.PointLight(0xff7a2a,1.3,40);k.position.set(5,6,3);scene.add(k);
+  const rm=new THREE.PointLight(0x00e5ff,1.6,40);rm.position.set(-5,4,-4);scene.add(rm);
+  const fl=new THREE.DirectionalLight(0xbfe9ff,.6);fl.position.set(0,5,8);scene.add(fl);
+  const un=new THREE.PointLight(0x00e5ff,1,8);un.position.set(0,.4,0);scene.add(un);
+  let camA=-.5;const camR=7,camY=3.1,tgt=new THREE.Vector3(0,1.5,0);let mx=0,my=0,tmx=0,tmy=0;
+  addEventListener('mousemove',ev=>{tmx=(ev.clientX/innerWidth-.5)*2;tmy=(ev.clientY/innerHeight-.5)*2;});
+  let p=0,phase='print',hold=0;const PT=6.2,HT=4.5,RT=1.4;let vis=true;
+  new IntersectionObserver(es=>es.forEach(x=>vis=x.isIntersecting),{threshold:.02}).observe(document.getElementById('hero'));
+  let last=performance.now();
+  (function loop(now){requestAnimationFrame(loop);const dt=Math.min((now-last)/1000,.05);last=now;if(!vis||document.getElementById('heroCanvas').style.display==='none')return;
+    if(phase==='print'){p+=dt/PT;if(p>=1){p=1;phase='hold';hold=0;}}else if(phase==='hold'){hold+=dt;if(hold>=HT)phase='reset';}else{p-=dt/RT;if(p<=0){p=0;phase='print';}}
+    const cy=p*MAXH;clip.constant=cy;const b=phase!=='hold';head.visible=b;head.position.y=cy;plane.material.opacity=b?(.045+Math.sin(now*.006)*.025):0;
+    part.rotation.y+=dt*(phase==='hold'?.5:.18);
+    mx+=(tmx-mx)*.05;my+=(tmy-my)*.05;camA+=dt*.1;camera.position.set(Math.cos(camA)*camR+mx*.7,camY+my*.5,Math.sin(camA)*camR);camera.lookAt(tgt);
+    const pa=pg.attributes.position.array;for(let i=0;i<PN;i++){pa[i*3+1]+=spd[i]*dt;if(pa[i*3+1]>8)pa[i*3+1]=-1;}pg.attributes.position.needsUpdate=true;points.rotation.y+=dt*.02;
+    un.intensity=b?(.8+Math.sin(now*.02)*.4):.5;noz.material.opacity=b?(.8+Math.sin(now*.015)*.2):0;
+    renderer.render(scene,camera);})(last);
+  addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onload="applyHero()"></script>
 </body>
 </html>
