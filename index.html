@@ -521,7 +521,6 @@ function initHero3D(){
   const gtex=glowTex(),lt=layerTex(),MAXH=3.35,clip=new THREE.Plane(new THREE.Vector3(0,-1,0),0);
   const bodyMat=new THREE.MeshStandardMaterial({color:0x2c3543,metalness:.55,roughness:.42,emissive:0xffffff,emissiveMap:lt,emissiveIntensity:.16,clippingPlanes:[clip],side:THREE.DoubleSide});
   const flMat=new THREE.MeshStandardMaterial({color:0x39404c,metalness:.7,roughness:.35,emissive:0x2a1400,emissiveIntensity:.25,clippingPlanes:[clip],side:THREE.DoubleSide});
-  const tubeMat=new THREE.MeshStandardMaterial({color:0x262f3b,metalness:.5,roughness:.5,emissive:0xffffff,emissiveMap:lt,emissiveIntensity:.13,clippingPlanes:[clip],side:THREE.DoubleSide});
   const part=new THREE.Group();
   const add=(g,m,p,r)=>{const me=new THREE.Mesh(g,m);if(p)me.position.set(...p);if(r)me.rotation.set(...r);part.add(me);};
   add(new THREE.CylinderGeometry(1.18,1.22,.26,48),flMat,[0,.13,0]);
@@ -532,9 +531,8 @@ function initHero3D(){
   add(new THREE.TorusGeometry(.78,.07,10,48),flMat,[0,1.0,0],[Math.PI/2,0,0]);
   add(new THREE.CylinderGeometry(.78,.66,.22,40),flMat,[0,2.48,0]);
   add(new THREE.TorusGeometry(.78,.05,10,48),flMat,[0,2.59,0],[Math.PI/2,0,0]);
-  const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(.55,1.45,.2),new THREE.Vector3(1.35,1.55,.35),new THREE.Vector3(1.95,2.05,.3),new THREE.Vector3(2.05,2.85,.1),new THREE.Vector3(1.95,3.0,-.05)]);
-  add(new THREE.TubeGeometry(curve,60,.4,22,false),tubeMat);
-  const e=curve.getPoint(1);add(new THREE.CylinderGeometry(.5,.46,.18,32),flMat,[e.x,e.y+.05,e.z],[Math.PI*.06,0,0]);
+  add(new THREE.CylinderGeometry(.16,.2,.5,24),flMat,[0,2.85,0]);
+  add(new THREE.SphereGeometry(.22,24,18),bodyMat,[0,3.15,0]);
   scene.add(part);
   const plat=new THREE.Mesh(new THREE.CylinderGeometry(2,2.05,.08,64),new THREE.MeshStandardMaterial({color:0x0c1218,metalness:.6,roughness:.5,emissive:0x00181f,emissiveIntensity:.4}));plat.position.y=-.04;scene.add(plat);
   const ring=new THREE.Mesh(new THREE.TorusGeometry(2.02,.025,12,80),new THREE.MeshBasicMaterial({color:0x00e5ff}));ring.rotation.x=Math.PI/2;scene.add(ring);
