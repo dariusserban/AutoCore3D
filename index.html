@@ -282,6 +282,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
+if('scrollRestoration' in history) history.scrollRestoration='manual';
+if(location.hash) history.replaceState(null,'',location.pathname+location.search);
+window.scrollTo(0,0);
 /* ================= SUPABASE (shared cu catalog.html) ================= */
 const SB_URL = "https://jimdpmrsprcpbyacxguj.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbWRwbXJzcHJjcGJ5YWN4Z3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzMwNDcsImV4cCI6MjA5NDQ0OTA0N30.CL0gIG67tokOK2tm7JZgamXb3Dpch-hs2zmqbV6oEBg";
@@ -330,7 +333,7 @@ async function uploadHeroVideo(file){
   links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');links.classList.remove('open')}));
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-  addEventListener('load',()=>setTimeout(()=>document.getElementById('loader').classList.add('hide'),800));
+  addEventListener('load',()=>{window.scrollTo(0,0);setTimeout(()=>document.getElementById('loader').classList.add('hide'),800);});
   setTimeout(()=>document.getElementById('loader').classList.add('hide'),2800);
 })();
 
@@ -446,11 +449,11 @@ async function loadFilaments(){
     if(rows.length<2)throw new Error('Foaia pare goală');
     const head=rows[0];
     const keepIdx=head.map((h,i)=>i).filter(i=>i<6);
-    const data=rows.slice(1).filter(r=>/abs|asa/i.test(r[1]||''));
+    const data=rows.slice(1).filter(r=>/abs|asa/i.test(r[1]||'')&&/alb|negru/i.test(r[2]||''));
     if(!data.length)throw new Error('Niciun filament ABS/ASA găsit');
     body.innerHTML='<div class="fil-table-scroll"><table class="fil"><thead><tr>'+keepIdx.map(i=>`<th>${esc(head[i])}</th>`).join('')+'</tr></thead><tbody>'+
       data.map(r=>'<tr>'+keepIdx.map(i=>`<td>${esc(i===4?String((parseInt(r[i])||0)+FILAMENT_MARKUP):(r[i]||''))}</td>`).join('')+'</tr>').join('')+'</tbody></table></div>';
-    status.classList.add('live');stxt.textContent='Live · '+data.length+' filamente ABS/ASA · '+new Date().toLocaleTimeString();
+    status.classList.add('live');stxt.textContent='Live · '+data.length+' filamente ABS/ASA (Alb/Negru) · '+new Date().toLocaleTimeString();
   }catch(e){
     status.classList.remove('live');stxt.textContent='Eroare la încărcare';
     body.innerHTML='<div class="fil-msg">Nu am putut citi sursa de filamente.<br>Verifică conexiunea sau încearcă din nou mai târziu.</div>';
