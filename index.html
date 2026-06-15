@@ -207,8 +207,8 @@
     <h1><span class="l1">Piese auto</span><span class="l2">printate <em>3D</em></span></h1>
     <p class="hero-sub">Componente funcționale recreate, optimizate și printate din materiale tehnice rezistente la căldură, vibrații și uzură.</p>
     <div class="hero-btns">
-      <a href="#gallery" class="btn btn-primary">Vezi piesele <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      <a href="#materials" class="btn btn-ghost">Materiale</a>
+      <a href="catalog.html#produse" class="btn btn-primary">Vezi piesele <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="catalog.html#filamente" class="btn btn-ghost">Materiale</a>
     </div>
   </div>
   <div class="scroll-hint"><div class="mouse"></div>Derulează</div>
@@ -445,10 +445,11 @@ async function loadFilaments(){
     const rows=tinyCSV(await res.text());
     if(rows.length<2)throw new Error('Foaia pare goală');
     const head=rows[0];
+    const keepIdx=head.map((h,i)=>i).filter(i=>!/actualizat|data/i.test(head[i]||''));
     const data=rows.slice(1).filter(r=>/abs|asa/i.test(r[1]||''));
     if(!data.length)throw new Error('Niciun filament ABS/ASA găsit');
-    body.innerHTML='<div class="fil-table-scroll"><table class="fil"><thead><tr>'+head.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr></thead><tbody>'+
-      data.map(r=>'<tr>'+head.map((_,i)=>`<td>${esc(i===4?String((parseInt(r[i])||0)+FILAMENT_MARKUP):(r[i]||''))}</td>`).join('')+'</tr>').join('')+'</tbody></table></div>';
+    body.innerHTML='<div class="fil-table-scroll"><table class="fil"><thead><tr>'+keepIdx.map(i=>`<th>${esc(head[i])}</th>`).join('')+'</tr></thead><tbody>'+
+      data.map(r=>'<tr>'+keepIdx.map(i=>`<td>${esc(i===4?String((parseInt(r[i])||0)+FILAMENT_MARKUP):(r[i]||''))}</td>`).join('')+'</tr>').join('')+'</tbody></table></div>';
     status.classList.add('live');stxt.textContent='Live · '+data.length+' filamente ABS/ASA · '+new Date().toLocaleTimeString();
   }catch(e){
     status.classList.remove('live');stxt.textContent='Eroare la încărcare';
