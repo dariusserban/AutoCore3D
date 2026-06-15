@@ -2634,6 +2634,10 @@ function showMainTab(id){
 }
 document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showMainTab(b.dataset.tab)));
 document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showMainTab(a.dataset.tab);}));
+(function(){
+  const id=(location.hash||'').replace('#','');
+  if(['produse','configurator','filamente'].includes(id))showMainTab(id);
+})();
 
 /* ══ EMAIL NOTIF ══ */
 if(EJS_KEY!=='YOUR_PUBLIC_KEY') emailjs.init(EJS_KEY);

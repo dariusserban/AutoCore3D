@@ -80,7 +80,7 @@
   .sec-title em{font-style:normal;color:var(--cyan)}
   .sec-desc{color:var(--muted);font-size:16px}
 
-  #gallery{padding:110px 0;background:linear-gradient(180deg,var(--bg),var(--bg-soft),var(--bg))}
+  #gallery{padding:110px 0;background:linear-gradient(180deg,var(--bg),var(--bg-soft),var(--bg));scroll-margin-top:80px}
   .parts{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
   .card{background:linear-gradient(155deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:8px;padding:28px;position:relative;overflow:hidden;transition:box-shadow .3s,border-color .3s,transform .15s}
   .card:hover{border-color:var(--line-2);box-shadow:0 24px 60px -20px rgba(0,229,255,.25);transform:translateY(-6px)}
@@ -114,7 +114,7 @@
   .card-oos{opacity:.62}
   .stock-badge{position:absolute;top:14px;right:14px;background:var(--orange);color:#1a0a00;font-family:var(--display);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:3px;z-index:2}
 
-  #materials{padding:110px 0}
+  #materials{padding:110px 0;scroll-margin-top:80px}
   .fil-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
   .fil-status{padding:14px 20px;border-bottom:1px solid var(--line);font-family:var(--display);letter-spacing:.1em;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:10px}
   .fil-status .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange)}
@@ -192,7 +192,7 @@
     <a href="#hero">Acasă</a>
     <a href="#gallery">Piese</a>
     <a href="#materials">Materiale</a>
-    <a href="catalog.html">Catalog complet</a>
+    <a href="catalog.html#produse">Catalog complet</a>
     <button class="nav-admin" id="adminBtn">Admin</button>
   </div>
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
@@ -242,7 +242,7 @@
 <footer>
   <div class="wrap foot">
     <div class="logo"><span class="dot"></span>AUTO<b>CORE3D</b></div>
-    <div class="fl"><a href="#gallery">Piese</a><a href="#materials">Materiale</a><a href="catalog.html">Catalog</a></div>
+    <div class="fl"><a href="#gallery">Piese</a><a href="#materials">Materiale</a><a href="catalog.html#produse">Catalog</a></div>
     <p>© 2026 AUTOCORE3D — autocore3d.com</p>
   </div>
 </footer>
@@ -408,7 +408,7 @@ function renderProducts(){
       ${bgs?`<div class="badges">${bgs}</div>`:''}
       <div class="card-foot">
         <div><div class="price">${priceStr}</div><div class="price-sub">Transport inclus</div></div>
-        <a href="catalog.html" class="card-link">Vezi & comandă</a>
+        <a href="catalog.html#produse" class="card-link">Vezi & comandă</a>
       </div>
     </div>`;
   }).join('');
