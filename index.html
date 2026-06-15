@@ -192,7 +192,7 @@
     <a href="#hero">Acasă</a>
     <a href="#gallery">Piese</a>
     <a href="#materials">Materiale</a>
-    <a href="catalog.html#produse">Catalog complet</a>
+    <a href="catalog.html?tab=produse">Catalog complet</a>
     <button class="nav-admin" id="adminBtn">Admin</button>
   </div>
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
@@ -207,8 +207,8 @@
     <h1><span class="l1">Piese auto</span><span class="l2">printate <em>3D</em></span></h1>
     <p class="hero-sub">Componente funcționale recreate, optimizate și printate din materiale tehnice rezistente la căldură, vibrații și uzură.</p>
     <div class="hero-btns">
-      <a href="catalog.html#produse" class="btn btn-primary">Vezi piesele <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      <a href="catalog.html#filamente" class="btn btn-ghost">Materiale</a>
+      <a href="catalog.html?tab=produse" class="btn btn-primary">Vezi piesele <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="catalog.html?tab=filamente" class="btn btn-ghost">Materiale</a>
     </div>
   </div>
   <div class="scroll-hint"><div class="mouse"></div>Derulează</div>
@@ -242,7 +242,7 @@
 <footer>
   <div class="wrap foot">
     <div class="logo"><span class="dot"></span>AUTO<b>CORE3D</b></div>
-    <div class="fl"><a href="#gallery">Piese</a><a href="#materials">Materiale</a><a href="catalog.html#produse">Catalog</a></div>
+    <div class="fl"><a href="#gallery">Piese</a><a href="#materials">Materiale</a><a href="catalog.html?tab=produse">Catalog</a></div>
     <p>© 2026 AUTOCORE3D — autocore3d.com</p>
   </div>
 </footer>
@@ -408,7 +408,7 @@ function renderProducts(){
       ${bgs?`<div class="badges">${bgs}</div>`:''}
       <div class="card-foot">
         <div><div class="price">${priceStr}</div><div class="price-sub">Transport inclus</div></div>
-        <a href="catalog.html#produse" class="card-link">Vezi & comandă</a>
+        <a href="catalog.html?tab=produse" class="card-link">Vezi & comandă</a>
       </div>
     </div>`;
   }).join('');
@@ -445,7 +445,7 @@ async function loadFilaments(){
     const rows=tinyCSV(await res.text());
     if(rows.length<2)throw new Error('Foaia pare goală');
     const head=rows[0];
-    const keepIdx=head.map((h,i)=>i).filter(i=>!/actualizat|data/i.test(head[i]||''));
+    const keepIdx=head.map((h,i)=>i).filter(i=>i<6);
     const data=rows.slice(1).filter(r=>/abs|asa/i.test(r[1]||''));
     if(!data.length)throw new Error('Niciun filament ABS/ASA găsit');
     body.innerHTML='<div class="fil-table-scroll"><table class="fil"><thead><tr>'+keepIdx.map(i=>`<th>${esc(head[i])}</th>`).join('')+'</tr></thead><tbody>'+

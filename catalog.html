@@ -2635,7 +2635,7 @@ function showMainTab(id){
 document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showMainTab(b.dataset.tab)));
 document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showMainTab(a.dataset.tab);}));
 (function(){
-  const id=(location.hash||'').replace('#','');
+  const id=new URLSearchParams(location.search).get('tab');
   if(['produse','configurator','filamente'].includes(id))showMainTab(id);
 })();
 
