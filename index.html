@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AutoCore3D — Piese auto printate 3D</title>
+<title>AutoCore3D — Imprimare 3D cu materiale tehnice | ABS-CF, ASA-CF, PC-CF, PA-CF</title>
+<meta name="description" content="Servicii de imprimare 3D cu materiale tehnice armate cu fibră de carbon: ABS-CF, ASA-CF, PC-CF, PA-CF, PA, PETG-CF. Piese funcționale și prototipuri printate pe Bambu Lab P2S cu AMS 2 Pro.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -36,7 +37,7 @@
   .logo b{color:var(--cyan)}
   .logo .dot{width:9px;height:9px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px var(--orange);animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-  .nav-links{display:flex;gap:28px;align-items:center}
+  .nav-links{display:flex;gap:24px;align-items:center}
   .nav-links a,.nav-links button{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:color .25s;position:relative;background:none;border:none;font-family:var(--body);cursor:pointer}
   .nav-links a:hover,.nav-links button:hover{color:var(--text)}
   .nav-links a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--cyan);transition:width .3s}
@@ -46,18 +47,18 @@
   .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:201}
   .burger span{width:24px;height:2px;background:var(--text);transition:.3s}
 
-  #hero{position:relative;height:100vh;min-height:620px;width:100%;overflow:hidden}
+  #hero{position:relative;height:100vh;height:100dvh;min-height:620px;width:100%;overflow:hidden}
   #heroCanvas,#heroVideo{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
   #heroVideo{display:none;background:#000}
-  .hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,10,.85),rgba(5,7,10,.3) 60%,transparent),linear-gradient(transparent 55%,var(--bg));pointer-events:none;z-index:2}
+  .hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,10,.85),rgba(5,7,10,.28) 58%,transparent),linear-gradient(transparent 55%,var(--bg));pointer-events:none;z-index:2}
   .hero-content{position:absolute;z-index:3;left:clamp(18px,6vw,72px);top:50%;transform:translateY(-50%);max-width:720px;pointer-events:none}
   .kicker{font-family:var(--display);letter-spacing:.32em;font-size:13px;color:var(--cyan);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:12px;opacity:0;animation:fadeUp .8s .3s forwards}
   .kicker::before{content:'';width:34px;height:1px;background:var(--cyan)}
-  h1{font-family:var(--display);font-weight:700;line-height:1.02;letter-spacing:-.01em;font-size:clamp(38px,6.4vw,82px);text-transform:uppercase;margin-bottom:22px}
+  h1{font-family:var(--display);font-weight:700;line-height:1.02;letter-spacing:-.01em;font-size:clamp(36px,6vw,78px);text-transform:uppercase;margin-bottom:22px}
   h1 .l1{display:block;opacity:0;animation:fadeUp .9s .45s forwards}
   h1 .l2{display:block;opacity:0;animation:fadeUp .9s .6s forwards}
   h1 em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .hero-sub{font-size:clamp(15px,1.5vw,18px);color:var(--muted);max-width:520px;margin-bottom:34px;opacity:0;animation:fadeUp .9s .78s forwards}
+  .hero-sub{font-size:clamp(15px,1.5vw,18px);color:var(--muted);max-width:540px;margin-bottom:32px;opacity:0;animation:fadeUp .9s .78s forwards}
   .hero-btns{display:flex;gap:16px;flex-wrap:wrap;pointer-events:auto;opacity:0;animation:fadeUp .9s .92s forwards}
   .btn{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:14px;padding:15px 30px;border-radius:2px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all .25s;border:1px solid transparent}
   .btn-primary{background:var(--cyan);color:#001014}
@@ -65,31 +66,113 @@
   .btn-ghost{border-color:var(--line);color:var(--text);background:rgba(255,255,255,.02)}
   .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
   .btn svg{width:16px;height:16px}
+  .hero-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px;opacity:0;animation:fadeUp .9s 1.06s forwards}
+  .hero-chips span{font-family:var(--display);font-size:12px;letter-spacing:.14em;padding:6px 12px;border:1px solid var(--line-2);border-radius:2px;color:var(--cyan);background:rgba(0,229,255,.05)}
+  .hero-machine{position:absolute;z-index:3;right:clamp(18px,5vw,56px);bottom:26px;display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2);opacity:0;animation:fadeUp 1s 1.2s forwards}
+  .hero-machine i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.6s infinite}
   .scroll-hint{position:absolute;z-index:3;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted-2);font-family:var(--display);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:0;animation:fadeUp 1s 1.3s forwards}
   .mouse{width:22px;height:34px;border:1px solid var(--muted-2);border-radius:12px;position:relative}
   .mouse::after{content:'';position:absolute;left:50%;top:7px;transform:translateX(-50%);width:3px;height:7px;border-radius:2px;background:var(--cyan);animation:scrolldot 1.6s infinite}
   @keyframes scrolldot{0%{opacity:0;top:7px}40%{opacity:1}80%{opacity:0;top:18px}100%{opacity:0}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
-  section{position:relative;z-index:5}
+  section{position:relative;z-index:5;scroll-margin-top:80px}
+  .sec{padding:110px 0}
   .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(18px,5vw,56px)}
-  .sec-head{margin-bottom:50px;max-width:680px}
+  .sec-head{margin-bottom:54px;max-width:680px}
   .sec-tag{font-family:var(--display);letter-spacing:.3em;font-size:13px;color:var(--orange);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px}
   .sec-tag::before{content:'';width:30px;height:1px;background:var(--orange)}
   .sec-title{font-family:var(--display);font-weight:700;text-transform:uppercase;line-height:1.05;font-size:clamp(30px,4.4vw,52px);margin-bottom:18px}
   .sec-title em{font-style:normal;color:var(--cyan)}
   .sec-desc{color:var(--muted);font-size:16px}
 
+  /* stats strip */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .stat{padding:34px 26px;border-left:1px solid var(--line)}
+  .stat:first-child{border-left:none}
+  .stat b{display:block;font-family:var(--display);font-weight:700;font-size:clamp(28px,3.4vw,44px);line-height:1;color:var(--cyan);margin-bottom:8px}
+  .stat b i{font-style:normal;color:var(--orange);font-size:.6em;vertical-align:super}
+  .stat span{font-size:13px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-family:var(--display)}
+
+  /* cards */
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .card{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:10px;padding:30px 26px;transition:border-color .3s,transform .3s,box-shadow .3s}
+  .card:hover{border-color:var(--line-2);transform:translateY(-5px);box-shadow:0 18px 40px rgba(0,0,0,.4)}
+  .card .ic{width:46px;height:46px;border:1px solid var(--line-2);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:rgba(0,229,255,.05)}
+  .card .ic svg{width:22px;height:22px;stroke:var(--cyan)}
+  .card h3{font-family:var(--display);font-size:20px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+  .card p{font-size:14px;color:var(--muted);line-height:1.65}
+
+  /* materials */
+  .mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .mat{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:10px;padding:26px;transition:border-color .3s,transform .3s}
+  .mat:hover{border-color:var(--line-2);transform:translateY(-4px)}
+  .mat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .mat-head h3{font-family:var(--display);font-size:22px;letter-spacing:.05em;text-transform:uppercase}
+  .mat-head h3 small{color:var(--cyan);font-size:.72em}
+  .chip{font-family:var(--display);font-size:11px;letter-spacing:.16em;padding:4px 10px;border:1px solid rgba(255,106,0,.4);border-radius:2px;color:var(--orange);text-transform:uppercase;white-space:nowrap}
+  .chip.cy{border-color:var(--line-2);color:var(--cyan)}
+  .mat-sub{font-size:13.5px;color:var(--muted);margin-bottom:18px;min-height:42px}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .bar-row label{flex:0 0 76px;font-family:var(--display);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)}
+  .bar{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--cyan-dim),var(--cyan));transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+  .mat.in .bar i{width:var(--w)}
+  .bar-row b{flex:0 0 44px;text-align:right;font-family:var(--display);font-size:13px;color:var(--text);font-weight:600}
+  .mat .uses{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);font-size:13px;color:var(--muted)}
+  .mat .uses b{color:var(--text);font-weight:600}
+  .mat-note{margin-top:22px;font-size:13.5px;color:var(--muted-2);display:flex;align-items:center;gap:10px}
+  .mat-note svg{width:16px;height:16px;stroke:var(--orange);flex:none}
+
+  /* equipment */
+  .equip{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:start}
+  .feat{display:flex;gap:16px;margin-bottom:22px}
+  .feat .fic{flex:none;width:40px;height:40px;border:1px solid var(--line-2);border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,229,255,.05)}
+  .feat .fic svg{width:19px;height:19px;stroke:var(--cyan)}
+  .feat h4{font-family:var(--display);font-size:17px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+  .feat p{font-size:14px;color:var(--muted)}
+  .spec{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line-2);border-radius:12px;padding:34px;position:relative;overflow:hidden}
+  .spec::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(0,229,255,.14),transparent 70%);pointer-events:none}
+  .spec h3{font-family:var(--display);font-size:22px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+  .spec h3 span{color:var(--cyan)}
+  .spec .ssub{font-size:13px;color:var(--muted-2);margin-bottom:22px}
+  .srow{display:flex;justify-content:space-between;gap:18px;padding:12px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .srow:last-child{border-bottom:none}
+  .srow span{color:var(--muted-2);font-family:var(--display);letter-spacing:.08em;text-transform:uppercase;font-size:12.5px;padding-top:2px}
+  .srow b{color:var(--text);font-weight:600;text-align:right}
+  .srow b em{font-style:normal;color:var(--cyan)}
+
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .step{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:10px;padding:28px 24px;position:relative}
+  .step .num{font-family:var(--display);font-weight:700;font-size:52px;line-height:1;color:transparent;-webkit-text-stroke:1px var(--orange);margin-bottom:16px}
+  .step h3{font-family:var(--display);font-size:18px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+  .step p{font-size:13.5px;color:var(--muted)}
+  .step::after{content:'';position:absolute;top:50%;right:-14px;width:10px;height:10px;border-top:1px solid var(--cyan);border-right:1px solid var(--cyan);transform:translateY(-50%) rotate(45deg);opacity:.6}
+  .step:last-child::after{display:none}
+
+  /* contact */
+  .cta-box{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line-2);border-radius:16px;padding:clamp(40px,6vw,72px);text-align:center;position:relative;overflow:hidden}
+  .cta-box::before{content:'';position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:420px;height:280px;background:radial-gradient(ellipse,rgba(0,229,255,.13),transparent 70%);pointer-events:none}
+  .cta-box .sec-tag{justify-content:center}
+  .cta-box .sec-tag::before{display:none}
+  .cta-box h2{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:clamp(28px,4.4vw,50px);line-height:1.05;margin-bottom:14px}
+  .cta-box h2 em{font-style:normal;color:var(--cyan)}
+  .cta-box p{color:var(--muted);max-width:560px;margin:0 auto 32px}
+  .cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .cta-note{margin-top:22px;font-size:13px;color:var(--muted-2)}
+
   footer{border-top:1px solid var(--line);padding:40px 0;background:var(--bg)}
   .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
   .foot .logo{font-size:18px}
   .foot p{color:var(--muted-2);font-size:13px}
-  .foot .fl{display:flex;gap:22px}
+  .foot .fl{display:flex;gap:22px;flex-wrap:wrap}
   .foot .fl a{color:var(--muted);font-size:13px;text-decoration:none;transition:color .2s}
   .foot .fl a:hover{color:var(--cyan)}
 
   .reveal{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.22,1,.36,1)}
   .reveal.in{opacity:1;transform:none}
+  .d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
 
   /* admin */
   #adminModal{position:fixed;inset:0;z-index:400;background:rgba(3,5,8,.82);backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:center;padding:40px 18px;overflow-y:auto}
@@ -120,8 +203,13 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .warn{font-size:12px;color:var(--muted-2);margin-top:10px;line-height:1.5}
 
+  @media(max-width:1000px){
+    .mat-grid{grid-template-columns:repeat(2,1fr)}
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .step:nth-child(2)::after{display:none}
+  }
   @media(max-width:900px){
-    .nav-links{position:fixed;inset:0;background:rgba(5,7,10,.97);flex-direction:column;justify-content:center;gap:26px;transform:translateX(100%);transition:transform .4s}
+    .nav-links{position:fixed;inset:0;background:rgba(5,7,10,.97);flex-direction:column;justify-content:center;gap:24px;transform:translateX(100%);transition:transform .4s}
     .nav-links.open{transform:none}
     .nav-links a,.nav-links button{font-size:18px}
     .nav-admin{font-size:15px!important}
@@ -129,8 +217,28 @@
     .burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
     .burger.open span:nth-child(2){opacity:0}
     .burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .grid4{grid-template-columns:repeat(2,1fr)}
+    .equip{grid-template-columns:1fr;gap:36px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .stat{border-left:none;border-top:1px solid var(--line)}
+    .stat:nth-child(-n+2){border-top:none}
+    .stat:nth-child(even){border-left:1px solid var(--line)}
+    .sec{padding:84px 0}
   }
-  @media(max-width:560px){.hero-content{top:auto;bottom:110px;transform:none}}
+  @media(max-width:620px){
+    .grid4{grid-template-columns:1fr}
+    .mat-grid{grid-template-columns:1fr}
+    .steps{grid-template-columns:1fr}
+    .step::after{display:none}
+    .hero-machine{display:none}
+  }
+  @media(max-width:560px){.hero-content{top:auto;bottom:96px;transform:none}}
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .kicker,h1 .l1,h1 .l2,.hero-sub,.hero-btns,.hero-chips,.hero-machine,.scroll-hint{animation-duration:.01ms;animation-delay:0s}
+    .reveal{transition:none;opacity:1;transform:none}
+    .logo .dot,.hero-machine i,.mouse::after{animation:none}
+  }
 </style>
 </head>
 <body>
@@ -141,35 +249,211 @@
 <nav id="nav">
   <a class="logo" href="#hero"><span class="dot"></span>AUTO<b>CORE3D</b></a>
   <div class="nav-links" id="links">
-    <a href="#hero">Acasă</a>
-    <a href="catalog.html?tab=produse">Piese</a>
-    <a href="catalog.html?tab=filamente">Materiale</a>
-    <a href="catalog.html?tab=produse">Catalog complet</a>
+    <a href="#servicii">Servicii</a>
+    <a href="#materiale">Materiale</a>
+    <a href="#echipament">Echipament</a>
+    <a href="#proces">Proces</a>
+    <a href="catalog.html?tab=produse">Catalog</a>
+    <a href="#contact">Contact</a>
     <button class="nav-admin" id="adminBtn">Admin</button>
   </div>
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
 </nav>
 
+<!-- ================= HERO ================= -->
 <section id="hero">
   <canvas id="heroCanvas"></canvas>
   <video id="heroVideo" autoplay muted loop playsinline></video>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <div class="kicker">AUTOCORE3D // Fabricație aditivă auto</div>
-    <h1><span class="l1">Piese auto</span><span class="l2">printate <em>3D</em></span></h1>
-    <p class="hero-sub">Componente funcționale recreate, optimizate și printate din materiale tehnice rezistente la căldură, vibrații și uzură.</p>
+    <div class="kicker">Servicii de imprimare 3D // Compozite tehnice</div>
+    <h1><span class="l1">Imprimare 3D cu</span><span class="l2">materiale <em>tehnice</em></span></h1>
+    <p class="hero-sub">Piese funcționale și prototipuri din compozite armate cu fibră de carbon — rigide, ușoare și stabile termic. Trimiți modelul 3D, noi îl transformăm în piesă reală.</p>
     <div class="hero-btns">
-      <a href="catalog.html?tab=produse" class="btn btn-primary">Vezi piesele <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      <a href="catalog.html?tab=filamente" class="btn btn-ghost">Materiale</a>
+      <a href="#contact" class="btn btn-primary">Cere ofertă <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="#materiale" class="btn btn-ghost">Materiale tehnice</a>
+    </div>
+    <div class="hero-chips"><span>ABS-CF</span><span>ASA-CF</span><span>PC-CF</span><span>PA-CF</span><span>PA</span><span>PETG-CF</span></div>
+  </div>
+  <div class="hero-machine"><i></i>Bambu Lab P2S + AMS 2 Pro — Live</div>
+  <div class="scroll-hint"><div class="mouse"></div>Derulează</div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section id="stats">
+  <div class="wrap">
+    <div class="stats reveal">
+      <div class="stat"><b>0.1<i>mm</i></b><span>Rezoluție de strat</span></div>
+      <div class="stat"><b>180<i>°C</i></b><span>Rezistență termică max.</span></div>
+      <div class="stat"><b>6<i>+</i></b><span>Materiale tehnice</span></div>
+      <div class="stat"><b>24-72<i>h</i></b><span>Timp tipic de producție</span></div>
     </div>
   </div>
-  <div class="scroll-hint"><div class="mouse"></div>Derulează</div>
+</section>
+
+<!-- ================= SERVICII ================= -->
+<section id="servicii" class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Servicii</div>
+      <div class="sec-title">Ce putem <em>printa</em> pentru tine</div>
+      <p class="sec-desc">De la o singură piesă de schimb imposibil de găsit, până la serii mici de componente funcționale — totul din materiale tehnice de înaltă performanță.</p>
+    </div>
+    <div class="grid4">
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h3>Prototipare rapidă</h3>
+        <p>De la fișier STL / STEP la piesă fizică în 24–72 de ore. Iterezi rapid, testezi în condiții reale, ajustezi și reprintezi fără costuri de matrițare.</p>
+      </div>
+      <div class="card reveal d1">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <h3>Piese funcționale</h3>
+        <p>Componente de utilizare finală din compozite cu fibră de carbon: suporturi, carcase, adaptoare, elemente mecanice — rigide, ușoare și dimensional stabile.</p>
+      </div>
+      <div class="card reveal d2">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14l-1.5-5.5a2 2 0 0 0-1.9-1.5H8.4a2 2 0 0 0-1.9 1.5L5 17z"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/></svg></div>
+        <h3>Piese auto personalizate</h3>
+        <p>Componente auto recreate sau îmbunătățite: clipsuri, suporturi, elemente de interior și exterior, piese sub capotă din materiale stabile termic.</p>
+      </div>
+      <div class="card reveal d3">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <h3>Consultanță &amp; DFM</h3>
+        <p>Te ajutăm să optimizezi modelul pentru printare: orientare, toleranțe, grosimi de perete și alegerea materialului potrivit pentru aplicația ta.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MATERIALE ================= -->
+<section id="materiale" class="sec" style="background:var(--bg-soft)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Materiale</div>
+      <div class="sec-title">Compozite <em>tehnice</em> cu fibră de carbon</div>
+      <p class="sec-desc">Filamente inginerești armate cu fibră de carbon, uscate și stocate controlat, printate în incintă închisă cu duză din oțel călit.</p>
+    </div>
+    <div class="mat-grid">
+      <div class="mat reveal">
+        <div class="mat-head"><h3>ABS<small>-CF</small></h3><span class="chip">Carbon</span></div>
+        <p class="mat-sub">Rigid, mat și rezistent la impact. Alternativa tehnică la piesele ABS injectate.</p>
+        <div class="bar-row"><label>Rigiditate</label><div class="bar"><i style="--w:75%"></i></div><b>75%</b></div>
+        <div class="bar-row"><label>Termic</label><div class="bar"><i style="--w:60%"></i></div><b>100°C</b></div>
+        <div class="bar-row"><label>Impact</label><div class="bar"><i style="--w:65%"></i></div><b>65%</b></div>
+        <div class="uses"><b>Aplicații:</b> suporturi, carcase, piese de interior auto, scule și dispozitive.</div>
+      </div>
+      <div class="mat reveal d1">
+        <div class="mat-head"><h3>ASA<small>-CF</small></h3><span class="chip">Carbon · UV</span></div>
+        <p class="mat-sub">Rezistent la UV și intemperii. Alegerea corectă pentru piese de exterior.</p>
+        <div class="bar-row"><label>Rigiditate</label><div class="bar"><i style="--w:74%"></i></div><b>74%</b></div>
+        <div class="bar-row"><label>Termic</label><div class="bar"><i style="--w:60%"></i></div><b>100°C</b></div>
+        <div class="bar-row"><label>Impact</label><div class="bar"><i style="--w:62%"></i></div><b>62%</b></div>
+        <div class="uses"><b>Aplicații:</b> piese exterior auto, capace de oglinzi, grile, elemente aero.</div>
+      </div>
+      <div class="mat reveal d2">
+        <div class="mat-head"><h3>PC<small>-CF</small></h3><span class="chip">Carbon</span></div>
+        <p class="mat-sub">Policarbonat armat: rigiditate ridicată și stabilitate termică excelentă.</p>
+        <div class="bar-row"><label>Rigiditate</label><div class="bar"><i style="--w:88%"></i></div><b>88%</b></div>
+        <div class="bar-row"><label>Termic</label><div class="bar"><i style="--w:80%"></i></div><b>125°C</b></div>
+        <div class="bar-row"><label>Impact</label><div class="bar"><i style="--w:76%"></i></div><b>76%</b></div>
+        <div class="uses"><b>Aplicații:</b> piese sub capotă, suporturi solicitate termic, componente structurale.</div>
+      </div>
+      <div class="mat reveal">
+        <div class="mat-head"><h3>PA<small>-CF</small></h3><span class="chip">Carbon · Pro</span></div>
+        <p class="mat-sub">Nailon armat cu carbon — vârful de gamă pentru piese puternic solicitate.</p>
+        <div class="bar-row"><label>Rigiditate</label><div class="bar"><i style="--w:95%"></i></div><b>95%</b></div>
+        <div class="bar-row"><label>Termic</label><div class="bar"><i style="--w:95%"></i></div><b>180°C</b></div>
+        <div class="bar-row"><label>Impact</label><div class="bar"><i style="--w:88%"></i></div><b>88%</b></div>
+        <div class="uses"><b>Aplicații:</b> bracket-uri de motor, piese mecanice, componente supuse la vibrații și uzură.</div>
+      </div>
+      <div class="mat reveal d1">
+        <div class="mat-head"><h3>PA <small>Nylon</small></h3><span class="chip cy">Tenace</span></div>
+        <p class="mat-sub">Tenacitate ridicată și coeficient de frecare redus, pentru piese în mișcare.</p>
+        <div class="bar-row"><label>Rigiditate</label><div class="bar"><i style="--w:58%"></i></div><b>58%</b></div>
+        <div class="bar-row"><label>Termic</label><div class="bar"><i style="--w:68%"></i></div><b>110°C</b></div>
+        <div class="bar-row"><label>Impact</label><div class="bar"><i style="--w:95%"></i></div><b>95%</b></div>
+        <div class="uses"><b>Aplicații:</b> bucșe, ghidaje, roți dințate, clipsuri și piese flexibile solicitate.</div>
+      </div>
+      <div class="mat reveal d2">
+        <div class="mat-head"><h3>PETG<small>-CF</small></h3><span class="chip">Carbon</span></div>
+        <p class="mat-sub">Echilibru între rigiditate, tenacitate și rezistență chimică. Ușor de întreținut.</p>
+        <div class="bar-row"><label>Rigiditate</label><div class="bar"><i style="--w:70%"></i></div><b>70%</b></div>
+        <div class="bar-row"><label>Termic</label><div class="bar"><i style="--w:52%"></i></div><b>80°C</b></div>
+        <div class="bar-row"><label>Impact</label><div class="bar"><i style="--w:66%"></i></div><b>66%</b></div>
+        <div class="uses"><b>Aplicații:</b> jiguri și fixturi, piese generale, componente expuse la lichide.</div>
+      </div>
+    </div>
+    <div class="mat-note reveal"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Valorile sunt orientative și depind de geometrie, orientare și parametrii de printare. Alte materiale (PET-CF, PPS-CF, TPU) sunt disponibile la cerere.</div>
+  </div>
+</section>
+
+<!-- ================= ECHIPAMENT ================= -->
+<section id="echipament" class="sec">
+  <div class="wrap">
+    <div class="equip">
+      <div>
+        <div class="sec-head reveal" style="margin-bottom:36px">
+          <div class="sec-tag">Echipament</div>
+          <div class="sec-title">Bambu Lab <em>P2S</em><br>+ AMS 2 Pro</div>
+          <p class="sec-desc">Printăm pe un sistem CoreXY de mare viteză, cu incintă închisă și management automat al filamentelor — exact ce au nevoie compozitele tehnice ca să iasă perfect.</p>
+        </div>
+        <div class="feat reveal"><div class="fic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg></div><div><h4>Incintă închisă</h4><p>Temperatură stabilă în cameră — fără warping și delaminare la ABS, ASA și nailon.</p></div></div>
+        <div class="feat reveal d1"><div class="fic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><h4>CoreXY de mare viteză</h4><p>Timp de producție redus și calitate constantă a suprafeței, chiar și la piese mari.</p></div></div>
+        <div class="feat reveal d2"><div class="fic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div><div><h4>AMS 2 Pro</h4><p>Patru filamente gestionate automat, cu uscare activă integrată — critică pentru nailon și compozitele CF, care absorb umiditate.</p></div></div>
+        <div class="feat reveal d3"><div class="fic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 8l4 12H8l4-12z"/><path d="M9 20h6"/></svg></div><div><h4>Duză din oțel călit</h4><p>Rezistă la abrazivitatea fibrei de carbon, pentru precizie constantă, printare după printare.</p></div></div>
+      </div>
+      <div class="spec reveal d1">
+        <h3>Fișă <span>tehnică</span></h3>
+        <div class="ssub">Configurația de producție AutoCore3D</div>
+        <div class="srow"><span>Imprimantă</span><b>Bambu Lab <em>P2S</em></b></div>
+        <div class="srow"><span>Cinematică</span><b>CoreXY, incintă închisă</b></div>
+        <div class="srow"><span>Volum printare</span><b>256 × 256 × 256 mm</b></div>
+        <div class="srow"><span>Sistem filament</span><b>AMS 2 Pro <em>· 4 sloturi</em></b></div>
+        <div class="srow"><span>Uscare filament</span><b>Activă, integrată în AMS</b></div>
+        <div class="srow"><span>Duză</span><b>0.4 mm oțel călit</b></div>
+        <div class="srow"><span>Materiale</span><b>ABS-CF · ASA-CF · PC-CF<br>PA-CF · PA · PETG-CF</b></div>
+        <div class="srow"><span>Monitorizare</span><b>Cameră + supraveghere live</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROCES ================= -->
+<section id="proces" class="sec" style="background:var(--bg-soft)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">Proces</div>
+      <div class="sec-title">De la <em>fișier</em> la piesă finită</div>
+      <p class="sec-desc">Un flux simplu, transparent și rapid — știi în fiecare moment în ce stadiu este piesa ta.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="num">01</div><h3>Trimiți modelul</h3><p>Ne trimiți fișierul STL, STEP sau 3MF pe e-mail, împreună cu cerințele piesei: rol, mediu de lucru, solicitări.</p></div>
+      <div class="step reveal d1"><div class="num">02</div><h3>Primești oferta</h3><p>Îți răspundem cu prețul, termenul de livrare și recomandarea de material potrivită aplicației tale.</p></div>
+      <div class="step reveal d2"><div class="num">03</div><h3>Producție</h3><p>Printăm pe Bambu Lab P2S cu filament uscat și parametri calibrați, cu monitorizare pe toată durata.</p></div>
+      <div class="step reveal d3"><div class="num">04</div><h3>Control &amp; livrare</h3><p>Verificăm dimensional piesa, o finisăm și o expediem oriunde în România, ambalată corespunzător.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="sec">
+  <div class="wrap">
+    <div class="cta-box reveal">
+      <div class="sec-tag">Contact</div>
+      <h2>Ai un proiect?<br>Hai să-l <em>printăm</em>.</h2>
+      <p>Trimite-ne modelul 3D sau doar o poză cu piesa de care ai nevoie — primești ofertă cu preț și termen, plus recomandarea de material potrivită.</p>
+      <div class="cta-btns">
+        <a href="mailto:contact@autocore3d.com?subject=Cerere%20ofert%C4%83%20imprimare%203D" class="btn btn-primary">contact@autocore3d.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></a>
+        <a href="catalog.html?tab=produse" class="btn btn-ghost">Vezi catalogul</a>
+      </div>
+      <div class="cta-note">Acceptăm fișiere STL · STEP · 3MF · OBJ — răspundem în aceeași zi lucrătoare.</div>
+    </div>
+  </div>
 </section>
 
 <footer>
   <div class="wrap foot">
     <div class="logo"><span class="dot"></span>AUTO<b>CORE3D</b></div>
-    <div class="fl"><a href="catalog.html?tab=produse">Piese</a><a href="catalog.html?tab=filamente">Materiale</a><a href="catalog.html?tab=produse">Catalog</a></div>
+    <div class="fl"><a href="#servicii">Servicii</a><a href="#materiale">Materiale</a><a href="#echipament">Echipament</a><a href="catalog.html?tab=produse">Catalog</a><a href="mailto:contact@autocore3d.com">Contact</a></div>
     <p>© 2026 AUTOCORE3D — autocore3d.com</p>
   </div>
 </footer>
@@ -192,7 +476,7 @@
       <!-- VIDEO -->
       <div class="ablock">
         <h4>Video showcase</h4>
-        <div class="hint">Rulează nonstop (loop, fără sunet) când se deschide site-ul. Lipește un link către video sau încarcă un fișier — se salvează permanent pentru toți vizitatorii. Dacă nu e setat niciun video, rămâne animația 3D de printare.</div>
+        <div class="hint">Rulează nonstop (loop, fără sunet) când se deschide site-ul. Lipește un link către video sau încarcă un fișier — se salvează permanent pentru toți vizitatorii. Dacă nu e setat niciun video, rămâne animația 3D cu imprimanta.</div>
         <label>URL video (mp4 / webm)</label>
         <input type="text" id="vUrl" placeholder="https://.../clip.mp4">
         <label>Sau încarcă fișier video</label>
@@ -210,7 +494,6 @@
 
 <script>
 if('scrollRestoration' in history) history.scrollRestoration='manual';
-if(location.hash) history.replaceState(null,'',location.pathname+location.search);
 window.scrollTo(0,0);
 /* ================= SUPABASE (shared cu catalog.html) ================= */
 const SB_URL = "https://jimdpmrsprcpbyacxguj.supabase.co";
@@ -249,14 +532,14 @@ async function uploadHeroVideo(file){
 /* ---------- UI base ---------- */
 (function(){
   const nav=document.getElementById('nav'),prog=document.getElementById('progress');
-  const onScroll=()=>{nav.classList.toggle('scrolled',scrollY>40);const h=document.documentElement.scrollHeight-innerHeight;prog.style.width=(scrollY/h*100)+'%';};
+  const onScroll=()=>{nav.classList.toggle('scrolled',scrollY>40);const h=document.documentElement.scrollHeight-innerHeight;prog.style.width=(scrollY/Math.max(h,1)*100)+'%';};
   addEventListener('scroll',onScroll,{passive:true});onScroll();
   const burger=document.getElementById('burger'),links=document.getElementById('links');
   burger.addEventListener('click',()=>{burger.classList.toggle('open');links.classList.toggle('open')});
   links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');links.classList.remove('open')}));
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
-  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-  addEventListener('load',()=>{window.scrollTo(0,0);setTimeout(()=>document.getElementById('loader').classList.add('hide'),800);});
+  document.querySelectorAll('.reveal,.mat').forEach(el=>io.observe(el));
+  addEventListener('load',()=>{setTimeout(()=>document.getElementById('loader').classList.add('hide'),800);});
   setTimeout(()=>document.getElementById('loader').classList.add('hide'),2800);
 })();
 
@@ -321,66 +604,231 @@ function applyHero(){
   applyHero(); // may wait for THREE; re-applied on three load
 })();
 
-/* ================= THREE.JS HERO FALLBACK (3D print) ================= */
+/* ================= THREE.JS HERO — Bambu Lab P2S + AMS 2 Pro ================= */
 function initHero3D(){
   if(typeof THREE==='undefined')return;
   const canvas=document.getElementById('heroCanvas');
-  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x05070a,0.052);
-  const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,0.1,100);
+  const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x05070a,0.03);
+  const camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,0.1,140);
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
-  renderer.setClearColor(0x05070a,1);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.localClippingEnabled=true;
+  renderer.setClearColor(0x05070a,1);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.localClippingEnabled=true;
   const isM=innerWidth<760;
+
+  /* ---- helper textures ---- */
   function glowTex(){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');const g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(160,235,255,.7)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);}
-  function layerTex(){const c=document.createElement('canvas');c.width=8;c.height=256;const x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,8,256);for(let y=0;y<256;y+=5){x.fillStyle='rgba(120,225,255,.9)';x.fillRect(0,y,8,1.4);}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1,7);return t;}
-  const gtex=glowTex(),lt=layerTex(),MAXH=3.35,clip=new THREE.Plane(new THREE.Vector3(0,-1,0),0);
-  const bodyMat=new THREE.MeshStandardMaterial({color:0x2c3543,metalness:.55,roughness:.42,emissive:0xffffff,emissiveMap:lt,emissiveIntensity:.16,clippingPlanes:[clip],side:THREE.DoubleSide});
-  const flMat=new THREE.MeshStandardMaterial({color:0x39404c,metalness:.7,roughness:.35,emissive:0x2a1400,emissiveIntensity:.25,clippingPlanes:[clip],side:THREE.DoubleSide});
-  const part=new THREE.Group();
-  const add=(g,m,p,r)=>{const me=new THREE.Mesh(g,m);if(p)me.position.set(...p);if(r)me.rotation.set(...r);part.add(me);};
-  add(new THREE.CylinderGeometry(1.18,1.22,.26,48),flMat,[0,.13,0]);
-  add(new THREE.TorusGeometry(1.18,.05,10,56),flMat,[0,.26,0],[Math.PI/2,0,0]);
-  for(let i=0;i<6;i++){const a=i/6*Math.PI*2;add(new THREE.CylinderGeometry(.14,.14,.34,18),flMat,[Math.cos(a)*.95,.17,Math.sin(a)*.95]);}
-  add(new THREE.CylinderGeometry(.62,.92,2.1,40),bodyMat,[0,1.32,0]);
-  for(let i=0;i<6;i++){const a=i/6*Math.PI*2,r=.82;add(new THREE.BoxGeometry(.07,1.5,.22),bodyMat,[Math.cos(a)*r,1.3,Math.sin(a)*r],[0,-a,0]);}
-  add(new THREE.TorusGeometry(.78,.07,10,48),flMat,[0,1.0,0],[Math.PI/2,0,0]);
-  add(new THREE.CylinderGeometry(.78,.66,.22,40),flMat,[0,2.48,0]);
-  add(new THREE.TorusGeometry(.78,.05,10,48),flMat,[0,2.59,0],[Math.PI/2,0,0]);
-  add(new THREE.CylinderGeometry(.16,.2,.5,24),flMat,[0,2.85,0]);
-  add(new THREE.SphereGeometry(.22,24,18),bodyMat,[0,3.15,0]);
-  scene.add(part);
-  const plat=new THREE.Mesh(new THREE.CylinderGeometry(2,2.05,.08,64),new THREE.MeshStandardMaterial({color:0x0c1218,metalness:.6,roughness:.5,emissive:0x00181f,emissiveIntensity:.4}));plat.position.y=-.04;scene.add(plat);
-  const ring=new THREE.Mesh(new THREE.TorusGeometry(2.02,.025,12,80),new THREE.MeshBasicMaterial({color:0x00e5ff}));ring.rotation.x=Math.PI/2;scene.add(ring);
-  const g1=new THREE.GridHelper(40,40,0x0a4654,0x07303a);g1.position.y=-.05;scene.add(g1);
-  const head=new THREE.Group();
-  const plane=new THREE.Mesh(new THREE.PlaneGeometry(4.4,4.4),new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.05,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));plane.rotation.x=-Math.PI/2;head.add(plane);
-  const sq=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-2.2,0,-2.2),new THREE.Vector3(2.2,0,-2.2),new THREE.Vector3(2.2,0,2.2),new THREE.Vector3(-2.2,0,2.2),new THREE.Vector3(-2.2,0,-2.2)]),new THREE.LineBasicMaterial({color:0x66f0ff}));head.add(sq);
-  const noz=new THREE.Sprite(new THREE.SpriteMaterial({map:gtex,color:0x00e5ff,blending:THREE.AdditiveBlending,depthWrite:false}));noz.scale.set(1.2,1.2,1);head.add(noz);scene.add(head);
-  const back=new THREE.Sprite(new THREE.SpriteMaterial({map:gtex,color:0x004a5a,blending:THREE.AdditiveBlending,depthWrite:false}));back.scale.set(9,9,1);back.position.set(0,1.6,-3);scene.add(back);
-  const PN=isM?220:340,pg=new THREE.BufferGeometry(),pos=new Float32Array(PN*3),spd=new Float32Array(PN);
-  for(let i=0;i<PN;i++){const a=Math.random()*Math.PI*2,r=Math.random()*7;pos[i*3]=Math.cos(a)*r;pos[i*3+1]=Math.random()*9-1;pos[i*3+2]=Math.sin(a)*r;spd[i]=.2+Math.random()*.6;}
+  function layerTex(){const c=document.createElement('canvas');c.width=8;c.height=256;const x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,8,256);for(let y=0;y<256;y+=6){x.fillStyle='rgba(120,225,255,.85)';x.fillRect(0,y,8,1.2);}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1,5);return t;}
+  function labelTex(text,fs,col){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.clearRect(0,0,512,128);x.font=`700 ${fs||64}px Rajdhani, Arial, sans-serif`;x.textAlign='center';x.textBaseline='middle';x.fillStyle=col||'#c8d2dc';x.letterSpacing='6px';x.fillText(text,256,68);return new THREE.CanvasTexture(c);}
+  const gtex=glowTex(),ltex=layerTex();
+
+  /* ---- materials ---- */
+  const clipY=3.0; /* planul duzei — piesa creste pana aici, patul coboara */
+  const clip=new THREE.Plane(new THREE.Vector3(0,-1,0),clipY);
+  const M={
+    frame:new THREE.MeshStandardMaterial({color:0x2a3240,metalness:.7,roughness:.35}),
+    panel:new THREE.MeshStandardMaterial({color:0x212934,metalness:.6,roughness:.45}),
+    dark:new THREE.MeshStandardMaterial({color:0x141922,metalness:.5,roughness:.6}),
+    glass:new THREE.MeshPhysicalMaterial({color:0x9fd4e6,metalness:0,roughness:.08,transparent:true,opacity:.1,side:THREE.DoubleSide,depthWrite:false}),
+    grey:new THREE.MeshStandardMaterial({color:0xb9c2cc,metalness:.2,roughness:.5}),
+    mid:new THREE.MeshStandardMaterial({color:0x39404c,metalness:.55,roughness:.4}),
+    carbon:new THREE.MeshStandardMaterial({color:0x262b31,metalness:.4,roughness:.5,emissive:0xffffff,emissiveMap:ltex,emissiveIntensity:.1,clippingPlanes:[clip],side:THREE.DoubleSide}),
+    tube:new THREE.MeshStandardMaterial({color:0xe8edf2,metalness:.1,roughness:.35,emissive:0x39434c,emissiveIntensity:.5,transparent:true,opacity:.9})
+  };
+  const box=(w,h,d,mat,x,y,z,parent)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);(parent||scene).add(m);return m;};
+  const cyl=(rt,rb,h,seg,mat,x,y,z,parent)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),mat);m.position.set(x,y,z);(parent||scene).add(m);return m;};
+
+  /* ================= IMPRIMANTA P2S ================= */
+  const PR=new THREE.Group();scene.add(PR);
+  /* soclu */
+  box(3.8,.28,3.6,M.dark,0,.14,0,PR);
+  /* coloane + grinzi cadru */
+  const CX=1.72,CZ=1.62;
+  [[-CX,-CZ],[CX,-CZ],[-CX,CZ],[CX,CZ]].forEach(([x,z])=>box(.18,3.9,.18,M.frame,x,2.23,z,PR));
+  [[4.05,-CZ],[4.05,CZ]].forEach(([y,z])=>box(3.62,.18,.18,M.frame,0,y,z,PR));
+  [[4.05,-CX],[4.05,CX]].forEach(([y,x])=>box(.18,.18,3.42,M.frame,x,y,0,PR));
+  /* panouri laterale + spate */
+  box(.06,3.6,3.2,M.panel,-1.76,2.2,0,PR);
+  box(.06,3.6,3.2,M.panel,1.76,2.2,0,PR);
+  box(3.4,3.6,.06,M.panel,0,2.2,-1.66,PR);
+  /* usa frontala din sticla + rama + maner */
+  const door=box(3.24,3.4,.04,M.glass,0,2.3,1.66,PR);door.renderOrder=10;
+  box(3.36,.1,.08,M.frame,0,.62,1.66,PR);
+  box(3.36,.1,.08,M.frame,0,3.98,1.66,PR);
+  box(.1,3.44,.08,M.frame,-1.66,2.3,1.66,PR);
+  box(.1,3.44,.08,M.frame,1.66,2.3,1.66,PR);
+  box(.07,.55,.07,M.grey,1.5,2.3,1.73,PR);
+  /* sticla top (sub AMS) */
+  const topG=box(3.2,.04,3.0,M.glass,0,4.12,0,PR);topG.renderOrder=10;
+  /* banda frontala + ecran tactil */
+  box(3.44,.36,.08,M.panel,0,.45,1.6,PR);
+  const scrCanvas=document.createElement('canvas');scrCanvas.width=160;scrCanvas.height=96;
+  const scrTex=new THREE.CanvasTexture(scrCanvas);
+  function drawScreen(pct,done){const x=scrCanvas.getContext('2d');x.fillStyle='#041216';x.fillRect(0,0,160,96);x.fillStyle='#0a8ca0';x.font='700 13px Rajdhani, Arial';x.fillText('AUTOCORE3D',12,22);x.fillStyle=done?'#ff9a4d':'#00e5ff';x.font='700 30px Rajdhani, Arial';x.fillText(pct+'%',12,58);x.fillStyle='rgba(255,255,255,.12)';x.fillRect(12,72,136,7);x.fillStyle=done?'#ff6a00':'#00e5ff';x.fillRect(12,72,136*pct/100,7);scrTex.needsUpdate=true;}
+  drawScreen(0,false);
+  const scr=new THREE.Mesh(new THREE.PlaneGeometry(.6,.3),new THREE.MeshBasicMaterial({map:scrTex}));scr.position.set(.98,.45,1.65);PR.add(scr);
+  /* logo P2S pe banda frontala */
+  const lbl=new THREE.Mesh(new THREE.PlaneGeometry(.9,.22),new THREE.MeshBasicMaterial({map:labelTex('P2S',72,'#dfe7ee'),transparent:true,opacity:.9}));
+  lbl.position.set(-1.05,.45,1.65);PR.add(lbl);
+  /* banda LED interioara */
+  box(3.1,.05,.06,new THREE.MeshBasicMaterial({color:0xcfefff}),0,3.9,1.45,PR);
+
+  /* ---- interior: pat + piesa (patul coboara pe masura ce piesa creste) ---- */
+  const BED=new THREE.Group();PR.add(BED);
+  box(2.7,.1,2.4,M.dark,0,-.05,0,BED);
+  box(2.6,.03,2.3,new THREE.MeshStandardMaterial({color:0x0c1218,metalness:.65,roughness:.4,emissive:0x1a0d00,emissiveIntensity:.35}),0,.015,0,BED);
+  box(.6,.36,.3,M.mid,0,-.28,-1.28,BED);
+  const bedGlow=new THREE.PointLight(0xff6a00,.45,3.2);bedGlow.position.set(0,-.4,0);BED.add(bedGlow);
+  /* piesa printata — flansa de admisie stilizata, din "carbon" */
+  const PART=new THREE.Group();BED.add(PART);
+  const PARTH=1.34;
+  cyl(.6,.6,.22,36,M.carbon,0,.11,0,PART);
+  for(let i=0;i<6;i++){const a=i/6*Math.PI*2;cyl(.07,.07,.22,14,M.carbon,Math.cos(a)*.47,.11,Math.sin(a)*.47,PART);}
+  cyl(.34,.56,.55,36,M.carbon,0,.495,0,PART);
+  for(let i=0;i<4;i++){const a=i/4*Math.PI*2+.4;const r=box(.05,.5,.26,M.carbon,Math.cos(a)*.42,.5,Math.sin(a)*.42,PART);r.rotation.y=-a;}
+  cyl(.3,.34,.35,36,M.carbon,0,.945,0,PART);
+  const tor=new THREE.Mesh(new THREE.TorusGeometry(.3,.05,12,36),M.carbon);tor.position.y=1.12;tor.rotation.x=Math.PI/2;PART.add(tor);
+  cyl(.27,.27,.22,36,M.carbon,0,1.23,0,PART);
+
+  /* ---- gantry + cap de printare (duza la y = clipY) ---- */
+  box(.12,.1,3.2,M.frame,-1.56,3.62,0,PR);
+  box(.12,.1,3.2,M.frame,1.56,3.62,0,PR);
+  const RAIL=new THREE.Group();RAIL.position.y=3.62;PR.add(RAIL);
+  box(3.1,.09,.14,M.mid,0,0,0,RAIL);
+  const HEAD=new THREE.Group();RAIL.add(HEAD);
+  box(.44,.42,.38,M.grey,0,-.22,0,HEAD);
+  box(.3,.08,.3,M.dark,0,-.44,0,HEAD);
+  const nozCone=new THREE.Mesh(new THREE.ConeGeometry(.06,.14,16),M.mid);nozCone.rotation.x=Math.PI;nozCone.position.set(0,-.55,0);HEAD.add(nozCone);
+  const headLed=new THREE.Mesh(new THREE.PlaneGeometry(.3,.06),new THREE.MeshBasicMaterial({color:0x00e5ff}));headLed.position.set(0,-.14,.2);HEAD.add(headLed);
+  const noz=new THREE.Sprite(new THREE.SpriteMaterial({map:gtex,color:0x00e5ff,blending:THREE.AdditiveBlending,depthWrite:false}));noz.scale.set(.85,.85,1);noz.position.set(0,-.6,0);HEAD.add(noz);
+  /* planul stratului curent */
+  const layerPlane=new THREE.Mesh(new THREE.PlaneGeometry(2.5,2.2),new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.045,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+  layerPlane.rotation.x=-Math.PI/2;layerPlane.position.y=clipY;layerPlane.renderOrder=5;PR.add(layerPlane);
+  /* lumina interioara */
+  const inLight=new THREE.PointLight(0xcfefff,1.7,7);inLight.position.set(0,3.55,.6);PR.add(inLight);
+
+  /* ================= AMS 2 PRO (deasupra) ================= */
+  const AMS=new THREE.Group();AMS.position.y=4.14;PR.add(AMS);
+  box(3.3,.9,2.8,M.grey,0,.45,0,AMS);
+  const amsLid=box(3.14,.62,2.62,M.glass,0,1.16,0,AMS);amsLid.renderOrder=11;
+  /* eticheta AMS 2 PRO */
+  const amsLbl=new THREE.Mesh(new THREE.PlaneGeometry(1.5,.28),new THREE.MeshBasicMaterial({map:labelTex('AMS 2 PRO',58,'#3a434e'),transparent:true,opacity:.95}));
+  amsLbl.position.set(0,.45,1.42);AMS.add(amsLbl);
+  /* LED status + LED-uri sloturi */
+  const amsLed=new THREE.Mesh(new THREE.CircleGeometry(.045,16),new THREE.MeshBasicMaterial({color:0x00e5ff}));amsLed.position.set(1.45,.45,1.42);AMS.add(amsLed);
+  const slotCols=[0x22262b,0x8a97a6,0xff6a00,0x00e5ff];
+  slotCols.forEach((c,i)=>{const d=new THREE.Mesh(new THREE.CircleGeometry(.03,12),new THREE.MeshBasicMaterial({color:c}));d.position.set(-1.14+i*.76,.14,1.42);AMS.add(d);});
+  /* bobine: 4, axul pe X, vizibile prin capacul transparent */
+  const flangeMat=new THREE.MeshStandardMaterial({color:0x333a44,metalness:.2,roughness:.3,transparent:true,opacity:.5});
+  const spools=[];
+  slotCols.forEach((c,i)=>{
+    const g=new THREE.Group();g.position.set(-1.14+i*.76,.95,0);g.rotation.z=Math.PI/2;
+    const fil=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.24,28),new THREE.MeshStandardMaterial({color:c,metalness:.15,roughness:.6}));g.add(fil);
+    [-0.14,0.14].forEach(off=>{const f=new THREE.Mesh(new THREE.CylinderGeometry(.45,.45,.03,28),flangeMat);f.position.y=off;g.add(f);});
+    AMS.add(g);spools.push(fil);
+  });
+  /* tub PTFE: AMS -> imprimanta */
+  const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(.9,4.95,-1.3),new THREE.Vector3(1.15,5.45,-1.85),new THREE.Vector3(.35,4.95,-2.0),new THREE.Vector3(0,4.2,-1.55)]);
+  const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,36,.05,10),M.tube);PR.add(tube);
+
+  /* ================= SCENA DIN JUR ================= */
+  /* platforma + inel */
+  const plat=cyl(3.4,3.55,.14,64,new THREE.MeshStandardMaterial({color:0x0c1218,metalness:.6,roughness:.5,emissive:0x00181f,emissiveIntensity:.4}),0,-.07,0);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(3.5,.028,12,90),new THREE.MeshBasicMaterial({color:0x00e5ff}));ring.rotation.x=Math.PI/2;ring.position.y=.02;scene.add(ring);
+  const grid=new THREE.GridHelper(60,60,0x0a4654,0x07303a);grid.position.y=-.1;scene.add(grid);
+  /* inele-puls holografice care se extind in jurul imprimantei */
+  const pulses=[];
+  for(let i=0;i<3;i++){
+    const p=new THREE.Mesh(new THREE.RingGeometry(1,1.05,72),new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));
+    p.rotation.x=-Math.PI/2;p.position.y=.03;scene.add(p);pulses.push(p);
+  }
+  /* halo spate */
+  const back=new THREE.Sprite(new THREE.SpriteMaterial({map:gtex,color:0x004a5a,blending:THREE.AdditiveBlending,depthWrite:false}));back.scale.set(15,15,1);back.position.set(0,2.6,-4.5);scene.add(back);
+  /* particule */
+  const PN=isM?200:340,pg=new THREE.BufferGeometry(),pos=new Float32Array(PN*3),spd=new Float32Array(PN);
+  for(let i=0;i<PN;i++){const a=Math.random()*Math.PI*2,r=2.5+Math.random()*8;pos[i*3]=Math.cos(a)*r;pos[i*3+1]=Math.random()*10-1;pos[i*3+2]=Math.sin(a)*r;spd[i]=.2+Math.random()*.55;}
   pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
-  const points=new THREE.Points(pg,new THREE.PointsMaterial({size:.06,map:gtex,color:0x9fe9ff,transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false}));scene.add(points);
-  scene.add(new THREE.AmbientLight(0x2b3a4a,.5));
-  const k=new THREE.PointLight(0xff7a2a,1.3,40);k.position.set(5,6,3);scene.add(k);
-  const rm=new THREE.PointLight(0x00e5ff,1.6,40);rm.position.set(-5,4,-4);scene.add(rm);
-  const fl=new THREE.DirectionalLight(0xbfe9ff,.6);fl.position.set(0,5,8);scene.add(fl);
-  const un=new THREE.PointLight(0x00e5ff,1,8);un.position.set(0,.4,0);scene.add(un);
-  let camA=-.5;const camR=7,camY=3.1,tgt=new THREE.Vector3(0,1.5,0);let mx=0,my=0,tmx=0,tmy=0;
+  const points=new THREE.Points(pg,new THREE.PointsMaterial({size:.06,map:gtex,color:0x9fe9ff,transparent:true,opacity:.65,blending:THREE.AdditiveBlending,depthWrite:false}));scene.add(points);
+  /* lumini */
+  scene.add(new THREE.AmbientLight(0x415063,.85));
+  const key=new THREE.PointLight(0xff7a2a,.95,60);key.position.set(7,7,5);scene.add(key);
+  const rim=new THREE.PointLight(0x00e5ff,1.6,60);rim.position.set(-7,5,-5);scene.add(rim);
+  const front=new THREE.DirectionalLight(0xcfe9f5,.75);front.position.set(2,6,9);scene.add(front);
+
+  /* ================= ANIMATIE ================= */
+  /* camera penduleaza in jurul vederii frontale, ca usa/ecranul sa ramana vizibile */
+  const CAM_BASE=.95;let camA=CAM_BASE;const tgt=new THREE.Vector3(0,2.55,0);let mx=0,my=0,tmx=0,tmy=0;
+  function camDist(){const a=camera.aspect;return a>1.4?13.2:a>1?15:a>.7?17:21;}
+  function applyViewOffset(){const w=innerWidth,h=innerHeight;if(camera.aspect>1)camera.setViewOffset(w,h,-w*.16,h*.02,w,h);else camera.clearViewOffset();}
+  applyViewOffset();
   addEventListener('mousemove',ev=>{tmx=(ev.clientX/innerWidth-.5)*2;tmy=(ev.clientY/innerHeight-.5)*2;});
-  let p=0,phase='print',hold=0;const PT=6.2,HT=4.5,RT=1.4;let vis=true;
+  let p=0,phase='print',hold=0,lastPct=-1,lastPhase='';
+  const PT=16,HT=4,RT=1.8;
+  let vis=true;
   new IntersectionObserver(es=>es.forEach(x=>vis=x.isIntersecting),{threshold:.02}).observe(document.getElementById('hero'));
+
+  function update(dt,now){
+    if(phase==='print'){p+=dt/PT;if(p>=1){p=1;phase='hold';hold=0;}}
+    else if(phase==='hold'){hold+=dt;if(hold>=HT)phase='reset';}
+    else{p-=dt/RT;if(p<=0){p=0;phase='print';}}
+    const printing=phase==='print';
+    /* patul coboara, piesa creste pana in planul duzei */
+    const partH=.06+p*(PARTH-.06);
+    BED.position.y=clipY-partH;
+    /* cap de printare: raster XY cand printeaza, parcat in rest */
+    const t=now*.001;
+    const txp=printing?Math.sin(t*2.3)*1.02*(.72+.28*Math.sin(t*.31)):1.25;
+    const tzp=printing?Math.sin(t*.7+1.3)*.72:-1.15;
+    HEAD.position.x+=(txp-HEAD.position.x)*(printing?.35:.06);
+    RAIL.position.z+=(tzp-RAIL.position.z)*(printing?.12:.06);
+    noz.material.opacity=printing?(.75+Math.sin(now*.02)*.25):0;
+    layerPlane.material.opacity=printing?(.04+Math.sin(now*.006)*.02):0;
+    /* bobina activa se roteste cand se printeaza */
+    if(printing)spools[0].rotation.y+=dt*1.4;
+    /* LED status */
+    amsLed.material.color.setHex(printing?0x00e5ff:0xff6a00);
+    headLed.material.color.setHex(printing?0x00e5ff:0xff6a00);
+    /* ecran % */
+    const pct=Math.round(p*100);
+    if(pct!==lastPct||phase!==lastPhase){lastPct=pct;lastPhase=phase;drawScreen(pct,phase==='hold');}
+    /* inele-puls */
+    pulses.forEach((pl,i)=>{const k=((now*.00033)+i/3)%1;const s=2.2+k*3.4;pl.scale.set(s,s,1);pl.material.opacity=(1-k)*.26;});
+    /* particule */
+    const pa=pg.attributes.position.array;
+    for(let i=0;i<PN;i++){pa[i*3+1]+=spd[i]*dt;if(pa[i*3+1]>9)pa[i*3+1]=-1;}
+    pg.attributes.position.needsUpdate=true;points.rotation.y+=dt*.02;
+    /* camera penduleaza + parallax mouse */
+    mx+=(tmx-mx)*.05;my+=(tmy-my)*.05;
+    camA=CAM_BASE+Math.sin(t*.11)*.5;
+    const R=camDist();
+    camera.position.set(Math.cos(camA)*R+mx*.8,3.7+my*.55+Math.sin(t*.07)*.35,Math.sin(camA)*R);
+    camera.lookAt(tgt);
+    inLight.intensity=printing?(1.6+Math.sin(now*.01)*.25):1.2;
+  }
+
+  if(REDUCED){
+    /* miscare redusa: un cadru static, fara orbita */
+    p=.62;phase='print';
+    const still=()=>{camera.position.set(Math.cos(CAM_BASE)*camDist(),3.7,Math.sin(CAM_BASE)*camDist());camera.lookAt(tgt);noz.material.opacity=.6;layerPlane.material.opacity=.04;renderer.render(scene,camera);};
+    update(0,0);drawScreen(62,false);still();
+    addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;applyViewOffset();camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);still();});
+    return;
+  }
+
   let last=performance.now();
-  (function loop(now){requestAnimationFrame(loop);const dt=Math.min((now-last)/1000,.05);last=now;if(!vis||document.getElementById('heroCanvas').style.display==='none')return;
-    if(phase==='print'){p+=dt/PT;if(p>=1){p=1;phase='hold';hold=0;}}else if(phase==='hold'){hold+=dt;if(hold>=HT)phase='reset';}else{p-=dt/RT;if(p<=0){p=0;phase='print';}}
-    const cy=p*MAXH;clip.constant=cy;const b=phase!=='hold';head.visible=b;head.position.y=cy;plane.material.opacity=b?(.045+Math.sin(now*.006)*.025):0;
-    part.rotation.y+=dt*(phase==='hold'?.5:.18);
-    mx+=(tmx-mx)*.05;my+=(tmy-my)*.05;camA+=dt*.1;camera.position.set(Math.cos(camA)*camR+mx*.7,camY+my*.5,Math.sin(camA)*camR);camera.lookAt(tgt);
-    const pa=pg.attributes.position.array;for(let i=0;i<PN;i++){pa[i*3+1]+=spd[i]*dt;if(pa[i*3+1]>8)pa[i*3+1]=-1;}pg.attributes.position.needsUpdate=true;points.rotation.y+=dt*.02;
-    un.intensity=b?(.8+Math.sin(now*.02)*.4):.5;noz.material.opacity=b?(.8+Math.sin(now*.015)*.2):0;
-    renderer.render(scene,camera);})(last);
-  addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+  (function loop(now){
+    requestAnimationFrame(loop);
+    const dt=Math.min((now-last)/1000,.05);last=now;
+    if(!vis||document.hidden||canvas.style.display==='none')return;
+    update(dt,now);
+    renderer.render(scene,camera);
+  })(last);
+  addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;applyViewOffset();camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onload="applyHero()"></script>
+<script src="assets/vendor/three.min.js" onload="applyHero()"></script>
 </body>
 </html>
