@@ -49,11 +49,16 @@
   /* ---- chrome ---- */
   header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:clamp(18px,3vw,34px) clamp(20px,4vw,48px)}
   .brand{font-family:var(--mono);font-size:12.5px;letter-spacing:.42em;text-transform:uppercase;text-decoration:none;padding-left:.42em}
-  .top-links{display:flex;gap:clamp(16px,3vw,34px)}
+  .top-links{display:flex;align-items:center;gap:clamp(16px,3vw,34px)}
   .top-links a{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;text-decoration:none;color:var(--mut);transition:color .3s;position:relative}
   .top-links a::after{content:'';position:absolute;left:0;bottom:-5px;height:1px;width:100%;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s}
   .top-links a:hover{color:var(--ink)}
   .top-links a:hover::after{transform:scaleX(1)}
+  .snd{background:none;border:none;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--mut);display:inline-flex;align-items:center;gap:10px;transition:color .3s}
+  .snd:hover{color:var(--ink)}
+  .snd .dot{width:7px;height:7px;border-radius:50%;border:1px solid var(--dim);flex:none;transition:background .3s,border-color .3s,box-shadow .3s}
+  .snd.on{color:var(--ink)}
+  .snd.on .dot{background:var(--amber);border-color:var(--amber);box-shadow:0 0 10px rgba(255,92,26,.8)}
 
   #hud-ch{position:fixed;left:clamp(20px,4vw,48px);bottom:clamp(20px,3.4vw,36px);z-index:20;font-family:var(--mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:14px;transition:opacity .5s}
   #hud-ch b{color:var(--ink);font-weight:500}
@@ -83,6 +88,8 @@
   .ov.center p{margin:0 auto}
   .ov .mats{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
   .ov .mats span{font-family:var(--mono);font-size:11px;letter-spacing:.18em;padding:8px 14px;border:1px solid var(--hair);color:var(--mut)}
+  .ov .note{margin-top:24px;font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:12px;max-width:440px}
+  .ov .note i{width:8px;height:8px;border:1px solid var(--amber);border-radius:50%;flex:none;box-shadow:0 0 8px rgba(255,92,26,.5)}
   .ov .specs{margin-top:8px;border-top:1px solid var(--hair);max-width:460px}
   .ov .specs div{display:flex;justify-content:space-between;gap:18px;padding:13px 0;border-bottom:1px solid var(--hair)}
   .ov .specs dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);padding-top:3px;flex:none}
@@ -102,6 +109,7 @@
     #hud-pr .track{width:44px}
     #hud-ch .name{display:none}
     .ov .specs div{padding:10px 0}
+    .snd .lbl{display:none}
   }
   @media(prefers-reduced-motion:reduce){
     #hint .line::after{animation:none}
@@ -128,6 +136,7 @@
   <nav class="top-links">
     <a href="catalog.html">Piese</a>
     <a href="mailto:contact@autocore3d.com">Contact</a>
+    <button class="snd" id="sndBtn" aria-pressed="false" title="Pornește / oprește sunetul"><span class="dot"></span><span class="lbl">Sunet</span></button>
   </nav>
 </header>
 
@@ -140,7 +149,7 @@
   <div class="in">
     <div class="kick">AUTOCORE3D — Piese auto imprimate 3D</div>
     <h1>Grila Renault<br>Mégane 2&nbsp;RS.</h1>
-    <p>Un exemplu din atelierul nostru: reprodusă după piesa originală și imprimată 3D din ABS armat cu fibră de carbon. Derulează ca să vezi cum lucrăm.</p>
+    <p>Un exemplu din atelierul nostru: reprodusă după piesa originală și imprimată 3D din ABS armat cu fibră de carbon. Derulează ca să-i dai ocol.</p>
   </div>
 </section>
 
@@ -160,6 +169,7 @@
     <h2>ABS armat cu<br>fibră de carbon.</h2>
     <p>Pentru grila de față am ales ABS-CF: rigid, stabil termic, cu finisaj mat, tehnic — fără vopsea, fără folie. Alegem compozitul potrivit rolului fiecărei piese.</p>
     <div class="mats"><span>ABS-CF</span><span>ASA-CF</span><span>PC-CF</span><span>PA-CF</span><span>PETG-CF</span></div>
+    <div class="note"><i></i>Mostră extrasă din piesă — fibrele de carbon, vizibile în material și în filament</div>
   </div>
 </section>
 
@@ -240,9 +250,9 @@ renderer.localClippingEnabled=true;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.42;
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x0a0a0b,.02);
+scene.fog=new THREE.FogExp2(0x0a0a0b,.016);
 const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,200);
-camera.position.set(0,2.9,11.5);camera.lookAt(0,2.4,0);
+camera.position.set(0,4.25,13.4);camera.lookAt(0,4.25,0);
 
 /* ---- mediu de studio: cubemap generat (reflexii pe carbon) ---- */
 function envFace(draw){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle='#08090b';x.fillRect(0,0,128,128);draw(x);return c;}
@@ -265,45 +275,76 @@ function carbonTex(){const c=document.createElement('canvas');c.width=c.height=2
 function layerTex(){const c=document.createElement('canvas');c.width=64;c.height=256;const x=c.getContext('2d');x.fillStyle='#808080';x.fillRect(0,0,64,256);
   for(let y=0;y<256;y+=6){x.fillStyle='#565656';x.fillRect(0,y,64,2);x.fillStyle='#a8a8a8';x.fillRect(0,y+3,64,1);}
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;return t;}
-function labelTex(t){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.font='500 30px "IBM Plex Mono", monospace';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#cfd6de';x.fillText(t,128,34);return new THREE.CanvasTexture(c);}
+/* macro ABS-CF: mostra marita — straturi + fibre de carbon tocate, sclipitoare */
+function macroTex(){const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
+  x.fillStyle='#141519';x.fillRect(0,0,512,512);
+  for(let y=0;y<512;y+=36){
+    const g=x.createLinearGradient(0,y,0,y+36);
+    g.addColorStop(0,'rgba(255,255,255,.035)');g.addColorStop(.4,'rgba(255,255,255,0)');
+    g.addColorStop(.92,'rgba(0,0,0,.16)');g.addColorStop(1,'rgba(0,0,0,.26)');
+    x.fillStyle=g;x.fillRect(0,y,512,36);
+  }
+  for(let i=0;i<1500;i++){
+    const px=Math.random()*512,py=Math.random()*512,l=5+Math.random()*20,a=(Math.random()-.5)*.7;
+    x.strokeStyle='rgba(212,220,232,'+(.07+Math.random()*.22).toFixed(3)+')';
+    x.lineWidth=Math.random()<.2?1.7:1;
+    x.beginPath();x.moveTo(px,py);x.lineTo(px+Math.cos(a)*l,py+Math.sin(a)*l);x.stroke();
+  }
+  for(let i=0;i<220;i++){x.fillStyle='rgba(255,255,255,'+(.35+Math.random()*.4).toFixed(2)+')';x.fillRect(Math.random()*512,Math.random()*512,2,1);}
+  for(let i=0;i<320;i++){x.fillStyle='rgba(0,0,0,'+(.2+Math.random()*.3).toFixed(2)+')';x.fillRect(Math.random()*512,Math.random()*512,2,1);}
+  return new THREE.CanvasTexture(c);}
+/* fir de filament: baza inchisa + dungi longitudinale + sclipici de carbon */
+function filTex(){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
+  x.fillStyle='#111216';x.fillRect(0,0,256,64);
+  for(let i=0;i<210;i++){
+    const py=Math.random()*64,px=Math.random()*256,l=6+Math.random()*26;
+    x.strokeStyle='rgba(205,214,226,'+(.05+Math.random()*.16).toFixed(3)+')';x.lineWidth=1;
+    x.beginPath();x.moveTo(px,py);x.lineTo(px+l,py+(Math.random()-.5)*2);x.stroke();
+  }
+  for(let i=0;i<90;i++){x.fillStyle='rgba(255,255,255,'+(.3+Math.random()*.4).toFixed(2)+')';x.fillRect(Math.random()*256,Math.random()*64,1.6,1);}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,1);return t;}
+function labelTex(t,fs){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.font='500 '+(fs||30)+'px "IBM Plex Mono", monospace';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#cfd6de';x.fillText(t,128,34);return new THREE.CanvasTexture(c);}
 const GTEX=glowTex(),STEX=shadowTex(),CTEX=carbonTex(),LTEX=layerTex();
-CTEX.repeat.set(7,2);LTEX.repeat.set(10,14);
+CTEX.repeat.set(2,7);LTEX.repeat.set(3,44);
 
 /* ---- lumini ---- */
 scene.add(new THREE.HemisphereLight(0x3a3e46,0x0c0c0e,1.05));
 const key=new THREE.DirectionalLight(0xffffff,1.0);key.position.set(6,10,7);scene.add(key);
 const front=new THREE.DirectionalLight(0xe8eef6,.95);front.position.set(-2,4,12);scene.add(front);
-const topFront=new THREE.PointLight(0xffffff,.55,34);topFront.position.set(2.5,7,7);scene.add(topFront);
+const back=new THREE.DirectionalLight(0xdfe6ee,1.15);back.position.set(2,6,-11);scene.add(back);
+const backFill=new THREE.PointLight(0xdfe6ee,.55,30);backFill.position.set(-5,3.5,-8);scene.add(backFill);
+const topFront=new THREE.PointLight(0xffffff,.55,34);topFront.position.set(2.5,8.5,7);scene.add(topFront);
 const fill=new THREE.PointLight(0xdfe6ee,.6,40);fill.position.set(-6,3.5,7);scene.add(fill);
-const rim=new THREE.PointLight(0xdfe6ee,.95,36);rim.position.set(-7,5.5,-6);scene.add(rim);
+const rim=new THREE.PointLight(0xdfe6ee,.95,36);rim.position.set(-7,6.5,-6);scene.add(rim);
 const warm=new THREE.PointLight(0xff5c1a,.4,26);warm.position.set(5.5,1.1,-4.5);scene.add(warm);
-const finBack=new THREE.PointLight(0xffffff,0,30);finBack.position.set(0,6.5,-7);scene.add(finBack);
+const finBack=new THREE.PointLight(0xffffff,0,30);finBack.position.set(0,7,-7);scene.add(finBack);
 
 /* ---- fundal + umbra de contact + praf ---- */
+let bgPlane;
 {const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
  const g=x.createRadialGradient(256,236,20,256,256,256);g.addColorStop(0,'#1a1c21');g.addColorStop(.55,'#0e0f12');g.addColorStop(1,'#0a0a0b');
  x.fillStyle=g;x.fillRect(0,0,512,512);
  const bt=new THREE.CanvasTexture(c);
- const bp=new THREE.Mesh(new THREE.PlaneGeometry(120,70),new THREE.MeshBasicMaterial({map:bt,fog:false,depthWrite:false}));
- bp.position.set(0,4,-34);scene.add(bp);}
-const shadow=new THREE.Mesh(new THREE.PlaneGeometry(14.5,5.4),new THREE.MeshBasicMaterial({map:STEX,transparent:true,depthWrite:false}));
+ bgPlane=new THREE.Mesh(new THREE.PlaneGeometry(150,90),new THREE.MeshBasicMaterial({map:bt,fog:false,depthWrite:false}));
+ bgPlane.position.set(0,4.2,-40);scene.add(bgPlane);}
+const shadow=new THREE.Mesh(new THREE.PlaneGeometry(7,4.6),new THREE.MeshBasicMaterial({map:STEX,transparent:true,depthWrite:false}));
 shadow.rotation.x=-Math.PI/2;shadow.position.set(0,.02,0);scene.add(shadow);
 
 const DN=340,dg=new THREE.BufferGeometry(),dpos=new Float32Array(DN*3),dspd=new Float32Array(DN);
-for(let i=0;i<DN;i++){dpos[i*3]=(Math.random()-.5)*30;dpos[i*3+1]=Math.random()*9;dpos[i*3+2]=8-Math.random()*40;dspd[i]=.1+Math.random()*.4;}
+for(let i=0;i<DN;i++){dpos[i*3]=(Math.random()-.5)*32;dpos[i*3+1]=Math.random()*10;dpos[i*3+2]=(Math.random()-.5)*32;dspd[i]=.1+Math.random()*.4;}
 dg.setAttribute('position',new THREE.BufferAttribute(dpos,3));
 const dust=new THREE.Points(dg,new THREE.PointsMaterial({size:.045,map:GTEX,color:0x9a968e,transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false}));
 scene.add(dust);
 
 /* ============ INCARCAREA PIESEI (STL binar) ============ */
-const PY=2.42;                            /* inaltimea la care pluteste piesa */
+const PY=4.25;                            /* centrul piesei verticale */
 const PART=new THREE.Group();PART.position.set(0,PY,0);scene.add(PART);
 const clip=new THREE.Plane(new THREE.Vector3(0,-1,0),100);
 
 let partReady=false,fetchPct=0;
-let carbonMesh=null,wire=null,scanPlane=null,scanLight=null,buildLine=null,buildGlow=null,dimGroup=null;
+let carbonMesh=null,wire=null,scanPlane=null,scanLight=null,buildSlab=null,buildGlow=null,dimGroup=null;
 const dimMats=[];
-let BB={w:9.2,h:2.7,d:1.0,minY:1.1,maxY:3.8};
+let BB={w:2.2,h:7.4,d:.82,minY:.55,maxY:7.95};
 
 function parseSTL(buf){
   const dv=new DataView(buf);
@@ -352,50 +393,47 @@ function buildGeometry(pos){
     const l=Math.hypot(sx,sy,sz)||1;
     nor[v*3]=sx/l;nor[v*3+1]=sy/l;nor[v*3+2]=sz/l;
   }
-  /* UV planar frontal (STL nu are UV): u dupa latime, v dupa inaltime */
-  let mnx=1e9,mxx=-1e9,mnz=1e9,mxz=-1e9;
-  for(let v=0;v<n*3;v++){
-    const x=pos[v*3],z=pos[v*3+2];
-    if(x<mnx)mnx=x;if(x>mxx)mxx=x;
-    if(z<mnz)mnz=z;if(z>mxz)mxz=z;
-  }
-  const uv=new Float32Array(n*6);
-  for(let v=0;v<n*3;v++){
-    uv[v*2]=(pos[v*3]-mnx)/(mxx-mnx);
-    uv[v*2+1]=(pos[v*3+2]-mnz)/(mxz-mnz);
-  }
   const g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.BufferAttribute(pos,3));
   g.setAttribute('normal',new THREE.BufferAttribute(nor,3));
-  g.setAttribute('uv',new THREE.BufferAttribute(uv,2));
   g.rotateX(-Math.PI/2);      /* Z-up (CAD) -> Y-up (scena) */
+  g.rotateZ(Math.PI/2);       /* pe verticala: axa lunga (367 mm) devine inaltime */
   g.center();
-  const box=new THREE.Box3().setFromBufferAttribute(g.getAttribute('position'));
-  const s=9.2/(box.max.x-box.min.x);   /* ~367 mm -> 9.2 unitati */
+  let box=new THREE.Box3().setFromBufferAttribute(g.getAttribute('position'));
+  const s=7.4/(box.max.y-box.min.y);   /* ~367 mm -> 7.4 unitati pe verticala */
   g.scale(s,s,s);
+  /* UV planar frontal dupa axele finale (STL nu are UV): u pe latime, v pe inaltime */
+  box=new THREE.Box3().setFromBufferAttribute(g.getAttribute('position'));
+  const p=g.getAttribute('position');
+  const uv=new Float32Array(n*6);
+  for(let v=0;v<n*3;v++){
+    uv[v*2]=(p.getX(v)-box.min.x)/(box.max.x-box.min.x);
+    uv[v*2+1]=(p.getY(v)-box.min.y)/(box.max.y-box.min.y);
+  }
+  g.setAttribute('uv',new THREE.BufferAttribute(uv,2));
   return g;
 }
 
 function makeDims(){
   dimGroup=new THREE.Group();PART.add(dimGroup);
-  const hw=BB.w/2,hh=BB.h/2,hd=BB.d/2,ext=.5,tick=.14;
+  const hw=BB.w/2,hh=BB.h/2,hd=BB.d/2,ext=.55,tick=.14;
   const P=[];
   const seg=(a,b)=>{P.push(a[0],a[1],a[2],b[0],b[1],b[2]);};
-  /* latime — sub piesa */
-  const wy=-hh-ext,wz=hd+.15;
-  seg([-hw,wy,wz],[hw,wy,wz]);
-  seg([-hw,wy-tick,wz],[-hw,wy+tick,wz]);
-  seg([hw,wy-tick,wz],[hw,wy+tick,wz]);
-  /* inaltime — in dreapta */
+  /* inaltime (367 mm) — in dreapta piesei verticale */
   const hx=hw+ext;
   seg([hx,-hh,0],[hx,hh,0]);
   seg([hx-tick,-hh,0],[hx+tick,-hh,0]);
   seg([hx-tick,hh,0],[hx+tick,hh,0]);
-  /* adancime — sus, in stanga */
-  const dx=-hw-ext,dy=hh+.25;
-  seg([dx,dy,-hd],[dx,dy,hd]);
-  seg([dx,dy-tick,-hd],[dx,dy+tick,-hd]);
-  seg([dx,dy-tick,hd],[dx,dy+tick,hd]);
+  /* latime (108 mm) — sub piesa */
+  const wy=-hh-.55,wz=hd+.15;
+  seg([-hw,wy,wz],[hw,wy,wz]);
+  seg([-hw,wy-tick,wz],[-hw,wy+tick,wz]);
+  seg([hw,wy-tick,wz],[hw,wy+tick,wz]);
+  /* adancime (40 mm) — deasupra */
+  const dy=hh+.3;
+  seg([0,dy,-hd],[0,dy,hd]);
+  seg([0,dy-tick,-hd],[0,dy+tick,-hd]);
+  seg([0,dy-tick,hd],[0,dy+tick,hd]);
   const lg=new THREE.BufferGeometry();
   lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(P),3));
   const lm=new THREE.LineBasicMaterial({color:0x8fa3b8,transparent:true,opacity:0});
@@ -405,13 +443,51 @@ function makeDims(){
     const sp=new THREE.Sprite(m);sp.position.set(x,y,z);sp.scale.set(1.55*sc,.39*sc,1);
     dimGroup.add(sp);dimMats.push(m);
   };
-  lab('367 mm',0,wy-.42,wz,1);
-  lab('108 mm',hx+.95,0,0,1);
-  lab('40 mm',dx,dy+.4,0,.85);
+  lab('367 mm',hx+.95,0,0,1);
+  lab('108 mm',0,wy-.42,wz,1);
+  lab('40 mm',0,dy+.4,0,.85);
 }
 
+/* ---- mostra de material extrasa din piesa (capitolul 02) ---- */
+let sample=null,chip=null,fil=null,reticle=null,connLine=null,connGeo=null,sampleLight=null;
+const sampleMats=[];
+function makeSample(){
+  sample=new THREE.Group();sample.visible=false;scene.add(sample);
+  const cm=new THREE.MeshStandardMaterial({
+    color:0x40444d,map:macroTex(),bumpMap:LTEX.clone(),bumpScale:.05,
+    metalness:.38,roughness:.46,envMap:ENV,envMapIntensity:1.35,transparent:true,opacity:0
+  });
+  cm.bumpMap.repeat.set(2,7);cm.bumpMap.needsUpdate=true;
+  chip=new THREE.Mesh(new THREE.BoxGeometry(1.15,.82,.26),cm);
+  sample.add(chip);sampleMats.push(cm);
+  /* fir de filament ABS-CF (1.75 mm), marit */
+  const fm=new THREE.MeshStandardMaterial({color:0x30343b,map:filTex(),metalness:.32,roughness:.5,envMap:ENV,envMapIntensity:1.1,transparent:true,opacity:0});
+  const curve=new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-.72,-.03,0),new THREE.Vector3(-.25,.11,.1),
+    new THREE.Vector3(.23,-.1,-.05),new THREE.Vector3(.72,.05,.02)
+  ]);
+  fil=new THREE.Mesh(new THREE.TubeGeometry(curve,40,.05,10),fm);
+  fil.position.y=-.82;sample.add(fil);sampleMats.push(fm);
+  const lab=(t,fs,y,sx,sy)=>{
+    const m=new THREE.SpriteMaterial({map:labelTex(t,fs),transparent:true,opacity:0,depthWrite:false});
+    const sp=new THREE.Sprite(m);sp.position.set(0,y,0);sp.scale.set(sx,sy,1);
+    sample.add(sp);sampleMats.push(m);
+  };
+  lab('ABS-CF · MACRO',26,.65,.95,.24);
+  lab('FILAMENT 1.75 MM',22,-1.12,.8,.2);
+  sampleLight=new THREE.PointLight(0xffffff,0,7);sampleLight.position.set(1.3,1.6,1.6);sample.add(sampleLight);
+  /* reticul pe piesa + fir de legatura */
+  reticle=new THREE.Mesh(new THREE.RingGeometry(.1,.15,32),
+    new THREE.MeshBasicMaterial({color:0xff5c1a,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+  reticle.visible=false;scene.add(reticle);
+  connGeo=new THREE.BufferGeometry();
+  connGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
+  connLine=new THREE.Line(connGeo,new THREE.LineBasicMaterial({color:0xff5c1a,transparent:true,opacity:0}));
+  connLine.visible=false;scene.add(connLine);
+}
+makeSample();
+
 function initPart(geo){
-  BB.w=0;
   const box=new THREE.Box3().setFromBufferAttribute(geo.getAttribute('position'));
   BB={w:box.max.x-box.min.x,h:box.max.y-box.min.y,d:box.max.z-box.min.z,
       minY:PY+box.min.y,maxY:PY+box.max.y};
@@ -427,18 +503,23 @@ function initPart(geo){
     new THREE.LineBasicMaterial({color:0x7f93a8,transparent:true,opacity:0}));
   wire.scale.setScalar(1.002);
   PART.add(wire);
-  /* plan de scanare care matura piesa */
-  scanPlane=new THREE.Mesh(new THREE.PlaneGeometry(BB.d+.7,BB.h+.7),
+  /* plan de scanare orizontal care urca pe piesa verticala */
+  scanPlane=new THREE.Mesh(new THREE.PlaneGeometry(BB.w+1,BB.d+1),
     new THREE.MeshBasicMaterial({color:0xff5c1a,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
-  scanPlane.rotation.y=Math.PI/2;
+  scanPlane.rotation.x=Math.PI/2;
   PART.add(scanPlane);
   scanLight=new THREE.PointLight(0xff5c1a,0,7);
   PART.add(scanLight);
-  /* linia incandescenta a stratului curent (faza de fabricatie) */
-  buildLine=new THREE.Mesh(new THREE.PlaneGeometry(BB.w+.7,.05),
-    new THREE.MeshBasicMaterial({color:0xffa050,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
-  scene.add(buildLine);
-  buildGlow=new THREE.PointLight(0xff6a26,0,10);
+  /* inel incandescent al stratului curent — rama subtire, vizibila din orice unghi */
+  buildSlab=new THREE.Group();
+  {const bm=new THREE.MeshBasicMaterial({color:0xff8a3a,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+   const bw=BB.w+.44,bd=BB.d+.44;
+   const bar=(gx,gz,px,pz)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(gx,.045,gz),bm);m.position.set(px,0,pz);buildSlab.add(m);};
+   bar(bw,.06,0,bd/2);bar(bw,.06,0,-bd/2);
+   bar(.06,bd,bw/2,0);bar(.06,bd,-bw/2,0);
+   buildSlab.userData.mat=bm;}
+  scene.add(buildSlab);
+  buildGlow=new THREE.PointLight(0xff6a26,0,12);
   scene.add(buildGlow);
   makeDims();
   partReady=true;
@@ -465,35 +546,7 @@ fetch('assets/models/grila-megane2rs.stl')
   .then(buf=>{initPart(buildGeometry(parseSTL(buf)));})
   .catch(()=>{fetchPct=1;partReady=true;});
 
-/* ============ TRASEUL CAMEREI ============ */
-const KF=[
- {p:0.00, pos:[0,2.9,11.6],   look:[0,2.4,0]},
- {p:0.08, pos:[2.9,3.5,9.6],  look:[0,2.4,0]},
- {p:0.16, pos:[7.6,3.4,6.2],  look:[0,2.4,0]},
- {p:0.235,pos:[.6,6.6,7.2],   look:[0,2.2,0]},
- {p:0.30, pos:[-4.2,2.8,5.2], look:[-.8,2.3,0]},
- {p:0.375,pos:[-2.6,2.7,3.0], look:[.4,2.35,-.2]},
- {p:0.45, pos:[2.4,2.35,2.8], look:[-.5,2.5,-.2]},
- {p:0.52, pos:[5.0,1.5,5.8],  look:[0,2.5,0]},
- {p:0.62, pos:[-4.4,4.6,5.8], look:[0,2.3,0]},
- {p:0.70, pos:[-4.2,2.7,3.4], look:[1.8,2.35,-.2]},
- {p:0.79, pos:[4.2,2.85,3.5], look:[-1.8,2.3,-.2]},
- {p:0.85, pos:[8.4,3.0,2.4],  look:[0,2.4,0]},
- {p:0.93, pos:[-6.2,3.8,8.0], look:[0,2.4,0]},
- {p:1.00, pos:[0,3.15,12.6],  look:[0,2.5,0]}
-];
-const posCurve=new THREE.CatmullRomCurve3(KF.map(k=>new THREE.Vector3(...k.pos)),false,'centripetal');
-const lookCurve=new THREE.CatmullRomCurve3(KF.map(k=>new THREE.Vector3(...k.look)),false,'centripetal');
-const NSEG=KF.length-1;
-function pathAt(P,vPos,vLook){
-  P=Math.max(0,Math.min(1,P));
-  let i=0;while(i<NSEG-1&&P>KF[i+1].p)i++;
-  const s=(P-KF[i].p)/(KF[i+1].p-KF[i].p);
-  const u=(i+Math.max(0,Math.min(1,s)))/NSEG;
-  posCurve.getPoint(u,vPos);lookCurve.getPoint(u,vLook);
-}
-
-/* ---- piste scalare (rotatie piesa, sarma, scan, dimensiuni, constructie) ---- */
+/* ============ piste scalare ============ */
 const sm2=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
 function trk(T,P){
   if(P<=T[0][0])return T[0][1];
@@ -501,13 +554,105 @@ function trk(T,P){
     if(P<=T[i+1][0])return T[i][1]+(T[i+1][1]-T[i][1])*sm2((P-T[i][0])/(T[i+1][0]-T[i][0]));
   return T[T.length-1][1];
 }
-const T_ROT =[[0,0],[.13,-.14],[.235,.28],[.30,.1],[.46,-.32],[.52,0],[.69,.2],[.835,-.12],[.95,0],[1,0]];
+/* ---- camera: orbita completa de 360° in jurul piesei verticale ---- */
+const T_TH=[[0,0],[.085,12],[.16,32],[.235,52],[.30,75],[.375,105],[.46,150],[.52,172],[.62,235],[.70,292],[.79,326],[.85,338],[.93,352],[1,360]];
+const T_R =[[0,13.4],[.085,11.5],[.16,7.2],[.235,5.4],[.30,5.8],[.375,5.0],[.46,5.4],[.52,7.0],[.62,6.2],[.70,4.7],[.79,4.9],[.85,7.0],[.93,11],[1,13.6]];
+const T_H =[[0,4.25],[.085,4.7],[.16,3.1],[.235,6.6],[.30,2.4],[.375,4.8],[.46,4.0],[.52,1.6],[.62,7.1],[.70,3.3],[.79,5.4],[.85,4.4],[.93,4.7],[1,4.35]];
+const T_LY=[[0,4.25],[.13,3.5],[.235,5.2],[.30,3.7],[.375,4.5],[.52,2.4],[.62,5.9],[.70,3.5],[.79,4.9],[.85,4.25],[1,4.3]];
+/* ---- piste efecte ---- */
 const T_WIRE=[[.12,0],[.165,1],[.29,1],[.345,0],[.49,0],[.525,.85],[.60,.55],[.665,0]];
 const T_DIMS=[[.185,0],[.225,1],[.285,1],[.325,0]];
-const T_SCAN=[[.15,-1.25],[.30,1.25]];
+const T_SCAN=[[.15,-1.15],[.30,1.15]];
 const T_CLIP=[[0,1],[.465,1],[.50,0],[.535,0],[.665,1],[1,1]];
 const T_BGLO=[[.49,0],[.535,1],[.64,1],[.675,0]];
+const T_XTR =[[.335,0],[.378,1],[.44,1],[.478,0]];
 const T_FIN =[[.90,0],[.965,1]];
+
+/* ============ SUNET (WebAudio, generat) ============ */
+const sndBtn=document.getElementById('sndBtn');
+const SND={ctx:null,master:null,wind:null,windF:null,noise:null,on:false,ready:false,
+           pref:localStorage.getItem('ac3d_snd')!=='off',tick:0};
+function audioBuild(){
+  const C=SND.ctx;
+  SND.master=C.createGain();SND.master.gain.value=0;SND.master.connect(C.destination);
+  /* drona de atelier */
+  const dgn=C.createGain();dgn.gain.value=.05;
+  const lp=C.createBiquadFilter();lp.type='lowpass';lp.frequency.value=170;lp.Q.value=.6;
+  const o1=C.createOscillator();o1.type='sawtooth';o1.frequency.value=54;
+  const o2=C.createOscillator();o2.type='sine';o2.frequency.value=108.4;
+  const og=C.createGain();og.gain.value=.5;
+  o1.connect(lp);o2.connect(og);og.connect(lp);lp.connect(dgn);dgn.connect(SND.master);
+  const lfo=C.createOscillator();lfo.frequency.value=.07;
+  const lg=C.createGain();lg.gain.value=.02;
+  lfo.connect(lg);lg.connect(dgn.gain);
+  o1.start();o2.start();lfo.start();
+  /* aer / vant legat de derulare */
+  const len=C.sampleRate*2,buf=C.createBuffer(1,len,C.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+  SND.noise=buf;
+  const src=C.createBufferSource();src.buffer=buf;src.loop=true;
+  const bp=C.createBiquadFilter();bp.type='bandpass';bp.frequency.value=420;bp.Q.value=.8;
+  SND.windF=bp;
+  SND.wind=C.createGain();SND.wind.gain.value=.012;
+  src.connect(bp);bp.connect(SND.wind);SND.wind.connect(SND.master);src.start();
+  SND.ready=true;
+}
+function audioOn(){
+  if(!SND.ctx){
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return;
+    SND.ctx=new AC();audioBuild();
+  }
+  if(SND.ctx.state==='suspended')SND.ctx.resume();
+  SND.on=true;
+  SND.master.gain.setTargetAtTime(.9,SND.ctx.currentTime,.7);
+  sndBtn.classList.add('on');sndBtn.setAttribute('aria-pressed','true');
+}
+function audioOff(){
+  if(SND.ctx)SND.master.gain.setTargetAtTime(0,SND.ctx.currentTime,.15);
+  SND.on=false;
+  sndBtn.classList.remove('on');sndBtn.setAttribute('aria-pressed','false');
+}
+sndBtn.addEventListener('click',()=>{
+  SND.pref=!SND.on;
+  localStorage.setItem('ac3d_snd',SND.pref?'on':'off');
+  SND.pref?audioOn():audioOff();
+});
+['pointerdown','keydown','touchend'].forEach(ev=>{
+  addEventListener(ev,()=>{if(SND.pref&&!SND.on)audioOn();},{once:true,passive:true});
+});
+document.addEventListener('visibilitychange',()=>{
+  if(!SND.ctx)return;
+  if(document.hidden)SND.master.gain.setTargetAtTime(0,SND.ctx.currentTime,.1);
+  else if(SND.on)SND.master.gain.setTargetAtTime(.9,SND.ctx.currentTime,.5);
+});
+function playBlip(){
+  if(!SND.on||!SND.ready)return;
+  const C=SND.ctx,t0=C.currentTime;
+  const o=C.createOscillator(),g=C.createGain();
+  o.type='sine';o.frequency.setValueAtTime(640,t0);o.frequency.exponentialRampToValueAtTime(430,t0+.22);
+  g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.05,t0+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+.3);
+  o.connect(g);g.connect(SND.master);o.start(t0);o.stop(t0+.32);
+}
+function playTick(v){
+  if(!SND.on||!SND.ready)return;
+  const C=SND.ctx,t0=C.currentTime;
+  const o=C.createOscillator(),g=C.createGain(),hp=C.createBiquadFilter();
+  hp.type='highpass';hp.frequency.value=900;
+  o.type='square';o.frequency.value=1400+Math.random()*500;
+  g.gain.setValueAtTime(.012*v,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+.03);
+  o.connect(hp);hp.connect(g);g.connect(SND.master);o.start(t0);o.stop(t0+.04);
+}
+function playWhoosh(){
+  if(!SND.on||!SND.ready)return;
+  const C=SND.ctx,t0=C.currentTime;
+  const src=C.createBufferSource();src.buffer=SND.noise;
+  const bp=C.createBiquadFilter();bp.type='bandpass';bp.Q.value=1.2;
+  bp.frequency.setValueAtTime(260,t0);bp.frequency.exponentialRampToValueAtTime(1400,t0+.5);
+  const g=C.createGain();
+  g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.07,t0+.12);g.gain.exponentialRampToValueAtTime(.0001,t0+.6);
+  src.connect(bp);bp.connect(g);g.connect(SND.master);src.start(t0);src.stop(t0+.65);
+}
 
 /* ============ SCROLL + OVERLAYS + HUD ============ */
 const ovs=[...document.querySelectorAll('.ov')].map(el=>({el,a:parseFloat(el.dataset.a),b:parseFloat(el.dataset.b)}));
@@ -536,7 +681,7 @@ function updateDOM(){
     o.el.style.transform='translateY('+ty.toFixed(1)+'px)';
   });
   let cur=CH[0];for(const c of CH)if(P>=c[0]-.02)cur=c;
-  if(cur[1]!==lastCh){lastCh=cur[1];chNum.textContent=cur[1];chName.textContent=cur[2];}
+  if(cur[1]!==lastCh){if(lastCh!=='')playBlip();lastCh=cur[1];chNum.textContent=cur[1];chName.textContent=cur[2];}
   const pct=Math.round(P*100);
   prNum.textContent=String(pct).padStart(3,'0');
   prBar.style.width=pct+'%';
@@ -545,7 +690,8 @@ function updateDOM(){
 
 /* ============ BUCLA ============ */
 const vPos=new THREE.Vector3(),vLook=new THREE.Vector3(),vDir=new THREE.Vector3(),vRight=new THREE.Vector3(),UP=new THREE.Vector3(0,1,0);
-let last=performance.now();
+const sDir=new THREE.Vector3(),sRight=new THREE.Vector3(),sAnchor=new THREE.Vector3();
+let last=performance.now(),Pprev=0,xrPrev=0;
 function frame(now){
   requestAnimationFrame(frame);
   const rawdt=(now-last)/1000;last=now;
@@ -553,28 +699,30 @@ function frame(now){
   P+=(Pt-P)*(REDUCED?1:(1-Math.exp(-Math.min(rawdt,.6)*4.6)));
   if(Math.abs(Pt-P)<.0004)P=Pt;
   const t=now*.001;
+  const vel=Math.abs(P-Pprev)/Math.max(dt,.001);Pprev=P;
 
-  /* piesa: rotatie pe scroll + respiratie discreta */
-  PART.rotation.y=trk(T_ROT,P)+(REDUCED?0:Math.sin(t*.4)*.045);
+  /* piesa: doar respiratie discreta — turul il face camera */
+  PART.rotation.y=REDUCED?0:Math.sin(t*.3)*.02;
   PART.position.y=PY+(REDUCED?0:Math.sin(t*.7)*.035);
-  shadow.material.opacity=.75-(REDUCED?0:Math.sin(t*.7)*.1);
+  shadow.material.opacity=.7-(REDUCED?0:Math.sin(t*.7)*.08);
 
   if(!REDUCED){
     dust.rotation.y=Math.sin(t*.02)*.02;
     const pa=dg.attributes.position.array;
-    for(let i=0;i<DN;i++){pa[i*3+1]+=dspd[i]*dt*.22;if(pa[i*3+1]>9)pa[i*3+1]=0;}
+    for(let i=0;i<DN;i++){pa[i*3+1]+=dspd[i]*dt*.22;if(pa[i*3+1]>10)pa[i*3+1]=0;}
     dg.attributes.position.needsUpdate=true;
   }
 
+  let boNow=0;
   if(partReady&&carbonMesh){
     /* faza 01: sarma + scan + cote */
     const w=trk(T_WIRE,P);
     wire.material.opacity=w*.55;
-    const sx=trk(T_SCAN,P)*(BB.w/2+.6);
+    const sy=trk(T_SCAN,P)*(BB.h/2+.55);
     const scanOn=(P>.15&&P<.30)?1:0;
-    scanPlane.position.x=sx;
-    scanPlane.material.opacity=scanOn*w*.20;
-    scanLight.position.set(sx,0,BB.d/2+.6);
+    scanPlane.position.y=sy;
+    scanPlane.material.opacity=scanOn*w*.22;
+    scanLight.position.set(0,sy,BB.d/2+.7);
     scanLight.intensity=scanOn*w*1.0;
     const dOp=trk(T_DIMS,P);
     dimMats.forEach(m=>{m.opacity=dOp*(m.isSpriteMaterial?.95:.5);});
@@ -583,17 +731,22 @@ function frame(now){
     const cy=BB.minY-.03+ct*(BB.maxY-BB.minY+.1);
     clip.constant=cy;
     const bo=trk(T_BGLO,P)*(ct>.005&&ct<.985?1:0);
-    buildLine.position.set(PART.position.x,cy,BB.d/2+.32);
-    buildLine.material.opacity=bo*(.7+Math.sin(t*8)*.25);
-    buildGlow.position.set(0,cy+.15,BB.d/2+1.4);
-    buildGlow.intensity=bo*1.6;
+    boNow=bo;
+    buildSlab.position.set(PART.position.x,cy,0);
+    buildSlab.userData.mat.opacity=bo*(.7+Math.sin(t*8)*.25);
+    const thB=trk(T_TH,P)*Math.PI/180;
+    buildGlow.position.set(Math.sin(thB)*2.2,cy+.12,Math.cos(thB)*2.2);
+    buildGlow.intensity=bo*1.7;
     warm.intensity=.4+bo*.5;
     /* final: lumina de contur creste */
     finBack.intensity=trk(T_FIN,P)*1.15;
   }
 
-  /* camera */
-  pathAt(P,vPos,vLook);
+  /* camera: orbita cilindrica — 360° in jurul piesei */
+  const th=trk(T_TH,P)*Math.PI/180;
+  const r=trk(T_R,P),hc=trk(T_H,P);
+  vPos.set(Math.sin(th)*r,hc,Math.cos(th)*r);
+  vLook.set(0,trk(T_LY,P),0);
   if(camera.aspect<1){vDir.copy(vPos).sub(vLook);vPos.copy(vLook).addScaledVector(vDir,1+(1-camera.aspect)*1.1);}
   mx+=(tmx-mx)*.04;my+=(tmy-my)*.04;
   vDir.copy(vLook).sub(vPos).normalize();
@@ -601,6 +754,52 @@ function frame(now){
   vPos.addScaledVector(vRight,mx*.35);vPos.y+=-my*.22+(REDUCED?0:Math.sin(t*.5)*.03);
   camera.position.copy(vPos);
   camera.lookAt(vLook);
+
+  /* fundalul urmeaza camera, ramane mereu in spatele piesei */
+  bgPlane.position.set(-Math.sin(th)*40,4.2,-Math.cos(th)*40);
+  bgPlane.lookAt(camera.position);
+
+  /* capitolul 02: mostra de material extrasa din piesa, adusa in fata camerei */
+  const xr=trk(T_XTR,P);
+  if(sample){
+    const vis=xr>.002;
+    sample.visible=vis;reticle.visible=vis;connLine.visible=vis;
+    if(vis){
+      sDir.copy(vLook).sub(camera.position).normalize();
+      sRight.crossVectors(sDir,UP).normalize();
+      const narrow=camera.aspect<1;
+      sample.position.copy(camera.position)
+        .addScaledVector(sDir,narrow?6.2:4.6)
+        .addScaledVector(sRight,narrow?.35:1.5);
+      sample.position.y+=(narrow?1.3:0)+(REDUCED?0:Math.sin(t*.8)*.05);
+      sample.quaternion.copy(camera.quaternion);
+      chip.rotation.y=Math.sin(t*.35)*.55;chip.rotation.x=Math.sin(t*.27)*.22;
+      fil.rotation.y=t*.4;
+      sample.scale.setScalar((.4+.6*sm2(xr))*(narrow?.72:1));
+      sampleMats.forEach(m=>{m.opacity=xr*(m.isSpriteMaterial?.95:1);});
+      sampleLight.intensity=xr*1.3;
+      /* punctul de pe piesa din care e "scoasa" mostra */
+      const thA=Math.atan2(camera.position.x,camera.position.z);
+      sAnchor.set(Math.sin(thA)*BB.w*.42,PY+1.05,Math.cos(thA)*BB.d*.62);
+      reticle.position.copy(sAnchor);reticle.lookAt(camera.position);
+      reticle.material.opacity=xr*.85;
+      const cp=connGeo.attributes.position.array;
+      cp[0]=sAnchor.x;cp[1]=sAnchor.y;cp[2]=sAnchor.z;
+      cp[3]=sample.position.x;cp[4]=sample.position.y;cp[5]=sample.position.z;
+      connGeo.attributes.position.needsUpdate=true;
+      connLine.material.opacity=xr*.4;
+    }
+  }
+  if(xr>.05&&xrPrev<=.05)playWhoosh();
+  xrPrev=xr;
+
+  /* sunet legat de miscare */
+  if(SND.on&&SND.ready){
+    const target=.012+Math.min(vel*2.2,.085);
+    SND.wind.gain.value+=(target-SND.wind.gain.value)*.08;
+    SND.windF.frequency.value=420+Math.min(vel*9000,900);
+    if(boNow>.05){SND.tick+=dt;if(SND.tick>.1){SND.tick=0;playTick(boNow);}}
+  }
 
   updateDOM();
   if(!document.hidden)renderer.render(scene,camera);
