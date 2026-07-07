@@ -175,10 +175,10 @@
   <div class="num-ghost">02</div>
   <div class="in">
     <div class="kick"><i></i>02 — Material</div>
-    <h2>ABS armat cu<br>fibră de carbon.</h2>
-    <p>Capacul de față e imprimat din ABS și finisat piano black — șlefuit și lăcuit până la luciu de oglindă. Alegem compozitul și finisajul potrivite rolului fiecărei piese.</p>
-    <div class="mats"><span>ABS</span><span>ABS-CF</span><span>ASA-CF</span><span>PC-CF</span><span>PA-CF</span></div>
-    <div class="note"><i></i>Așa arată materialul brut, înainte de finisare — fibre de carbon în material și în filament</div>
+    <h2>ABS negru,<br>vopsit piano black.</h2>
+    <p>Capacul e imprimat din ABS negru simplu — fără fibre. Apoi e vopsit piano black și protejat cu lac anti-UV: luciu de oglindă care nu se decolorează la soare.</p>
+    <div class="mats"><span>ABS negru</span><span>Vopsire piano black</span><span>Lac anti-UV</span></div>
+    <div class="note"><i></i>Așa arată ABS-ul brut, înainte de vopsire — negru simplu, fără fibre</div>
   </div>
 </section>
 
@@ -312,14 +312,33 @@ function filTex(){const c=document.createElement('canvas');c.width=256;c.height=
   }
   for(let i=0;i<90;i++){x.fillStyle='rgba(255,255,255,'+(.3+Math.random()*.4).toFixed(2)+')';x.fillRect(Math.random()*256,Math.random()*64,1.6,1);}
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,1);return t;}
-function labelTex(t,fs){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.font='500 '+(fs||30)+'px "IBM Plex Mono", monospace';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#cfd6de';x.fillText(t,128,34);return new THREE.CanvasTexture(c);}
+/* macro ABS negru simplu: doar straturi de printare, mat, FARA fibre/sclipici */
+function absMacroTex(){const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
+  x.fillStyle='#141416';x.fillRect(0,0,512,512);
+  for(let y=0;y<512;y+=34){
+    const g=x.createLinearGradient(0,y,0,y+34);
+    g.addColorStop(0,'rgba(255,255,255,.04)');g.addColorStop(.35,'rgba(255,255,255,0)');
+    g.addColorStop(.9,'rgba(0,0,0,.2)');g.addColorStop(1,'rgba(0,0,0,.32)');
+    x.fillStyle=g;x.fillRect(0,y,512,34);
+  }
+  /* granulatie mata fina, monocroma, fara sclipici de fibra */
+  for(let i=0;i<2200;i++){const v=Math.random()<.5?255:0;x.fillStyle='rgba('+v+','+v+','+v+','+(.015+Math.random()*.04).toFixed(3)+')';x.fillRect(Math.random()*512,Math.random()*512,1,1);}
+  return new THREE.CanvasTexture(c);}
+/* fir de filament ABS negru: dungi longitudinale discrete, FARA sclipici */
+function absFilTex(){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
+  x.fillStyle='#101012';x.fillRect(0,0,256,64);
+  for(let i=0;i<130;i++){const py=Math.random()*64,px=Math.random()*256,l=8+Math.random()*30;
+    x.strokeStyle='rgba(120,124,130,'+(.03+Math.random()*.06).toFixed(3)+')';x.lineWidth=1;
+    x.beginPath();x.moveTo(px,py);x.lineTo(px+l,py+(Math.random()-.5)*1.4);x.stroke();}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,1);return t;}
+function labelTex(t,fs){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.font='500 '+(fs||30)+'px "IBM Plex Mono", monospace';x.textAlign='center';x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=8;x.fillStyle='rgba(0,0,0,.9)';for(let i=0;i<3;i++)x.fillText(t,128,34);x.shadowBlur=0;x.fillStyle='#eef2f6';x.fillText(t,128,34);const tx=new THREE.CanvasTexture(c);tx.anisotropy=8;return tx;}
 const GTEX=glowTex(),STEX=shadowTex(),CTEX=carbonTex(),LTEX=layerTex();
 CTEX.repeat.set(5,3);LTEX.repeat.set(6,26);
 const MAXANI=renderer.capabilities.getMaxAnisotropy();
 CTEX.anisotropy=MAXANI;LTEX.anisotropy=MAXANI;
 
 /* ---- lumini ---- */
-scene.add(new THREE.HemisphereLight(0x3a3e46,0x0c0c0e,1.05));
+scene.add(new THREE.HemisphereLight(0x2b2f38,0x090a0c,.62));
 const key=new THREE.DirectionalLight(0xffffff,1.0);key.position.set(6,10,7);scene.add(key);
 const front=new THREE.DirectionalLight(0xe8eef6,.95);front.position.set(-2,4,12);scene.add(front);
 const back=new THREE.DirectionalLight(0xdfe6ee,1.15);back.position.set(2,6,-11);scene.add(back);
@@ -430,36 +449,36 @@ function buildGeometry(pos){
 
 function makeDims(){
   dimGroup=new THREE.Group();PART.add(dimGroup);
-  const hw=BB.w/2,hh=BB.h/2,hd=BB.d/2,ext=.55,tick=.14;
+  const hw=BB.w/2,hh=BB.h/2,hd=BB.d/2,ext=.42,tick=.14;
   const P=[];
   const seg=(a,b)=>{P.push(a[0],a[1],a[2],b[0],b[1],b[2]);};
-  /* inaltime (240 mm) — in dreapta piesei */
+  /* inaltime (207 mm) — in dreapta piesei */
   const hx=hw+ext;
   seg([hx,-hh,0],[hx,hh,0]);
   seg([hx-tick,-hh,0],[hx+tick,-hh,0]);
   seg([hx-tick,hh,0],[hx+tick,hh,0]);
-  /* latime (383 mm) — sub piesa */
-  const wy=-hh-.55,wz=hd+.15;
+  /* latime (216 mm) — sub piesa */
+  const wy=-hh-.42,wz=hd+.15;
   seg([-hw,wy,wz],[hw,wy,wz]);
   seg([-hw,wy-tick,wz],[-hw,wy+tick,wz]);
   seg([hw,wy-tick,wz],[hw,wy+tick,wz]);
-  /* adancime (203 mm) — deasupra */
-  const dy=hh+.3;
+  /* adancime (63 mm) — deasupra */
+  const dy=hh+.24;
   seg([0,dy,-hd],[0,dy,hd]);
   seg([0,dy-tick,-hd],[0,dy+tick,-hd]);
   seg([0,dy-tick,hd],[0,dy+tick,hd]);
   const lg=new THREE.BufferGeometry();
   lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(P),3));
-  const lm=new THREE.LineBasicMaterial({color:0x8fa3b8,transparent:true,opacity:0});
-  dimGroup.add(new THREE.LineSegments(lg,lm));dimMats.push(lm);
+  const lm=new THREE.LineBasicMaterial({color:0xaebccb,transparent:true,opacity:0,depthTest:false});
+  const ll=new THREE.LineSegments(lg,lm);ll.renderOrder=20;dimGroup.add(ll);dimMats.push(lm);
   const lab=(t,x,y,z,sc)=>{
-    const m=new THREE.SpriteMaterial({map:labelTex(t),transparent:true,opacity:0,depthWrite:false});
-    const sp=new THREE.Sprite(m);sp.position.set(x,y,z);sp.scale.set(1.55*sc,.39*sc,1);
+    const m=new THREE.SpriteMaterial({map:labelTex(t),transparent:true,opacity:0,depthWrite:false,depthTest:false});
+    const sp=new THREE.Sprite(m);sp.position.set(x,y,z);sp.scale.set(1.75*sc,.44*sc,1);sp.renderOrder=21;
     dimGroup.add(sp);dimMats.push(m);
   };
-  lab('207 mm',hx+.95,0,0,1);
-  lab('216 mm',0,wy-.42,wz,1);
-  lab('63 mm',0,dy+.4,0,.85);
+  lab('207 mm',hx+.82,0,0,1);
+  lab('216 mm',0,wy-.34,wz,1);
+  lab('63 mm',0,dy+.32,0,.85);
 }
 
 /* ---- mostra de material extrasa din piesa (capitolul 02) ---- */
@@ -467,15 +486,16 @@ let sample=null,chip=null,fil=null,reticle=null,connLine=null,connGeo=null,sampl
 const sampleMats=[];
 function makeSample(){
   sample=new THREE.Group();sample.visible=false;scene.add(sample);
+  /* ABS negru brut: mat, fara luciu — contrast clar cu piesa finita piano black */
   const cm=new THREE.MeshStandardMaterial({
-    color:0x40444d,map:macroTex(),bumpMap:LTEX.clone(),bumpScale:.05,
-    metalness:.38,roughness:.46,envMap:ENV,envMapIntensity:1.35,transparent:true,opacity:0
+    color:0x161618,map:absMacroTex(),bumpMap:LTEX.clone(),bumpScale:.05,
+    metalness:.04,roughness:.72,envMap:ENV,envMapIntensity:.45,transparent:true,opacity:0
   });
   cm.bumpMap.repeat.set(2,7);cm.bumpMap.needsUpdate=true;
   chip=new THREE.Mesh(new THREE.BoxGeometry(1.15,.82,.26),cm);
   sample.add(chip);sampleMats.push(cm);
-  /* fir de filament ABS-CF (1.75 mm), marit */
-  const fm=new THREE.MeshStandardMaterial({color:0x30343b,map:filTex(),metalness:.32,roughness:.5,envMap:ENV,envMapIntensity:1.1,transparent:true,opacity:0});
+  /* fir de filament ABS negru (1.75 mm), marit */
+  const fm=new THREE.MeshStandardMaterial({color:0x141416,map:absFilTex(),metalness:.04,roughness:.66,envMap:ENV,envMapIntensity:.4,transparent:true,opacity:0});
   const curve=new THREE.CatmullRomCurve3([
     new THREE.Vector3(-.72,-.03,0),new THREE.Vector3(-.25,.11,.1),
     new THREE.Vector3(.23,-.1,-.05),new THREE.Vector3(.72,.05,.02)
@@ -487,8 +507,8 @@ function makeSample(){
     const sp=new THREE.Sprite(m);sp.position.set(0,y,0);sp.scale.set(sx,sy,1);
     sample.add(sp);sampleMats.push(m);
   };
-  lab('ABS-CF · MACRO',26,.65,.95,.24);
-  lab('FILAMENT 1.75 MM',22,-1.12,.8,.2);
+  lab('ABS NEGRU · MACRO',24,.65,1.02,.22);
+  lab('FILAMENT ABS 1.75 MM',22,-1.12,.86,.2);
   sampleLight=new THREE.PointLight(0xffffff,0,7);sampleLight.position.set(1.3,1.6,1.6);sample.add(sampleLight);
   /* reticul pe piesa + fir de legatura */
   reticle=new THREE.Mesh(new THREE.RingGeometry(.1,.15,32),
@@ -505,11 +525,11 @@ function initPart(geo){
   const box=new THREE.Box3().setFromBufferAttribute(geo.getAttribute('position'));
   BB={w:box.max.x-box.min.x,h:box.max.y-box.min.y,d:box.max.z-box.min.z,
       minY:PY+box.min.y,maxY:PY+box.max.y};
-  /* piano black: negru adanc, lacuit — traieste din reflexii, nu din textura */
+  /* piano black: lac dielectric negru — baza ramane neagra, luciu doar in highlight-uri */
   const carbon=new THREE.MeshPhysicalMaterial({
-    color:0x0c0c0f,metalness:.12,roughness:.16,
-    clearcoat:1,clearcoatRoughness:.06,
-    envMap:ENV,envMapIntensity:1.75,
+    color:0x050506,metalness:0,roughness:.2,
+    clearcoat:1,clearcoatRoughness:.035,reflectivity:.6,
+    envMap:ENV,envMapIntensity:.85,
     side:THREE.DoubleSide,clippingPlanes:[clip]
   });
   carbonMesh=new THREE.Mesh(geo,carbon);
@@ -571,13 +591,14 @@ function trk(T,P){
   return T[T.length-1][1];
 }
 /* ---- camera: orbita completa de 360° in jurul piesei verticale ---- */
-const T_TH=[[0,0],[.085,12],[.16,32],[.235,52],[.30,75],[.375,105],[.46,150],[.52,172],[.62,235],[.70,292],[.79,326],[.85,338],[.93,352],[1,360]];
-const T_R =[[0,11.2],[.085,9.8],[.16,7.0],[.235,6.0],[.30,5.6],[.375,5.0],[.46,5.2],[.52,6.6],[.62,6.2],[.70,4.6],[.79,4.9],[.85,6.6],[.93,9.6],[1,11.6]];
-const T_H =[[0,3.6],[.085,4.2],[.16,2.7],[.235,6.0],[.30,2.0],[.375,4.2],[.46,3.4],[.52,1.4],[.62,6.3],[.70,2.8],[.79,4.7],[.85,3.8],[.93,4.1],[1,3.7]];
-const T_LY=[[0,3.6],[.13,3.1],[.235,4.3],[.30,3.2],[.375,3.8],[.52,2.2],[.62,4.9],[.70,3.0],[.79,4.1],[.85,3.6],[1,3.65]];
+/* 0.14–0.31 e mentinut aproape frontal si stabil ca sa se vada cotele */
+const T_TH=[[0,0],[.085,9],[.16,16],[.235,24],[.30,40],[.375,96],[.46,150],[.52,172],[.62,235],[.70,292],[.79,326],[.85,338],[.93,352],[1,360]];
+const T_R =[[0,11.2],[.085,10.2],[.16,9.4],[.235,9.8],[.30,8.8],[.375,5.2],[.46,5.2],[.52,6.6],[.62,6.2],[.70,4.6],[.79,4.9],[.85,6.6],[.93,9.6],[1,11.6]];
+const T_H =[[0,3.6],[.085,3.8],[.16,3.6],[.235,3.7],[.30,3.4],[.375,4.2],[.46,3.4],[.52,1.4],[.62,6.3],[.70,2.8],[.79,4.7],[.85,3.8],[.93,4.1],[1,3.7]];
+const T_LY=[[0,3.6],[.13,3.6],[.235,3.6],[.30,3.6],[.375,3.8],[.52,2.2],[.62,4.9],[.70,3.0],[.79,4.1],[.85,3.6],[1,3.65]];
 /* ---- piste efecte ---- */
 const T_WIRE=[[.12,0],[.165,1],[.29,1],[.345,0],[.49,0],[.525,.85],[.60,.55],[.665,0]];
-const T_DIMS=[[.185,0],[.225,1],[.285,1],[.325,0]];
+const T_DIMS=[[.16,0],[.20,1],[.30,1],[.335,0]];
 const T_SCAN=[[.15,-1.15],[.30,1.15]];
 const T_CLIP=[[0,1],[.465,1],[.50,0],[.535,0],[.665,1],[1,1]];
 const T_BGLO=[[.49,0],[.535,1],[.64,1],[.675,0]];
