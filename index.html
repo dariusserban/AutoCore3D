@@ -7,7 +7,7 @@
 <meta name="description" content="AUTOCORE3D reproduce piese auto care nu se mai găsesc și le imprimă 3D din compozite cu fibră de carbon. Exemplu: scut termic BMW E46. Trimite-ne piesa ta.">
 <meta property="og:title" content="AUTOCORE3D — Piese auto imprimate 3D">
 <meta property="og:description" content="Scut termic BMW E46, reprodus și imprimat 3D din ABS cu fibră de carbon. Orice piesă, la comandă — contactează-ne.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0b'/%3E%3Cpath d='M8 24L16 8l8 16h-4.6L16 16.4 12.6 24z' fill='%23ff5c1a'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="assets/brand/autocore3d-mark-badge.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -48,7 +48,9 @@
 
   /* ---- chrome ---- */
   header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:clamp(18px,3vw,34px) clamp(20px,4vw,48px)}
-  .brand{font-family:var(--mono);font-size:12.5px;letter-spacing:.42em;text-transform:uppercase;text-decoration:none;padding-left:.42em}
+  .brand{display:flex;align-items:center;text-decoration:none}
+  .brand img{height:24px;display:block}
+  @media(max-width:640px){.brand img{height:20px}}
   .top-links{display:flex;align-items:center;gap:clamp(16px,3vw,34px)}
   .top-links a{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;text-decoration:none;color:var(--mut);transition:color .3s;position:relative}
   .top-links a::after{content:'';position:absolute;left:0;bottom:-5px;height:1px;width:100%;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s}
@@ -129,6 +131,7 @@
 
 <div id="loader">
   <div class="ld">
+    <img src="assets/brand/autocore3d-mark.svg" alt="" width="46" height="46">
     <div class="ld-mark">AUTOCORE3D</div>
     <div class="ld-num" id="ldNum">0</div>
     <div class="ld-bar"><i id="ldBar"></i></div>
@@ -137,7 +140,7 @@
 </div>
 
 <header>
-  <a class="brand" href="#">AUTOCORE3D</a>
+  <a class="brand" href="#"><img src="assets/brand/autocore3d-logo.svg" alt="AUTOCORE3D"></a>
   <nav class="top-links">
     <a href="catalog.html">Piese</a>
     <a href="mailto:contact@autocore3d.com">Contact</a>

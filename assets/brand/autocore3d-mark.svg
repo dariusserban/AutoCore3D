@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96"><clipPath id="hxm"><path d="M48.00,8.00 L13.36,28.00 L13.36,68.00 L48.00,88.00 L82.64,68.00 L82.64,28.00 Z"/></clipPath>
+<rect clip-path="url(#hxm)" x="11.36" y="8.00" width="73.28" height="7.20" fill="#f2f0ee"/>
+<rect clip-path="url(#hxm)" x="11.36" y="18.40" width="73.28" height="7.20" fill="#f2f0ee"/>
+<rect clip-path="url(#hxm)" x="11.36" y="28.80" width="73.28" height="7.20" fill="#f2f0ee"/>
+<rect clip-path="url(#hxm)" x="11.36" y="39.20" width="73.28" height="7.20" fill="#f2f0ee"/>
+<rect clip-path="url(#hxm)" x="11.36" y="49.60" width="73.28" height="7.20" fill="#f2f0ee"/>
+<rect clip-path="url(#hxm)" x="11.36" y="70.40" width="73.28" height="7.20" fill="#f2f0ee"/>
+<rect clip-path="url(#hxm)" x="11.36" y="80.80" width="73.28" height="7.20" fill="#f2f0ee"/>
+<path fill="#ff5c1a" d="M13.36 60.00 L86.40 60.00 A3.60 3.60 0 0 1 86.40 67.20 L13.36 67.20 Z"/></svg>
