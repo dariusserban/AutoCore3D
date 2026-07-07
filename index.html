@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AUTOCORE3D — Piese auto imprimate 3D · Grila Renault Mégane 2 RS</title>
-<meta name="description" content="AUTOCORE3D reproduce piese auto care nu se mai găsesc și le imprimă 3D din compozite cu fibră de carbon. Exemplu: grila Renault Mégane 2 RS. Trimite-ne piesa ta.">
+<title>AUTOCORE3D — Piese auto imprimate 3D · Scut termic BMW E46</title>
+<meta name="description" content="AUTOCORE3D reproduce piese auto care nu se mai găsesc și le imprimă 3D din compozite cu fibră de carbon. Exemplu: scut termic BMW E46. Trimite-ne piesa ta.">
 <meta property="og:title" content="AUTOCORE3D — Piese auto imprimate 3D">
-<meta property="og:description" content="Grila Renault Mégane 2 RS, reprodusă și imprimată 3D din ABS cu fibră de carbon. Orice piesă, la comandă — contactează-ne.">
+<meta property="og:description" content="Scut termic BMW E46, reprodus și imprimat 3D din ABS cu fibră de carbon. Orice piesă, la comandă — contactează-ne.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0b'/%3E%3Cpath d='M8 24L16 8l8 16h-4.6L16 16.4 12.6 24z' fill='%23ff5c1a'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0b;--ink:#f2f0ec;--mut:#b9b7b2;--dim:#6f6e6a;--hair:rgba(242,240,236,.14);
+    --bg:#12141a;--ink:#f4f2ee;--mut:#c6c4bf;--dim:#84837f;--hair:rgba(242,240,236,.16);
     --amber:#ff5c1a;
     --disp:'Space Grotesk',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;
   }
@@ -75,8 +75,13 @@
 
   /* ---- overlays capitole ---- */
   .ov{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;opacity:0;visibility:hidden}
-  .ov .in{max-width:560px}
+  .ov .in{max-width:560px;position:relative}
   .ov .in.wide{max-width:820px}
+  /* scrim discret in spatele textului: lizibil peste orice unghi al piesei */
+  .ov .in::before{content:'';position:absolute;inset:-90px -120px;z-index:-1;pointer-events:none;
+    background:radial-gradient(ellipse farthest-side,rgba(9,10,14,.74),rgba(9,10,14,.48) 40%,rgba(9,10,14,.2) 66%,rgba(9,10,14,0) 92%)}
+  .ov h1,.ov h2{text-shadow:0 2px 34px rgba(0,0,0,.95),0 1px 6px rgba(0,0,0,.6)}
+  .ov p,.ov .kick{text-shadow:0 1px 18px rgba(0,0,0,.9)}
   .ov.side{align-items:center;padding-left:clamp(22px,8vw,110px);padding-right:22px}
   .ov.center{align-items:center;justify-content:center;text-align:center;padding:0 22px}
   .kick{font-family:var(--mono);font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);margin-bottom:22px;display:flex;align-items:center;gap:14px}
@@ -87,7 +92,7 @@
   .ov p{font-size:clamp(14px,1.35vw,17px);line-height:1.7;color:var(--mut);max-width:440px;font-weight:300}
   .ov.center p{margin:0 auto}
   .ov .mats{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
-  .ov .mats span{font-family:var(--mono);font-size:11px;letter-spacing:.18em;padding:8px 14px;border:1px solid var(--hair);color:var(--mut)}
+  .ov .mats span{font-family:var(--mono);font-size:11px;letter-spacing:.18em;padding:8px 14px;border:1px solid var(--hair);color:var(--mut);background:rgba(9,10,14,.45)}
   .ov .note{margin-top:24px;font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:12px;max-width:440px}
   .ov .note i{width:8px;height:8px;border:1px solid var(--amber);border-radius:50%;flex:none;box-shadow:0 0 8px rgba(255,92,26,.5)}
   .ov .specs{margin-top:8px;border-top:1px solid var(--hair);max-width:460px}
@@ -148,8 +153,8 @@
 <section class="ov center" data-a="-0.02" data-b="0.085">
   <div class="in">
     <div class="kick">AUTOCORE3D — Piese auto imprimate 3D</div>
-    <h1>Grila Renault<br>Mégane 2&nbsp;RS.</h1>
-    <p>Un exemplu din atelierul nostru: reprodusă după piesa originală și imprimată 3D din ABS armat cu fibră de carbon. Derulează ca să-i dai ocol.</p>
+    <h1>Scut termic<br>BMW E46.</h1>
+    <p>Un exemplu din atelierul nostru: reprodus după piesa originală și imprimat 3D din ABS armat cu fibră de carbon. Derulează ca să-i dai ocol.</p>
   </div>
 </section>
 
@@ -167,7 +172,7 @@
   <div class="in">
     <div class="kick"><i></i>02 — Material</div>
     <h2>ABS armat cu<br>fibră de carbon.</h2>
-    <p>Pentru grila de față am ales ABS-CF: rigid, stabil termic, cu finisaj mat, tehnic — fără vopsea, fără folie. Alegem compozitul potrivit rolului fiecărei piese.</p>
+    <p>Pentru scutul de față am ales ABS-CF: rigid, stabil dimensional, cu finisaj mat, tehnic — fără vopsea, fără folie. Alegem compozitul potrivit rolului fiecărei piese.</p>
     <div class="mats"><span>ABS-CF</span><span>ASA-CF</span><span>PC-CF</span><span>PA-CF</span><span>PETG-CF</span></div>
     <div class="note"><i></i>Mostră extrasă din piesă — fibrele de carbon, vizibile în material și în filament</div>
   </div>
@@ -197,10 +202,10 @@
     <div class="kick"><i></i>05 — Piesa din exemplu</div>
     <h2>Pe scurt.</h2>
     <dl class="specs">
-      <div><dt>Piesă</dt><dd>Grilă spate — bară</dd></div>
-      <div><dt>Compatibilitate</dt><dd>Renault Mégane 2 RS</dd></div>
+      <div><dt>Piesă</dt><dd>Scut termic</dd></div>
+      <div><dt>Compatibilitate</dt><dd>BMW E46</dd></div>
       <div><dt>Material</dt><dd>ABS + fibră de carbon</dd></div>
-      <div><dt>Dimensiuni</dt><dd>367 × 108 × 40 mm</dd></div>
+      <div><dt>Dimensiuni</dt><dd>383 × 203 × 240 mm</dd></div>
       <div><dt>Fabricație</dt><dd>Imprimare 3D, la comandă</dd></div>
     </dl>
   </div>
@@ -210,7 +215,7 @@
   <div class="in wide">
     <div class="kick">06 — Contact</div>
     <h1>Ai o piesă?<br>Hai să vorbim.</h1>
-    <p>Grila din exemplu e doar una dintre piesele pe care le putem reface. Trimite-ne piesa, o poză sau modelul 3D — AUTOCORE3D e punctul tău de contact pentru piese auto imprimate 3D.</p>
+    <p>Scutul din exemplu e doar una dintre piesele pe care le putem reface. Trimite-ne piesa, o poză sau modelul 3D — AUTOCORE3D e punctul tău de contact pentru piese auto imprimate 3D.</p>
     <div class="cta-row">
       <a class="cta" href="mailto:contact@autocore3d.com?subject=Cerere%20pies%C4%83%20imprimat%C4%83%203D">contact@autocore3d.com
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -245,14 +250,14 @@ const canvas=document.getElementById('gl');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
-renderer.setClearColor(0x0a0a0b,1);
+renderer.setClearColor(0x12141a,1);
 renderer.localClippingEnabled=true;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.42;
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x0a0a0b,.016);
+scene.fog=new THREE.FogExp2(0x12141a,.014);
 const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,200);
-camera.position.set(0,4.25,13.4);camera.lookAt(0,4.25,0);
+camera.position.set(0,3.9,13.8);camera.lookAt(0,3.9,0);
 
 /* ---- mediu de studio: cubemap generat (reflexii pe carbon) ---- */
 function envFace(draw){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.fillStyle='#08090b';x.fillRect(0,0,128,128);draw(x);return c;}
@@ -305,7 +310,9 @@ function filTex(){const c=document.createElement('canvas');c.width=256;c.height=
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,1);return t;}
 function labelTex(t,fs){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.font='500 '+(fs||30)+'px "IBM Plex Mono", monospace';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#cfd6de';x.fillText(t,128,34);return new THREE.CanvasTexture(c);}
 const GTEX=glowTex(),STEX=shadowTex(),CTEX=carbonTex(),LTEX=layerTex();
-CTEX.repeat.set(2,7);LTEX.repeat.set(3,44);
+CTEX.repeat.set(5,3);LTEX.repeat.set(6,26);
+const MAXANI=renderer.capabilities.getMaxAnisotropy();
+CTEX.anisotropy=MAXANI;LTEX.anisotropy=MAXANI;
 
 /* ---- lumini ---- */
 scene.add(new THREE.HemisphereLight(0x3a3e46,0x0c0c0e,1.05));
@@ -322,12 +329,16 @@ const finBack=new THREE.PointLight(0xffffff,0,30);finBack.position.set(0,7,-7);s
 /* ---- fundal + umbra de contact + praf ---- */
 let bgPlane;
 {const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
- const g=x.createRadialGradient(256,236,20,256,256,256);g.addColorStop(0,'#1a1c21');g.addColorStop(.55,'#0e0f12');g.addColorStop(1,'#0a0a0b');
+ /* fundal mai deschis, gri-albastrui rece: piesa neagra de carbon se decupeaza clar pe el */
+ const g=x.createRadialGradient(256,226,20,256,256,258);g.addColorStop(0,'#3a4050');g.addColorStop(.45,'#252a36');g.addColorStop(.8,'#171a22');g.addColorStop(1,'#12141a');
  x.fillStyle=g;x.fillRect(0,0,512,512);
+ /* linie de orizont discreta, ca intr-un studio foto */
+ const hg=x.createLinearGradient(0,300,0,512);hg.addColorStop(0,'rgba(0,0,0,0)');hg.addColorStop(1,'rgba(0,0,0,.42)');
+ x.fillStyle=hg;x.fillRect(0,300,512,212);
  const bt=new THREE.CanvasTexture(c);
  bgPlane=new THREE.Mesh(new THREE.PlaneGeometry(150,90),new THREE.MeshBasicMaterial({map:bt,fog:false,depthWrite:false}));
  bgPlane.position.set(0,4.2,-40);scene.add(bgPlane);}
-const shadow=new THREE.Mesh(new THREE.PlaneGeometry(7,4.6),new THREE.MeshBasicMaterial({map:STEX,transparent:true,depthWrite:false}));
+const shadow=new THREE.Mesh(new THREE.PlaneGeometry(10.5,6.4),new THREE.MeshBasicMaterial({map:STEX,transparent:true,depthWrite:false}));
 shadow.rotation.x=-Math.PI/2;shadow.position.set(0,.02,0);scene.add(shadow);
 
 const DN=340,dg=new THREE.BufferGeometry(),dpos=new Float32Array(DN*3),dspd=new Float32Array(DN);
@@ -337,14 +348,14 @@ const dust=new THREE.Points(dg,new THREE.PointsMaterial({size:.045,map:GTEX,colo
 scene.add(dust);
 
 /* ============ INCARCAREA PIESEI (STL binar) ============ */
-const PY=4.25;                            /* centrul piesei verticale */
+const PY=3.9;                             /* centrul piesei */
 const PART=new THREE.Group();PART.position.set(0,PY,0);scene.add(PART);
 const clip=new THREE.Plane(new THREE.Vector3(0,-1,0),100);
 
 let partReady=false,fetchPct=0;
 let carbonMesh=null,wire=null,scanPlane=null,scanLight=null,buildSlab=null,buildGlow=null,dimGroup=null;
 const dimMats=[];
-let BB={w:2.2,h:7.4,d:.82,minY:.55,maxY:7.95};
+let BB={w:8,h:5,d:4.2,minY:1.4,maxY:6.4};
 
 function parseSTL(buf){
   const dv=new DataView(buf);
@@ -396,11 +407,10 @@ function buildGeometry(pos){
   const g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.BufferAttribute(pos,3));
   g.setAttribute('normal',new THREE.BufferAttribute(nor,3));
-  g.rotateX(-Math.PI/2);      /* Z-up (CAD) -> Y-up (scena) */
-  g.rotateZ(Math.PI/2);       /* pe verticala: axa lunga (367 mm) devine inaltime */
+  g.rotateX(-Math.PI/2);      /* Z-up (CAD) -> Y-up (scena): scutul sta ca pe masina */
   g.center();
   let box=new THREE.Box3().setFromBufferAttribute(g.getAttribute('position'));
-  const s=7.4/(box.max.y-box.min.y);   /* ~367 mm -> 7.4 unitati pe verticala */
+  const s=5.0/(box.max.y-box.min.y);   /* ~240 mm inaltime -> 5.0 unitati */
   g.scale(s,s,s);
   /* UV planar frontal dupa axele finale (STL nu are UV): u pe latime, v pe inaltime */
   box=new THREE.Box3().setFromBufferAttribute(g.getAttribute('position'));
@@ -419,17 +429,17 @@ function makeDims(){
   const hw=BB.w/2,hh=BB.h/2,hd=BB.d/2,ext=.55,tick=.14;
   const P=[];
   const seg=(a,b)=>{P.push(a[0],a[1],a[2],b[0],b[1],b[2]);};
-  /* inaltime (367 mm) — in dreapta piesei verticale */
+  /* inaltime (240 mm) — in dreapta piesei */
   const hx=hw+ext;
   seg([hx,-hh,0],[hx,hh,0]);
   seg([hx-tick,-hh,0],[hx+tick,-hh,0]);
   seg([hx-tick,hh,0],[hx+tick,hh,0]);
-  /* latime (108 mm) — sub piesa */
+  /* latime (383 mm) — sub piesa */
   const wy=-hh-.55,wz=hd+.15;
   seg([-hw,wy,wz],[hw,wy,wz]);
   seg([-hw,wy-tick,wz],[-hw,wy+tick,wz]);
   seg([hw,wy-tick,wz],[hw,wy+tick,wz]);
-  /* adancime (40 mm) — deasupra */
+  /* adancime (203 mm) — deasupra */
   const dy=hh+.3;
   seg([0,dy,-hd],[0,dy,hd]);
   seg([0,dy-tick,-hd],[0,dy+tick,-hd]);
@@ -443,9 +453,9 @@ function makeDims(){
     const sp=new THREE.Sprite(m);sp.position.set(x,y,z);sp.scale.set(1.55*sc,.39*sc,1);
     dimGroup.add(sp);dimMats.push(m);
   };
-  lab('367 mm',hx+.95,0,0,1);
-  lab('108 mm',0,wy-.42,wz,1);
-  lab('40 mm',0,dy+.4,0,.85);
+  lab('240 mm',hx+.95,0,0,1);
+  lab('383 mm',0,wy-.42,wz,1);
+  lab('203 mm',0,dy+.4,0,.85);
 }
 
 /* ---- mostra de material extrasa din piesa (capitolul 02) ---- */
@@ -492,8 +502,8 @@ function initPart(geo){
   BB={w:box.max.x-box.min.x,h:box.max.y-box.min.y,d:box.max.z-box.min.z,
       minY:PY+box.min.y,maxY:PY+box.max.y};
   const carbon=new THREE.MeshStandardMaterial({
-    color:0x383b42,map:CTEX,bumpMap:LTEX,bumpScale:.015,
-    metalness:.42,roughness:.44,envMap:ENV,envMapIntensity:1.25,
+    color:0x43474f,map:CTEX,bumpMap:LTEX,bumpScale:.013,
+    metalness:.42,roughness:.42,envMap:ENV,envMapIntensity:1.4,
     side:THREE.DoubleSide,clippingPlanes:[clip]
   });
   carbonMesh=new THREE.Mesh(geo,carbon);
@@ -525,9 +535,9 @@ function initPart(geo){
   partReady=true;
 }
 
-fetch('assets/models/grila-megane2rs.stl')
+fetch('assets/models/scut-termic-e46.stl')
   .then(r=>{
-    const total=+r.headers.get('Content-Length')||374184;
+    const total=+r.headers.get('Content-Length')||2250084;
     const reader=r.body.getReader();
     const chunks=[];let got=0;
     return (function pump(){
@@ -556,9 +566,9 @@ function trk(T,P){
 }
 /* ---- camera: orbita completa de 360° in jurul piesei verticale ---- */
 const T_TH=[[0,0],[.085,12],[.16,32],[.235,52],[.30,75],[.375,105],[.46,150],[.52,172],[.62,235],[.70,292],[.79,326],[.85,338],[.93,352],[1,360]];
-const T_R =[[0,13.4],[.085,11.5],[.16,7.2],[.235,5.4],[.30,5.8],[.375,5.0],[.46,5.4],[.52,7.0],[.62,6.2],[.70,4.7],[.79,4.9],[.85,7.0],[.93,11],[1,13.6]];
-const T_H =[[0,4.25],[.085,4.7],[.16,3.1],[.235,6.6],[.30,2.4],[.375,4.8],[.46,4.0],[.52,1.6],[.62,7.1],[.70,3.3],[.79,5.4],[.85,4.4],[.93,4.7],[1,4.35]];
-const T_LY=[[0,4.25],[.13,3.5],[.235,5.2],[.30,3.7],[.375,4.5],[.52,2.4],[.62,5.9],[.70,3.5],[.79,4.9],[.85,4.25],[1,4.3]];
+const T_R =[[0,13.8],[.085,12],[.16,8.4],[.235,7.2],[.30,6.8],[.375,6.2],[.46,6.4],[.52,8.0],[.62,7.4],[.70,5.7],[.79,6.0],[.85,8.0],[.93,11.8],[1,14.2]];
+const T_H =[[0,3.9],[.085,4.5],[.16,2.9],[.235,6.5],[.30,2.1],[.375,4.6],[.46,3.7],[.52,1.5],[.62,6.9],[.70,3.0],[.79,5.1],[.85,4.1],[.93,4.4],[1,4.0]];
+const T_LY=[[0,3.9],[.13,3.3],[.235,4.7],[.30,3.4],[.375,4.1],[.52,2.3],[.62,5.3],[.70,3.2],[.79,4.4],[.85,3.9],[1,3.95]];
 /* ---- piste efecte ---- */
 const T_WIRE=[[.12,0],[.165,1],[.29,1],[.345,0],[.49,0],[.525,.85],[.60,.55],[.665,0]];
 const T_DIMS=[[.185,0],[.225,1],[.285,1],[.325,0]];
@@ -770,7 +780,7 @@ function frame(now){
       const narrow=camera.aspect<1;
       sample.position.copy(camera.position)
         .addScaledVector(sDir,narrow?6.2:4.6)
-        .addScaledVector(sRight,narrow?.35:1.5);
+        .addScaledVector(sRight,narrow?.35:1.75);
       sample.position.y+=(narrow?1.3:0)+(REDUCED?0:Math.sin(t*.8)*.05);
       sample.quaternion.copy(camera.quaternion);
       chip.rotation.y=Math.sin(t*.35)*.55;chip.rotation.x=Math.sin(t*.27)*.22;
@@ -780,7 +790,7 @@ function frame(now){
       sampleLight.intensity=xr*1.3;
       /* punctul de pe piesa din care e "scoasa" mostra */
       const thA=Math.atan2(camera.position.x,camera.position.z);
-      sAnchor.set(Math.sin(thA)*BB.w*.42,PY+1.05,Math.cos(thA)*BB.d*.62);
+      sAnchor.set(Math.sin(thA)*BB.w*.3,PY+.7,Math.cos(thA)*BB.d*.5);
       reticle.position.copy(sAnchor);reticle.lookAt(camera.position);
       reticle.material.opacity=xr*.85;
       const cp=connGeo.attributes.position.array;
