@@ -123,6 +123,32 @@
     #hint .line::after{animation:none}
     #grain{animation:none}
   }
+
+  /* ---- contact modal ---- */
+  button.cta{background:none;font:inherit}
+  #cmodal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:22px;
+    background:rgba(6,7,10,.72);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:opacity .35s,visibility .35s}
+  #cmodal.open{opacity:1;visibility:visible}
+  .cm-card{width:min(460px,100%);background:#15171d;border:1px solid var(--hair);position:relative;
+    padding:clamp(26px,4vw,40px);transform:translateY(16px);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+  #cmodal.open .cm-card{transform:translateY(0)}
+  .cm-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer;line-height:1;transition:color .3s}
+  .cm-close:hover{color:var(--ink)}
+  .cm-kick{font-family:var(--mono);font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+  .cm-kick i{width:26px;height:1px;background:var(--amber);flex:none}
+  .cm-card h3{font-weight:300;font-size:clamp(24px,4vw,32px);line-height:1.1;letter-spacing:-.02em;margin-bottom:8px}
+  .cm-card p.cm-sub{font-size:13.5px;line-height:1.6;color:var(--mut);font-weight:300;margin-bottom:24px}
+  .cm-field{margin-bottom:16px}
+  .cm-field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+  .cm-field input,.cm-field textarea{width:100%;background:#0d0f14;border:1px solid var(--hair);color:var(--ink);font-family:var(--disp);font-size:15px;font-weight:300;padding:12px 14px;outline:none;transition:border-color .3s;resize:vertical}
+  .cm-field input:focus,.cm-field textarea:focus{border-color:var(--amber)}
+  .cm-field textarea{min-height:84px}
+  .cm-submit{width:100%;margin-top:6px;padding:15px;background:var(--ink);color:var(--bg);border:1px solid var(--ink);
+    font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:background .3s,color .3s}
+  .cm-submit:hover{background:transparent;color:var(--ink)}
+  .cm-note{margin-top:16px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:10px;text-align:left}
+  .cm-note i{width:7px;height:7px;border-radius:50%;background:#25D366;flex:none;box-shadow:0 0 8px rgba(37,211,102,.7)}
+  .cm-err{border-color:#ff5c1a!important}
 </style>
 </head>
 <body class="loading">
@@ -221,16 +247,61 @@
     <h1>Ai o piesă?<br>Hai să vorbim.</h1>
     <p>Capacul din exemplu e doar una dintre piesele pe care le putem reface. Trimite-ne piesa, o poză sau modelul 3D — AUTOCORE3D e punctul tău de contact pentru piese auto imprimate 3D.</p>
     <div class="cta-row">
-      <a class="cta" href="mailto:contact@autocore3d.com?subject=Cerere%20pies%C4%83%20imprimat%C4%83%203D">contact@autocore3d.com
+      <button class="cta" id="ctaContact" type="button">Contact
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
-      <a class="cta dim" href="catalog.html">Vezi toate piesele</a>
+      </button>
+      <a class="cta dim" href="catalog.html">Calculator preț</a>
     </div>
     <div class="foot-note">© 2026 AUTOCORE3D — autocore3d.com</div>
   </div>
 </section>
 
 <div id="space"></div>
+
+<!-- ============ CONTACT MODAL ============ -->
+<div id="cmodal" role="dialog" aria-modal="true" aria-labelledby="cmTitle">
+  <div class="cm-card">
+    <button class="cm-close" id="cmClose" aria-label="Închide">✕</button>
+    <div class="cm-kick"><i></i>Contact</div>
+    <h3 id="cmTitle">Hai să vorbim.</h3>
+    <p class="cm-sub">Completează formularul — mesajul ajunge direct la noi pe WhatsApp și îți răspundem rapid.</p>
+    <form id="cmForm" novalidate>
+      <div class="cm-field"><label for="cmName">Numele tău *</label><input id="cmName" type="text" autocomplete="name" placeholder="Cum te cheamă..."></div>
+      <div class="cm-field"><label for="cmPhone">Telefon sau email *</label><input id="cmPhone" type="text" autocomplete="tel" placeholder="07XX... sau email@..."></div>
+      <div class="cm-field"><label for="cmMsg">Piesa / mesajul tău</label><textarea id="cmMsg" placeholder="Descrie piesa de care ai nevoie sau atașează o poză în WhatsApp..."></textarea></div>
+      <button class="cm-submit" type="submit">Trimite pe WhatsApp
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.6-4.1-.1-.2-1.1-1.4-1.1-2.7s.7-1.9 1-2.2c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.4 2.6 1.6.2.1.4.1.6-.1l.7-.9c.2-.2.4-.2.6-.1l2 .9c.3.2.5.2.5.4.1.2.1.9-.1 1.5Z"/></svg>
+      </button>
+    </form>
+    <div class="cm-note"><i></i>Se deschide WhatsApp la 0771 119 423</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var WA='40771119423';
+  var modal=document.getElementById('cmodal');
+  function open(){modal.classList.add('open');setTimeout(function(){document.getElementById('cmName').focus();},260);}
+  function close(){modal.classList.remove('open');}
+  var nav=document.getElementById('navContact'),cta=document.getElementById('ctaContact');
+  if(nav)nav.addEventListener('click',function(e){e.preventDefault();open();});
+  if(cta)cta.addEventListener('click',open);
+  document.getElementById('cmClose').addEventListener('click',close);
+  modal.addEventListener('click',function(e){if(e.target===modal)close();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal.classList.contains('open'))close();});
+  document.getElementById('cmForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=document.getElementById('cmName'),phone=document.getElementById('cmPhone'),msg=document.getElementById('cmMsg');
+    var ok=true;
+    [name,phone].forEach(function(f){if(!f.value.trim()){f.classList.add('cm-err');ok=false;}else{f.classList.remove('cm-err');}});
+    if(!ok)return;
+    var text='Bună ziua!\n\n👤 Nume: '+name.value.trim()+'\n📞 Contact: '+phone.value.trim();
+    if(msg.value.trim())text+='\n📦 Piesă / mesaj: '+msg.value.trim();
+    text+='\n\nAș dori o ofertă pentru o piesă imprimată 3D. Mulțumesc!';
+    window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(text),'_blank');
+  });
+})();
+</script>
 
 <script src="assets/vendor/three.min.js"></script>
 <script>

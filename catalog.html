@@ -257,6 +257,18 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .carousel-slide{flex-shrink:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .carousel-slide img{width:100%;height:100%;object-fit:cover;transition:transform .55s var(--ease);cursor:zoom-in;}
 .card.visible:hover .carousel-slide img{transform:scale(1.06);}
+/* ── 3D MODEL VIEWER (orbiting) ── */
+.model-wrap{position:relative;height:195px;background:radial-gradient(ellipse at 50% 30%,#0f2233 0%,#06080F 70%);border-bottom:1px solid var(--bdr);overflow:hidden;}
+.model-viewer{display:block;width:100%;height:100%;cursor:grab;}
+.model-badge{position:absolute;bottom:.5rem;left:.5rem;z-index:3;font-family:var(--mono);font-size:.5rem;letter-spacing:.14em;color:var(--red);background:rgba(6,8,15,.7);border:1px solid rgba(255,51,102,.4);padding:.2rem .5rem;pointer-events:none;}
+.model-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.55rem;letter-spacing:.2em;color:var(--muted);}
+/* ── PROJECT PHOTO GALLERY ── */
+.gallery-wrap{padding:.75rem 0 0;}
+.proj-gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:.6rem;}
+.proj-shot{position:relative;aspect-ratio:4/3;overflow:hidden;border:1px solid var(--bdr);background:#06080F;}
+.proj-shot img{width:100%;height:100%;object-fit:cover;transition:transform .55s var(--ease);}
+.proj-shot:hover img{transform:scale(1.07);}
+@media(max-width:700px){.proj-gallery{grid-template-columns:repeat(2,1fr);}}
 .card-hex-wrap{display:flex;flex-direction:column;align-items:center;gap:.4rem;cursor:default;}
 .card-hex-wrap svg{transition:transform .55s var(--ease),filter .4s;}
 .card.visible:hover .card-hex-wrap svg{transform:rotate(30deg) scale(1.18);filter:drop-shadow(0 0 10px rgba(0,230,255,.7));}
@@ -822,12 +834,11 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
       <div><div class="logo-name">AUTOCORE<span>3D</span></div><div class="logo-tag">3D PRINTING & ENGINEERING · SINCE 2023</div></div>
     </a>
     <nav>
+      <a href="#" class="nav-link" data-tab="produse" data-i18n="nav_products">Proiecte</a>
       <a href="#" class="nav-link" data-tab="configurator" data-i18n="nav_configurator">Configurator</a>
-      <a href="#" class="nav-link" data-tab="produse" data-i18n="nav_products">Produse</a>
-      <a href="#" class="nav-link" data-tab="filamente" data-i18n="nav_filaments">Filamente</a>
-      <button class="nav-cart" id="cartBtn">🛒<span class="cart-badge" id="cartBadge"></span></button>
+      <button class="nav-cart" id="cartBtn" style="display:none">🛒<span class="cart-badge" id="cartBadge"></span></button>
       <button class="nav-admin" id="admBtn">⚙</button>
-      <a href="https://wa.me/40775695029" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
+      <a href="https://wa.me/40771119423" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
     </nav>
   </div>
   <div class="hbar"></div>
@@ -836,9 +847,8 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
 <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
 
 <div class="tabs-bar" id="tabsBar">
-  <button class="tab-btn active" data-tab="produse"><span class="tab-icon">🚗</span><span data-i18n="nav_products">Produse</span></button>
+  <button class="tab-btn active" data-tab="produse"><span class="tab-icon">🚗</span><span data-i18n="nav_products">Proiecte</span></button>
   <button class="tab-btn" data-tab="configurator"><span class="tab-icon">⬡</span><span data-i18n="nav_configurator">Configurator</span></button>
-  <button class="tab-btn" data-tab="filamente"><span class="tab-icon">🧵</span><span data-i18n="nav_filaments">Filamente</span></button>
 </div>
 
 <!-- ══ SECTION 1: CERERE PRINTARE 3D ══ -->
@@ -922,7 +932,16 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
       <span class="sect-title" data-i18n="prod_sect_title_html">PIESE <span>AUTO</span> 3D</span>
       <div class="sect-line"></div>
     </div>
-    <div class="sect-desc" data-i18n="prod_sect_desc">Componente auto printate 3D din workshopul nostru · Materiale tehnice industriale · Comandă direct cu livrare rapidă</div>
+    <div class="sect-desc" data-i18n="prod_sect_desc">Proiecte reale printate 3D în atelierul nostru · Modele 3D interactive care se rotesc · Cere o ofertă direct pe WhatsApp</div>
+  </div>
+  <div class="gallery-wrap">
+    <div class="section-label" data-i18n="gallery_label">// GALERIE PROIECTE</div>
+    <div class="proj-gallery" id="projGallery">
+      <figure class="proj-shot"><img src="assets/products/proj-intake-kit.jpg" alt="" loading="lazy"></figure>
+      <figure class="proj-shot"><img src="assets/products/proj-gauges.jpg" alt="" loading="lazy"></figure>
+      <figure class="proj-shot"><img src="assets/products/proj-trim.jpg" alt="" loading="lazy"></figure>
+      <figure class="proj-shot"><img src="assets/products/proj-gascap.jpg" alt="" loading="lazy"></figure>
+    </div>
   </div>
   <div class="filters-wrap" style="padding-top:.75rem;">
     <div class="section-label" data-i18n="filter_label">// FILTRARE RAPIDĂ</div>
@@ -931,15 +950,12 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
   <div class="search-sort-wrap">
     <div class="search-main-wrap">
       <span class="search-main-ico">🔍</span>
-      <input class="search-main-inp" id="searchMainInp" placeholder="Caută produs, material, categorie..." data-i18n-ph="search_ph" autocomplete="off" spellcheck="false"/>
+      <input class="search-main-inp" id="searchMainInp" placeholder="Caută proiect, categorie..." data-i18n-ph="search_ph" autocomplete="off" spellcheck="false"/>
       <button class="search-main-clear" id="searchMainClear">✕</button>
     </div>
     <div class="sort-wrap">
       <span class="sort-label" data-i18n="sort_label">// SORT</span>
       <button class="sort-btn on" data-sort="newest" data-i18n="sort_newest">Cele mai noi</button>
-      <button class="sort-btn" data-sort="price-asc" data-i18n="sort_price_asc">Preț ↑</button>
-      <button class="sort-btn" data-sort="price-desc" data-i18n="sort_price_desc">Preț ↓</button>
-      <button class="sort-btn" data-sort="stock" data-i18n="sort_stock">Stoc ↑</button>
     </div>
   </div>
   <div class="products-wrap">
@@ -948,49 +964,15 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
   </div>
 </section>
 
-<!-- ══ SECTION 3: CATALOG FILAMENTE TEHNICE ══ -->
-<section id="filamente" class="fil-section tab-section">
-  <div class="sect-wrap">
-    <div class="sect-top">
-      <span class="sect-num" data-i18n="fil_sect_num">03 / CATALOG</span>
-      <span class="sect-title" data-i18n="fil_sect_title_html">FILAMENTE <span>TEHNICE</span></span>
-      <div class="sect-line"></div>
-    </div>
-    <div class="sect-desc" data-i18n="fil_sect_desc">Materie primă pentru printare 3D · ABS · ASA · Carbon · PETG · Nylon · Stoc actualizat din timp real</div>
+<!-- Secțiunea de filamente a fost eliminată. Stub ascuns: păstrează ID-urile la care încă face referire JS-ul ca să nu apară erori null. -->
+<div id="filamente" style="display:none" aria-hidden="true">
+  <div id="filSubFilters"><div id="filBrandBar"></div><div id="filCatBar"></div>
+    <button id="filSAll"></button><button id="filSIn"></button><button id="filSOut"></button>
+    <div id="filSyncBadge"><span id="filSyncTxt"></span></div>
   </div>
-  <div class="fil-subfilters active" id="filSubFilters">
-    <div class="section-label" style="margin-bottom:.6rem;" data-i18n="fil_filter_label">// FILTRE FILAMENTE</div>
-    <div class="fil-sub-row">
-      <span class="fil-sub-lbl" data-i18n="fil_brand_label">BRAND</span>
-      <div id="filBrandBar" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
-    </div>
-    <div class="fil-sub-row">
-      <span class="fil-sub-lbl" data-i18n="fil_type_label">TIP</span>
-      <div id="filCatBar" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
-    </div>
-    <div class="fil-sub-row">
-      <span class="fil-sub-lbl" data-i18n="fil_stock_label">STOC</span>
-      <button class="fb on" id="filSAll" data-i18n="fil_all_stock">Toate</button>
-      <button class="fb" id="filSIn" data-i18n="fil_in_stock_btn">În stoc</button>
-      <button class="fb" id="filSOut" data-i18n="fil_out_stock_btn">Fără stoc</button>
-    </div>
-    <div class="fil-sync-badge loading" id="filSyncBadge">
-      <div class="fil-sync-dot"></div>
-      <span id="filSyncTxt">Conectare inventar...</span>
-    </div>
-  </div>
-  <div class="search-sort-wrap">
-    <div class="search-main-wrap">
-      <span class="search-main-ico">🔍</span>
-      <input class="search-main-inp" id="filSearchInp" placeholder="Caută filament după culoare, brand, tip..." data-i18n-ph="fil_search_ph" autocomplete="off" spellcheck="false"/>
-      <button class="search-main-clear" id="filSearchClear">✕</button>
-    </div>
-  </div>
-  <div class="products-wrap" style="padding-bottom:3rem;">
-    <div class="prod-hdr"><span class="prod-count" id="filCount">—</span><div class="prod-line"></div></div>
-    <div class="grid" id="filGrid"></div>
-  </div>
-</section>
+  <input id="filSearchInp"/><button id="filSearchClear"></button>
+  <span id="filCount"></span><div id="filGrid"></div>
+</div>
 
 <div id="policyGrid" style="display:none"></div>
 
@@ -1135,7 +1117,7 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
 <div class="ap-overlay" id="apOverlay" style="display:none">
   <div class="ap-panel">
     <div class="ap-hdr">
-      <div class="ap-hdr-l"><span class="ap-ico">⬡</span><div><div class="ap-title">ADMIN PANEL</div><div class="ap-sub" style="display:flex;gap:.5rem;align-items:center;margin-top:.2rem;"><div class="db-badge loading" id="dbBadge" style="font-size:.48rem;padding:.18rem .5rem;"><div class="db-dot"></div><span id="dbText">Supabase...</span></div><div class="db-badge loading" id="filBadge" style="font-size:.48rem;padding:.18rem .5rem;"><div class="db-dot"></div><span id="filBadgeText">Filamente...</span></div></div></div></div>
+      <div class="ap-hdr-l"><span class="ap-ico">⬡</span><div><div class="ap-title">ADMIN PANEL</div><div class="ap-sub" style="display:flex;gap:.5rem;align-items:center;margin-top:.2rem;"><div class="db-badge loading" id="dbBadge" style="font-size:.48rem;padding:.18rem .5rem;"><div class="db-dot"></div><span id="dbText">Supabase...</span></div><div class="db-badge loading" id="filBadge" style="display:none;font-size:.48rem;padding:.18rem .5rem;"><div class="db-dot"></div><span id="filBadgeText">Filamente...</span></div></div></div></div>
       <button class="ap-close" id="apClose">✕</button>
     </div>
     <div class="ap-tabs">
@@ -1154,9 +1136,9 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
       </div>
       <div class="g2"><div class="field"><label>Categorie</label><select class="fsel" id="fCat"></select></div></div>
       <div class="field"><label>Descriere</label><textarea class="ftx" id="fDesc" rows="2"></textarea></div>
-      <div class="ap-sec">// MATERIALE &amp; PREŢURI *</div>
+      <div class="ap-sec">// MATERIALE &amp; PREŢURI (opțional — proiectele nu afișează preț)</div>
       <div class="fmat-list" id="fMatList"></div>
-      <div class="fmat-note" id="fMatNote">Adaugă cel puțin un material cu preț</div>
+      <div class="fmat-note" id="fMatNote">Opțional. Lasă gol pentru un proiect fără preț.</div>
       <div class="fmat-add-row">
         <div class="field" style="margin:0"><label>Material</label><select class="fsel" id="fMatSel"></select></div>
         <div class="field" style="margin:0"><label>Preț RON</label><input class="finput" id="fMatPrice" type="number" min="0" step="0.5" placeholder="150"/></div>
@@ -1182,6 +1164,13 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
         <div class="img-add-row"><input class="finput" id="fImgUrl" placeholder="https://..."/><button class="img-add-btn" id="addUrlBtn">+</button></div>
       </div>
       <div class="imgs-list" id="imgsList"></div>
+      <div class="ap-sec">// MODEL 3D (STL / 3MF) — se rotește în catalog</div>
+      <div class="dropzone" id="modelDrop">Click sau trage fișierul STL / 3MF aici<br><span style="font-size:.5rem;opacity:.6;">Se salvează în Supabase Storage · proiect fără preț</span></div>
+      <input type="file" id="adminModelInput" accept=".stl,.3mf,model/3mf,application/vnd.ms-package.3dmanufacturing-3dmodel+xml" style="display:none"/>
+      <div id="modelUploadProgress" style="display:none;margin-top:.4rem;">
+        <div class="upload-progress"><div class="upload-progress-label" id="modelUploadLabel">Se încarcă modelul...</div><div class="upload-bar-wrap"><div class="upload-bar" id="modelUploadBar"></div></div></div>
+      </div>
+      <div id="modelCurrent" style="font-family:var(--mono);font-size:.55rem;color:var(--muted);margin-top:.5rem;"></div>
       <div class="ap-sec">// PROPRIETĂŢI TEHNICE</div>
       <div class="badge-grid" id="badgeGrid"></div>
       <div class="ap-sec">// STOC</div>
@@ -1260,7 +1249,7 @@ footer{background:linear-gradient(0deg,#070F14,#06080F);border-color:var(--bdr);
 const SB_URL = "https://jimdpmrsprcpbyacxguj.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbWRwbXJzcHJjcGJ5YWN4Z3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NzMwNDcsImV4cCI6MjA5NDQ0OTA0N30.CL0gIG67tokOK2tm7JZgamXb3Dpch-hs2zmqbV6oEBg";
 const BUCKET = "product-images";
-const WA     = "40775695029";
+const WA     = "40771119423";
 const PWD    = "Darius12@";
 /* ── EmailJS ── */
 const EJS_KEY = "7gcMOv8PcZlzdxghN";
@@ -1419,7 +1408,7 @@ let lang       = "ro";
 let filter     = "Toate";
 let searchQ    = "";
 let sortMode   = "newest";
-let editId     = null, stockVal=true, selB=[], imgMode="file", formImgs=[], formMats=[];
+let editId     = null, stockVal=true, selB=[], imgMode="file", formImgs=[], formMats=[], formModel=null;
 let delTgt     = null, delType="prod";
 let catEditId  = null, matEditId=null;
 let adminAuth  = false;
@@ -1493,7 +1482,7 @@ const T={
     matrix_col0:"Parametru",matrix_row1:"Temp. deformare (HDT)",matrix_row2:"Rezistență UV",matrix_row3:"Rigiditate (modul elastic)",matrix_row4:"Rezistență la impact",
     matrix_uv_low:"Scăzută",matrix_uv_high:"Ridicată",matrix_impact_low:"Fragil",matrix_impact_high:"Ridicată",matrix_impact_vhigh:"Foarte ridicată",
     final_title:"Trimite fișierul. Începem analiza.",final_text:"Încarcă un model 3D (STL/STEP), o scanare sau fotografii ale piesei. Primești o evaluare tehnică: material recomandat, timp de producție și cost.",final_btn:"📁 Încarcă fișierul",
-    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Produse",nav_filaments:"Filamente",
+    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Proiecte",nav_filaments:"Filamente",
     conf_eyebrow:"// 01 · CERERE PRINTARE 3D PERSONALIZATĂ",conf_title_html:"Trimite <span>Fișierul Tău</span> 3D",conf_sub:"Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.",
     upload_title:"Trage fișierul 3D aici",upload_sub:"sau apasă pentru a selecta",upload_hint:"STL / STEP — ofertă personalizată pe WhatsApp · GCODE — preț calculat automat",
     zone_label:"// ZONA PIESEI",stress_label:"// NIVEL STRES MECANIC",name_label:"// NUMELE TĂU",contact_label:"// TELEFON SAU EMAIL",name_ph:"Cum te cheamă...",contact_ph:"07XX... sau email@...",
@@ -1503,11 +1492,12 @@ const T={
     price_badge_gcode:"⬡ PREȚ CALCULAT DIN GCODE ✓",price_save_gcode:"✓ Preț calculat exact din fișier · Transport GRATUIT inclus",
     price_badge_manual:"⬡ OFERTĂ PERSONALIZATĂ",price_save_manual:"Prețul depinde de dimensiune, complexitate și timp de printare.<br>Trimite cererea pe WhatsApp — îți calculăm și confirmăm în 24h.",
     cta_btn:"📲 Trimite pe WhatsApp",cta_sub:"Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT",
-    prod_sect_num:"02 / CATALOG",prod_sect_title_html:"PIESE <span>AUTO</span> 3D",prod_sect_desc:"Componente auto printate 3D din workshopul nostru · Materiale tehnice industriale · Comandă direct cu livrare rapidă",
+    prod_sect_num:"02 / PROIECTE",prod_sect_title_html:"GALERIE <span>PROIECTE</span> 3D",prod_sect_desc:"Proiecte reale printate 3D în atelierul nostru · Modele 3D interactive care se rotesc · Cere o ofertă direct pe WhatsApp",
+    quote_btn:"Cere ofertă",gallery_label:"// GALERIE PROIECTE",
     filter_label:"// FILTRARE RAPIDĂ",sort_label:"// SORT",sort_newest:"Cele mai noi",sort_price_asc:"Preț ↑",sort_price_desc:"Preț ↓",sort_stock:"Stoc ↑",search_ph:"Caută produs, material, categorie...",
     fil_sect_num:"03 / CATALOG",fil_sect_title_html:"FILAMENTE <span>TEHNICE</span>",fil_sect_desc:"Materie primă pentru printare 3D · ABS · ASA · Carbon · PETG · Nylon · Stoc actualizat din timp real",
     fil_filter_label:"// FILTRE FILAMENTE",fil_brand_label:"BRAND",fil_type_label:"TIP",fil_stock_label:"STOC",fil_all_stock:"Toate",fil_in_stock_btn:"În stoc",fil_out_stock_btn:"Fără stoc",fil_search_ph:"Caută filament după culoare, brand, tip...",
-    shipping_included:"Transport si taxe incluse in pret",prod_found:"PRODUSE GASITE",fil_found:"FILAMENTE GASITE",order_btn:"Comanda",unavailable:"Indisponibil",in_stock:"In stoc",out_stock:"Epuizat",low_stock:"⚠ Stoc mic",pcs:"buc",fil_card_cat:"// FILAMENTE 3D",
+    shipping_included:"Transport si taxe incluse in pret",prod_found:"PROIECTE",fil_found:"FILAMENTE GASITE",order_btn:"Comanda",unavailable:"Indisponibil",in_stock:"In stoc",out_stock:"Epuizat",low_stock:"⚠ Stoc mic",pcs:"buc",fil_card_cat:"// FILAMENTE 3D",
     toast_saved:"Salvat cu succes!",policy_privacy_title:"Politica de Confidentialitate",policy_terms_title:"Termeni si Conditii",policy_return_title:"Politica de Retur",policy_cookies_title:"Politica Cookies",
     zone_motor_name:"Compartiment Motor",zone_exterior_name:"Exterior Caroserie",zone_interior_name:"Interior / Habitaclu",
     stress_low_name:"Scăzut",stress_mid_name:"Mediu",stress_crit_name:"Critic",
@@ -1539,7 +1529,7 @@ const T={
     matrix_col0:"Parameter",matrix_row1:"Heat deflection temp (HDT)",matrix_row2:"UV resistance",matrix_row3:"Stiffness (elastic modulus)",matrix_row4:"Impact resistance",
     matrix_uv_low:"Low",matrix_uv_high:"High",matrix_impact_low:"Brittle",matrix_impact_high:"High",matrix_impact_vhigh:"Very high",
     final_title:"Send the file. We start the analysis.",final_text:"Upload a 3D model (STL/STEP), a scan, or photos of the part. You'll get a technical assessment: recommended material, production time, and cost.",final_btn:"📁 Upload file",
-    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Products",nav_filaments:"Filaments",
+    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Projects",nav_filaments:"Filaments",
     conf_eyebrow:"// 01 · CUSTOM 3D PRINTING REQUEST",conf_title_html:"Send Your <span>3D File</span>",conf_sub:"Upload your STL/STEP model, choose the zone and stress level — get an instant estimated price. If you like it, send your order on WhatsApp.",
     upload_title:"Drag your 3D file here",upload_sub:"or tap to select",upload_hint:"STL / STEP — custom quote on WhatsApp · GCODE — price auto-calculated",
     zone_label:"// PART ZONE",stress_label:"// MECHANICAL STRESS",name_label:"// YOUR NAME",contact_label:"// PHONE OR EMAIL",name_ph:"Your name...",contact_ph:"07XX... or email@...",
@@ -1549,11 +1539,12 @@ const T={
     price_badge_gcode:"⬡ PRICE FROM GCODE ✓",price_save_gcode:"✓ Price calculated from file · FREE Shipping included",
     price_badge_manual:"⬡ CUSTOM QUOTE",price_save_manual:"Price depends on size, complexity and print time.<br>Send your request on WhatsApp — we calculate and confirm in 24h.",
     cta_btn:"📲 Send on WhatsApp",cta_sub:"Attach file in WhatsApp · Offer confirmed in 24h · FREE Shipping",
-    prod_sect_num:"02 / CATALOG",prod_sect_title_html:"3D <span>AUTO</span> PARTS",prod_sect_desc:"3D printed auto components from our workshop · Industrial technical materials · Order directly with fast delivery",
+    prod_sect_num:"02 / PROJECTS",prod_sect_title_html:"3D <span>PROJECTS</span> GALLERY",prod_sect_desc:"Real 3D printed projects from our workshop · Interactive orbiting 3D models · Request a quote directly on WhatsApp",
+    quote_btn:"Request quote",gallery_label:"// PROJECTS GALLERY",
     filter_label:"// QUICK FILTER",sort_label:"// SORT",sort_newest:"Newest",sort_price_asc:"Price ↑",sort_price_desc:"Price ↓",sort_stock:"Stock ↑",search_ph:"Search product, material, category...",
     fil_sect_num:"03 / CATALOG",fil_sect_title_html:"<span>TECHNICAL</span> FILAMENTS",fil_sect_desc:"Raw material for 3D printing · ABS · ASA · Carbon · PETG · Nylon · Stock updated in real time",
     fil_filter_label:"// FILAMENT FILTERS",fil_brand_label:"BRAND",fil_type_label:"TYPE",fil_stock_label:"STOCK",fil_all_stock:"All",fil_in_stock_btn:"In stock",fil_out_stock_btn:"Out of stock",fil_search_ph:"Search filament by color, brand, type...",
-    shipping_included:"Shipping & taxes included",prod_found:"PRODUCTS FOUND",fil_found:"FILAMENTS FOUND",order_btn:"Order",unavailable:"Unavailable",in_stock:"In stock",out_stock:"Out of stock",low_stock:"⚠ Low stock",pcs:"pcs",fil_card_cat:"// 3D FILAMENTS",
+    shipping_included:"Shipping & taxes included",prod_found:"PROJECTS",fil_found:"FILAMENTS FOUND",order_btn:"Order",unavailable:"Unavailable",in_stock:"In stock",out_stock:"Out of stock",low_stock:"⚠ Low stock",pcs:"pcs",fil_card_cat:"// 3D FILAMENTS",
     toast_saved:"Saved successfully!",policy_privacy_title:"Privacy Policy",policy_terms_title:"Terms & Conditions",policy_return_title:"Return Policy",policy_cookies_title:"Cookie Policy",
     zone_motor_name:"Engine Compartment",zone_exterior_name:"Exterior Bodywork",zone_interior_name:"Interior / Cabin",
     stress_low_name:"Low",stress_mid_name:"Medium",stress_crit_name:"Critical",
@@ -1804,31 +1795,32 @@ function attachCarousel(card){
   car.addEventListener('mouseleave',()=>{md=false;});
 }
 
-/* ══ PRODUCT CARD ══ */
+/* ══ 3D MODEL HELPERS ══ */
+function isModelUrl(u){return typeof u==='string'&&/\.(stl|3mf)(\?|$)/i.test(u);}
+function prodModel(p){return (p.images||[]).find(isModelUrl)||null;}
+function prodPhotos(p){return (p.images||[]).filter(u=>!isModelUrl(u));}
+
+/* ══ PRODUCT CARD (proiect fără preț) ══ */
 function renderCard(p){
   const cc=getCatColor(p.category);
-  const mats=getProdMats(p);
   const bgs=(p.badges||[]).map(b=>{const bc=BC.find(x=>x.k===b)||{i:"·",c:"#FF3366"};return`<span class="badge" style="border-color:${bc.c}44;color:${bc.c}"><span>${bc.i}</span> ${b}</span>`;}).join('');
-  let priceStr;
-  if(!mats.length){priceStr=fmtPrice(p.price||0);}
-  else if(mats.length===1){priceStr=fmtPrice(mats[0].price);}
-  else{const ps=mats.map(m=>Number(m.price)).sort((a,b)=>a-b);priceStr=lang==='en'?`€${Math.ceil(ps[0]/EUR_RATE)} – €${Math.ceil(ps[ps.length-1]/EUR_RATE)}`:`${ps[0]} – ${ps[ps.length-1]} RON`;}
-  const matsHtml=mats.length?`<div class="card-mats">${mats.map(m=>{const mc=getMatColor(m.name),mtxt=contrastColor(mc);return`<span class="card-mat-tag" style="border-color:${mc};background:${mc};color:${mtxt}">${m.name}<span class="card-mat-price">${fmtPrice(m.price)}</span></span>`;}).join('')}</div>`:'';
+  const model=prodModel(p),photos=prodPhotos(p);
+  const media=model
+    ? `<div class="model-wrap"><canvas class="model-viewer" data-model="${model}"></canvas><div class="model-loading">◈ SE ÎNCARCĂ 3D…</div><div class="model-badge">◈ 3D · rotește</div></div>`
+    : buildCarousel(photos);
   return `<div class="card${p.stock?'':' card-oos'}" data-id="${p.id}">
     <div class="card-glow"></div>
     <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
     ${!p.stock?`<div class="stock-badge">${t('unavailable')}</div>`:''}
-    ${buildCarousel(p.images||[])}
+    ${media}
     <div class="card-body">
-      <div class="card-cat" style="color:${cc}">// ${p.category||'—'}</div>
+      <div class="card-cat" style="color:${cc}">// ${p.category||'PROIECT'}</div>
       <div class="card-name">${p.name}</div>
       ${p.brand?`<div class="card-brand">⬡ ${p.brand}</div>`:''}
       <div class="card-desc">${p.description||''}</div>
-      ${matsHtml}
       <div class="badges">${bgs}</div>
       <div class="card-foot">
-        <div><div class="price">${priceStr}</div><div class="price-sub">${t('shipping_included')}</div></div>
-        ${p.stock?`<button class="order-btn" data-cart="${p.id}">🛒 ${t('order_btn')}</button>`:`<button class="order-btn dis" disabled>${t('unavailable')}</button>`}
+        <button class="order-btn" data-quote="${p.id}">📲 ${t('quote_btn')}</button>
       </div>
     </div>
   </div>`;
@@ -1936,6 +1928,7 @@ function renderGrid(){
       requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add('visible')));
       attachCarousel(c);attachCarouselLightbox(c);
     });
+    g.querySelectorAll('.model-viewer[data-model]').forEach(cv=>mountModelViewer(cv,cv.dataset.model));
   }
   $('prodCount').textContent=`${list.length} ${t('prod_found')}`;
   $('tabCount').textContent=products.length;
@@ -2110,7 +2103,7 @@ function tryPw(){
   if($('pwInp').value===PWD){adminAuth=true;$('pwOverlay').style.display='none';$('pwInp').value='';$('pwErr').style.display='none';$('pwInp').classList.remove('err');openAdmin();}
   else{$('pwErr').style.display='block';const i=$('pwInp');i.classList.add('err');setTimeout(()=>i.classList.remove('err'),400);}
 }
-function openAdmin(){$('apOverlay').style.display='flex';populateCatSelect();populateFMatSel();renderBadges();loadPolFields();}
+function openAdmin(){$('apOverlay').style.display='flex';populateCatSelect();populateFMatSel();renderBadges();loadPolFields();renderModelCurrent();}
 $('pwBtn').onclick=tryPw;
 $('pwInp').onkeydown=e=>{if(e.key==='Enter')tryPw();};
 $('pwOverlay').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none';};
@@ -2193,17 +2186,43 @@ $('dropzone').ondragover=e=>{e.preventDefault();$('dropzone').classList.add('dra
 $('dropzone').ondragleave=()=>$('dropzone').classList.remove('drag');
 $('dropzone').ondrop=async e=>{e.preventDefault();$('dropzone').classList.remove('drag');const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));if(!files.length)return;const urls=await uploadFilesToSupabase(files);formImgs.push(...urls);renderImgsList();};
 
+/* ══ MODEL 3D (STL / 3MF) UPLOAD ══ */
+function renderModelCurrent(){
+  const el=$('modelCurrent');if(!el)return;
+  if(!formModel){el.innerHTML='<span style="opacity:.5">Niciun model 3D atașat</span>';return;}
+  const name=decodeURIComponent(formModel.split('/').pop().split('?')[0]);
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;border:1px solid rgba(255,51,102,.35);background:rgba(255,51,102,.06)"><span style="color:var(--red)">◈ 3D</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${formModel}">${name}</span><button class="img-row-btn" id="modelRmBtn">✕</button></div>`;
+  const rm=$('modelRmBtn');if(rm)rm.onclick=()=>{formModel=null;renderModelCurrent();};
+}
+async function uploadModelFile(f){
+  const ext=(f.name.split('.').pop()||'stl').toLowerCase();
+  if(!['stl','3mf'].includes(ext)){toast('Doar fișiere STL sau 3MF',true);return;}
+  $('modelUploadProgress').style.display='block';$('modelUploadBar').style.width='15%';
+  $('modelUploadLabel').textContent=`Se încarcă ${f.name}...`;
+  try{
+    const path=`models/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    formModel=await sb.uploadImage(f,path);
+    $('modelUploadBar').style.width='100%';renderModelCurrent();
+  }catch(e){toast(`Eroare upload model: ${e.message}`,true);}
+  setTimeout(()=>{$('modelUploadProgress').style.display='none';$('modelUploadBar').style.width='0%';},900);
+}
+$('modelDrop').onclick=()=>$('adminModelInput').click();
+$('adminModelInput').onchange=async e=>{const f=e.target.files[0];if(f)await uploadModelFile(f);e.target.value='';};
+$('modelDrop').ondragover=e=>{e.preventDefault();$('modelDrop').classList.add('drag');};
+$('modelDrop').ondragleave=()=>$('modelDrop').classList.remove('drag');
+$('modelDrop').ondrop=async e=>{e.preventDefault();$('modelDrop').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)await uploadModelFile(f);};
+
 /* ══ ADMIN FORM ══ */
 function renderBadges(){$('badgeGrid').innerHTML=BC.map(b=>`<button class="badge-btn${selB.includes(b.k)?' on':''}" data-badge="${b.k}"><span>${b.i}</span> ${b.k}</button>`).join('');}
 function setStk(){$('stIn').className='stock-btn'+(stockVal?' in':'');$('stOut').className='stock-btn'+(stockVal?'':' out');}
 function populateCatSelect(){const sel=$('fCat'),cur=sel.value;sel.innerHTML=getCatNames().map(n=>`<option>${n}</option>`).join('');if(cur&&getCatNames().includes(cur))sel.value=cur;}
 function resetForm(){
-  editId=null;stockVal=true;selB=[];formImgs=[];formMats=[];imgMode='file';
+  editId=null;stockVal=true;selB=[];formImgs=[];formMats=[];formModel=null;imgMode='file';
   ['fName','fBrand','fDesc','fImgUrl','fMatPrice'].forEach(id=>{const e=$(id);if(e)e.value='';});
   populateCatSelect();populateFMatSel();
   $('urlInputArea').style.display='none';$('fileInputArea').style.display='block';
   $('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');
-  renderImgsList();renderFMatList();
+  renderImgsList();renderFMatList();renderModelCurrent();
   $('formSubmit').textContent='+ Adauga Produs';$('formCancel').style.display='none';
   $('tabAdd').textContent='+ Adauga';
   setStk();renderBadges();
@@ -2215,10 +2234,11 @@ $('formCancel').onclick=resetForm;
 $('formSubmit').onclick=async()=>{
   const name=$('fName').value.trim();
   if(!name){toast('Completeaza numele produsului',true);return;}
-  if(!formMats.length){toast('Adauga cel putin un material cu pret',true);return;}
+  if(!formImgs.length&&!formModel){toast('Adaugă cel puțin o imagine sau un model 3D',true);return;}
   const btn=$('formSubmit');btn.disabled=true;btn.textContent='Se salveaza...';
-  const minPrice=Math.min(...formMats.map(m=>m.price));
-  const pl={name,brand:$('fBrand').value.trim(),category:$('fCat').value,material:formMats[0].name,price:minPrice,description:$('fDesc').value.trim(),images:[...formImgs],badges:[...selB],stock:stockVal,materials_list:formMats.map(m=>({name:m.name,price:m.price}))};
+  const minPrice=formMats.length?Math.min(...formMats.map(m=>m.price)):0;
+  const images=[...formImgs,...(formModel?[formModel]:[])];
+  const pl={name,brand:$('fBrand').value.trim(),category:$('fCat').value,material:formMats[0]?formMats[0].name:'',price:minPrice,description:$('fDesc').value.trim(),images,badges:[...selB],stock:stockVal,materials_list:formMats.map(m=>({name:m.name,price:m.price}))};
   try{
     if(editId!==null){await sb.updateProduct(editId,pl);products=products.map(p=>p.id===editId?{...p,...pl}:p);showOk('✓ Actualizat!');}
     else{const res=await sb.insertProduct(pl);if(res&&res[0])products=[res[0],...products];else await loadAll();showOk('✓ Adaugat in Supabase!');}
@@ -2232,10 +2252,11 @@ function renderList(){
   const el=$('listView');
   if(!products.length){el.innerHTML='<div class="list-empty">Niciun produs.</div>';return;}
   el.innerHTML=products.map(p=>{
-    const fi=(p.images||[])[0];
+    const fi=prodPhotos(p)[0];
+    const has3d=!!prodModel(p);
     const mats=getProdMats(p);
-    const priceStr=mats.length===0?`${p.price||0}`:(mats.length===1?`${mats[0].price}`:`${Math.min(...mats.map(m=>m.price))}–${Math.max(...mats.map(m=>m.price))}`);
-    return`<div class="list-item"><div class="list-thumb">${fi?`<img src="${fi}" alt="" onerror="this.style.display='none'">`:`<span class="list-hex">⬡</span>`}</div><div class="list-info"><div class="list-name">${p.name}</div><div class="list-meta"><span class="list-cat" style="color:${getCatColor(p.category)}">${p.category||'—'}</span><span class="list-price">${priceStr} RON</span><span class="list-stock ${p.stock?'in':'out'}">${p.stock?'In stoc':'Epuizat'}</span><span style="font-family:var(--mono);font-size:.48rem;color:var(--muted)">${mats.length} mat.</span></div></div><div class="list-actions"><button class="list-btn tg" data-tg="${p.id}">${p.stock?'⊘':'✓'}</button><button class="list-btn ed" data-ed="${p.id}">✎</button><button class="list-btn dl" data-dl="${p.id}">✕</button></div></div>`;
+    const priceStr=mats.length===0?(has3d?'proiect':'—'):(mats.length===1?`${mats[0].price} RON`:`${Math.min(...mats.map(m=>m.price))}–${Math.max(...mats.map(m=>m.price))} RON`);
+    return`<div class="list-item"><div class="list-thumb">${fi?`<img src="${fi}" alt="" onerror="this.style.display='none'">`:`<span class="list-hex">${has3d?'◈':'⬡'}</span>`}</div><div class="list-info"><div class="list-name">${p.name}${has3d?' <span style="color:var(--red);font-size:.5rem">◈3D</span>':''}</div><div class="list-meta"><span class="list-cat" style="color:${getCatColor(p.category)}">${p.category||'—'}</span><span class="list-price">${priceStr}</span><span class="list-stock ${p.stock?'in':'out'}">${p.stock?'In stoc':'Epuizat'}</span></div></div><div class="list-actions"><button class="list-btn tg" data-tg="${p.id}">${p.stock?'⊘':'✓'}</button><button class="list-btn ed" data-ed="${p.id}">✎</button><button class="list-btn dl" data-dl="${p.id}">✕</button></div></div>`;
   }).join('');
 }
 $('listView').addEventListener('click',async e=>{
@@ -2243,7 +2264,8 @@ $('listView').addEventListener('click',async e=>{
   if(tg){const id=+tg.dataset.tg,p=products.find(x=>x.id===id);if(!p)return;try{await sb.updateProduct(id,{stock:!p.stock});products=products.map(x=>x.id===id?{...x,stock:!x.stock}:x);renderGrid();renderList();}catch(e){toast('Eroare stoc',true);}return;}
   if(ed){
     const id=+ed.dataset.ed,p=products.find(x=>x.id===id);if(!p)return;
-    editId=id;stockVal=p.stock;selB=[...(p.badges||[])];formImgs=[...(p.images||[])];
+    editId=id;stockVal=p.stock;selB=[...(p.badges||[])];
+    const _imgs=(p.images||[]);formModel=_imgs.find(isModelUrl)||null;formImgs=_imgs.filter(u=>!isModelUrl(u));
     formMats=getProdMats(p).map(m=>({name:m.name,price:m.price}));imgMode='file';
     $('fName').value=p.name||'';$('fBrand').value=p.brand||'';
     populateCatSelect();$('fCat').value=p.category||getCatNames()[0];
@@ -2251,7 +2273,7 @@ $('listView').addEventListener('click',async e=>{
     populateFMatSel();
     $('urlInputArea').style.display='none';$('fileInputArea').style.display='block';
     $('imgFileBtn').classList.add('on');$('imgUrlBtn').classList.remove('on');
-    renderImgsList();renderFMatList();
+    renderImgsList();renderFMatList();renderModelCurrent();
     $('formSubmit').textContent='✓ Actualizeaza';$('formCancel').style.display='block';
     $('tabAdd').textContent='✎ Editeaza';
     setStk();renderBadges();showTab('add');return;
@@ -2478,16 +2500,89 @@ $('lightbox').addEventListener('touchstart',e=>{lbTx=e.touches[0].clientX;lbTy=e
 $('lightbox').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-lbTx,dy=e.changedTouches[0].clientY-lbTy;if(Math.abs(dx)>Math.abs(dy)*1.3&&Math.abs(dx)>50){if(dx<0&&lbIdx<lbImages.length-1){lbIdx++;lbRender();}else if(dx>0&&lbIdx>0){lbIdx--;lbRender();}}},{passive:true});
 function attachCarouselLightbox(card){
   const prod=products.find(p=>p.id===+card.dataset.id);
-  if(!prod||(prod.images||[]).length===0)return;
+  if(!prod)return;
+  const photos=prodPhotos(prod);
+  if(!photos.length)return;
   const car=card.querySelector('.card-carousel');
   card.querySelectorAll('.carousel-slide img').forEach(img=>{
     let downX=0,downTime=0;
     img.addEventListener('mousedown',e=>{downX=e.clientX;downTime=Date.now();});
-    img.addEventListener('click',e=>{if(Math.abs(e.clientX-downX)<8&&Date.now()-downTime<400){e.stopPropagation();openLightbox(prod.images,car?parseInt(car.dataset.idx||0):0,prod.name);}});
+    img.addEventListener('click',e=>{if(Math.abs(e.clientX-downX)<8&&Date.now()-downTime<400){e.stopPropagation();openLightbox(photos,car?parseInt(car.dataset.idx||0):0,prod.name);}});
     let tDown=0,txD=0;
     img.addEventListener('touchstart',e=>{tDown=Date.now();txD=e.touches[0].clientX;},{passive:true});
-    img.addEventListener('touchend',e=>{if(Math.abs(e.changedTouches[0].clientX-txD)<10&&Date.now()-tDown<300){e.stopPropagation();openLightbox(prod.images,car?parseInt(car.dataset.idx||0):0,prod.name);}},{passive:true});
+    img.addEventListener('touchend',e=>{if(Math.abs(e.changedTouches[0].clientX-txD)<10&&Date.now()-tDown<300){e.stopPropagation();openLightbox(photos,car?parseInt(car.dataset.idx||0):0,prod.name);}},{passive:true});
   });
+}
+
+/* ══ CERE OFERTĂ (proiect fără preț) → WhatsApp ══ */
+document.addEventListener('click',e=>{
+  const q=e.target.closest('[data-quote]');if(!q)return;
+  const p=products.find(x=>x.id===+q.dataset.quote);if(!p)return;
+  const intro=lang==='en'?'Hello! I would like a quote for this 3D project:':'Bună ziua! Aș dori o ofertă pentru acest proiect 3D:';
+  const outro=lang==='en'?'Can you give me more details?':'Îmi puteți da mai multe detalii?';
+  const msg=`${intro}\n\n📦 ${p.name}${p.category?`\n🏷 ${p.category}`:''}${p.description?`\n\n${p.description}`:''}\n\n${outro}`;
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
+});
+
+/* ══ VIZUALIZATOR 3D (STL / 3MF) — orbitare constantă ══ */
+const MODEL_CDN={
+  three:'assets/vendor/three.min.js',
+  fflate:'assets/vendor/fflate.min.js',
+  stl:'assets/vendor/STLLoader.js',
+  tmf:'assets/vendor/3MFLoader.js'
+};
+let _threeReady=null;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load '+src));document.head.appendChild(s);});}
+function ensureThree(){
+  if(_threeReady)return _threeReady;
+  _threeReady=(async()=>{
+    if(!window.THREE)await loadScript(MODEL_CDN.three);
+    if(!window.fflate)await loadScript(MODEL_CDN.fflate);
+    if(!THREE.STLLoader)await loadScript(MODEL_CDN.stl);
+    if(!THREE.ThreeMFLoader)await loadScript(MODEL_CDN.tmf);
+  })();
+  return _threeReady;
+}
+async function mountModelViewer(canvas,url){
+  if(canvas.dataset.mounted)return;canvas.dataset.mounted='1';
+  const wrap=canvas.parentElement,loadingEl=wrap&&wrap.querySelector('.model-loading');
+  try{
+    await ensureThree();
+    const W=canvas.clientWidth||300,H=canvas.clientHeight||195;
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H,false);
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(38,W/H,.1,4000);
+    scene.add(new THREE.HemisphereLight(0xdfefff,0x0a1018,1.05));
+    const key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(5,8,6);scene.add(key);
+    const rim=new THREE.DirectionalLight(0xff3366,.55);rim.position.set(-6,3,-5);scene.add(rim);
+    const group=new THREE.Group();scene.add(group);
+    const mat=new THREE.MeshStandardMaterial({color:0xc2c7cf,metalness:.35,roughness:.5});
+    const ext=(url.split('.').pop()||'').toLowerCase().replace(/\?.*$/,'');
+    if(ext==='3mf'){
+      const obj=await new THREE.ThreeMFLoader().loadAsync(url);
+      obj.traverse(o=>{if(o.isMesh)o.material=mat;});
+      group.add(obj);
+    }else{
+      const geo=await new THREE.STLLoader().loadAsync(url);
+      geo.computeVertexNormals();
+      group.add(new THREE.Mesh(geo,mat));
+    }
+    const box=new THREE.Box3().setFromObject(group);
+    const size=box.getSize(new THREE.Vector3()),ctr=box.getCenter(new THREE.Vector3());
+    group.position.sub(ctr);
+    const maxd=Math.max(size.x,size.y,size.z)||1;group.scale.setScalar(2.2/maxd);
+    camera.position.set(0,.7,4.4);camera.lookAt(0,0,0);
+    if(loadingEl)loadingEl.remove();
+    let visible=true;
+    if('IntersectionObserver'in window){new IntersectionObserver(es=>{visible=es[0].isIntersecting;},{threshold:.02}).observe(canvas);}
+    function tick(){requestAnimationFrame(tick);group.rotation.y+=.012;if(visible&&!document.hidden)renderer.render(scene,camera);}
+    tick();
+    if('ResizeObserver'in window){new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(w&&h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}).observe(canvas);}
+  }catch(err){
+    if(loadingEl)loadingEl.textContent='⚠ 3D indisponibil';
+    canvas.style.display='none';
+  }
 }
 
 /* ══ CART ══ */
@@ -2637,7 +2732,7 @@ document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>
 document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showMainTab(a.dataset.tab);}));
 (function(){
   const id=new URLSearchParams(location.search).get('tab');
-  if(['produse','configurator','filamente'].includes(id))showMainTab(id);
+  if(['produse','configurator'].includes(id))showMainTab(id);
 })();
 
 /* ══ EMAIL NOTIF ══ */
@@ -2656,7 +2751,6 @@ buildTicker();
 applyI18n();
 updateEstimate();
 loadAll();
-loadFilaments();
 initScrollReveal();
 initCounters();
 attachTilt();
