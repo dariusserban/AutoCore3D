@@ -818,6 +818,68 @@ footer{background:linear-gradient(0deg,#070F14,#12141a);border-color:var(--bdr);
   .conf-right{padding:1.1rem;}
   .sect-wrap{padding:2rem 1rem .5rem;}
 }
+
+/* ══════════ ASPECT „PRIMA PAGINĂ" — skin minimal, ca index.html ══════════ */
+#app,body{font-weight:300;}
+/* granulație de film, ca pe homepage */
+body::before{content:'';position:fixed;inset:0;z-index:6;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");}
+/* fără ticker și fără grilă/halou zgomotos */
+.ticker-wrap{display:none!important;}
+#gb{display:none!important;}
+#cg{opacity:.45;}
+
+/* nav ca pe homepage: subțire, fără glow */
+.nav-link{font-weight:400;letter-spacing:.28em;font-size:.62rem;color:var(--muted);}
+.nav-link:hover,.nav-link.active{color:var(--text);text-shadow:none!important;}
+.nav-cta{background:transparent!important;color:var(--text)!important;border:1px solid rgba(242,240,236,.3)!important;border-radius:999px!important;padding:.55rem 1.15rem!important;font-weight:400!important;letter-spacing:.2em!important;text-transform:uppercase;transition:background .3s,color .3s,border-color .3s;}
+.nav-cta:hover{background:var(--text)!important;color:var(--bg)!important;border-color:var(--text)!important;}
+.nav-admin,.nav-cart{border-radius:999px!important;border-color:rgba(242,240,236,.2)!important;}
+
+/* tab-bar minimal, fără emoji */
+.tab-icon{display:none!important;}
+.tabs-bar{box-shadow:none!important;}
+.tab-btn{font-weight:400;letter-spacing:.28em;padding:1rem .5rem;}
+
+/* language switch discret */
+.lang-opt{border-radius:999px;font-weight:500;}
+.lang-opt.on{background:transparent!important;border-color:var(--red)!important;color:var(--red)!important;}
+
+/* eyebrow / etichete secundare */
+.conf-eyebrow{color:var(--muted)!important;letter-spacing:.3em;font-weight:400;}
+.sect-num{border:none!important;padding:0!important;color:var(--muted)!important;letter-spacing:.3em;}
+.card-cat{color:var(--muted)!important;letter-spacing:.24em;}
+.sect-desc,.conf-sub{font-weight:300;color:var(--sub);}
+
+/* titluri subțiri, ne-uppercase forțat */
+.sect-title{font-weight:300!important;letter-spacing:-.01em!important;text-transform:none!important;font-size:clamp(1.5rem,3vw,2.2rem)!important;}
+.sect-title span{color:var(--red);}
+.conf-title{font-weight:300!important;text-transform:none!important;letter-spacing:-.02em!important;font-size:clamp(2rem,4.6vw,3.4rem)!important;}
+.conf-title span{color:var(--red);}
+.card-name{font-weight:400!important;font-size:1.25rem!important;letter-spacing:-.01em!important;}
+.conf-mat-name{font-weight:400!important;}
+
+/* butoane ghost-pill, ca .cta de pe homepage */
+.order-btn,.conf-cta-btn{background:transparent!important;color:var(--text)!important;border:1px solid rgba(242,240,236,.3)!important;border-radius:999px!important;font-weight:400!important;letter-spacing:.2em!important;text-transform:uppercase;box-shadow:none!important;transition:background .3s,color .3s,border-color .3s!important;}
+.order-btn{padding:.7rem 1.35rem!important;font-size:.6rem!important;}
+.conf-cta-btn{padding:1rem 2.4rem!important;font-size:.66rem!important;}
+.order-btn:hover,.conf-cta-btn:hover{background:var(--text)!important;color:var(--bg)!important;border-color:var(--text)!important;}
+.order-btn::before,.conf-cta-btn::before{display:none!important;}
+
+/* filtre + sort ca pastile outline */
+.fb,.sort-btn{border-radius:999px!important;font-weight:400!important;letter-spacing:.16em!important;}
+.fb.on{font-weight:400!important;}
+.sort-btn.on{background:transparent!important;border-color:var(--red)!important;color:var(--red)!important;font-weight:400!important;}
+
+/* carduri curate: hairline, fără colțuri/halou */
+.corner{display:none!important;}
+.card-glow{display:none!important;}
+.card{background:rgba(255,255,255,.02)!important;border:1px solid rgba(242,240,236,.12)!important;transition:border-color .35s,transform .35s var(--ease)!important;}
+.card.visible:hover{border-color:rgba(242,240,236,.28)!important;transform:translateY(-3px)!important;box-shadow:none!important;}
+.card.visible:hover .card-name{color:var(--text)!important;}
+/* upload: fără emoji mare, doar tipografie */
+.upload-icon{display:none!important;}
+.upload-title{font-weight:400!important;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
@@ -875,9 +937,9 @@ footer{background:linear-gradient(0deg,#070F14,#12141a);border-color:var(--bdr);
           <div class="conf-form-group">
             <label class="conf-form-lbl" for="selZone" data-i18n="zone_label">// ZONA PIESEI</label>
             <select class="conf-select" id="selZone">
-              <option value="motor" data-i18n="zone_motor">🔧 Compartiment Motor</option>
-              <option value="exterior" data-i18n="zone_exterior">🚗 Exterior Caroserie</option>
-              <option value="interior" data-i18n="zone_interior">🪑 Interior / Habitaclu</option>
+              <option value="motor" data-i18n="zone_motor">Compartiment Motor</option>
+              <option value="exterior" data-i18n="zone_exterior">Exterior Caroserie</option>
+              <option value="interior" data-i18n="zone_interior">Interior / Habitaclu</option>
             </select>
           </div>
           <div class="conf-form-group">
@@ -1479,12 +1541,12 @@ const T={
     conf_eyebrow:"// 01 · CERERE PRINTARE 3D PERSONALIZATĂ",conf_title_html:"Trimite <span>Fișierul Tău</span> 3D",conf_sub:"Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.",
     upload_title:"Trage fișierul 3D aici",upload_sub:"sau apasă pentru a selecta",upload_hint:"STL / STEP — ofertă personalizată pe WhatsApp · GCODE — preț calculat automat",
     zone_label:"// ZONA PIESEI",stress_label:"// NIVEL STRES MECANIC",name_label:"// NUMELE TĂU",contact_label:"// TELEFON SAU EMAIL",name_ph:"Cum te cheamă...",contact_ph:"07XX... sau email@...",
-    zone_motor:"🔧 Compartiment Motor",zone_exterior:"🚗 Exterior Caroserie",zone_interior:"🪑 Interior / Habitaclu",
+    zone_motor:"Compartiment Motor",zone_exterior:"Exterior Caroserie",zone_interior:"Interior / Habitaclu",
     stress_low:"⬡ Scăzut — uz interior, decorativ",stress_mid:"◈ Mediu — vibrații, temperaturi moderate",stress_crit:"⚠ Critic — motor, impact, temp. ridicate",
     mat_eyebrow:"// MATERIAL RECOMANDAT",price_badge:"⬡ PREȚ ESTIMAT AUTOCORE3D",price_empty:"— RON",price_save_empty:"✓ Transport GRATUIT inclus · Încarcă fișierul pentru preț",
     price_badge_gcode:"⬡ PREȚ CALCULAT DIN GCODE ✓",price_save_gcode:"✓ Preț calculat exact din fișier · Transport GRATUIT inclus",
     price_badge_manual:"⬡ OFERTĂ PERSONALIZATĂ",price_save_manual:"Prețul depinde de dimensiune, complexitate și timp de printare.<br>Trimite cererea pe WhatsApp — îți calculăm și confirmăm în 24h.",
-    cta_btn:"📲 Trimite pe WhatsApp",cta_sub:"Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT",
+    cta_btn:"Trimite pe WhatsApp",cta_sub:"Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT",
     prod_sect_num:"02 / PROIECTE",prod_sect_title_html:"GALERIE <span>PROIECTE</span> 3D",prod_sect_desc:"Proiecte reale printate 3D în atelierul nostru · Modele 3D interactive care se rotesc · Cere o ofertă direct pe WhatsApp",
     quote_btn:"Cere ofertă",gallery_label:"// GALERIE PROIECTE",
     filter_label:"// FILTRARE RAPIDĂ",sort_label:"// SORT",sort_newest:"Cele mai noi",sort_price_asc:"Preț ↑",sort_price_desc:"Preț ↓",sort_stock:"Stoc ↑",search_ph:"Caută produs, material, categorie...",
@@ -1526,12 +1588,12 @@ const T={
     conf_eyebrow:"// 01 · CUSTOM 3D PRINTING REQUEST",conf_title_html:"Send Your <span>3D File</span>",conf_sub:"Upload your STL/STEP model, choose the zone and stress level — get an instant estimated price. If you like it, send your order on WhatsApp.",
     upload_title:"Drag your 3D file here",upload_sub:"or tap to select",upload_hint:"STL / STEP — custom quote on WhatsApp · GCODE — price auto-calculated",
     zone_label:"// PART ZONE",stress_label:"// MECHANICAL STRESS",name_label:"// YOUR NAME",contact_label:"// PHONE OR EMAIL",name_ph:"Your name...",contact_ph:"07XX... or email@...",
-    zone_motor:"🔧 Engine Compartment",zone_exterior:"🚗 Exterior Bodywork",zone_interior:"🪑 Interior / Cabin",
+    zone_motor:"Engine Compartment",zone_exterior:"Exterior Bodywork",zone_interior:"Interior / Cabin",
     stress_low:"⬡ Low — interior use, decorative",stress_mid:"◈ Medium — vibrations, moderate temps",stress_crit:"⚠ Critical — engine, impact, high temps",
     mat_eyebrow:"// RECOMMENDED MATERIAL",price_badge:"⬡ ESTIMATED PRICE AUTOCORE3D",price_empty:"— €",price_save_empty:"✓ FREE Shipping included · Upload file for price",
     price_badge_gcode:"⬡ PRICE FROM GCODE ✓",price_save_gcode:"✓ Price calculated from file · FREE Shipping included",
     price_badge_manual:"⬡ CUSTOM QUOTE",price_save_manual:"Price depends on size, complexity and print time.<br>Send your request on WhatsApp — we calculate and confirm in 24h.",
-    cta_btn:"📲 Send on WhatsApp",cta_sub:"Attach file in WhatsApp · Offer confirmed in 24h · FREE Shipping",
+    cta_btn:"Send on WhatsApp",cta_sub:"Attach file in WhatsApp · Offer confirmed in 24h · FREE Shipping",
     prod_sect_num:"02 / PROJECTS",prod_sect_title_html:"3D <span>PROJECTS</span> GALLERY",prod_sect_desc:"Real 3D printed projects from our workshop · Interactive orbiting 3D models · Request a quote directly on WhatsApp",
     quote_btn:"Request quote",gallery_label:"// PROJECTS GALLERY",
     filter_label:"// QUICK FILTER",sort_label:"// SORT",sort_newest:"Newest",sort_price_asc:"Price ↑",sort_price_desc:"Price ↓",sort_stock:"Stock ↑",search_ph:"Search product, material, category...",
@@ -1813,7 +1875,9 @@ function renderCard(p){
       <div class="card-desc">${p.description||''}</div>
       <div class="badges">${bgs}</div>
       <div class="card-foot">
-        <button class="order-btn" data-quote="${p.id}">📲 ${t('quote_btn')}</button>
+        <button class="order-btn" data-quote="${p.id}">${t('quote_btn')}
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
       </div>
     </div>
   </div>`;
@@ -1935,7 +1999,7 @@ function renderFilters(){
   $('fbar').innerHTML=names.map((n,i)=>{
     const isAll=i===0,isOn=isAll?curIsAll:(filter===n);
     const col=isAll?"#ff5c1a":getCatColor(n);
-    return`<button class="fb${isOn?' on':''}" data-fname="${n}" style="border-color:${isOn?col:'#262626'};${isOn?`background:${col};`:''}color:${isOn?'#fff':'var(--sub)'};">${n}</button>`;
+    return`<button class="fb${isOn?' on':''}" data-fname="${n}" style="border-color:${isOn?col:'rgba(242,240,236,.16)'};color:${isOn?col:'var(--sub)'};">${n}</button>`;
   }).join('');
 }
 $('fbar').addEventListener('click',e=>{
