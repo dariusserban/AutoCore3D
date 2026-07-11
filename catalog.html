@@ -1527,6 +1527,35 @@ let orderFile = null;
 let cart = []; // [{uid, name, material, price, qty, image}]
 let cartPayMethod = 'RAMBURS';
 
+/* ══ PROIECTE LOCALE — versionate în repo (assets/models), afișate mereu,
+      independent de Supabase. Dacă un proiect cu același nume apare ulterior
+      în baza de date (adăugat din admin), varianta locală se ascunde singură. ══ */
+const LOCAL_PROJECTS=[
+  {
+    id:990001,
+    name:"Grile Ventilație VW T5",
+    brand:"Volkswagen Transporter T5",
+    category:"Piese Auto",
+    material:"",price:0,
+    description:"Grile de ventilație pentru VW Transporter T5, remodelate 3D după piesa originală și printate din ASA negru — material stabil la UV, la temperaturi ridicate și la vibrații, exact ce trebuie pentru habitaclu. Ramă circulară Ø116 mm cu lamele înclinate și cleme de prindere integrate: se clipsează direct în locașul original, fără adeziv și fără modificări. Finisaj negru mat, gata de montaj.",
+    images:["assets/models/grile-t5.stl"],
+    badges:["UV Resistant","High Temp"],
+    stock:true,
+    materials_list:[],
+    model_color:"#34373d",   // ASA negru — randăm piesa în negru-grafit, ca în realitate
+    _local:true
+  }
+];
+function mergeLocalProjects(dbProds){
+  const db=dbProds||[];
+  return [...LOCAL_PROJECTS.filter(lp=>!db.some(p=>(p.name||'').trim().toLowerCase()===lp.name.trim().toLowerCase())),...db];
+}
+function ensureLocalCats(){
+  LOCAL_PROJECTS.forEach(lp=>{
+    if(lp.category&&!categories.some(c=>c.name===lp.category))categories.push({id:'local-'+lp.id,name:lp.category,color:'#ff5c1a'});
+  });
+}
+
 /* ══ UTILS ══ */
 const $  = id => document.getElementById(id);
 const getCatColor  = name => { const c=categories.find(x=>x.name===name); return c?c.color:"#ff5c1a"; };
@@ -2036,11 +2065,11 @@ function renderGrid(){
     });
     g.querySelectorAll('.model-viewer[data-model]').forEach(cv=>{
       const card=cv.closest('.card'),p=products.find(x=>x.id===+card.dataset.id);
-      mountModelViewer(cv,cv.dataset.model,{onTap:p?()=>openProjectViewer(p):undefined});
+      mountModelViewer(cv,cv.dataset.model,{onTap:p?()=>openProjectViewer(p):undefined,color:p&&p.model_color});
     });
   }
   $('prodCount').textContent=`${list.length} ${t('prod_found')}`;
-  $('tabCount').textContent=products.length;
+  $('tabCount').textContent=products.filter(p=>!p._local).length;
 }
 
 /* ══ FILTERS (product categories only) ══ */
@@ -2192,17 +2221,22 @@ async function loadAll(){
   setDbStatus('loading','Conectare Supabase...');
   try{
     const [prods,cats,mats,pols]=await Promise.all([sb.getProducts(),sb.getCategories(),sb.getMaterials(),sb.getPolicies()]);
-    products=(prods||[]).map(p=>({...p,images:Array.isArray(p.images)?p.images:(p.image_url?[p.image_url]:[]),badges:Array.isArray(p.badges)?p.badges:[],materials_list:Array.isArray(p.materials_list)?p.materials_list:[]}));
+    products=mergeLocalProjects((prods||[]).map(p=>({...p,images:Array.isArray(p.images)?p.images:(p.image_url?[p.image_url]:[]),badges:Array.isArray(p.badges)?p.badges:[],materials_list:Array.isArray(p.materials_list)?p.materials_list:[]})));
     if(cats&&cats.length)categories=cats;else{await Promise.all(DEFAULT_CATS.map(c=>sb.upsertCategory(c)));categories=[...DEFAULT_CATS];}
     if(mats&&mats.length)materials=mats;else{await Promise.all(DEFAULT_MATS.map(m=>sb.upsertMaterial(m)));materials=[...DEFAULT_MATS];}
     if(pols)policies={...DEFAULT_POLICIES,...pols};
+    ensureLocalCats();
     setDbStatus('ok','Supabase conectat ✓');
     renderFilters();renderGrid();renderFilaments();renderPolicyCards();
   }catch(e){
     console.error(e);
     setDbStatus('err',`Eroare: ${e.message}`);
     toast('Eroare conexiune Supabase',true);
-    $('grid').innerHTML=`<div class="no-prod">// Eroare conexiune</div>`;
+    // chiar și fără conexiune, proiectele locale din repo rămân vizibile
+    products=[...LOCAL_PROJECTS];
+    if(!categories.length)categories=[...DEFAULT_CATS];
+    ensureLocalCats();
+    renderFilters();renderGrid();
   }
 }
 
@@ -2359,8 +2393,9 @@ $('formSubmit').onclick=async()=>{
 /* ══ LIST ══ */
 function renderList(){
   const el=$('listView');
-  if(!products.length){el.innerHTML='<div class="list-empty">Niciun produs.</div>';return;}
-  el.innerHTML=products.map(p=>{
+  const dbProducts=products.filter(p=>!p._local); // proiectele locale se gestionează din repo, nu din admin
+  if(!dbProducts.length){el.innerHTML='<div class="list-empty">Niciun produs.</div>';return;}
+  el.innerHTML=dbProducts.map(p=>{
     const fi=prodPhotos(p)[0];
     const has3d=!!prodModel(p);
     const mats=getProdMats(p);
@@ -2656,8 +2691,8 @@ function ensureThree(){
    CAD/slicer vin adesea poziționate departe de origine), îl ridică în picioare
    (STL/3MF sunt Z-up, scena e Y-up) și îl normalizează la aceeași mărime,
    indiferent cât de mare sau mic e fișierul. */
-async function buildModelPivot(url){
-  const mat=new THREE.MeshStandardMaterial({color:0xc2c7cf,metalness:.35,roughness:.5});
+async function buildModelPivot(url,color){
+  const mat=new THREE.MeshStandardMaterial({color:color||0xc2c7cf,metalness:.35,roughness:.5});
   const ext=(url.split('?')[0].split('.').pop()||'').toLowerCase();
   let obj;
   if(ext==='3mf'){
@@ -2700,7 +2735,7 @@ function fitModelCamera(camera,radius,aspect){
 async function createModelStage(canvas,url,opts={}){
   await ensureThree();
   const speed=typeof opts.speed==='number'?opts.speed:.01;
-  const {pivot,radius}=await buildModelPivot(url);
+  const {pivot,radius}=await buildModelPivot(url,opts.color);
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.setSize(canvas.clientWidth||300,canvas.clientHeight||195,false);
@@ -2785,7 +2820,7 @@ async function openProjectViewer(p){
   $('pv').classList.add('open');document.body.style.overflow='hidden';
   if(pvStage){pvStage.dispose();pvStage=null;}
   try{
-    pvStage=await createModelStage(cv,model,{speed:.006});
+    pvStage=await createModelStage(cv,model,{speed:.006,color:p.model_color});
     ld.remove();
   }catch(err){
     ld.textContent=t('model_err');
