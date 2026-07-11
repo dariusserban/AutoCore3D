@@ -262,7 +262,8 @@ nav{display:flex;align-items:center;gap:1.4rem;}
 .card.visible:hover .carousel-slide img{transform:scale(1.06);}
 /* ── 3D MODEL VIEWER (orbiting) ── */
 .model-wrap{position:relative;height:195px;background:radial-gradient(ellipse at 50% 30%,#2a2d36 0%,#12141a 70%);border-bottom:1px solid var(--bdr);overflow:hidden;}
-.model-viewer{display:block;width:100%;height:100%;cursor:grab;}
+.model-viewer{display:block;width:100%;height:100%;cursor:grab;touch-action:pan-y;}
+.model-viewer.grabbing{cursor:grabbing;}
 .model-badge{position:absolute;bottom:.5rem;left:.5rem;z-index:3;font-family:var(--mono);font-size:.5rem;letter-spacing:.14em;color:var(--red);background:rgba(6,8,15,.7);border:1px solid rgba(255,92,26,.4);padding:.2rem .5rem;pointer-events:none;}
 .model-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.55rem;letter-spacing:.2em;color:var(--muted);}
 /* ── PROJECT PHOTO GALLERY ── */
@@ -402,6 +403,33 @@ footer{border-top:1px solid var(--bdr);padding:1.4rem 1.5rem;background:var(--su
 .lb-dot.on{background:#fff;width:20px;border-radius:4px;}
 .lb-counter{position:absolute;top:1rem;left:1rem;font-family:var(--mono);font-size:.6rem;color:rgba(255,255,255,.6);background:rgba(0,0,0,.6);padding:.25rem .6rem;border:1px solid rgba(255,255,255,.1);}
 .lb-caption{position:absolute;bottom:3.2rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.58rem;color:rgba(255,255,255,.5);letter-spacing:.12em;white-space:nowrap;}
+
+/* ── PROJECT 3D VIEWER (STL mare + poze, scrollabil) ── */
+#pv{position:fixed;inset:0;background:rgba(5,7,11,.97);backdrop-filter:blur(14px);z-index:550;opacity:0;pointer-events:none;transition:opacity .3s;}
+#pv.open{opacity:1;pointer-events:all;}
+.pv-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;}
+.pv-scroll::-webkit-scrollbar{width:4px;}
+.pv-scroll::-webkit-scrollbar-thumb{background:var(--bdr);}
+.pv-close{position:absolute;top:1rem;right:1rem;width:40px;height:40px;background:rgba(0,0,0,.7);border:1px solid var(--bdr);color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:20;}
+.pv-close:hover{border-color:var(--err);color:var(--err);}
+.pv-head{position:absolute;top:1rem;left:1rem;z-index:15;pointer-events:none;max-width:70vw;}
+.pv-cat{font-family:var(--mono);font-size:.55rem;color:var(--red);letter-spacing:.2em;margin-bottom:.3rem;}
+.pv-title{font-family:var(--disp);font-size:clamp(1.1rem,2.6vw,1.7rem);font-weight:900;text-transform:uppercase;color:var(--text);line-height:1.05;text-shadow:0 2px 18px rgba(0,0,0,.8);}
+.pv-hero{position:relative;height:86vh;min-height:400px;background:radial-gradient(ellipse at 50% 38%,#262a33 0%,#0a0c11 72%);border-bottom:1px solid var(--bdr);overflow:hidden;}
+.pv-canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:pan-y;}
+.pv-canvas.grabbing{cursor:grabbing;}
+.pv-hint{position:absolute;bottom:3.4rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.58rem;color:rgba(255,255,255,.55);letter-spacing:.14em;white-space:nowrap;pointer-events:none;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.08);padding:.3rem .8rem;}
+.pv-cue{position:absolute;bottom:.9rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.1rem;font-family:var(--mono);font-size:.52rem;color:var(--red);letter-spacing:.26em;pointer-events:none;animation:pv-bounce 2s ease-in-out infinite;}
+.pv-cue svg{display:block;}
+@keyframes pv-bounce{0%,100%{transform:translateX(-50%) translateY(0);opacity:.85;}50%{transform:translateX(-50%) translateY(6px);opacity:.45;}}
+.pv-photos{max-width:1040px;margin:0 auto;padding:2.4rem 1.25rem 4.5rem;}
+.pv-photos-label{font-family:var(--mono);font-size:.6rem;color:var(--red);letter-spacing:.22em;margin-bottom:.35rem;}
+.pv-photos-hint{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.1em;margin-bottom:1.4rem;}
+.pv-shots{display:flex;flex-direction:column;gap:1.25rem;}
+.pv-shot{border:1px solid var(--bdr);background:#0a0c11;overflow:hidden;}
+.pv-shot img{display:block;width:100%;max-height:82vh;object-fit:contain;cursor:zoom-in;transition:transform .5s var(--ease);}
+.pv-shot img:hover{transform:scale(1.015);}
+@media(max-width:640px){.pv-hero{height:74vh;}.pv-head{max-width:62vw;}}
 
 .policy-modal{max-width:640px;}
 .policy-modal-content{padding:1.4rem 1.5rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;}
@@ -1168,6 +1196,23 @@ body::before{content:'';position:fixed;inset:0;z-index:6;pointer-events:none;opa
   </div>
 </div>
 
+<!-- PROJECT 3D VIEWER (model mare + poze) -->
+<div id="pv">
+  <button class="pv-close" id="pvClose">✕</button>
+  <div class="pv-scroll" id="pvScroll">
+    <div class="pv-hero" id="pvHero">
+      <div class="pv-head"><div class="pv-cat" id="pvCat"></div><div class="pv-title" id="pvTitle"></div></div>
+      <div class="pv-hint" id="pvHint"></div>
+      <div class="pv-cue" id="pvCue" style="display:none"><span id="pvCueTxt"></span><svg width="14" height="8" viewBox="0 0 14 8" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 1l6 6 6-6"/></svg></div>
+    </div>
+    <div class="pv-photos" id="pvPhotos" style="display:none">
+      <div class="pv-photos-label" id="pvPhotosLabel"></div>
+      <div class="pv-photos-hint" id="pvPhotosHint"></div>
+      <div class="pv-shots" id="pvShots"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ADMIN PANEL -->
 <div class="ap-overlay" id="apOverlay" style="display:none">
   <div class="ap-panel">
@@ -1549,6 +1594,8 @@ const T={
     cta_btn:"Trimite pe WhatsApp",cta_sub:"Fișierul îl atașezi în WhatsApp · Confirmare ofertă în 24h · Transport GRATUIT",
     prod_sect_num:"02 / PROIECTE",prod_sect_title_html:"GALERIE <span>PROIECTE</span> 3D",prod_sect_desc:"Proiecte reale printate 3D în atelierul nostru · Modele 3D interactive care se rotesc · Cere o ofertă direct pe WhatsApp",
     quote_btn:"Cere ofertă",gallery_label:"// GALERIE PROIECTE",
+    model_badge:"◈ 3D · apasă pentru mărire",model_loading:"◈ SE ÎNCARCĂ 3D…",model_err:"⚠ 3D indisponibil",
+    pv_hint:"⟳ Trage ca să rotești modelul",pv_scroll_cue:"POZE",pv_photos_label:"// GALERIE FOTO",pv_photos_hint:"Apasă pe o poză pentru a o mări",
     filter_label:"// FILTRARE RAPIDĂ",sort_label:"// SORT",sort_newest:"Cele mai noi",sort_price_asc:"Preț ↑",sort_price_desc:"Preț ↓",sort_stock:"Stoc ↑",search_ph:"Caută produs, material, categorie...",
     fil_sect_num:"03 / CATALOG",fil_sect_title_html:"FILAMENTE <span>TEHNICE</span>",fil_sect_desc:"Materie primă pentru printare 3D · ABS · ASA · Carbon · PETG · Nylon · Stoc actualizat din timp real",
     fil_filter_label:"// FILTRE FILAMENTE",fil_brand_label:"BRAND",fil_type_label:"TIP",fil_stock_label:"STOC",fil_all_stock:"Toate",fil_in_stock_btn:"În stoc",fil_out_stock_btn:"Fără stoc",fil_search_ph:"Caută filament după culoare, brand, tip...",
@@ -1596,6 +1643,8 @@ const T={
     cta_btn:"Send on WhatsApp",cta_sub:"Attach file in WhatsApp · Offer confirmed in 24h · FREE Shipping",
     prod_sect_num:"02 / PROJECTS",prod_sect_title_html:"3D <span>PROJECTS</span> GALLERY",prod_sect_desc:"Real 3D printed projects from our workshop · Interactive orbiting 3D models · Request a quote directly on WhatsApp",
     quote_btn:"Request quote",gallery_label:"// PROJECTS GALLERY",
+    model_badge:"◈ 3D · tap to enlarge",model_loading:"◈ LOADING 3D…",model_err:"⚠ 3D unavailable",
+    pv_hint:"⟳ Drag to rotate the model",pv_scroll_cue:"PHOTOS",pv_photos_label:"// PHOTO GALLERY",pv_photos_hint:"Tap a photo to enlarge it",
     filter_label:"// QUICK FILTER",sort_label:"// SORT",sort_newest:"Newest",sort_price_asc:"Price ↑",sort_price_desc:"Price ↓",sort_stock:"Stock ↑",search_ph:"Search product, material, category...",
     fil_sect_num:"03 / CATALOG",fil_sect_title_html:"<span>TECHNICAL</span> FILAMENTS",fil_sect_desc:"Raw material for 3D printing · ABS · ASA · Carbon · PETG · Nylon · Stock updated in real time",
     fil_filter_label:"// FILAMENT FILTERS",fil_brand_label:"BRAND",fil_type_label:"TYPE",fil_stock_label:"STOCK",fil_all_stock:"All",fil_in_stock_btn:"In stock",fil_out_stock_btn:"Out of stock",fil_search_ph:"Search filament by color, brand, type...",
@@ -1861,7 +1910,7 @@ function renderCard(p){
   const bgs=(p.badges||[]).map(b=>{const bc=BC.find(x=>x.k===b)||{i:"·",c:"#ff5c1a"};return`<span class="badge" style="border-color:${bc.c}44;color:${bc.c}"><span>${bc.i}</span> ${b}</span>`;}).join('');
   const model=prodModel(p),photos=prodPhotos(p);
   const media=model
-    ? `<div class="model-wrap"><canvas class="model-viewer" data-model="${model}"></canvas><div class="model-loading">◈ SE ÎNCARCĂ 3D…</div><div class="model-badge">◈ 3D · rotește</div></div>`
+    ? `<div class="model-wrap"><canvas class="model-viewer" data-model="${model}"></canvas><div class="model-loading">${t('model_loading')}</div><div class="model-badge">${t('model_badge')}</div></div>`
     : buildCarousel(photos);
   return `<div class="card${p.stock?'':' card-oos'}" data-id="${p.id}">
     <div class="card-glow"></div>
@@ -1985,7 +2034,10 @@ function renderGrid(){
       requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add('visible')));
       attachCarousel(c);attachCarouselLightbox(c);
     });
-    g.querySelectorAll('.model-viewer[data-model]').forEach(cv=>mountModelViewer(cv,cv.dataset.model));
+    g.querySelectorAll('.model-viewer[data-model]').forEach(cv=>{
+      const card=cv.closest('.card'),p=products.find(x=>x.id===+card.dataset.id);
+      mountModelViewer(cv,cv.dataset.model,{onTap:p?()=>openProjectViewer(p):undefined});
+    });
   }
   $('prodCount').textContent=`${list.length} ${t('prod_found')}`;
   $('tabCount').textContent=products.length;
@@ -2545,7 +2597,7 @@ function lbRender(){
   $('lbDots').innerHTML=n>1?lbImages.map((_,i)=>`<div class="lb-dot${i===lbIdx?' on':''}" data-i="${i}"></div>`).join(''):'';
   $('lbCaption').textContent=lbProdName?lbProdName.toUpperCase():'';
 }
-function closeLightbox(){$('lightbox').classList.remove('open');document.body.style.overflow='';}
+function closeLightbox(){$('lightbox').classList.remove('open');document.body.style.overflow=$('pv').classList.contains('open')?'hidden':'';}
 $('lbClose').onclick=closeLightbox;
 $('lightbox').addEventListener('click',e=>{if(e.target===$('lightbox')||e.target.classList.contains('lb-inner'))closeLightbox();});
 $('lbPrev').onclick=e=>{e.stopPropagation();if(lbIdx>0){lbIdx--;lbRender();}};
@@ -2581,7 +2633,7 @@ document.addEventListener('click',e=>{
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-/* ══ VIZUALIZATOR 3D (STL / 3MF) — orbitare constantă ══ */
+/* ══ VIZUALIZATOR 3D (STL / 3MF) — centrat & încadrat automat, orice mărime ══ */
 const MODEL_CDN={
   three:'assets/vendor/three.min.js',
   fflate:'assets/vendor/fflate.min.js',
@@ -2600,47 +2652,163 @@ function ensureThree(){
   })();
   return _threeReady;
 }
-async function mountModelViewer(canvas,url){
+/* Încarcă modelul, îl aduce cu centrul cutiei de gabarit în origine (STL-urile din
+   CAD/slicer vin adesea poziționate departe de origine), îl ridică în picioare
+   (STL/3MF sunt Z-up, scena e Y-up) și îl normalizează la aceeași mărime,
+   indiferent cât de mare sau mic e fișierul. */
+async function buildModelPivot(url){
+  const mat=new THREE.MeshStandardMaterial({color:0xc2c7cf,metalness:.35,roughness:.5});
+  const ext=(url.split('?')[0].split('.').pop()||'').toLowerCase();
+  let obj;
+  if(ext==='3mf'){
+    obj=await new THREE.ThreeMFLoader().loadAsync(url);
+    obj.traverse(o=>{if(o.isMesh){o.material=mat;if(o.geometry&&!o.geometry.attributes.normal)o.geometry.computeVertexNormals();}});
+  }else{
+    const geo=await new THREE.STLLoader().loadAsync(url);
+    geo.computeVertexNormals();
+    obj=new THREE.Mesh(geo,mat);
+  }
+  const inner=new THREE.Group();inner.add(obj);
+  inner.rotation.x=-Math.PI/2;
+  const pivot=new THREE.Group();pivot.add(inner);
+  pivot.updateMatrixWorld(true);
+  const box=new THREE.Box3().setFromObject(inner);
+  const size=box.getSize(new THREE.Vector3()),ctr=box.getCenter(new THREE.Vector3());
+  const maxd=Math.max(size.x,size.y,size.z)||1,s=2/maxd;
+  // raza reală față de centru (nu doar cutia) — garantează că nu iese din cadru la rotire
+  let r2=0;const v=new THREE.Vector3();
+  inner.traverse(o=>{
+    if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;
+    const pos=o.geometry.attributes.position;
+    for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);r2=Math.max(r2,v.distanceToSquared(ctr));}
+  });
+  const radius=(Math.sqrt(r2)||maxd/2)*s;
+  inner.position.sub(ctr);          // centrul piesei ajunge exact în origine
+  pivot.scale.setScalar(s);         // mărime normalizată — rotirea e mereu în jurul centrului
+  return {pivot,radius,mat};
+}
+function fitModelCamera(camera,radius,aspect){
+  const vF=camera.fov*Math.PI/180,hF=2*Math.atan(Math.tan(vF/2)*aspect);
+  const d=(radius*1.1)/Math.sin(Math.min(vF,hF)/2);
+  camera.aspect=aspect;
+  camera.near=Math.max(d-radius*3,d/100);camera.far=d+radius*6;
+  camera.position.set(0,d*Math.sin(.34),d*Math.cos(.34));
+  camera.lookAt(0,0,0);
+  camera.updateProjectionMatrix();
+}
+/* Scenă completă pe un canvas: auto-rotire + tragere pentru rotit manual + tap. */
+async function createModelStage(canvas,url,opts={}){
+  await ensureThree();
+  const speed=typeof opts.speed==='number'?opts.speed:.01;
+  const {pivot,radius}=await buildModelPivot(url);
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(canvas.clientWidth||300,canvas.clientHeight||195,false);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(38,(canvas.clientWidth||300)/(canvas.clientHeight||195),.1,4000);
+  scene.add(new THREE.HemisphereLight(0xdfefff,0x0a1018,1.05));
+  const key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(5,8,6);scene.add(key);
+  const rim=new THREE.DirectionalLight(0xff5c1a,.55);rim.position.set(-6,3,-5);scene.add(rim);
+  scene.add(pivot);
+  fitModelCamera(camera,radius,(canvas.clientWidth||300)/(canvas.clientHeight||195));
+  let yaw=0,tilt=0,dragging=false,px=0,py=0,moved=0,downT=0,resumeAt=0,disposed=false,visible=true;
+  canvas.addEventListener('pointerdown',e=>{
+    if(e.button!==undefined&&e.button!==0)return;
+    dragging=true;moved=0;px=e.clientX;py=e.clientY;downT=Date.now();
+    canvas.classList.add('grabbing');
+    if(canvas.setPointerCapture)try{canvas.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const dx=e.clientX-px,dy=e.clientY-py;px=e.clientX;py=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
+    yaw+=dx*.011;tilt=Math.max(-1.1,Math.min(1.1,tilt+dy*.008));
+  });
+  const endDrag=e=>{
+    if(!dragging)return;dragging=false;canvas.classList.remove('grabbing');resumeAt=performance.now()+1600;
+    if(e&&e.type==='pointerup'&&moved<8&&Date.now()-downT<400&&opts.onTap)opts.onTap();
+  };
+  canvas.addEventListener('pointerup',endDrag);
+  canvas.addEventListener('pointercancel',endDrag);
+  let io=null,ro=null;
+  if('IntersectionObserver'in window){io=new IntersectionObserver(es=>{visible=es[0].isIntersecting;},{threshold:.02});io.observe(canvas);}
+  if('ResizeObserver'in window){ro=new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(w&&h){renderer.setSize(w,h,false);fitModelCamera(camera,radius,w/h);}});ro.observe(canvas);}
+  const handle={dispose(){
+    if(disposed)return;disposed=true;
+    if(io)io.disconnect();if(ro)ro.disconnect();
+    scene.traverse(o=>{if(o.isMesh){if(o.geometry)o.geometry.dispose();if(o.material&&o.material.dispose)o.material.dispose();}});
+    renderer.dispose();
+  }};
+  function tick(){
+    if(disposed)return;
+    if(!canvas.isConnected){handle.dispose();return;}  // grila s-a re-randat — oprim contextul vechi
+    requestAnimationFrame(tick);
+    if(!dragging&&performance.now()>resumeAt)yaw+=speed;
+    pivot.rotation.y=yaw;pivot.rotation.x=tilt;
+    if(visible&&!document.hidden)renderer.render(scene,camera);
+  }
+  tick();
+  return handle;
+}
+async function mountModelViewer(canvas,url,opts={}){
   if(canvas.dataset.mounted)return;canvas.dataset.mounted='1';
   const wrap=canvas.parentElement,loadingEl=wrap&&wrap.querySelector('.model-loading');
   try{
-    await ensureThree();
-    const W=canvas.clientWidth||300,H=canvas.clientHeight||195;
-    const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(W,H,false);
-    const scene=new THREE.Scene();
-    const camera=new THREE.PerspectiveCamera(38,W/H,.1,4000);
-    scene.add(new THREE.HemisphereLight(0xdfefff,0x0a1018,1.05));
-    const key=new THREE.DirectionalLight(0xffffff,1.15);key.position.set(5,8,6);scene.add(key);
-    const rim=new THREE.DirectionalLight(0xff5c1a,.55);rim.position.set(-6,3,-5);scene.add(rim);
-    const group=new THREE.Group();scene.add(group);
-    const mat=new THREE.MeshStandardMaterial({color:0xc2c7cf,metalness:.35,roughness:.5});
-    const ext=(url.split('.').pop()||'').toLowerCase().replace(/\?.*$/,'');
-    if(ext==='3mf'){
-      const obj=await new THREE.ThreeMFLoader().loadAsync(url);
-      obj.traverse(o=>{if(o.isMesh)o.material=mat;});
-      group.add(obj);
-    }else{
-      const geo=await new THREE.STLLoader().loadAsync(url);
-      geo.computeVertexNormals();
-      group.add(new THREE.Mesh(geo,mat));
-    }
-    const box=new THREE.Box3().setFromObject(group);
-    const size=box.getSize(new THREE.Vector3()),ctr=box.getCenter(new THREE.Vector3());
-    group.position.sub(ctr);
-    const maxd=Math.max(size.x,size.y,size.z)||1;group.scale.setScalar(2.2/maxd);
-    camera.position.set(0,.7,4.4);camera.lookAt(0,0,0);
+    await createModelStage(canvas,url,opts);
     if(loadingEl)loadingEl.remove();
-    let visible=true;
-    if('IntersectionObserver'in window){new IntersectionObserver(es=>{visible=es[0].isIntersecting;},{threshold:.02}).observe(canvas);}
-    function tick(){requestAnimationFrame(tick);group.rotation.y+=.012;if(visible&&!document.hidden)renderer.render(scene,camera);}
-    tick();
-    if('ResizeObserver'in window){new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(w&&h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}).observe(canvas);}
   }catch(err){
-    if(loadingEl)loadingEl.textContent='⚠ 3D indisponibil';
+    if(loadingEl)loadingEl.textContent=t('model_err');
     canvas.style.display='none';
   }
 }
+
+/* ══ VIZUALIZATOR PROIECT — modelul 3D mare întâi, apoi pozele la scroll ══ */
+let pvStage=null;
+async function openProjectViewer(p){
+  const model=prodModel(p);if(!model)return;
+  const photos=prodPhotos(p);
+  $('pvCat').textContent=p.category?`// ${p.category.toUpperCase()}`:'// PROIECT 3D';
+  $('pvTitle').textContent=p.name||'';
+  $('pvHint').textContent=t('pv_hint');
+  $('pvCueTxt').textContent=t('pv_scroll_cue');
+  $('pvCue').style.display=photos.length?'flex':'none';
+  $('pvPhotos').style.display=photos.length?'block':'none';
+  $('pvPhotosLabel').textContent=`${t('pv_photos_label')} (${photos.length})`;
+  $('pvPhotosHint').textContent=t('pv_photos_hint');
+  $('pvShots').innerHTML=photos.map((u,i)=>`<div class="pv-shot"><img src="${u}" data-pvi="${i}" alt="" loading="lazy"/></div>`).join('');
+  // canvas nou la fiecare deschidere — context WebGL curat
+  const hero=$('pvHero');
+  hero.querySelectorAll('.pv-canvas,.model-loading').forEach(el=>el.remove());
+  const cv=document.createElement('canvas');cv.className='pv-canvas';
+  const ld=document.createElement('div');ld.className='model-loading';ld.textContent=t('model_loading');
+  hero.prepend(ld);hero.prepend(cv);
+  $('pvScroll').scrollTop=0;
+  $('pv').classList.add('open');document.body.style.overflow='hidden';
+  if(pvStage){pvStage.dispose();pvStage=null;}
+  try{
+    pvStage=await createModelStage(cv,model,{speed:.006});
+    ld.remove();
+  }catch(err){
+    ld.textContent=t('model_err');
+  }
+}
+function closeProjectViewer(){
+  if(pvStage){pvStage.dispose();pvStage=null;}
+  const hero=$('pvHero');hero.querySelectorAll('.pv-canvas,.model-loading').forEach(el=>el.remove());
+  $('pv').classList.remove('open');document.body.style.overflow='';
+}
+$('pvClose').onclick=closeProjectViewer;
+$('pvShots').addEventListener('click',e=>{
+  const img=e.target.closest('[data-pvi]');if(!img)return;
+  const imgs=[...$('pvShots').querySelectorAll('[data-pvi]')].map(x=>x.src);
+  openLightbox(imgs,+img.dataset.pvi,$('pvTitle').textContent);
+});
+// capture: rulează înaintea handler-ului lightbox-ului — Escape închide întâi lightbox-ul, apoi viewer-ul
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(!$('pv').classList.contains('open'))return;
+  if($('lightbox').classList.contains('open'))return;
+  closeProjectViewer();
+},true);
 
 /* ══ CART ══ */
 function cartRenderCount(){
