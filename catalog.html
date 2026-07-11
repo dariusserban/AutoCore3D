@@ -1501,6 +1501,7 @@ const sb = {
 
 /* ══ STATE ══ */
 let products   = [];
+let DB_DOWN    = false;
 let categories = [];
 let materials  = [];
 let policies   = {...DEFAULT_POLICIES};
@@ -1532,7 +1533,7 @@ let cartPayMethod = 'RAMBURS';
       în baza de date (adăugat din admin), varianta locală se ascunde singură. ══ */
 const LOCAL_PROJECTS=[
   {
-    id:990001,
+    id:0,   /* id sub seria din DB: la sortarea „cele mai noi", proiectele adăugate de tine rămân primele */
     name:"Grile Ventilație VW T5",
     brand:"Volkswagen Transporter T5",
     category:"Piese Auto",
@@ -1625,6 +1626,7 @@ const T={
     quote_btn:"Cere ofertă",gallery_label:"// GALERIE PROIECTE",
     model_badge:"◈ 3D · apasă pentru mărire",model_loading:"◈ SE ÎNCARCĂ 3D…",model_err:"⚠ 3D indisponibil",
     pv_hint:"⟳ Trage ca să rotești modelul",pv_scroll_cue:"POZE",pv_photos_label:"// GALERIE FOTO",pv_photos_hint:"Apasă pe o poză pentru a o mări",
+    db_down:"⚠ Baza de date nu răspunde — se afișează doar proiectele demonstrative. Proiectele salvate revin automat când conexiunea funcționează.",
     filter_label:"// FILTRARE RAPIDĂ",sort_label:"// SORT",sort_newest:"Cele mai noi",sort_price_asc:"Preț ↑",sort_price_desc:"Preț ↓",sort_stock:"Stoc ↑",search_ph:"Caută produs, material, categorie...",
     fil_sect_num:"03 / CATALOG",fil_sect_title_html:"FILAMENTE <span>TEHNICE</span>",fil_sect_desc:"Materie primă pentru printare 3D · ABS · ASA · Carbon · PETG · Nylon · Stoc actualizat din timp real",
     fil_filter_label:"// FILTRE FILAMENTE",fil_brand_label:"BRAND",fil_type_label:"TIP",fil_stock_label:"STOC",fil_all_stock:"Toate",fil_in_stock_btn:"În stoc",fil_out_stock_btn:"Fără stoc",fil_search_ph:"Caută filament după culoare, brand, tip...",
@@ -1674,6 +1676,7 @@ const T={
     quote_btn:"Request quote",gallery_label:"// PROJECTS GALLERY",
     model_badge:"◈ 3D · tap to enlarge",model_loading:"◈ LOADING 3D…",model_err:"⚠ 3D unavailable",
     pv_hint:"⟳ Drag to rotate the model",pv_scroll_cue:"PHOTOS",pv_photos_label:"// PHOTO GALLERY",pv_photos_hint:"Tap a photo to enlarge it",
+    db_down:"⚠ Database unreachable — only demo projects are shown. Saved projects will reappear automatically once the connection is back.",
     filter_label:"// QUICK FILTER",sort_label:"// SORT",sort_newest:"Newest",sort_price_asc:"Price ↑",sort_price_desc:"Price ↓",sort_stock:"Stock ↑",search_ph:"Search product, material, category...",
     fil_sect_num:"03 / CATALOG",fil_sect_title_html:"<span>TECHNICAL</span> FILAMENTS",fil_sect_desc:"Raw material for 3D printing · ABS · ASA · Carbon · PETG · Nylon · Stock updated in real time",
     fil_filter_label:"// FILAMENT FILTERS",fil_brand_label:"BRAND",fil_type_label:"TYPE",fil_stock_label:"STOCK",fil_all_stock:"All",fil_in_stock_btn:"In stock",fil_out_stock_btn:"Out of stock",fil_search_ph:"Search filament by color, brand, type...",
@@ -2052,12 +2055,13 @@ function renderGrid(){
   const list=applySearchSort(base);
   const mc=$('searchMainClear');if(mc)mc.classList.toggle('vis',searchQ.length>0);
   const g=$('grid');
+  const dbBanner=DB_DOWN?`<div style="grid-column:1/-1;font-family:var(--mono);font-size:.62rem;color:var(--err);border:1px dashed rgba(239,68,68,.4);padding:.8rem 1rem;letter-spacing:.05em;line-height:1.6">${t('db_down')}</div>`:'';
   if(!list.length){
-    g.innerHTML=searchQ
+    g.innerHTML=dbBanner+(searchQ
       ?`<div class="no-prod-search">🔍 Niciun rezultat pentru "<b style="color:var(--red)">${searchQ}</b>"</div>`
-      :`<div class="no-prod">// 0 ${t('prod_found')}</div>`;
+      :`<div class="no-prod">// 0 ${t('prod_found')}</div>`);
   } else {
-    g.innerHTML=list.map(renderCard).join('');
+    g.innerHTML=dbBanner+list.map(renderCard).join('');
     g.querySelectorAll('.card').forEach((c,i)=>{
       c.style.transitionDelay=`${i*55}ms`;
       requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add('visible')));
@@ -2226,6 +2230,7 @@ async function loadAll(){
     if(mats&&mats.length)materials=mats;else{await Promise.all(DEFAULT_MATS.map(m=>sb.upsertMaterial(m)));materials=[...DEFAULT_MATS];}
     if(pols)policies={...DEFAULT_POLICIES,...pols};
     ensureLocalCats();
+    DB_DOWN=false;
     setDbStatus('ok','Supabase conectat ✓');
     renderFilters();renderGrid();renderFilaments();renderPolicyCards();
   }catch(e){
@@ -2233,6 +2238,7 @@ async function loadAll(){
     setDbStatus('err',`Eroare: ${e.message}`);
     toast('Eroare conexiune Supabase',true);
     // chiar și fără conexiune, proiectele locale din repo rămân vizibile
+    DB_DOWN=true;
     products=[...LOCAL_PROJECTS];
     if(!categories.length)categories=[...DEFAULT_CATS];
     ensureLocalCats();
@@ -2346,7 +2352,12 @@ async function uploadModelFile(f){
     const path=`models/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
     formModel=await sb.uploadImage(f,path);
     $('modelUploadBar').style.width='100%';renderModelCurrent();
-  }catch(e){toast(`Eroare upload model: ${e.message}`,true);}
+  }catch(e){
+    console.error('Upload model:',e);
+    toast(`Eroare upload model: ${e.message}`,true);
+    // eroarea rămâne vizibilă în formular, nu doar în toast
+    $('modelCurrent').innerHTML=`<div style="padding:.4rem .6rem;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.06);color:var(--err)">✕ Upload eșuat: ${String(e.message||e).slice(0,120)}<br><span style="opacity:.7">Modelul NU a fost atașat — proiectul s-ar salva fără 3D. Reîncearcă sau verifică Supabase Storage.</span></div>`;
+  }
   setTimeout(()=>{$('modelUploadProgress').style.display='none';$('modelUploadBar').style.width='0%';},900);
 }
 $('modelDrop').onclick=()=>$('adminModelInput').click();
@@ -2707,16 +2718,28 @@ async function buildModelPivot(url,color){
   inner.rotation.x=-Math.PI/2;
   const pivot=new THREE.Group();pivot.add(inner);
   pivot.updateMatrixWorld(true);
-  const box=new THREE.Box3().setFromObject(inner);
-  const size=box.getSize(new THREE.Vector3()),ctr=box.getCenter(new THREE.Vector3());
-  const maxd=Math.max(size.x,size.y,size.z)||1,s=2/maxd;
-  // raza reală față de centru (nu doar cutia) — garantează că nu iese din cadru la rotire
-  let r2=0;const v=new THREE.Vector3();
-  inner.traverse(o=>{
+  // gabarit calculat manual, ignorând vertecșii corupți (NaN/Inf) din unele fișiere
+  const v=new THREE.Vector3();
+  let minX=1/0,minY=1/0,minZ=1/0,maxX=-1/0,maxY=-1/0,maxZ=-1/0;
+  const eachVert=fn=>inner.traverse(o=>{
     if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;
     const pos=o.geometry.attributes.position;
-    for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);r2=Math.max(r2,v.distanceToSquared(ctr));}
+    for(let i=0;i<pos.count;i++){
+      v.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);
+      if(isFinite(v.x)&&isFinite(v.y)&&isFinite(v.z))fn(v);
+    }
   });
+  eachVert(p=>{
+    if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;
+    if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;
+    if(p.z<minZ)minZ=p.z;if(p.z>maxZ)maxZ=p.z;
+  });
+  if(maxX<minX)throw new Error('geometrie goală sau coruptă');
+  const ctr=new THREE.Vector3((minX+maxX)/2,(minY+maxY)/2,(minZ+maxZ)/2);
+  const maxd=Math.max(maxX-minX,maxY-minY,maxZ-minZ)||1,s=2/maxd;
+  // raza reală față de centru (nu doar cutia) — garantează că nu iese din cadru la rotire
+  let r2=0;
+  eachVert(p=>{const d=p.distanceToSquared(ctr);if(d>r2)r2=d;});
   const radius=(Math.sqrt(r2)||maxd/2)*s;
   inner.position.sub(ctr);          // centrul piesei ajunge exact în origine
   pivot.scale.setScalar(s);         // mărime normalizată — rotirea e mereu în jurul centrului
@@ -2791,7 +2814,8 @@ async function mountModelViewer(canvas,url,opts={}){
     await createModelStage(canvas,url,opts);
     if(loadingEl)loadingEl.remove();
   }catch(err){
-    if(loadingEl)loadingEl.textContent=t('model_err');
+    console.error('3D viewer:',url,err);
+    if(loadingEl){loadingEl.textContent=t('model_err');loadingEl.title=String(err&&err.message||err);}
     canvas.style.display='none';
   }
 }
@@ -2823,7 +2847,8 @@ async function openProjectViewer(p){
     pvStage=await createModelStage(cv,model,{speed:.006,color:p.model_color});
     ld.remove();
   }catch(err){
-    ld.textContent=t('model_err');
+    console.error('3D viewer (proiect):',model,err);
+    ld.textContent=t('model_err');ld.title=String(err&&err.message||err);
   }
 }
 function closeProjectViewer(){
