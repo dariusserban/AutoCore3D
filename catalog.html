@@ -1543,7 +1543,6 @@ const LOCAL_PROJECTS=[
     badges:["UV Resistant","High Temp"],
     stock:true,
     materials_list:[],
-    model_color:"#34373d",   // ASA negru — randăm piesa în negru-grafit, ca în realitate
     _local:true
   }
 ];
@@ -2703,17 +2702,40 @@ function ensureThree(){
    (STL/3MF sunt Z-up, scena e Y-up) și îl normalizează la aceeași mărime,
    indiferent cât de mare sau mic e fișierul. */
 async function buildModelPivot(url,color){
-  const mat=new THREE.MeshStandardMaterial({color:color||0xc2c7cf,metalness:.35,roughness:.5});
+  /* toate piesele se randează negru (ASA/ABS negru), ca în realitate;
+     culoarea poate fi suprascrisă per proiect prin model_color */
+  const mat=new THREE.MeshStandardMaterial({color:color||0x34373d,metalness:.35,roughness:.5});
   const ext=(url.split('?')[0].split('.').pop()||'').toLowerCase();
-  let obj;
-  if(ext==='3mf'){
-    obj=await new THREE.ThreeMFLoader().loadAsync(url);
-    obj.traverse(o=>{if(o.isMesh){o.material=mat;if(o.geometry&&!o.geometry.attributes.normal)o.geometry.computeVertexNormals();}});
-  }else{
-    const geo=await new THREE.STLLoader().loadAsync(url);
-    geo.computeVertexNormals();
-    obj=new THREE.Mesh(geo,mat);
+  /* descărcăm noi fișierul — erorile HTTP și de format primesc mesaje clare,
+     iar fișierele redenumite greșit (3MF cu extensia .stl etc.) tot se deschid */
+  let res;
+  try{res=await fetch(url);}
+  catch(e){throw new Error('descărcarea a eșuat (rețea)');}
+  if(!res.ok)throw new Error(`HTTP ${res.status}${res.status===404?' — fișierul lipsește din Storage':''}`);
+  const buf=await res.arrayBuffer();
+  if(buf.byteLength<84)throw new Error('fișier gol sau trunchiat');
+  const hb=new Uint8Array(buf,0,Math.min(300,buf.byteLength));
+  let head='';for(let i=0;i<hb.length;i++)head+=String.fromCharCode(hb[i]);
+  if(/ISO-10303/i.test(head))throw new Error('fișier STEP redenumit — exportă STL sau 3MF din CAD');
+  const isZip=hb[0]===0x50&&hb[1]===0x4B;   // 'PK' — 3MF e o arhivă ZIP
+  const asSTL=()=>{
+    const g=new THREE.STLLoader().parse(buf);
+    if(!g.attributes.position||!g.attributes.position.count)throw new Error('STL fără geometrie');
+    g.computeVertexNormals();
+    return new THREE.Mesh(g,mat);
+  };
+  const as3MF=()=>{
+    const o=new THREE.ThreeMFLoader().parse(buf);
+    let meshes=0;
+    o.traverse(x=>{if(x.isMesh){meshes++;x.material=mat;if(x.geometry&&!x.geometry.attributes.normal)x.geometry.computeVertexNormals();}});
+    if(!meshes)throw new Error('3MF fără geometrie');
+    return o;
+  };
+  let obj=null;
+  for(const tryParse of ((ext==='3mf'||isZip)?[as3MF,asSTL]:[asSTL,as3MF])){
+    try{obj=tryParse();break;}catch(e){}
   }
+  if(!obj)throw new Error('format nerecunoscut sau fișier corupt');
   const inner=new THREE.Group();inner.add(obj);
   inner.rotation.x=-Math.PI/2;
   const pivot=new THREE.Group();pivot.add(inner);
@@ -2815,7 +2837,10 @@ async function mountModelViewer(canvas,url,opts={}){
     if(loadingEl)loadingEl.remove();
   }catch(err){
     console.error('3D viewer:',url,err);
-    if(loadingEl){loadingEl.textContent=t('model_err');loadingEl.title=String(err&&err.message||err);}
+    if(loadingEl){
+      const msg=String(err&&err.message||err).slice(0,90).replace(/[<>&]/g,'');
+      loadingEl.innerHTML=`<div style="text-align:center;line-height:1.8;padding:0 .9rem">${t('model_err')}<br><span style="font-size:.48rem;opacity:.7;letter-spacing:.08em">${msg}</span></div>`;
+    }
     canvas.style.display='none';
   }
 }
@@ -2848,7 +2873,8 @@ async function openProjectViewer(p){
     ld.remove();
   }catch(err){
     console.error('3D viewer (proiect):',model,err);
-    ld.textContent=t('model_err');ld.title=String(err&&err.message||err);
+    const msg=String(err&&err.message||err).slice(0,90).replace(/[<>&]/g,'');
+    ld.innerHTML=`<div style="text-align:center;line-height:1.8;padding:0 .9rem">${t('model_err')}<br><span style="font-size:.48rem;opacity:.7;letter-spacing:.08em">${msg}</span></div>`;
   }
 }
 function closeProjectViewer(){
