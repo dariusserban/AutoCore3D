@@ -414,6 +414,16 @@ textarea.inp{min-height:64px;resize:vertical}
 .chk-row b{font-size:14px}
 .chk-row span{display:block;font-size:12px;color:var(--muted-2)}
 .demo-banner{position:fixed;bottom:0;left:0;right:0;z-index:var(--z-toast);background:var(--red-2);color:#fff;font-size:12px;font-weight:800;text-align:center;padding:7px 14px calc(7px + env(safe-area-inset-bottom))}
+.conn-line{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;padding:10px 13px;border-radius:12px;margin-bottom:12px;line-height:1.4}
+.conn-line .d{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.conn-line.ok{background:rgba(62,207,110,.1);border:1px solid rgba(62,207,110,.4);color:#8FE9AF}
+.conn-line.ok .d{background:var(--green);box-shadow:0 0 8px var(--green)}
+.conn-line.wait{background:rgba(255,138,0,.1);border:1px solid rgba(255,138,0,.4);color:#FFC48A}
+.conn-line.wait .d{background:var(--orange)}
+.conn-line.local{background:rgba(138,138,147,.1);border:1px solid var(--line-2);color:var(--muted)}
+.conn-line.local .d{background:var(--gray-st)}
+.o-del{color:var(--muted-2)!important}
+.o-del:hover{color:var(--danger)!important;border-color:rgba(255,90,69,.5)!important}
 
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
@@ -572,6 +582,135 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const lei = n => (Math.round(n * 100) / 100) % 1 ? (Math.round(n * 100) / 100).toFixed(2) : String(Math.round(n));
 const fmtTel = d => /^\d{10}$/.test(d) ? d.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3') : d;
 const uid = () => 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const genOrderCode = () => 'KB-' + (Date.now().toString(36) + Math.random().toString(36).slice(2, 4)).toUpperCase();
+
+/* ================= SUPABASE (comenzi + poze partajate; fallback local) =================
+   ▼▼▼ Completează cu datele din Supabase → Project Settings → API ▼▼▼
+   Cheile de mai jos sunt PUBLICE (se pot pune în cod). NU pune niciodată service_role. */
+const SB_URL    = 'PUNE_AICI_PROJECT_URL';   // ex: https://xxxxxxxx.supabase.co
+const SB_KEY    = 'PUNE_AICI_CHEIA_ANON';    // cheia „anon / public"
+const SB_BUCKET = 'menu-photos';
+/* ▲▲▲ Atât trebuie completat — restul e gata ▲▲▲ */
+
+const SB = {
+  get on(){ return /^https:\/\/.+\.supabase\.co\/?$/.test(SB_URL) && SB_KEY.length > 30; },
+  _base(){ return SB_URL.replace(/\/$/, ''); },
+  h(extra){ return Object.assign({ apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }, extra || {}); },
+  async rest(method, path, body, prefer){
+    const opt = { method, headers: this.h(body !== undefined ? { 'Content-Type': 'application/json' } : {}) };
+    if(prefer) opt.headers.Prefer = prefer;
+    if(body !== undefined) opt.body = JSON.stringify(body);
+    const res = await fetch(this._base() + '/rest/v1/' + path, opt);
+    if(!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 140));
+    const txt = await res.text();
+    return txt ? JSON.parse(txt) : null;
+  },
+  async rpc(fn, args){
+    const res = await fetch(this._base() + '/rest/v1/rpc/' + fn, {
+      method: 'POST', headers: this.h({ 'Content-Type': 'application/json' }), body: JSON.stringify(args || {})
+    });
+    if(!res.ok) throw new Error('RPC ' + res.status + ': ' + (await res.text()).slice(0, 140));
+    const txt = await res.text();
+    return txt ? JSON.parse(txt) : null;
+  },
+  async uploadPhoto(blob){
+    const name = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7) + '.jpg';
+    const res = await fetch(this._base() + '/storage/v1/object/' + SB_BUCKET + '/' + name, {
+      method: 'POST', headers: this.h({ 'Content-Type': blob.type || 'image/jpeg', 'x-upsert': 'true' }), body: blob
+    });
+    if(!res.ok) throw new Error('Upload ' + res.status + ': ' + (await res.text()).slice(0, 140));
+    return this._base() + '/storage/v1/object/public/' + SB_BUCKET + '/' + name;
+  }
+};
+
+/* Mapare între modelul local și rândurile din Supabase */
+const itemToRow = (it, pos) => ({
+  id: it.id, cat: it.cat, name: it.name, price: it.price, emoji: it.emoji || '🍽️',
+  img: it.img || null, badge: it.badge || '', spicy: !!it.spicy, available: it.available !== false,
+  descr: it.desc || '', ing: it.ing || [], pos: pos != null ? pos : (it.pos || 0)
+});
+const rowToItem = r => ({
+  id: r.id, cat: r.cat, name: r.name, price: Number(r.price), emoji: r.emoji || '🍽️',
+  img: r.img || null, badge: r.badge || '', spicy: !!r.spicy, available: r.available !== false,
+  desc: r.descr || '', ing: Array.isArray(r.ing) ? r.ing : []
+});
+
+let cloudReady = false;      // true când s-au încărcat datele din cloud
+let cloudOrders = null;      // comenzile din cloud (pentru admin)
+
+async function cloudPull(){
+  const [cats, items, setRows] = await Promise.all([
+    SB.rest('GET', 'kb_categories?select=*&order=pos.asc'),
+    SB.rest('GET', 'kb_items?select=*&order=pos.asc'),
+    SB.rest('GET', 'kb_settings?id=eq.1&select=data')
+  ]);
+  return { cats, items, settings: (setRows && setRows[0]) ? setRows[0].data : null };
+}
+async function cloudSeed(){
+  await SB.rest('POST', 'kb_settings', { id: 1, data: DB.settings }, 'resolution=merge-duplicates,return=minimal');
+  await SB.rest('POST', 'kb_categories', DB.categories.map((c, i) => ({ id: c.id, name: c.name, note: c.note || '', pos: i })), 'resolution=merge-duplicates,return=minimal');
+  await SB.rest('POST', 'kb_items', DB.items.map((it, i) => itemToRow(it, i)), 'resolution=merge-duplicates,return=minimal');
+}
+async function bootstrap(){
+  if(!SB.on) return;
+  try{
+    let d = await cloudPull();
+    if(!d.items || d.items.length === 0){ await cloudSeed(); d = await cloudPull(); }
+    if(d.settings) DB.settings = Object.assign({}, DB.settings, d.settings);
+    if(d.cats && d.cats.length) DB.categories = d.cats.map(c => ({ id: c.id, name: c.name, note: c.note || '' }));
+    if(d.items && d.items.length) DB.items = d.items.map(rowToItem);
+    cloudReady = true;
+    const adminOpen = !$('#adminView').classList.contains('hidden');
+    if(adminOpen) renderAdmin(); else renderSite();
+  }catch(e){ console.warn('Supabase indisponibil — folosesc datele locale:', e.message); }
+}
+
+/* Oglindește modificările din admin în cloud (fără să blocheze UI-ul) */
+function cloudUpsertItem(it){ if(SB.on) SB.rest('POST', 'kb_items', itemToRow(it), 'resolution=merge-duplicates,return=minimal').catch(() => toast('⚠️ Sincronizare cloud eșuată')); }
+function cloudDeleteItem(id){ if(SB.on) SB.rest('DELETE', 'kb_items?id=eq.' + encodeURIComponent(id)).catch(() => {}); }
+function cloudSyncCats(){ if(SB.on) SB.rest('POST', 'kb_categories', DB.categories.map((c, i) => ({ id: c.id, name: c.name, note: c.note || '', pos: i })), 'resolution=merge-duplicates,return=minimal').catch(() => {}); }
+function cloudDeleteCat(id){ if(SB.on) SB.rest('DELETE', 'kb_categories?id=eq.' + encodeURIComponent(id)).catch(() => {}); }
+function cloudSaveSettings(){ if(SB.on) SB.rest('POST', 'kb_settings', { id: 1, data: DB.settings }, 'resolution=merge-duplicates,return=minimal').catch(() => toast('⚠️ Sincronizare setări eșuată')); }
+
+/* Comenzi din cloud (admin) */
+const getOrders = () => SB.on ? (cloudOrders || []) : DB.orders;
+async function loadCloudOrders(){
+  if(!SB.on) return;
+  try{
+    const rows = await SB.rpc('kb_orders_list', { pw: ADMIN_PASS });
+    cloudOrders = (rows || []).map(o => ({ id: o.id, ts: Number(o.ts), items: o.items, total: Number(o.total), client: o.client, note: o.note || '', status: o.status }));
+  }catch(e){ console.warn('Încărcare comenzi cloud:', e.message); if(cloudOrders === null) cloudOrders = []; }
+}
+async function setOrderStatus(id, st){
+  if(SB.on){
+    try{ await SB.rpc('kb_orders_status', { pw: ADMIN_PASS, oid: id, st }); await loadCloudOrders(); renderAdmin(); }
+    catch(e){ toast('⚠️ Nu am putut actualiza comanda'); }
+  } else { const o = DB.orders.find(x => x.id === id); if(o){ o.status = st; saveDB(); renderAdmin(); } }
+}
+async function deleteOrder(id){
+  if(SB.on){
+    try{ await SB.rpc('kb_orders_delete', { pw: ADMIN_PASS, oid: id }); await loadCloudOrders(); renderAdmin(); toast('🗑 Comandă ștearsă'); }
+    catch(e){ toast('⚠️ Nu am putut șterge comanda'); }
+  } else { DB.orders = DB.orders.filter(x => x.id !== id); saveDB(); renderAdmin(); toast('🗑 Comandă ștearsă'); }
+}
+let ordPoll = null, ordSig = '';
+function ordersSignature(){ return getOrders().map(o => o.id + o.status).join(','); }
+function startOrdPoll(){
+  stopOrdPoll();
+  if(!SB.on) return;
+  ordSig = ordersSignature();
+  ordPoll = setInterval(async () => {
+    if(adminTab !== 'orders' || $('#adminView').classList.contains('hidden')) return;
+    const before = (cloudOrders || []).length;
+    await loadCloudOrders();
+    const sig = ordersSignature();
+    if(sig !== ordSig){
+      if((cloudOrders || []).length > before) toast('🔔 Comandă nouă primită!');
+      ordSig = sig; renderAdmin();
+    }
+  }, 15000);
+}
+function stopOrdPoll(){ if(ordPoll){ clearInterval(ordPoll); ordPoll = null; } }
 
 function seed(){
   return {
@@ -900,7 +1039,7 @@ function submitOrder(){
   const firstBad = $('.fld.bad .inp');
   if(firstBad){ firstBad.focus(); return; }
   const order = {
-    id: 'KB-' + (++DB.counter),
+    id: genOrderCode(),
     ts: Date.now(),
     items: cart.map(l => { const it = itemById(l.id); return { name: it.name, price: it.price, qty: l.qty, spicy: l.spicy }; }),
     total: cartTotal(),
@@ -908,8 +1047,19 @@ function submitOrder(){
     note: $('#fNote').value.trim(),
     status: 'noua'
   };
-  DB.orders.unshift(order);
-  saveDB();
+  if(SB.on){
+    // trimite comanda în cloud; dacă pică, o păstrăm local ca rezervă
+    SB.rest('POST', 'kb_orders', {
+      id: order.id, ts: order.ts, items: order.items, total: order.total,
+      client: order.client, note: order.note, status: 'noua'
+    }, 'return=minimal').catch(err => {
+      console.warn('Comanda nu a ajuns în cloud:', err.message);
+      DB.orders.unshift(order); saveDB();
+      toast('⚠️ Conexiune slabă — comanda s-a salvat local. Sună la local pentru siguranță.');
+    });
+  } else {
+    DB.orders.unshift(order); saveDB();
+  }
   try{ localStorage.setItem(CLIENT_KEY, JSON.stringify({ fn, ln, tel: d })); }catch(e){}
   cart = []; saveCart();
   orderDone = order;
@@ -938,6 +1088,7 @@ const setAuthed = v => { try{ v ? sessionStorage.setItem(AUTH_KEY, '1') : sessio
 function renderAdmin(){
   const el = $('#adminView');
   if(!isAuthed()){
+    stopOrdPoll();
     el.innerHTML = `
       <div class="ad-wrap">
         <div class="login-card">
@@ -963,7 +1114,7 @@ function renderAdmin(){
     };
     return;
   }
-  const newCount = DB.orders.filter(o => o.status === 'noua').length;
+  const newCount = getOrders().filter(o => o.status === 'noua').length;
   el.innerHTML = `
     <div class="ad-top"><div class="container ad-top-in">
       <span class="t"><svg class="crown" aria-hidden="true"><use href="#i-crown"/></svg> Admin — King Bistro</span>
@@ -982,26 +1133,37 @@ function renderAdmin(){
     </div>`;
   $('#logoutBtn').onclick = () => { setAuthed(false); renderAdmin(); };
   $$('#adminView [data-tab]').forEach(b => b.onclick = () => { adminTab = b.dataset.tab; renderAdmin(); });
-  if(adminTab === 'orders') renderOrdersTab();
-  else if(adminTab === 'menu') renderMenuTab();
-  else renderSettingsTab();
+  if(adminTab === 'orders'){
+    renderOrdersTab();
+    if(SB.on){
+      startOrdPoll();
+      if(cloudOrders === null) loadCloudOrders().then(() => { if(adminTab === 'orders' && !$('#adminView').classList.contains('hidden')) renderOrdersTab(); });
+    }
+  }
+  else { stopOrdPoll(); if(adminTab === 'menu') renderMenuTab(); else renderSettingsTab(); }
   updateTitle();
 }
 
 function sameDay(ts){ const a = new Date(ts), b = new Date(); return a.toDateString() === b.toDateString(); }
+function connLine(){
+  if(!SB.on) return `<div class="conn-line local"><span class="d"></span>Mod local — comenzile se salvează doar pe acest dispozitiv. (Conectează Supabase în „Setări".)</div>`;
+  return `<div class="conn-line ${cloudReady ? 'ok' : 'wait'}"><span class="d"></span>${cloudReady ? 'Conectat la cloud — comenzile de la clienți ajung automat aici.' : 'Se conectează la cloud…'}</div>`;
+}
 function renderOrdersTab(){
   const tb = $('#tabBody');
-  const today = DB.orders.filter(o => sameDay(o.ts) && o.status !== 'anulata');
+  const ORD = getOrders();
+  const loading = SB.on && cloudOrders === null;
+  const today = ORD.filter(o => sameDay(o.ts) && o.status !== 'anulata');
   const stats = `
     <div class="stats">
       <div class="stat"><div class="v">${today.length}</div><div class="l">Comenzi azi</div></div>
       <div class="stat"><div class="v">${lei(today.reduce((s, o) => s + o.total, 0))}</div><div class="l">Lei azi</div></div>
-      <div class="stat"><div class="v">${DB.orders.filter(o => o.status === 'noua').length}</div><div class="l">Noi (de confirmat)</div></div>
+      <div class="stat"><div class="v">${ORD.filter(o => o.status === 'noua').length}</div><div class="l">Noi (de confirmat)</div></div>
     </div>`;
   const filters = ['toate', 'noua', 'pregatire', 'ridicata', 'anulata'];
   const fRow = `<div class="filter-row">${filters.map(f =>
     `<button class="f-chip ${orderFilter===f?'on':''}" data-ofilter="${f}">${f==='toate'?'Toate':ST[f].t}</button>`).join('')}</div>`;
-  const list = DB.orders.filter(o => orderFilter === 'toate' || o.status === orderFilter);
+  const list = ORD.filter(o => orderFilter === 'toate' || o.status === orderFilter);
   const cards = list.length ? list.map(o => {
     const st = ST[o.status] || ST.noua;
     const t = new Date(o.ts);
@@ -1009,10 +1171,10 @@ function renderOrdersTab(){
     const items = o.items.map(i =>
       `<div class="oi"><span><b>${i.qty}×</b> ${esc(i.name)}${i.spicy ? ` <em>(${i.spicy === 'picant' ? '🌶 picant' : 'ne picant'})</em>` : ''}</span><span>${lei(i.price * i.qty)} lei</span></div>`).join('');
     let btns = '';
-    if(o.status === 'noua') btns = `<button class="btn btn-gold btn-sm" data-ost="${o.id}|pregatire">Acceptă — în pregătire</button>
-      <button class="btn btn-danger btn-sm" data-ost="${o.id}|anulata">Anulează</button>`;
-    else if(o.status === 'pregatire') btns = `<button class="btn btn-gold btn-sm" data-ost="${o.id}|ridicata">✔ A fost ridicată</button>
-      <button class="btn btn-danger btn-sm" data-ost="${o.id}|anulata">Anulează</button>`;
+    if(o.status === 'noua') btns = `<button class="btn btn-gold btn-sm" data-ost="${esc(o.id)}|pregatire">Acceptă — în pregătire</button>
+      <button class="btn btn-danger btn-sm" data-ost="${esc(o.id)}|anulata">Anulează</button>`;
+    else if(o.status === 'pregatire') btns = `<button class="btn btn-gold btn-sm" data-ost="${esc(o.id)}|ridicata">✔ A fost ridicată</button>
+      <button class="btn btn-danger btn-sm" data-ost="${esc(o.id)}|anulata">Anulează</button>`;
     return `
     <div class="o-card" style="border-left-color:${st.c}">
       <div class="o-head">
@@ -1027,17 +1189,22 @@ function renderOrdersTab(){
         <a href="tel:${esc(o.client.tel)}"><svg class="ic ic-s" aria-hidden="true"><use href="#i-phone"/></svg> ${esc(fmtTel(o.client.tel))}</a>
       </div>
       ${o.note ? `<div class="o-note">„${esc(o.note)}”</div>` : ''}
-      ${btns ? `<div class="o-btns">${btns}</div>` : ''}
+      <div class="o-btns">
+        ${btns}
+        <button class="btn btn-ghost btn-sm o-del" data-odel="${esc(o.id)}"><svg class="ic ic-s" aria-hidden="true"><use href="#i-trash"/></svg> Șterge</button>
+      </div>
     </div>`;
-  }).join('') : `<div class="empty-box"><div class="e">🧾</div>Nicio comandă ${orderFilter === 'toate' ? 'încă' : 'în această categorie'}.<br>Comenzile plasate de clienți pe site apar aici instant.</div>`;
-  tb.innerHTML = stats + fRow + cards;
+  }).join('') : `<div class="empty-box"><div class="e">${loading ? '⏳' : '🧾'}</div>${loading ? 'Se încarcă comenzile din cloud…' : `Nicio comandă ${orderFilter === 'toate' ? 'încă' : 'în această categorie'}.<br>Comenzile plasate de clienți pe site apar aici instant.`}</div>`;
+  tb.innerHTML = connLine() + stats + fRow + cards;
   $$('#tabBody [data-ofilter]').forEach(b => b.onclick = () => { orderFilter = b.dataset.ofilter; renderAdmin(); });
   $$('#tabBody [data-ost]').forEach(b => b.onclick = () => {
     const [id, st] = b.dataset.ost.split('|');
-    const o = DB.orders.find(x => x.id === id);
-    if(!o) return;
     if(st === 'anulata' && !confirm('Sigur anulezi comanda #' + id + '?')) return;
-    o.status = st; saveDB(); renderAdmin();
+    setOrderStatus(id, st);
+  });
+  $$('#tabBody [data-odel]').forEach(b => b.onclick = () => {
+    const id = b.dataset.odel;
+    if(confirm('Ștergi definitiv comanda #' + id + '? (folosește după ce ai predat-o)')) deleteOrder(id);
   });
 }
 
@@ -1087,12 +1254,12 @@ function renderMenuTab(){
     const it = itemById(b.dataset.del);
     if(it && confirm('Ștergi definitiv „' + it.name + '”?')){
       DB.items = DB.items.filter(x => x.id !== it.id);
-      saveDB(); renderSite(); renderAdmin();
+      saveDB(); cloudDeleteItem(it.id); renderSite(); renderAdmin();
     }
   });
   $$('#tabBody [data-avail]').forEach(sw => sw.onchange = () => {
     const it = itemById(sw.dataset.avail);
-    if(it){ it.available = sw.checked; saveDB(); renderSite(); toast(sw.checked ? '✅ „' + it.name + '” e din nou pe site' : '🚫 „' + it.name + '” marcat indisponibil'); }
+    if(it){ it.available = sw.checked; saveDB(); cloudUpsertItem(it); renderSite(); toast(sw.checked ? '✅ „' + it.name + '” e din nou pe site' : '🚫 „' + it.name + '” marcat indisponibil'); }
   });
 }
 
@@ -1100,7 +1267,15 @@ function renderSettingsTab(){
   const s = DB.settings;
   const used = Math.round(JSON.stringify(DB).length / 1024);
   const pct = Math.min(100, Math.round(used / 4800 * 100));
+  const connCard = SB.on
+    ? `<div class="conn-line ${cloudReady ? 'ok' : 'wait'}" style="margin:0"><span class="d"></span>${cloudReady ? 'Conectat la Supabase — comenzile și pozele se salvează în cloud și ajung pe orice dispozitiv.' : 'Datele Supabase sunt completate; se testează conexiunea…'}</div>`
+    : `<div class="conn-line local" style="margin:0"><span class="d"></span>Supabase neconfigurat — comenzile și pozele rămân doar pe acest dispozitiv. Trimite-i cheile lui Claude ca să le pună în cod.</div>`;
   $('#tabBody').innerHTML = `
+    <div class="set-card">
+      <h3><svg class="ic" aria-hidden="true"><use href="#i-settings"/></svg> Comenzi &amp; poze în cloud</h3>
+      ${connCard}
+      <div class="hint">Aici comenzile clienților ajung la tine în timp real, iar pozele încărcate se văd de toată lumea. Cheile se pun o singură dată în cod (sunt publice, sigure).</div>
+    </div>
     <div class="set-card">
       <h3><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg> Stare local</h3>
       <div class="open-row">
@@ -1137,11 +1312,10 @@ function renderSettingsTab(){
         <button class="btn btn-danger btn-sm" id="resetBtn"><svg class="ic ic-s" aria-hidden="true"><use href="#i-trash"/></svg> Resetează meniul</button>
       </div>
       <div class="storage-bar"><i style="width:${pct}%"></i></div>
-      <div class="hint">Spațiu folosit: ~${used} KB din ~5.000 KB disponibili în browser. Pozele mari ocupă cel mai mult — se optimizează automat la încărcare.
-      <br>Datele (meniu, comenzi, setări) se salvează local, în browserul acestui dispozitiv.</div>
+      <div class="hint">Spațiu local folosit: ~${used} KB din ~5.000 KB. ${SB.on ? 'Cu Supabase conectat, pozele și comenzile stau în cloud, nu în acest spațiu.' : 'Pozele mari ocupă cel mai mult — se optimizează automat la încărcare.'}</div>
     </div>
     <div class="save-fab"><button class="btn btn-gold btn-block" id="saveSettings" style="min-height:54px">💾 Salvează setările</button></div>`;
-  $('#sOpen').onchange = e => { DB.settings.isOpen = e.target.checked; saveDB(); renderSite(); renderAdmin(); toast(e.target.checked ? '🟢 Local marcat DESCHIS' : '🔴 Local marcat ÎNCHIS'); };
+  $('#sOpen').onchange = e => { DB.settings.isOpen = e.target.checked; saveDB(); cloudSaveSettings(); renderSite(); renderAdmin(); toast(e.target.checked ? '🟢 Local marcat DESCHIS' : '🔴 Local marcat ÎNCHIS'); };
   $('#saveSettings').onclick = () => {
     const s2 = DB.settings;
     s2.address = $('#sAddr').value.trim() || s2.address;
@@ -1151,7 +1325,7 @@ function renderSettingsTab(){
     s2.promo = $('#sPromo').value.trim();
     s2.policyTerms = $('#sTerms').value;
     s2.policyPrivacy = $('#sPrivacy').value;
-    saveDB(); renderSite(); toast('💾 Setări salvate ✓');
+    saveDB(); cloudSaveSettings(); renderSite(); toast(SB.on ? '💾 Setări salvate (și în cloud) ✓' : '💾 Setări salvate ✓');
   };
   $('#expBtn').onclick = () => {
     const blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
@@ -1260,17 +1434,30 @@ function openEditor(id){
   $('#edSave').onclick = saveItem;
   $('#addIng').onclick = () => $('#ingRows').insertAdjacentHTML('beforeend', ingRowHTML());
   m.onclick = e => { const d = e.target.closest('[data-ing-del]'); if(d) d.closest('.ing-row').remove(); };
+  const showPreview = src => {
+    const prev = $('#edImgPrev');
+    const img = document.createElement('img'); img.src = src; img.id = 'edImgPrev'; img.alt = 'Poza produsului';
+    prev.replaceWith(img);
+    $('#eImgDel').style.display = '';
+  };
   $('#eImgInput').onchange = e => {
     const f = e.target.files[0]; if(!f) return;
-    resizeImage(f, dataURL => {
-      edState.img = dataURL;
-      const box = $('#photoBox');
-      const prev = $('#edImgPrev');
-      const img = document.createElement('img'); img.src = dataURL; img.id = 'edImgPrev'; img.alt = 'Poza produsului';
-      prev.replaceWith(img);
-      $('#eImgDel').style.display = '';
-      toast('📷 Poză încărcată — apasă „Salvează”');
-    });
+    if(SB.on){
+      toast('📤 Se încarcă poza în cloud…');
+      resizeImageBlob(f, async (blob, dataURL) => {
+        showPreview(dataURL);              // preview instant
+        try{
+          edState.img = await SB.uploadPhoto(blob);
+          toast('📷 Poză încărcată — apasă „Salvează”');
+        }catch(err){
+          console.warn('Upload cloud eșuat:', err.message);
+          edState.img = dataURL;           // fallback: rămâne poza locală
+          toast('⚠️ Nu am putut urca în cloud — folosesc poza locală. Verifică bucket-ul „menu-photos".');
+        }
+      });
+    } else {
+      resizeImage(f, dataURL => { edState.img = dataURL; showPreview(dataURL); toast('📷 Poză încărcată — apasă „Salvează”'); });
+    }
   };
   $('#eImgDel').onclick = () => {
     edState.img = null;
@@ -1302,15 +1489,16 @@ function saveItem(){
     available: $('#eAvail').checked,
     img: edState.img, ing
   };
+  let saved;
   if(edState.id){
-    Object.assign(itemById(edState.id), data);
+    saved = itemById(edState.id); Object.assign(saved, data);
   } else {
-    DB.items.push(Object.assign({ id: uid() }, data));
+    saved = Object.assign({ id: uid() }, data); DB.items.push(saved);
   }
-  saveDB(); closeEditor(); renderSite(); renderAdmin();
+  saveDB(); cloudUpsertItem(saved); closeEditor(); renderSite(); renderAdmin();
   toast('✅ „' + name + '” a fost salvat în meniu');
 }
-function resizeImage(file, cb){
+function drawResized(file, cb){
   const r = new FileReader();
   r.onload = () => {
     const img = new Image();
@@ -1322,12 +1510,26 @@ function resizeImage(file, cb){
       const c = document.createElement('canvas');
       c.width = w; c.height = h;
       c.getContext('2d').drawImage(img, 0, 0, w, h);
-      cb(c.toDataURL('image/jpeg', 0.78));
+      cb(c);
     };
     img.onerror = () => toast('⚠️ Nu am putut citi imaginea — încearcă un JPG/PNG.');
     img.src = r.result;
   };
   r.readAsDataURL(file);
+}
+function resizeImage(file, cb){ drawResized(file, c => cb(c.toDataURL('image/jpeg', 0.78))); }
+function resizeImageBlob(file, cb){
+  drawResized(file, c => {
+    const dataURL = c.toDataURL('image/jpeg', 0.78);
+    if(c.toBlob) c.toBlob(b => cb(b || dataURLtoBlob(dataURL), dataURL), 'image/jpeg', 0.78);
+    else cb(dataURLtoBlob(dataURL), dataURL);
+  });
+}
+function dataURLtoBlob(u){
+  const [head, data] = u.split(','); const mime = /:(.*?);/.exec(head)[1];
+  const bin = atob(data); const arr = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
 }
 
 /* ================= EDITOR CATEGORIE ================= */
@@ -1355,13 +1557,13 @@ function openCatEditor(catId){
     if(!name){ $('#cName').focus(); return; }
     if(c){ c.name = name; c.note = $('#cNote').value.trim(); }
     else DB.categories.push({ id: uid(), name, note: $('#cNote').value.trim() });
-    saveDB(); renderSite(); renderAdmin(); m.classList.remove('open');
+    saveDB(); cloudSyncCats(); renderSite(); renderAdmin(); m.classList.remove('open');
     toast('✅ Categorie salvată');
   };
   const del = $('#cDel');
   if(del) del.onclick = () => {
     DB.categories = DB.categories.filter(x => x.id !== c.id);
-    saveDB(); renderSite(); renderAdmin(); m.classList.remove('open');
+    saveDB(); cloudDeleteCat(c.id); renderSite(); renderAdmin(); m.classList.remove('open');
   };
 }
 
@@ -1375,7 +1577,7 @@ function toast(msg){
   toastT = setTimeout(() => t.classList.remove('show'), 2800);
 }
 function updateTitle(){
-  const n = DB.orders.filter(o => o.status === 'noua').length;
+  const n = getOrders().filter(o => o.status === 'noua').length;
   const adminOpen = !$('#adminView').classList.contains('hidden');
   document.title = (adminOpen && n ? `(${n}) ` : '') + 'King Bistro — Meniu & Comandă cu Ridicare';
 }
@@ -1386,7 +1588,7 @@ function route(){
   $('#siteView').classList.toggle('hidden', admin);
   $('#adminView').classList.toggle('hidden', !admin);
   if(admin){ closeSheet(); renderAdmin(); window.scrollTo(0, 0); }
-  else { renderSite(); }
+  else { stopOrdPoll(); renderSite(); }
   updateTitle();
 }
 window.addEventListener('hashchange', route);
@@ -1456,6 +1658,7 @@ document.addEventListener('keydown', e => {
 
 /* ================= START ================= */
 route();
+bootstrap();   // dacă Supabase e configurat, aduce meniul/comenzile din cloud
 </script>
 </body>
 </html>

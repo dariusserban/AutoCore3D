@@ -24,13 +24,28 @@ Site complet într-un singur fișier: **`index.html`**. Nu are nevoie de server,
 - **Meniu:** adaugi/editezi/ștergi produse — nume, categorie, preț, descriere, **ingrediente cu gramaje**, etichete (⭐ Cel mai vândut / 🔥 Nou / % Promoție), variantă picantă, disponibil/indisponibil și **poză** (se optimizează automat la max. 900px).
 - **Setări:** adresă, telefon, program, timp de pregătire, banner promoțional, comutator **Deschis/Închis**, politici (Termeni + Confidențialitate), export/import date (JSON), resetare meniu.
 
-## Important de știut (versiunea demo)
+## Conectare Supabase (comenzi reale + poze partajate)
 
-1. **Datele se salvează local în browser** (localStorage). Meniul, pozele și comenzile rămân salvate pe dispozitivul respectiv, chiar și după închiderea browserului.
-2. **Limitare:** o comandă plasată de un client de pe telefonul LUI ajunge doar în admin-ul deschis pe ACELAȘI dispozitiv/browser. Pentru comenzi reale de la clienți e nevoie de un mic backend (ex. Firebase/Supabase) — acesta e pasul următor firesc înainte de lansare; site-ul e pregătit pentru asta.
+Fără Supabase, site-ul merge, dar comenzile și pozele rămân doar pe dispozitivul curent. Cu Supabase conectat, comenzile clienților ajung la tine pe orice dispozitiv, iar pozele se văd de toată lumea. Pași:
+
+1. Cont gratuit pe [supabase.com](https://supabase.com) → **New project** (ține minte parola de bază de date).
+2. În proiect: **SQL Editor → New query** → lipește tot conținutul din **[`supabase-setup.sql`](./supabase-setup.sql)** → **Run**. (creează tabelele, regulile de securitate și bucket-ul de poze `menu-photos`.)
+3. **Project Settings → API** → copiază **Project URL** și cheia **`anon` / `public`** (NU `service_role`).
+4. În `index.html`, la începutul scriptului, completează:
+   ```js
+   const SB_URL = 'https://xxxxxxxx.supabase.co';   // Project URL
+   const SB_KEY = 'eyJhbGciOi...';                   // cheia anon / public
+   ```
+5. `git push` (sau lasă-l pe Claude să pună cheile) → Vercel reface deploy-ul. În **Admin → Setări** vei vedea „🟢 Conectat la Supabase".
+
+**Cum e protejat:** clientul poate DOAR să trimită comenzi; citirea, schimbarea de status și ștergerea comenzilor se fac doar cu parola ta (verificată în Supabase), deci telefoanele clienților nu pot fi citite de cineva care are doar cheia publică. Ștergi comenzile executate din panou, cu butonul **Șterge**.
+
+## Important de știut
+
+1. **Fără Supabase**, datele se salvează local în browser (localStorage) — bune pentru test, dar o comandă de pe telefonul unui client ajunge doar în admin-ul de pe ACELAȘI dispozitiv. De aceea conectezi Supabase înainte de lansarea reală (pași mai sus).
+2. Parola de admin (`kingbistro2026`) e o barieră de acces, nu securitate militară — e vizibilă pentru cine citește codul. Dacă o schimbi în `index.html` (`ADMIN_PASS`), schimb-o și în `supabase-setup.sql` (în cele 3 funcții `kb_orders_*`).
 3. Gramajele din meniul demo sunt **orientative** — trece-le pe cele reale din Admin → Meniu.
-4. Parola de admin e doar o barieră de acces în pagină, nu securitate reală (oricine citește codul sursă o poate vedea). Suficient pentru demo, de înlocuit la lansare.
-5. Spațiul de stocare din browser e ~5 MB — pozele se comprimă automat, iar în Admin → Setări vezi cât spațiu s-a folosit.
+4. Fără Supabase, spațiul local din browser e ~5 MB — pozele se comprimă automat. Cu Supabase, pozele stau în cloud, nu în acest spațiu.
 
 ## Când vrei să apară pe Google la „King Bistro"
 
@@ -42,7 +57,20 @@ Site-ul are deja titlul, descrierea și datele structurate (schema.org `FastFood
 ## Structură
 
 ```
-king-bistro/
-├── index.html   ← tot site-ul (pagina publică + panoul admin + logică)
-└── README.md    ← acest fișier
+kingbistro/
+├── index.html          ← tot site-ul (pagina publică + panoul admin + logică)
+├── supabase-setup.sql  ← se lipește o dată în Supabase (tabele + securitate + poze)
+├── vercel.json         ← configurare de deploy pentru Vercel
+└── README.md           ← acest fișier
 ```
+
+## Deploy pe Vercel
+
+`index.html` stă în rădăcina repo-ului, deci Vercel îl servește automat, fără build.
+
+1. Cont gratuit pe [vercel.com](https://vercel.com) (login cu GitHub).
+2. **Add New Project** → alegi repo-ul `dariusserban/kingbistro` → Framework Preset **Other** → **Deploy** (fără build command).
+3. Primești un link `…vercel.app` pentru test.
+4. **Project Settings → Domains** → adaugi domeniul cumpărat; Vercel îți dă înregistrările DNS de pus la registrator, iar HTTPS vine automat.
+
+Orice `git push` pe branch-ul `main` declanșează un deploy nou.
