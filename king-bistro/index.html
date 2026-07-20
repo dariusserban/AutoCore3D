@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KingBistro">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230A0A0C'/%3E%3Cpath d='M4 15.5 3 7.5l4.6 3.4L12 4l4.4 6.9L21 7.5l-1 8H4z' fill='%23FFC400'/%3E%3Crect x='4' y='17' width='16' height='2.4' rx='1.2' fill='%23FFC400'/%3E%3C/svg%3E">
-<script type="application/ld+json">
+<script type="application/ld+json" id="ldjson">
 {
   "@context": "https://schema.org",
   "@type": "FastFoodRestaurant",
@@ -25,7 +25,7 @@
   "description": "Fast food cu meniuri de pui crispy, hamburger, șnițel, aripioare și sandwich-uri. Comandă cu ridicare din local.",
   "servesCuisine": ["Fast food", "Pui crispy", "Burgeri", "Sandwich-uri"],
   "priceRange": "8–30 RON",
-  "address": { "@type": "PostalAddress", "streetAddress": "Sat Araci, comuna Vâlcele, nr. 346", "addressRegion": "Covasna", "addressCountry": "RO" }
+  "address": { "@type": "PostalAddress", "addressCountry": "RO" }
 }
 </script>
 <style>
@@ -582,26 +582,27 @@ const CLIENT_KEY = 'kingbistro_client_v1';
 const AUTH_KEY = 'kingbistro_admin';
 const ADMIN_PASS = 'kingbistro2026';
 
-/* Date legale firmă — din Certificatul de Înregistrare ONRC (afișate în footer + politici) */
-const LEGAL = {
+/* Date legale firmă IMPLICITE — din Certificatul de Înregistrare ONRC.
+   Sunt doar valori de pornire: se editează din Admin → Setări → „Date legale firmă"
+   și se salvează în cloud. Adresa afișată clienților e cea din Admin → Setări → Adresă. */
+const LEGAL_DEFAULT = {
   company:  'CONTUR MAGAZIN S.R.L.',
   cui:      '48369968',
   regNo:    'J2023017850080',
-  euid:     'ROONRC.J2023017850080',
   office:   'Sat Araci, comuna Vâlcele, jud. Covasna, nr. 346',
-  activity: '5611 – Restaurante',
-  director: 'Geanina Adela Toma',
-  regDate:  '22.06.2023'
+  director: 'Geanina Adela Toma'
 };
+function legal(){ return Object.assign({}, LEGAL_DEFAULT, (DB.settings && DB.settings.legal) ? DB.settings.legal : {}); }
 function legalTextBlock(){
-  return 'Date de identificare ale operatorului:\n'
-    + LEGAL.company + '\n'
-    + 'Cod Unic de Înregistrare (CUI): ' + LEGAL.cui + '\n'
-    + 'Nr. de ordine în registrul comerțului: ' + LEGAL.regNo + '\n'
-    + 'EUID: ' + LEGAL.euid + '\n'
-    + 'Sediul social: ' + LEGAL.office + '\n'
-    + 'Obiect de activitate: ' + LEGAL.activity + ' (înregistrat la ' + LEGAL.regDate + ')\n'
-    + 'Administrator: ' + LEGAL.director;
+  const L = legal();
+  const addr = (DB.settings && DB.settings.address) ? DB.settings.address : '';
+  let s = 'Date de identificare ale operatorului:\n' + L.company;
+  if(L.cui)    s += '\nCod Unic de Înregistrare (CUI): ' + L.cui;
+  if(L.regNo)  s += '\nNr. de ordine în registrul comerțului: ' + L.regNo + '\nEUID: ROONRC.' + L.regNo;
+  if(L.director) s += '\nAdministrator: ' + L.director;
+  if(L.office)   s += '\nSediu social: ' + L.office;
+  if(addr)       s += '\nAdresă punct de lucru (ridicare comenzi): ' + addr;
+  return s;
 }
 
 const $  = q => document.querySelector(q);
@@ -752,6 +753,7 @@ function seed(){
       pickupMinutes: '15–20',
       promo: '🍟 Toate meniurile conțin cartofi + salate + sosuri',
       isOpen: true,
+      legal: Object.assign({}, LEGAL_DEFAULT),
       policyTerms: 'Comenzile plasate pe acest site se pregătesc și se ridică exclusiv din locația KingBistro.\n\n• Plata se face la ridicare (numerar sau card, în funcție de disponibilitate).\n• Timpul mediu de pregătire este de 15–20 de minute, în intervalul orar de funcționare.\n• Gramajele afișate sunt pentru produsul crud/înainte de preparare și pot varia cu ±10%.\n• Pentru modificarea sau anularea unei comenzi, vă rugăm să sunați la numărul de telefon afișat pe site.',
       policyPrivacy: 'Datele introduse la plasarea comenzii (nume, prenume, număr de telefon) sunt folosite exclusiv pentru pregătirea și predarea comenzii. Nu le transmitem către terți și nu le folosim în scop de marketing fără acordul dumneavoastră.\n\nComanda este preluată prin serviciul Supabase, folosit ca infrastructură de stocare. Puteți solicita ștergerea datelor sunând la numărul de telefon afișat pe site.'
     },
@@ -924,7 +926,26 @@ function renderStatic(){
   pill.classList.toggle('closed', !s.isOpen);
   $('#statusTxt').textContent = s.isOpen ? 'Deschis' : 'Închis';
   $('#yr').textContent = new Date().getFullYear();
-  $('#fLegal').textContent = LEGAL.company + ' • CUI ' + LEGAL.cui + ' • Nr. reg. com. ' + LEGAL.regNo + ' • Sediu social: ' + LEGAL.office;
+  const L = legal();
+  $('#fLegal').textContent = [L.company, L.cui ? 'CUI ' + L.cui : '', L.regNo ? 'Nr. reg. com. ' + L.regNo : '']
+    .filter(Boolean).join(' • ');
+  updateSeo();
+}
+function updateSeo(){
+  const el = $('#ldjson'); if(!el) return;
+  const L = legal(), s = DB.settings;
+  try{
+    el.textContent = JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'FastFoodRestaurant',
+      name: 'KingBistro', alternateName: 'King Bistro',
+      legalName: L.company || undefined, taxID: L.cui || undefined,
+      description: 'Fast food cu meniuri de pui crispy, hamburger, șnițel, aripioare și sandwich-uri. Comandă cu ridicare din local.',
+      servesCuisine: ['Fast food', 'Pui crispy', 'Burgeri', 'Sandwich-uri'],
+      priceRange: '8–30 RON',
+      telephone: (s.phone && !/^0722 000 000$/.test(s.phone)) ? s.phone : undefined,
+      address: { '@type': 'PostalAddress', streetAddress: s.address || undefined, addressCountry: 'RO' }
+    });
+  }catch(e){}
 }
 function renderSite(){ renderStatic(); renderMenu(); renderBar(); }
 
@@ -1298,6 +1319,7 @@ function renderMenuTab(){
 
 function renderSettingsTab(){
   const s = DB.settings;
+  const lg = legal();
   const used = Math.round(JSON.stringify(DB).length / 1024);
   const pct = Math.min(100, Math.round(used / 4800 * 100));
   const connCard = SB.on
@@ -1320,7 +1342,7 @@ function renderSettingsTab(){
     <div class="set-card">
       <h3><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg> Date local</h3>
       <div class="f-grid">
-        <div class="fld"><label for="sAddr">Adresă (afișată la comandă)</label><input class="inp" id="sAddr" value="${esc(s.address)}"></div>
+        <div class="fld"><label for="sAddr">Adresă local — de ridicare (afișată clienților la comandă)</label><input class="inp" id="sAddr" value="${esc(s.address)}"></div>
         <div class="fld"><label for="sPhone">Telefon</label><input class="inp" id="sPhone" type="tel" value="${esc(s.phone)}"></div>
         <div class="fld"><label for="sSchedule">Program (câte un rând pe interval)</label><textarea class="inp" id="sSchedule" rows="3">${esc(s.schedule)}</textarea></div>
         <div class="f-grid two">
@@ -1328,6 +1350,19 @@ function renderSettingsTab(){
           <div class="fld"><label for="sPromo">Banner promo (prima pagină)</label><input class="inp" id="sPromo" value="${esc(s.promo)}"></div>
         </div>
       </div>
+    </div>
+    <div class="set-card">
+      <h3><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg> Date legale firmă</h3>
+      <div class="f-grid">
+        <div class="fld"><label for="lCompany">Denumire firmă</label><input class="inp" id="lCompany" value="${esc(lg.company || '')}"></div>
+        <div class="f-grid two">
+          <div class="fld"><label for="lCui">CUI</label><input class="inp" id="lCui" value="${esc(lg.cui || '')}"></div>
+          <div class="fld"><label for="lReg">Nr. reg. comerțului</label><input class="inp" id="lReg" value="${esc(lg.regNo || '')}"></div>
+        </div>
+        <div class="fld"><label for="lAdmin">Administrator</label><input class="inp" id="lAdmin" value="${esc(lg.director || '')}"></div>
+        <div class="fld"><label for="lOffice">Sediu social (din certificat — apare doar în „Termeni")</label><input class="inp" id="lOffice" value="${esc(lg.office || '')}"></div>
+      </div>
+      <div class="hint">Astea apar în footer și în Termeni și condiții. Adresa afișată clienților este cea de mai sus (Adresă local), nu sediul social.</div>
     </div>
     <div class="set-card">
       <h3><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg> Politici site</h3>
@@ -1358,6 +1393,13 @@ function renderSettingsTab(){
     s2.promo = $('#sPromo').value.trim();
     s2.policyTerms = $('#sTerms').value;
     s2.policyPrivacy = $('#sPrivacy').value;
+    s2.legal = {
+      company:  $('#lCompany').value.trim(),
+      cui:      $('#lCui').value.trim(),
+      regNo:    $('#lReg').value.trim(),
+      director: $('#lAdmin').value.trim(),
+      office:   $('#lOffice').value.trim()
+    };
     saveDB(); cloudSaveSettings(); renderSite(); toast(SB.on ? '💾 Setări salvate (și în cloud) ✓' : '💾 Setări salvate ✓');
   };
   $('#expBtn').onclick = () => {
