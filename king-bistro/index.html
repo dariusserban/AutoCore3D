@@ -3,26 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>King Bistro — Meniu & Comandă cu Ridicare</title>
-<meta name="description" content="King Bistro — meniuri cu pui crispy, hamburger, șnițel, aripioare și sandwich-uri. Comandă online și ridică din local în ~15 minute. Toate meniurile conțin cartofi, salate și sosuri.">
-<meta property="og:title" content="King Bistro — Meniu & Comandă cu Ridicare">
+<title>KingBistro — Meniu & Comandă cu Ridicare</title>
+<meta name="description" content="KingBistro — meniuri cu pui crispy, hamburger, șnițel, aripioare și sandwich-uri. Comandă online și ridică din local în ~15 minute. Toate meniurile conțin cartofi, salate și sosuri.">
+<meta property="og:title" content="KingBistro — Meniu & Comandă cu Ridicare">
 <meta property="og:description" content="Comanzi în 30 de secunde, ridici din local. Toate meniurile conțin cartofi + salate + sosuri.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0A0A0C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="King Bistro">
+<meta name="apple-mobile-web-app-title" content="KingBistro">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230A0A0C'/%3E%3Cpath d='M4 15.5 3 7.5l4.6 3.4L12 4l4.4 6.9L21 7.5l-1 8H4z' fill='%23FFC400'/%3E%3Crect x='4' y='17' width='16' height='2.4' rx='1.2' fill='%23FFC400'/%3E%3C/svg%3E">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FastFoodRestaurant",
-  "name": "King Bistro",
+  "name": "KingBistro",
+  "alternateName": "King Bistro",
+  "legalName": "CONTUR MAGAZIN S.R.L.",
+  "taxID": "48369968",
   "description": "Fast food cu meniuri de pui crispy, hamburger, șnițel, aripioare și sandwich-uri. Comandă cu ridicare din local.",
   "servesCuisine": ["Fast food", "Pui crispy", "Burgeri", "Sandwich-uri"],
   "priceRange": "8–30 RON",
-  "address": { "@type": "PostalAddress", "addressCountry": "RO" }
+  "address": { "@type": "PostalAddress", "streetAddress": "Sat Araci, comuna Vâlcele, nr. 346", "addressRegion": "Covasna", "addressCountry": "RO" }
 }
 </script>
 <style>
@@ -202,6 +205,8 @@ footer.site .f-brand{font-weight:900;font-size:16px;margin-bottom:8px}
 footer.site .f-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:10px 0}
 footer.site .f-links button,footer.site .f-links a{background:none;border:0;color:var(--muted);font-size:13px;font-weight:700;padding:6px 2px}
 footer.site .f-links a:hover,footer.site .f-links button:hover{color:var(--gold)}
+footer.site .f-brand .gold{color:var(--gold)}
+footer.site .legal-line{max-width:640px;margin:0 auto 10px;color:var(--muted-2);font-size:11.5px;line-height:1.6}
 footer.site small{color:var(--muted-2);font-size:12px}
 
 /* ---------- Cart bar ---------- */
@@ -463,13 +468,13 @@ textarea.inp{min-height:64px;resize:vertical}
 <div id="siteView">
   <header class="top">
     <div class="container top-in">
-      <a class="brand" href="#" aria-label="King Bistro — prima pagină">
+      <a class="brand" href="#" aria-label="KingBistro — prima pagină">
         <svg class="crown" aria-hidden="true"><use href="#i-crown"/></svg>
-        King&nbsp;<b>Bistro</b>
+        King<b>Bistro</b>
       </a>
       <div class="top-right">
         <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusTxt">Deschis</span></span>
-        <a class="call-btn" id="callBtn" href="tel:" aria-label="Sună la King Bistro"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></a>
+        <a class="call-btn" id="callBtn" href="tel:" aria-label="Sună la KingBistro"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg></a>
       </div>
     </div>
   </header>
@@ -513,13 +518,14 @@ textarea.inp{min-height:64px;resize:vertical}
   </section>
 
   <footer class="site">
-    <div class="f-brand">👑 King Bistro</div>
+    <div class="f-brand">👑 King<span class="gold">Bistro</span></div>
     <div class="f-links">
       <button type="button" data-policy="terms">Termeni și condiții</button>
       <button type="button" data-policy="privacy">Politica de confidențialitate</button>
       <a href="#admin">Administrare</a>
     </div>
-    <small>© <span id="yr"></span> King Bistro. Toate drepturile rezervate.</small>
+    <div class="legal-line" id="fLegal"></div>
+    <small>© <span id="yr"></span> KingBistro. Toate drepturile rezervate.</small>
   </footer>
 
   <button class="cart-bar away" id="cartBar" aria-label="Finalizează comanda">
@@ -565,7 +571,7 @@ textarea.inp{min-height:64px;resize:vertical}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<noscript><div style="padding:30px;text-align:center;font-weight:800">Activează JavaScript pentru a vedea meniul King Bistro.</div></noscript>
+<noscript><div style="padding:30px;text-align:center;font-weight:800">Activează JavaScript pentru a vedea meniul KingBistro.</div></noscript>
 
 <script>
 'use strict';
@@ -575,6 +581,28 @@ const CART_KEY = 'kingbistro_cart_v1';
 const CLIENT_KEY = 'kingbistro_client_v1';
 const AUTH_KEY = 'kingbistro_admin';
 const ADMIN_PASS = 'kingbistro2026';
+
+/* Date legale firmă — din Certificatul de Înregistrare ONRC (afișate în footer + politici) */
+const LEGAL = {
+  company:  'CONTUR MAGAZIN S.R.L.',
+  cui:      '48369968',
+  regNo:    'J2023017850080',
+  euid:     'ROONRC.J2023017850080',
+  office:   'Sat Araci, comuna Vâlcele, jud. Covasna, nr. 346',
+  activity: '5611 – Restaurante',
+  director: 'Geanina Adela Toma',
+  regDate:  '22.06.2023'
+};
+function legalTextBlock(){
+  return 'Date de identificare ale operatorului:\n'
+    + LEGAL.company + '\n'
+    + 'Cod Unic de Înregistrare (CUI): ' + LEGAL.cui + '\n'
+    + 'Nr. de ordine în registrul comerțului: ' + LEGAL.regNo + '\n'
+    + 'EUID: ' + LEGAL.euid + '\n'
+    + 'Sediul social: ' + LEGAL.office + '\n'
+    + 'Obiect de activitate: ' + LEGAL.activity + ' (înregistrat la ' + LEGAL.regDate + ')\n'
+    + 'Administrator: ' + LEGAL.director;
+}
 
 const $  = q => document.querySelector(q);
 const $$ = q => [...document.querySelectorAll(q)];
@@ -717,15 +745,15 @@ function seed(){
     v: 1,
     counter: 1000,
     settings: {
-      name: 'King Bistro',
+      name: 'KingBistro',
       address: 'Strada Principală nr. 1, Orașul tău (completează în Admin → Setări)',
       phone: '0722 000 000',
       schedule: 'Luni – Sâmbătă: 10:00 – 22:00\nDuminică: 11:00 – 20:00',
       pickupMinutes: '15–20',
       promo: '🍟 Toate meniurile conțin cartofi + salate + sosuri',
       isOpen: true,
-      policyTerms: 'Comenzile plasate pe acest site se pregătesc și se ridică exclusiv din locația King Bistro.\n\n• Plata se face la ridicare (numerar sau card, în funcție de disponibilitate).\n• Timpul mediu de pregătire este de 15–20 de minute, în intervalul orar de funcționare.\n• Gramajele afișate sunt pentru produsul crud/înainte de preparare și pot varia cu ±10%.\n• Pentru modificarea sau anularea unei comenzi, vă rugăm să sunați la numărul de telefon afișat pe site.\n\n[De completat: denumirea firmei (SRL/PFA), CUI, adresa sediului social.]',
-      policyPrivacy: 'Datele introduse la plasarea comenzii (nume, prenume, număr de telefon) sunt folosite exclusiv pentru pregătirea și predarea comenzii. Nu le transmitem către terți și nu le folosim în scop de marketing fără acordul dumneavoastră.\n\nÎn această versiune demonstrativă, datele rămân stocate local, în browserul dispozitivului pe care s-a plasat comanda.\n\n[De completat: operatorul de date, adresa de e-mail de contact pentru solicitări GDPR.]'
+      policyTerms: 'Comenzile plasate pe acest site se pregătesc și se ridică exclusiv din locația KingBistro.\n\n• Plata se face la ridicare (numerar sau card, în funcție de disponibilitate).\n• Timpul mediu de pregătire este de 15–20 de minute, în intervalul orar de funcționare.\n• Gramajele afișate sunt pentru produsul crud/înainte de preparare și pot varia cu ±10%.\n• Pentru modificarea sau anularea unei comenzi, vă rugăm să sunați la numărul de telefon afișat pe site.',
+      policyPrivacy: 'Datele introduse la plasarea comenzii (nume, prenume, număr de telefon) sunt folosite exclusiv pentru pregătirea și predarea comenzii. Nu le transmitem către terți și nu le folosim în scop de marketing fără acordul dumneavoastră.\n\nComanda este preluată prin serviciul Supabase, folosit ca infrastructură de stocare. Puteți solicita ștergerea datelor sunând la numărul de telefon afișat pe site.'
     },
     categories: [
       { id: 'meniuri',  name: 'Meniuri',  note: '🍟 Toate meniurile conțin cartofi + salate + sosuri — incluse în preț' },
@@ -896,6 +924,7 @@ function renderStatic(){
   pill.classList.toggle('closed', !s.isOpen);
   $('#statusTxt').textContent = s.isOpen ? 'Deschis' : 'Închis';
   $('#yr').textContent = new Date().getFullYear();
+  $('#fLegal').textContent = LEGAL.company + ' • CUI ' + LEGAL.cui + ' • Nr. reg. com. ' + LEGAL.regNo + ' • Sediu social: ' + LEGAL.office;
 }
 function renderSite(){ renderStatic(); renderMenu(); renderBar(); }
 
@@ -1069,7 +1098,11 @@ function submitOrder(){
 /* ================= POLITICI ================= */
 function openPolicy(kind){
   $('#pmTitle').textContent = kind === 'terms' ? 'Termeni și condiții' : 'Politica de confidențialitate';
-  $('#pmBody').textContent = kind === 'terms' ? DB.settings.policyTerms : DB.settings.policyPrivacy;
+  const raw = kind === 'terms' ? DB.settings.policyTerms : DB.settings.policyPrivacy;
+  // scoate la afișare eventualele rânduri placeholder „[De completat…]" (nu modifică datele salvate)
+  const cleaned = String(raw || '').split('\n').filter(l => !/\[De completat/i.test(l)).join('\n')
+    .replace(/King Bistro/g, 'KingBistro').replace(/\n{3,}/g, '\n\n').trim();
+  $('#pmBody').textContent = cleaned + '\n\n———————————\n' + legalTextBlock();
   $('#policyModal').classList.add('open'); lockScroll(true);
 }
 function closePolicy(){ $('#policyModal').classList.remove('open'); if(!sheetOpen) lockScroll(false); }
@@ -1094,7 +1127,7 @@ function renderAdmin(){
         <div class="login-card">
           <svg class="crown" aria-hidden="true"><use href="#i-crown"/></svg>
           <h2>Panou de administrare</h2>
-          <p>Zonă rezervată echipei King Bistro.</p>
+          <p>Zonă rezervată echipei KingBistro.</p>
           <form id="loginForm">
             <div class="pass-row">
               <input class="inp" type="password" id="adminPass" placeholder="Parola de acces" autocomplete="current-password" aria-label="Parola">
@@ -1117,7 +1150,7 @@ function renderAdmin(){
   const newCount = getOrders().filter(o => o.status === 'noua').length;
   el.innerHTML = `
     <div class="ad-top"><div class="container ad-top-in">
-      <span class="t"><svg class="crown" aria-hidden="true"><use href="#i-crown"/></svg> Admin — King Bistro</span>
+      <span class="t"><svg class="crown" aria-hidden="true"><use href="#i-crown"/></svg> Admin — KingBistro</span>
       <div class="ad-actions">
         <a class="btn btn-ghost btn-sm" href="#">Vezi site-ul</a>
         <button class="icon-btn" id="logoutBtn" aria-label="Ieși din cont" title="Ieși"><svg class="ic" aria-hidden="true"><use href="#i-logout"/></svg></button>
@@ -1331,7 +1364,7 @@ function renderSettingsTab(){
     const blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'king-bistro-date-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.download = 'kingbistro-date-' + new Date().toISOString().slice(0, 10) + '.json';
     a.click(); URL.revokeObjectURL(a.href);
   };
   $('#impFile').onchange = e => {
@@ -1344,7 +1377,7 @@ function renderSettingsTab(){
         if(confirm('Înlocuiești toate datele actuale cu cele din fișier?')){
           DB = d; saveDB(); renderSite(); renderAdmin(); toast('📦 Date importate ✓');
         }
-      }catch(err){ toast('⚠️ Fișier invalid — folosește un export King Bistro.'); }
+      }catch(err){ toast('⚠️ Fișier invalid — folosește un export KingBistro.'); }
     };
     r.readAsText(f);
   };
@@ -1579,7 +1612,7 @@ function toast(msg){
 function updateTitle(){
   const n = getOrders().filter(o => o.status === 'noua').length;
   const adminOpen = !$('#adminView').classList.contains('hidden');
-  document.title = (adminOpen && n ? `(${n}) ` : '') + 'King Bistro — Meniu & Comandă cu Ridicare';
+  document.title = (adminOpen && n ? `(${n}) ` : '') + 'KingBistro — Meniu & Comandă cu Ridicare';
 }
 
 /* ================= RUTARE ================= */
