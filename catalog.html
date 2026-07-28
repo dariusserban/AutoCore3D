@@ -826,6 +826,14 @@ footer{background:linear-gradient(0deg,#070F14,#12141a);border-color:var(--bdr);
 .conf-cta-btn:hover::before{transform:translateX(0);}
 .conf-cta-btn:hover{box-shadow:0 0 32px rgba(255,92,26,.5);transform:translateY(-2px);}
 .conf-cta-sub{font-family:var(--mono);font-size:.52rem;color:var(--muted);letter-spacing:.12em;}
+.conf-adv-link{display:flex;align-items:center;gap:.8rem;margin-top:1rem;padding:.85rem 1rem;border:1px solid var(--bdr);background:rgba(255,92,26,.04);text-decoration:none;transition:border-color .25s,background .25s;}
+.conf-adv-link:hover{border-color:rgba(255,92,26,.5);background:rgba(255,92,26,.08);}
+.conf-adv-link .cal-ico{font-size:1.1rem;color:var(--red);flex:none;}
+.conf-adv-link .cal-txt{display:flex;flex-direction:column;gap:.2rem;min-width:0;}
+.conf-adv-link .cal-txt b{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text);font-weight:700;}
+.conf-adv-link .cal-txt em{font-family:var(--mono);font-size:.5rem;letter-spacing:.06em;color:var(--muted);font-style:normal;line-height:1.5;}
+.conf-adv-link .cal-arrow{margin-left:auto;color:var(--red);font-size:.9rem;flex:none;transition:transform .25s;}
+.conf-adv-link:hover .cal-arrow{transform:translateX(4px);}
 @media(max-width:960px){.conf-panels{grid-template-columns:1fr;}}
 /* ── TABS ── */
 .tabs-bar{display:flex;background:#12141a;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:100;overflow-x:auto;scrollbar-width:none;box-shadow:0 4px 24px rgba(0,0,0,.5);}
@@ -928,6 +936,7 @@ body::before{content:'';position:fixed;inset:0;z-index:6;pointer-events:none;opa
     <nav>
       <a href="#" class="nav-link" data-tab="produse" data-i18n="nav_products">Proiecte</a>
       <a href="#" class="nav-link" data-tab="configurator" data-i18n="nav_configurator">Configurator</a>
+      <a href="calculator.html" class="nav-link" data-i18n="nav_calculator">Calculator</a>
       <button class="nav-cart" id="cartBtn" style="display:none">🛒<span class="cart-badge" id="cartBadge"></span></button>
       <button class="nav-admin" id="admBtn">⚙</button>
       <a href="https://wa.me/40771119423" target="_blank" class="nav-cta"><span class="nav-dot"></span><span data-i18n="nav_contact">Contact</span></a>
@@ -941,6 +950,7 @@ body::before{content:'';position:fixed;inset:0;z-index:6;pointer-events:none;opa
 <div class="tabs-bar" id="tabsBar">
   <button class="tab-btn active" data-tab="produse"><span class="tab-icon">🚗</span><span data-i18n="nav_products">Proiecte</span></button>
   <button class="tab-btn" data-tab="configurator"><span class="tab-icon">⬡</span><span data-i18n="nav_configurator">Configurator</span></button>
+  <a class="tab-btn" href="calculator.html" style="text-decoration:none"><span class="tab-icon">∑</span><span data-i18n="nav_calculator">Calculator</span></a>
 </div>
 
 <!-- ══ SECTION 1: CERERE PRINTARE 3D ══ -->
@@ -1011,6 +1021,12 @@ body::before{content:'';position:fixed;inset:0;z-index:6;pointer-events:none;opa
           <button class="conf-cta-btn" id="confCtaBtn" data-i18n="cta_btn">📲 Trimite pe WhatsApp</button>
           <span class="conf-cta-sub" data-i18n="cta_sub">Cererea ajunge direct la noi · Confirmare în 24h · Transport GRATUIT</span>
         </div>
+        <a class="conf-adv-link" href="calculator.html">
+          <span class="cal-ico">⬡</span>
+          <span class="cal-txt"><b data-i18n="adv_calc_title">Calculator avansat de preț</b>
+          <em data-i18n="adv_calc_sub">Material · curent · amortizare imprimantă · rata de eșec · recuperarea investiției — cu G-code, ca la Prusa</em></span>
+          <span class="cal-arrow">→</span>
+        </a>
       </div>
     </div>
   </div>
@@ -1611,7 +1627,8 @@ const T={
     matrix_col0:"Parametru",matrix_row1:"Temp. deformare (HDT)",matrix_row2:"Rezistență UV",matrix_row3:"Rigiditate (modul elastic)",matrix_row4:"Rezistență la impact",
     matrix_uv_low:"Scăzută",matrix_uv_high:"Ridicată",matrix_impact_low:"Fragil",matrix_impact_high:"Ridicată",matrix_impact_vhigh:"Foarte ridicată",
     final_title:"Trimite fișierul. Începem analiza.",final_text:"Încarcă un model 3D (STL/STEP), o scanare sau fotografii ale piesei. Primești o evaluare tehnică: material recomandat, timp de producție și cost.",final_btn:"📁 Încarcă fișierul",
-    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Proiecte",nav_filaments:"Filamente",
+    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Proiecte",nav_filaments:"Filamente",nav_calculator:"Calculator",
+    adv_calc_title:"Calculator avansat de preț",adv_calc_sub:"Material · curent · amortizare imprimantă · rata de eșec · recuperarea investiției — cu G-code, ca la Prusa",
     conf_eyebrow:"// 01 · CERERE PRINTARE 3D PERSONALIZATĂ",conf_title_html:"Trimite <span>Fișierul Tău</span> 3D",conf_sub:"Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.",
     upload_title:"Trage fișierul 3D aici",upload_sub:"sau apasă pentru a selecta",upload_hint:"STL / STEP — ofertă personalizată pe WhatsApp · GCODE — preț calculat automat",
     zone_label:"// ZONA PIESEI",stress_label:"// NIVEL STRES MECANIC",name_label:"// NUMELE TĂU",contact_label:"// TELEFON SAU EMAIL",name_ph:"Cum te cheamă...",contact_ph:"07XX... sau email@...",
@@ -1661,7 +1678,8 @@ const T={
     matrix_col0:"Parameter",matrix_row1:"Heat deflection temp (HDT)",matrix_row2:"UV resistance",matrix_row3:"Stiffness (elastic modulus)",matrix_row4:"Impact resistance",
     matrix_uv_low:"Low",matrix_uv_high:"High",matrix_impact_low:"Brittle",matrix_impact_high:"High",matrix_impact_vhigh:"Very high",
     final_title:"Send the file. We start the analysis.",final_text:"Upload a 3D model (STL/STEP), a scan, or photos of the part. You'll get a technical assessment: recommended material, production time, and cost.",final_btn:"📁 Upload file",
-    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Projects",nav_filaments:"Filaments",
+    nav_contact:"Contact",nav_configurator:"Configurator",nav_products:"Projects",nav_filaments:"Filaments",nav_calculator:"Calculator",
+    adv_calc_title:"Advanced price calculator",adv_calc_sub:"Material · electricity · printer depreciation · failure rate · payback time — with G-code, Prusa-style",
     conf_eyebrow:"// 01 · CUSTOM 3D PRINTING REQUEST",conf_title_html:"Send Your <span>3D File</span>",conf_sub:"Upload your STL/STEP model, choose the zone and stress level — get an instant estimated price. If you like it, send your order on WhatsApp.",
     upload_title:"Drag your 3D file here",upload_sub:"or tap to select",upload_hint:"STL / STEP — custom quote on WhatsApp · GCODE — price auto-calculated",
     zone_label:"// PART ZONE",stress_label:"// MECHANICAL STRESS",name_label:"// YOUR NAME",contact_label:"// PHONE OR EMAIL",name_ph:"Your name...",contact_ph:"07XX... or email@...",
@@ -3039,7 +3057,7 @@ function showMainTab(id){
   document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.classList.toggle('active',a.dataset.tab===id));
   window.scrollTo({top:0,behavior:'smooth'});
 }
-document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showMainTab(b.dataset.tab)));
+document.querySelectorAll('.tab-btn[data-tab]').forEach(b=>b.addEventListener('click',()=>showMainTab(b.dataset.tab)));
 document.querySelectorAll('.nav-link[data-tab]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showMainTab(a.dataset.tab);}));
 (function(){
   const id=new URLSearchParams(location.search).get('tab');

@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculator avansat de preț — imprimare 3D · AUTOCORE3D</title>
+<meta name="description" content="Calculator profesional de cost pentru imprimare 3D: material, curent electric, amortizarea imprimantei, rata de eșec, manoperă, marjă și TVA. Încarcă G-code pentru calcul exact și află în cât timp se recuperează investiția.">
+<meta property="og:title" content="Calculator avansat de preț — AUTOCORE3D">
+<meta property="og:description" content="Costul real al unei piese imprimate 3D: material + curent + amortizare + eșecuri + manoperă. Cu G-code, breakdown complet și timpul de recuperare a investiției.">
+<link rel="icon" type="image/svg+xml" href="assets/brand/autocore3d-mark-badge.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12141a;--surf:#15171d;--well:#0d0f14;--ink:#f4f2ee;--mut:#c6c4bf;--dim:#84837f;
+    --hair:rgba(242,240,236,.16);--hair2:rgba(242,240,236,.08);
+    --amber:#ff5c1a;--amber2:#ff9d66;--green:#25D366;--red:#ef4444;--yellow:#eab308;
+    --disp:'Space Grotesk',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--disp);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--ink);color:var(--bg)}
+  a{color:inherit}
+  #grain{position:fixed;inset:-50%;width:200%;height:200%;z-index:40;pointer-events:none;opacity:.05;animation:grain 8s steps(10) infinite}
+  @keyframes grain{0%,100%{transform:translate(0,0)}10%{transform:translate(-5%,-10%)}20%{transform:translate(-15%,5%)}30%{transform:translate(7%,-25%)}40%{transform:translate(-5%,25%)}50%{transform:translate(-15%,10%)}60%{transform:translate(15%,0)}70%{transform:translate(0,15%)}80%{transform:translate(3%,35%)}90%{transform:translate(-10%,10%)}}
+  @media(prefers-reduced-motion:reduce){#grain{animation:none}}
+
+  /* fundal: aura discreta + linii tehnice */
+  .bg-aura{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(820px 420px at 78% -80px,rgba(255,92,26,.075),transparent 70%),
+               radial-gradient(700px 520px at -120px 30%,rgba(90,110,140,.08),transparent 70%)}
+
+  /* ---- header ---- */
+  header{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:center;
+    padding:clamp(14px,2.4vw,22px) clamp(20px,4vw,48px);
+    background:linear-gradient(180deg,rgba(18,20,26,.92),rgba(18,20,26,.75));backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--hair2)}
+  .brand{display:flex;align-items:center;text-decoration:none}
+  .brand img{height:22px;display:block}
+  .top-links{display:flex;align-items:center;gap:clamp(14px,3vw,32px)}
+  .top-links a{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;text-decoration:none;color:var(--mut);transition:color .3s;position:relative}
+  .top-links a::after{content:'';position:absolute;left:0;bottom:-5px;height:1px;width:100%;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s}
+  .top-links a:hover{color:var(--ink)}
+  .top-links a:hover::after{transform:scaleX(1)}
+  .top-links a.here{color:var(--ink)}
+  .top-links a.here::after{transform:scaleX(1);background:var(--amber)}
+  @media(max-width:640px){.brand img{height:19px}.top-links a.hide-m{display:none}}
+
+  /* ---- hero ---- */
+  .hero{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:clamp(120px,16vh,170px) clamp(20px,4vw,48px) clamp(30px,4vw,46px)}
+  .kick{font-family:var(--mono);font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:14px;margin-bottom:22px}
+  .kick i{display:inline-block;width:30px;height:1px;background:var(--amber);flex:none}
+  .hero h1{font-weight:300;font-size:clamp(34px,5.6vw,64px);line-height:1.05;letter-spacing:-.02em;max-width:820px}
+  .hero p.sub{margin-top:18px;font-size:clamp(14px,1.35vw,17px);line-height:1.7;color:var(--mut);max-width:640px;font-weight:300}
+  .hero .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .hero .chips span{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;padding:8px 14px;border:1px solid var(--hair);color:var(--mut)}
+  .hero .chips span b{color:var(--amber);font-weight:500}
+
+  /* ---- layout ---- */
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,48px) 120px;
+    display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:clamp(24px,3vw,44px);align-items:start}
+  .col-in{display:flex;flex-direction:column;gap:clamp(18px,2.4vw,26px);min-width:0}
+  @media(max-width:1020px){.wrap{grid-template-columns:1fr}.res-panel{position:static!important}}
+
+  /* ---- carduri ---- */
+  .card{position:relative;background:var(--surf);border:1px solid var(--hair2);padding:clamp(20px,3vw,30px);overflow:hidden}
+  .card::before{content:'';position:absolute;top:0;left:0;width:44px;height:1px;background:var(--amber)}
+  .c-kick{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .c-kick i{width:22px;height:1px;background:var(--amber);flex:none}
+  .card h2{font-weight:300;font-size:clamp(20px,2.6vw,27px);letter-spacing:-.01em;margin-bottom:4px}
+  .c-sub{font-size:13px;line-height:1.6;color:var(--dim);font-weight:300;margin-bottom:18px;max-width:520px}
+  .c-ghost{position:absolute;right:14px;top:6px;font-weight:300;font-size:76px;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(242,240,236,.07);user-select:none;pointer-events:none;font-variant-numeric:tabular-nums}
+  .c-live{margin-top:16px;padding-top:14px;border-top:1px solid var(--hair2);display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .c-live .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+  .c-live .v{font-family:var(--disp);font-weight:300;font-size:22px;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+  .c-live .v small{font-size:13px;color:var(--dim);letter-spacing:0}
+
+  /* ---- campuri ---- */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:560px){.grid3{grid-template-columns:1fr 1fr}}
+  .fld{min-width:0}
+  .fld label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .in-wrap{position:relative}
+  .fld input[type=number],.fld input[type=text],.fld select{width:100%;background:var(--well);border:1px solid var(--hair);color:var(--ink);
+    font-family:var(--disp);font-size:16px;font-weight:300;padding:11px 13px;outline:none;transition:border-color .3s;border-radius:0;-moz-appearance:textfield}
+  .fld input::-webkit-outer-spin-button,.fld input::-webkit-inner-spin-button{-webkit-appearance:none}
+  .fld input:focus,.fld select:focus{border-color:var(--amber)}
+  .fld select{appearance:none;cursor:pointer;padding-right:34px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2384837f' fill='none'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 13px center}
+  .unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dim);pointer-events:none;text-transform:uppercase}
+  .in-wrap input{padding-right:52px}
+  .hint{margin-top:8px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--dim);line-height:1.6}
+  .hint b{color:var(--mut);font-weight:500}
+
+  /* range */
+  .rng{display:flex;align-items:center;gap:16px}
+  .rng input[type=range]{flex:1;appearance:none;height:2px;background:linear-gradient(90deg,var(--amber) var(--p,50%),rgba(242,240,236,.14) var(--p,50%));outline:none;cursor:pointer}
+  .rng input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;border-radius:50%;background:var(--bg);border:2px solid var(--amber);box-shadow:0 0 10px rgba(255,92,26,.5);transition:transform .2s}
+  .rng input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+  .rng input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--amber);box-shadow:0 0 10px rgba(255,92,26,.5)}
+  .rng .rv{font-family:var(--disp);font-weight:300;font-size:22px;min-width:74px;text-align:right;font-variant-numeric:tabular-nums}
+  .rng .rv small{font-size:13px;color:var(--dim)}
+
+  /* toggle */
+  .tgl{display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+  .tgl input{display:none}
+  .tgl .sw{width:38px;height:20px;border:1px solid var(--hair);border-radius:999px;position:relative;transition:border-color .3s,background .3s;flex:none}
+  .tgl .sw::after{content:'';position:absolute;left:3px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--dim);transition:transform .25s,background .3s}
+  .tgl input:checked+.sw{border-color:var(--amber);background:rgba(255,92,26,.12)}
+  .tgl input:checked+.sw::after{transform:translateX(18px);background:var(--amber)}
+  .tgl .tl{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+
+  /* ---- dropzone G-code ---- */
+  .drop{position:relative;border:1px dashed var(--hair);background:var(--well);padding:26px 20px;text-align:center;cursor:pointer;transition:border-color .3s,background .3s;margin-bottom:18px}
+  .drop:hover,.drop.over{border-color:var(--amber);background:rgba(255,92,26,.04)}
+  .drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .drop .d-ico{width:34px;height:34px;margin:0 auto 12px;opacity:.75}
+  .drop .d-t{font-weight:300;font-size:16px;margin-bottom:5px}
+  .drop .d-s{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  .drop.loaded{border-style:solid;border-color:rgba(37,211,102,.5)}
+  .gchips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+  .gchips span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:6px 10px;border:1px solid var(--hair);color:var(--mut);text-transform:uppercase}
+  .gchips span.ok{border-color:rgba(37,211,102,.4);color:var(--green)}
+  .g-clear{margin-top:12px;background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .g-clear:hover{color:var(--ink)}
+
+  /* ---- panoul de rezultate ---- */
+  .res-panel{position:sticky;top:92px;display:flex;flex-direction:column;gap:18px}
+  .res-card{background:linear-gradient(180deg,#181b22,#14161c);border:1px solid var(--hair);padding:clamp(20px,3vw,28px);position:relative;overflow:hidden}
+  .res-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--amber) 35%,var(--amber2) 50%,var(--amber) 65%,transparent)}
+  .res-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .cur-sw{display:flex;border:1px solid var(--hair)}
+  .cur-sw button{background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.18em;padding:6px 12px;cursor:pointer;transition:color .2s,background .2s}
+  .cur-sw button.on{background:var(--ink);color:var(--bg)}
+  .big-l{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim);margin:14px 0 6px}
+  .big{font-weight:300;font-size:clamp(44px,5vw,58px);line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .big small{font-size:20px;color:var(--dim);letter-spacing:0;margin-left:6px}
+  .big.na{color:var(--dim);font-size:30px}
+  .big-sub{margin-top:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+  .big-sub b{color:var(--mut);font-weight:500}
+  .mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--hair2);border:1px solid var(--hair2);margin-top:18px}
+  .mini-stats div{background:var(--surf);padding:12px 14px}
+  .mini-stats .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+  .mini-stats .v{font-weight:300;font-size:19px;font-variant-numeric:tabular-nums}
+  .mini-stats .v.pos{color:var(--green)}
+  .mini-stats .v.neg{color:var(--red)}
+
+  /* breakdown */
+  .bd{margin-top:20px;border-top:1px solid var(--hair2)}
+  .bd-row{display:grid;grid-template-columns:13px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--hair2);position:relative}
+  .bd-row .dot{width:8px;height:8px;border-radius:2px;flex:none}
+  .bd-row .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+  .bd-row .n small{display:block;letter-spacing:.08em;color:var(--dim);font-size:9px;margin-top:2px;text-transform:none}
+  .bd-row .v{font-family:var(--disp);font-weight:300;font-size:16px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .bd-row .bar{grid-column:1/4;height:2px;background:rgba(242,240,236,.07);position:relative;margin:2px 0 4px;overflow:hidden}
+  .bd-row .bar i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+  .bd-row.sum{border-bottom:1px solid var(--hair)}
+  .bd-row.sum .n{color:var(--ink)}
+  .bd-row.sum .v{font-size:18px;font-weight:400}
+  .bd-row.total .n{color:var(--amber)}
+  .bd-row.total .v{font-size:22px;color:var(--amber)}
+
+  /* donut */
+  .donut-wrap{display:flex;align-items:center;gap:20px;margin-top:20px}
+  .donut{flex:none}
+  .donut svg{display:block}
+  .dn-c{font-family:var(--disp);font-weight:300;font-size:15px;fill:var(--ink)}
+  .dn-cl{font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;fill:var(--dim);text-transform:uppercase}
+  .legend{display:flex;flex-direction:column;gap:7px;min-width:0}
+  .legend div{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--mut);text-transform:uppercase;white-space:nowrap}
+  .legend i{width:8px;height:8px;border-radius:2px;flex:none}
+  .legend b{color:var(--ink);font-weight:500;margin-left:auto;font-variant-numeric:tabular-nums}
+
+  /* payback */
+  .pb-months{display:flex;align-items:baseline;gap:10px;margin:6px 0 2px}
+  .pb-months .n{font-weight:300;font-size:46px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .pb-months .u{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+  .pb-line{height:3px;background:rgba(242,240,236,.08);position:relative;margin:16px 0 8px;overflow:visible}
+  .pb-line .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--amber),var(--amber2));width:0;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+  .pb-line .mk{position:absolute;top:-5px;width:1px;height:13px;background:var(--hair)}
+  .pb-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+  .pb-facts{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+  .pb-facts div{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+  .pb-facts b{color:var(--mut);font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
+
+  /* avertizari */
+  .warns{display:flex;flex-direction:column;gap:8px}
+  .warn{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--hair2);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;line-height:1.6;color:var(--mut)}
+  .warn i{width:7px;height:7px;border-radius:50%;flex:none;margin-top:4px}
+  .warn.err{border-color:rgba(239,68,68,.45);color:#f3b3b3}.warn.err i{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.6)}
+  .warn.wrn{border-color:rgba(234,179,8,.4)}.warn.wrn i{background:var(--yellow);box-shadow:0 0 8px rgba(234,179,8,.5)}
+  .warn.inf i{background:var(--amber);box-shadow:0 0 8px rgba(255,92,26,.5)}
+
+  /* actiuni */
+  .acts{display:flex;flex-direction:column;gap:10px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 22px;border:1px solid rgba(242,240,236,.3);border-radius:999px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;text-decoration:none;color:var(--ink);background:none;cursor:pointer;transition:background .3s,color .3s,border-color .3s}
+  .btn:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .btn.solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .btn.solid:hover{background:transparent;color:var(--ink)}
+  .btn.dim{border-color:var(--hair2);color:var(--dim)}
+  .btn.dim:hover{background:none;color:var(--ink);border-color:var(--hair)}
+  .btn svg{width:14px;height:14px;flex:none}
+  .res-foot{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);line-height:1.9;text-align:center}
+
+  /* bara mobila */
+  #mbar{position:fixed;left:0;right:0;bottom:0;z-index:25;display:none;align-items:center;justify-content:space-between;gap:14px;
+    padding:12px 18px calc(12px + env(safe-area-inset-bottom));background:rgba(13,15,20,.94);backdrop-filter:blur(10px);border-top:1px solid var(--hair)}
+  #mbar .t{font-family:var(--mono);font-size:9px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase}
+  #mbar .p{font-weight:300;font-size:24px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  #mbar a{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);text-decoration:none;border:1px solid rgba(255,92,26,.4);padding:10px 16px;border-radius:999px}
+  @media(max-width:1020px){#mbar{display:flex}}
+
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);z-index:60;background:var(--ink);color:var(--bg);
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;padding:12px 20px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;text-transform:uppercase;max-width:92vw;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  footer{position:relative;z-index:1;border-top:1px solid var(--hair2);padding:34px clamp(20px,4vw,48px) calc(90px + env(safe-area-inset-bottom));text-align:center}
+  footer .f{font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+  @media(min-width:1021px){footer{padding-bottom:44px}}
+
+  /* ---- print: oferta alba ---- */
+  #printSheet{display:none}
+  @media print{
+    body{background:#fff;color:#111}
+    header,.hero,.wrap,#mbar,#grain,.bg-aura,footer,#toast{display:none!important}
+    #printSheet{display:block;font-family:Georgia,'Times New Roman',serif;color:#111;padding:10mm 6mm;max-width:180mm;margin:0 auto}
+    #printSheet .ph{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:18px}
+    #printSheet .ph b{font-size:20px;letter-spacing:.06em}
+    #printSheet .ph span{font-size:11px;color:#666}
+    #printSheet h3{font-size:13px;text-transform:uppercase;letter-spacing:.14em;margin:18px 0 8px;color:#333}
+    #printSheet table{width:100%;border-collapse:collapse;font-size:13px}
+    #printSheet td{padding:5px 4px;border-bottom:1px solid #ddd}
+    #printSheet td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+    #printSheet tr.tot td{border-top:2px solid #111;border-bottom:none;font-weight:700;font-size:15px}
+    #printSheet .pf{margin-top:22px;font-size:10.5px;color:#777;line-height:1.7}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-aura"></div>
+<div id="grain"></div>
+
+<header>
+  <a class="brand" href="index.html"><img src="assets/brand/autocore3d-logo.svg" alt="AUTOCORE3D"></a>
+  <nav class="top-links">
+    <a href="index.html" class="hide-m">Acasă</a>
+    <a href="catalog.html">Piese</a>
+    <a href="calculator.html" class="here">Calculator</a>
+    <a href="https://wa.me/40771119423" target="_blank" rel="noopener">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="kick"><i></i>Calculator avansat — imprimare 3D</div>
+  <h1>Prețul exact,<br>la watt și la gram.</h1>
+  <p class="sub">Metodologia calculatoarelor profesionale, în limbajul AUTOCORE3D: material + curent electric + amortizarea imprimantei + rata de eșec + manoperă = costul real al piesei. Peste el, marja și TVA-ul — și afli inclusiv în cât timp își scoate imprimanta banii.</p>
+  <div class="chips">
+    <span><b>G-code</b> · completare automată</span>
+    <span><b>6</b> componente de cost</span>
+    <span><b>ROI</b> · recuperarea investiției</span>
+    <span>Se salvează în browser</span>
+  </div>
+</section>
+
+<div class="wrap">
+  <!-- ============ COLOANA DE INPUT ============ -->
+  <div class="col-in">
+
+    <!-- 01 PIESA + GCODE -->
+    <section class="card" id="c-file">
+      <div class="c-ghost">01</div>
+      <div class="c-kick"><i></i>01 — Piesă</div>
+      <h2>Timp și material consumat.</h2>
+      <p class="c-sub">Cel mai exact: trage aici G-code-ul din slicer — citim timpul, gramele și tipul de filament direct din fișier. Sau completează manual.</p>
+      <div class="drop" id="drop">
+        <input type="file" id="gfile" accept=".gcode,.gco,.gc,.bgcode,.txt">
+        <div id="dropBody">
+          <svg class="d-ico" viewBox="0 0 24 24" fill="none" stroke="#c6c4bf" stroke-width="1.2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+          <div class="d-t">Trage G-code aici</div>
+          <div class="d-s">.gcode · orice slicer — Prusa, Orca, Bambu, Cura</div>
+        </div>
+      </div>
+      <div class="grid3">
+        <div class="fld"><label for="qHours">Timp imprimare</label>
+          <div class="in-wrap"><input type="number" id="qHours" min="0" max="500" step="1" value="6"><span class="unit">ore</span></div></div>
+        <div class="fld"><label for="qMins">&nbsp;</label>
+          <div class="in-wrap"><input type="number" id="qMins" min="0" max="59" step="1" value="30"><span class="unit">min</span></div></div>
+        <div class="fld"><label for="qGrams">Greutate piesă</label>
+          <div class="in-wrap"><input type="number" id="qGrams" min="0" max="20000" step="1" value="120"><span class="unit">g</span></div></div>
+      </div>
+      <div class="grid3" style="margin-top:14px">
+        <div class="fld"><label for="qQty">Bucăți în comandă</label>
+          <div class="in-wrap"><input type="number" id="qQty" min="1" max="999" step="1" value="1"><span class="unit">buc</span></div></div>
+      </div>
+    </section>
+
+    <!-- 02 MATERIAL -->
+    <section class="card" id="c-mat">
+      <div class="c-ghost">02</div>
+      <div class="c-kick"><i></i>02 — Material</div>
+      <h2>Filamentul, la gram.</h2>
+      <p class="c-sub">Alege materialul sau scrie prețul rolei tale. Pierderile acoperă purjarea, brim-ul și suporturile — material plătit, dar care nu ajunge în piesă.</p>
+      <div class="grid2">
+        <div class="fld"><label for="mSel">Material</label>
+          <select id="mSel"></select></div>
+        <div class="fld"><label for="mSpoolPrice">Preț rolă</label>
+          <div class="in-wrap"><input type="number" id="mSpoolPrice" min="0" step="1" value="120"><span class="unit">RON</span></div></div>
+        <div class="fld"><label for="mSpoolW">Greutate rolă</label>
+          <div class="in-wrap"><input type="number" id="mSpoolW" min="100" step="50" value="1000"><span class="unit">g</span></div></div>
+        <div class="fld"><label for="mWaste">Pierderi (purjare · suporturi)</label>
+          <div class="rng"><input type="range" id="mWaste" min="0" max="30" step="1" value="8"><span class="rv" id="mWasteVal">8<small>%</small></span></div></div>
+      </div>
+      <div class="hint" id="mHint"></div>
+      <div class="c-live"><span class="l">Cost material / piesă</span><span class="v" id="oMat">—</span></div>
+    </section>
+
+    <!-- 03 CURENT -->
+    <section class="card" id="c-power">
+      <div class="c-ghost">03</div>
+      <div class="c-kick"><i></i>03 — Curent electric</div>
+      <h2>Fiecare kilowatt-oră.</h2>
+      <p class="c-sub">Alege imprimanta — îi preluăm consumul mediu și, mai jos, prețul de achiziție. Pentru precizie maximă, măsoară consumul real cu un contor de priză.</p>
+      <div class="grid2">
+        <div class="fld"><label for="pSel">Imprimantă</label>
+          <select id="pSel"></select></div>
+        <div class="fld"><label for="pWatts">Putere medie la imprimare</label>
+          <div class="in-wrap"><input type="number" id="pWatts" min="0" max="2000" step="5" value="150"><span class="unit">W</span></div></div>
+        <div class="fld"><label for="pKwh">Preț energie</label>
+          <div class="in-wrap"><input type="number" id="pKwh" min="0" step="0.05" value="2.00"><span class="unit">RON/kWh</span></div></div>
+      </div>
+      <div class="hint">Media include încălzirea patului și a incintei. ABS/ASA cer pat la 90–100&nbsp;°C — consum mai mare decât la PLA.</div>
+      <div class="c-live"><span class="l">Energie / piesă</span><span class="v" id="oElec">—</span></div>
+    </section>
+
+    <!-- 04 AMORTIZARE -->
+    <section class="card" id="c-amort">
+      <div class="c-ghost">04</div>
+      <div class="c-kick"><i></i>04 — Imprimantă & amortizare</div>
+      <h2>Mașina se plătește din piese.</h2>
+      <p class="c-sub">Fiecare oră de imprimare consumă din viața imprimantei: uzură, duze, plăci, service. Costul ăsta intră în piesă — altfel îl plătești tu, nu clientul.</p>
+      <div class="grid2">
+        <div class="fld"><label for="aPrice">Preț achiziție imprimantă</label>
+          <div class="in-wrap"><input type="number" id="aPrice" min="0" step="50" value="4500"><span class="unit">RON</span></div></div>
+        <div class="fld"><label for="aLife">Durată de viață estimată</label>
+          <div class="in-wrap"><input type="number" id="aLife" min="100" step="100" value="8000"><span class="unit">ore</span></div></div>
+        <div class="fld"><label for="aMaint">Mentenanță pe an</label>
+          <div class="in-wrap"><input type="number" id="aMaint" min="0" step="10" value="300"><span class="unit">RON</span></div></div>
+        <div class="fld"><label for="aUse">Utilizare pe an</label>
+          <div class="in-wrap"><input type="number" id="aUse" min="1" step="10" value="1200"><span class="unit">ore</span></div></div>
+      </div>
+      <div class="hint" id="aHint"></div>
+      <div class="c-live"><span class="l">Amortizare / piesă</span><span class="v" id="oAmort">—</span></div>
+    </section>
+
+    <!-- 05 RATA DE ESEC -->
+    <section class="card" id="c-fail">
+      <div class="c-ghost">05</div>
+      <div class="c-kick"><i></i>05 — Rata de eșec</div>
+      <h2>Imprimările care nu ies.</h2>
+      <p class="c-sub">Desprinderi, warping, pene de curent: un procent din imprimări eșuează, iar materialul, curentul și uzura lor se pierd. Costul lor se împarte pe piesele reușite.</p>
+      <div class="fld"><label for="fRate">Rată de eșec estimată</label>
+        <div class="rng"><input type="range" id="fRate" min="0" max="30" step="1" value="5"><span class="rv" id="fRateVal">5<small>%</small></span></div></div>
+      <div class="hint">5&nbsp;% = 1 imprimare din 20 eșuează. Se aplică pe material + curent + amortizare, nu pe manoperă.</div>
+      <div class="c-live"><span class="l">Cost eșecuri / piesă</span><span class="v" id="oFail">—</span></div>
+    </section>
+
+    <!-- 06 MANOPERA -->
+    <section class="card" id="c-labor">
+      <div class="c-ghost">06</div>
+      <div class="c-kick"><i></i>06 — Manoperă</div>
+      <h2>Timpul tău costă.</h2>
+      <p class="c-sub">Slicing, pregătirea plăcii, scosul piesei, ruperea suporturilor, finisarea. Imprimanta lucrează singură — tu, nu.</p>
+      <div class="grid3">
+        <div class="fld"><label for="lPrep">Pregătire</label>
+          <div class="in-wrap"><input type="number" id="lPrep" min="0" step="5" value="10"><span class="unit">min</span></div></div>
+        <div class="fld"><label for="lPost">Post-procesare</label>
+          <div class="in-wrap"><input type="number" id="lPost" min="0" step="5" value="15"><span class="unit">min</span></div></div>
+        <div class="fld"><label for="lRate">Tarif orar</label>
+          <div class="in-wrap"><input type="number" id="lRate" min="0" step="5" value="50"><span class="unit">RON/h</span></div></div>
+      </div>
+      <div class="c-live"><span class="l">Manoperă / piesă</span><span class="v" id="oLabor">—</span></div>
+    </section>
+
+    <!-- 07 MARJA & TAXE -->
+    <section class="card" id="c-margin">
+      <div class="c-ghost">07</div>
+      <div class="c-kick"><i></i>07 — Marjă & taxe</div>
+      <h2>De la cost, la preț.</h2>
+      <p class="c-sub">Marja acoperă riscul, garanția, discuțiile cu clientul și profitul. Peste ea, statul își ia TVA-ul.</p>
+      <div class="fld"><label for="gMargin">Marjă peste cost</label>
+        <div class="rng"><input type="range" id="gMargin" min="0" max="300" step="5" value="150"><span class="rv" id="gMarginVal">150<small>%</small></span></div></div>
+      <div class="grid2" style="margin-top:16px">
+        <div class="fld">
+          <label class="tgl" style="margin-top:26px"><input type="checkbox" id="gVat" checked><span class="sw"></span><span class="tl">Aplică TVA</span></label>
+        </div>
+        <div class="fld"><label for="gVatPct">Cotă TVA</label>
+          <div class="in-wrap"><input type="number" id="gVatPct" min="0" max="50" step="1" value="21"><span class="unit">%</span></div></div>
+        <div class="fld"><label for="gShip">Transport / comandă</label>
+          <div class="in-wrap"><input type="number" id="gShip" min="0" step="1" value="20"><span class="unit">RON</span></div></div>
+        <div class="fld">
+          <label class="tgl" style="margin-top:26px"><input type="checkbox" id="gShipInc" checked><span class="sw"></span><span class="tl">Afișat «gratuit», inclus în preț</span></label>
+        </div>
+      </div>
+      <div class="hint">Marjă 150&nbsp;% = preț de 2,5× costul — reglajul standard AUTOCORE3D.</div>
+    </section>
+  </div>
+
+  <!-- ============ PANOUL DE REZULTATE ============ -->
+  <aside class="res-panel" id="rezultat">
+    <div class="res-card">
+      <div class="res-head">
+        <div class="c-kick" style="margin:0"><i></i>Rezultat</div>
+        <div class="cur-sw"><button id="curRon" class="on">RON</button><button id="curEur">EUR</button></div>
+      </div>
+      <div class="big-l">Preț recomandat / piesă</div>
+      <div class="big" id="bigPrice">—</div>
+      <div class="big-sub" id="bigSub">completează datele piesei</div>
+      <div class="mini-stats">
+        <div><div class="l">Cost real / piesă</div><div class="v" id="msCost">—</div></div>
+        <div><div class="l">Profit / piesă</div><div class="v" id="msProfit">—</div></div>
+        <div><div class="l">Profit / oră imprimare</div><div class="v" id="msProfitH">—</div></div>
+        <div><div class="l">Energie / piesă</div><div class="v" id="msKwh">—</div></div>
+      </div>
+
+      <div class="bd" id="bdList"></div>
+
+      <div class="donut-wrap">
+        <div class="donut">
+          <svg width="150" height="150" viewBox="0 0 150 150">
+            <g id="dnSegs" transform="rotate(-90 75 75)"></g>
+            <text class="dn-c" x="75" y="72" text-anchor="middle" id="dnCenter">—</text>
+            <text class="dn-cl" x="75" y="86" text-anchor="middle">cost / piesă</text>
+          </svg>
+        </div>
+        <div class="legend" id="dnLegend"></div>
+      </div>
+    </div>
+
+    <!-- RECUPERAREA INVESTITIEI -->
+    <div class="res-card" id="c-payback">
+      <div class="c-kick" style="margin-bottom:10px"><i></i>Recuperarea investiției</div>
+      <p class="c-sub" style="margin-bottom:14px">La prețul de mai sus, în cât timp se plătește imprimanta singură?</p>
+      <div class="fld"><label for="pbHours">Ore de imprimare vândute / lună</label>
+        <div class="rng"><input type="range" id="pbHours" min="10" max="500" step="10" value="120"><span class="rv" id="pbHoursVal">120<small>h</small></span></div></div>
+      <div class="pb-months"><span class="n" id="pbMonths">—</span><span class="u" id="pbUnit">luni</span></div>
+      <div class="pb-line"><div class="fill" id="pbFill"></div><div class="mk" style="left:25%"></div><div class="mk" style="left:50%"></div><div class="mk" style="left:75%"></div></div>
+      <div class="pb-scale"><span>azi</span><span id="pbScaleMid"></span><span id="pbScaleEnd">24 luni</span></div>
+      <div class="pb-facts">
+        <div><span>Piese / lună</span><b id="pbPieces">—</b></div>
+        <div><span>Profit lunar estimat</span><b id="pbProfit">—</b></div>
+        <div><span>Imprimanta amortizată la</span><b id="pbDate">—</b></div>
+        <div><span>Sau după</span><b id="pbBreakEven">—</b></div>
+      </div>
+    </div>
+
+    <div class="warns" id="warns"></div>
+
+    <div class="acts">
+      <button class="btn solid" id="btnWa">Trimite pe WhatsApp
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.6-4.1-.1-.2-1.1-1.4-1.1-2.7s.7-1.9 1-2.2c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.4 2.6 1.6.2.1.4.1.6-.1l.7-.9c.2-.2.4-.2.6-.1l2 .9c.3.2.5.2.5.4.1.2.1.9-.1 1.5Z"/></svg>
+      </button>
+      <button class="btn" id="btnCopy">Copiază raportul</button>
+      <button class="btn" id="btnPrint">Descarcă oferta (PDF)</button>
+      <button class="btn dim" id="btnReset">Resetează valorile</button>
+    </div>
+    <div class="res-foot">Se salvează automat în acest browser<br>Estimare de cost — nu e ofertă fermă</div>
+  </aside>
+</div>
+
+<div id="mbar">
+  <div><div class="t">Preț / piesă</div><div class="p" id="mbarPrice">—</div></div>
+  <a href="#rezultat">Vezi detaliile</a>
+</div>
+
+<div id="toast"></div>
+<div id="printSheet"></div>
+
+<footer><div class="f">© 2026 AUTOCORE3D — autocore3d.com · Calculator de cost imprimare 3D</div></footer>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+
+/* ============ granulatie de film (ca pe prima pagina) ============ */
+(function(){
+  var c=document.createElement('canvas');c.width=c.height=128;
+  var x=c.getContext('2d'),d=x.createImageData(128,128);
+  for(var i=0;i<d.data.length;i+=4){var v=Math.random()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=28;}
+  x.putImageData(d,0,0);
+  $('grain').style.backgroundImage='url('+c.toDataURL()+')';
+})();
+
+/* ============ DATE ============ */
+var EUR_RATE=5.20, WA='40771119423';
+var MATS={
+  pla:  {n:'PLA / PLA+',          price:90,  density:1.24, note:'Ușor de imprimat, dar se deformează la ~55 °C — nu pentru habitaclu vara.'},
+  petg: {n:'PETG',                price:100, density:1.27, note:'Tenace și rezistent chimic; bun pentru suporturi și carcase.'},
+  abs:  {n:'ABS',                 price:120, density:1.04, note:'Standardul pieselor auto: rezistă la ~90 °C, se șlefuiește frumos.'},
+  asa:  {n:'ASA',                 price:150, density:1.07, note:'ABS-ul de exterior: stabil UV, nu îngălbenește în soare.'},
+  abscf:{n:'ABS Carbon Fiber',    price:220, density:1.06, note:'Rigid, stabil dimensional, finisaj mat tehnic — piese solicitate mecanic.'},
+  asacf:{n:'ASA Carbon Fiber',    price:240, density:1.07, note:'Rigiditatea fibrei + stabilitatea UV — exterior fără compromis.'},
+  pc:   {n:'PC (policarbonat)',   price:260, density:1.20, note:'Rezistență termică ~110–120 °C; pretențios la imprimare.'},
+  pa:   {n:'PA12 / Nylon-CF',     price:350, density:1.05, note:'Uzură și frecare: bucșe, ghidaje, piese de mecanism.'},
+  tpu:  {n:'TPU flexibil',        price:180, density:1.21, note:'Garnituri, tampoane, protecții — elastic și indestructibil.'}
+};
+var PRINTERS={
+  gen:  {n:'FDM generică (incintă)',  w:150, price:4500, life:8000,  maint:300, use:1200},
+  x1c:  {n:'Bambu Lab X1 Carbon',     w:180, price:5000, life:8000,  maint:350, use:1500},
+  p1s:  {n:'Bambu Lab P1S',           w:170, price:3300, life:8000,  maint:300, use:1500},
+  mk4s: {n:'Prusa MK4S',              w:120, price:4600, life:10000, maint:250, use:1200},
+  core1:{n:'Prusa CORE One',          w:140, price:6500, life:10000, maint:250, use:1500},
+  k1max:{n:'Creality K1 Max',         w:190, price:4200, life:6000,  maint:400, use:1200},
+  custom:{n:'Personalizată…',         w:null}
+};
+var mSel=$('mSel'),pSel=$('pSel');
+Object.keys(MATS).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=MATS[k].n;mSel.appendChild(o);});
+Object.keys(PRINTERS).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=PRINTERS[k].n;pSel.appendChild(o);});
+mSel.value='abs';
+
+/* ============ STARE + PERSISTENTA ============ */
+var FIELDS=['qHours','qMins','qGrams','qQty','mSel','mSpoolPrice','mSpoolW','mWaste','pSel','pWatts','pKwh',
+            'aPrice','aLife','aMaint','aUse','fRate','lPrep','lPost','lRate','gMargin','gVat','gVatPct','gShip','gShipInc','pbHours'];
+var LS_KEY='ac3d_calc_v1';
+var CUR=localStorage.getItem('ac3d_calc_cur')||'RON';
+var gcode=null; /* {name,mins,grams,type,slicer,layer} */
+
+function saveState(){
+  var s={};
+  FIELDS.forEach(function(f){var el=$(f);s[f]=el.type==='checkbox'?el.checked:el.value;});
+  try{localStorage.setItem(LS_KEY,JSON.stringify(s));}catch(e){}
+}
+function loadState(){
+  var raw=null;
+  try{raw=localStorage.getItem(LS_KEY);}catch(e){}
+  if(!raw)return;
+  try{
+    var s=JSON.parse(raw);
+    FIELDS.forEach(function(f){
+      if(!(f in s))return;
+      var el=$(f);
+      if(el.type==='checkbox')el.checked=!!s[f];else el.value=s[f];
+    });
+  }catch(e){}
+}
+
+/* ============ FORMATARE ============ */
+function nf(x,dec){
+  return new Intl.NumberFormat('ro-RO',{minimumFractionDigits:dec,maximumFractionDigits:dec}).format(x);
+}
+function money(ron,dec){
+  if(!isFinite(ron))return '—';
+  if(CUR==='EUR'){var e=ron/EUR_RATE;return nf(e,dec===undefined?(e<20?2:0):dec)+' €';}
+  return nf(ron,dec===undefined?(ron<20?2:0):dec)+' RON';
+}
+function moneyS(ron){ /* varianta scurta pt spatii mici */
+  if(!isFinite(ron))return '—';
+  if(CUR==='EUR')return nf(ron/EUR_RATE,ron/EUR_RATE<20?1:0)+'€';
+  return nf(ron,ron<20?1:0);
+}
+function hhmm(mins){
+  var h=Math.floor(mins/60),m=Math.round(mins%60);
+  return (h?h+'h ':'')+(m?m+'m':(h?'':'0m'));
+}
+
+/* ============ CALCUL ============ */
+function readNum(id){var v=parseFloat($(id).value);return isFinite(v)?v:0;}
+var LAST=null;
+
+function compute(){
+  var hours=readNum('qHours')+readNum('qMins')/60;
+  var grams=readNum('qGrams');
+  var qty=Math.max(1,Math.round(readNum('qQty')));
+  var spoolPrice=readNum('mSpoolPrice'),spoolW=Math.max(1,readNum('mSpoolW'));
+  var waste=readNum('mWaste')/100;
+  var watts=readNum('pWatts'),kwhPrice=readNum('pKwh');
+  var prPrice=readNum('aPrice'),prLife=Math.max(1,readNum('aLife')),prMaint=readNum('aMaint'),prUse=Math.max(1,readNum('aUse'));
+  var fail=Math.min(.95,readNum('fRate')/100);
+  var prep=readNum('lPrep'),post=readNum('lPost'),lRate=readNum('lRate');
+  var margin=readNum('gMargin')/100;
+  var vatOn=$('gVat').checked,vat=readNum('gVatPct')/100;
+  var ship=readNum('gShip'),shipInc=$('gShipInc').checked;
+
+  var valid=hours>0&&grams>0;
+
+  /* componente de cost / piesa */
+  var mat  = grams*(1+waste)/spoolW*spoolPrice;
+  var kwh  = hours*watts/1000;
+  var elec = kwh*kwhPrice;
+  var amortRate = prPrice/prLife + prMaint/prUse;      /* RON pe ora de imprimare */
+  var amort = hours*amortRate;
+  var prodBase = mat+elec+amort;
+  var failCost = fail>0 ? prodBase*(1/(1-fail)-1) : 0; /* costul esecurilor, impartit pe piesele reusite */
+  var labor = (prep+post)/60*lRate;
+  var cost  = prodBase+failCost+labor;                 /* cost real de productie / piesa */
+
+  var withMargin = cost*(1+margin);
+  var profit = withMargin-cost;                        /* ce ramane, inainte de TVA */
+  var vatAmt = vatOn ? withMargin*vat : 0;
+  var piece  = withMargin+vatAmt;                      /* pret final / piesa, fara transport */
+  var orderTotal = piece*qty + ship;                   /* transportul o singura data / comanda */
+
+  var profitH = hours>0 ? profit/hours : 0;
+
+  /* recuperarea investitiei */
+  var pbH=readNum('pbHours');
+  var piecesMo = hours>0 ? pbH/hours : 0;
+  var profitMo = piecesMo*profit;
+  var months   = profitMo>0 ? prPrice/profitMo : Infinity;
+  var breakEvenPieces = profit>0 ? Math.ceil(prPrice/profit) : Infinity;
+
+  LAST={valid:valid,hours:hours,grams:grams,qty:qty,mat:mat,kwh:kwh,elec:elec,amort:amort,amortRate:amortRate,
+        fail:fail,failCost:failCost,labor:labor,cost:cost,margin:margin,withMargin:withMargin,profit:profit,
+        vatOn:vatOn,vat:vat,vatAmt:vatAmt,piece:piece,ship:ship,shipInc:shipInc,orderTotal:orderTotal,
+        profitH:profitH,pbH:pbH,piecesMo:piecesMo,profitMo:profitMo,months:months,breakEvenPieces:breakEvenPieces,
+        watts:watts,spoolPrice:spoolPrice,prPrice:prPrice};
+  return LAST;
+}
+
+/* ============ RANDARE ============ */
+var SEGC=['#ff5c1a','#ff9d66','#8fa3b8','#eab308','#5c636e'];
+var SEGN=['Material','Curent','Amortizare','Eșecuri','Manoperă'];
+
+var bigShown=0;
+function animateBig(target,el,fmt){
+  var from=bigShown,t0=performance.now();
+  if(!isFinite(target)){el.textContent='—';bigShown=0;return;}
+  function step(now){
+    var t=Math.min(1,(now-t0)/380);t=t*t*(3-2*t);
+    var v=from+(target-from)*t;
+    el.innerHTML=fmt(v);
+    if(t<1)requestAnimationFrame(step);else bigShown=target;
+  }
+  requestAnimationFrame(step);
+}
+
+function bdRow(color,name,sub,val,frac,cls){
+  return '<div class="bd-row '+(cls||'')+'">'+
+    (color?'<span class="dot" style="background:'+color+'"></span>':'<span></span>')+
+    '<span class="n">'+name+(sub?'<small>'+sub+'</small>':'')+'</span>'+
+    '<span class="v">'+val+'</span>'+
+    (frac!==undefined?'<div class="bar"><i style="width:'+(frac*100).toFixed(1)+'%;background:'+color+'"></i></div>':'')+
+  '</div>';
+}
+
+function render(){
+  var r=compute();
+  var na=!r.valid;
+
+  /* pretul mare */
+  var big=$('bigPrice');
+  big.classList.toggle('na',na);
+  if(na){big.textContent='introdu datele';$('bigSub').textContent='greutate + timp — sau trage un G-code';}
+  else{
+    animateBig(r.piece,big,function(v){
+      return CUR==='EUR'?nf(v/EUR_RATE,v/EUR_RATE<20?2:0)+'<small>€</small>':nf(v,v<20?2:0)+'<small>RON</small>';
+    });
+    $('bigSub').innerHTML='<b>'+r.qty+' buc + transport = '+money(r.orderTotal)+'</b>'+
+      (r.shipInc?' · afișat «transport gratuit»':' · transport separat')+
+      (r.vatOn?' · TVA inclus':' · fără TVA');
+  }
+  $('mbarPrice').textContent=na?'—':money(r.piece);
+
+  $('msCost').textContent=na?'—':money(r.cost);
+  var pv=$('msProfit');pv.textContent=na?'—':money(r.profit);
+  pv.className='v '+(na?'':(r.profit>0?'pos':'neg'));
+  var ph=$('msProfitH');ph.textContent=na?'—':money(r.profitH)+'/h';
+  ph.className='v '+(na?'':(r.profitH>0?'pos':'neg'));
+  $('msKwh').textContent=na?'—':nf(r.kwh,2)+' kWh';
+
+  /* live pe carduri */
+  $('oMat').innerHTML  =na?'—':money(r.mat)+' <small>'+nf(r.grams,0)+' g + pierderi</small>';
+  $('oElec').innerHTML =na?'—':money(r.elec)+' <small>'+nf(r.kwh,2)+' kWh</small>';
+  $('oAmort').innerHTML=na?'—':money(r.amort)+' <small>'+money(r.amortRate)+'/oră</small>';
+  $('oFail').innerHTML =na?'—':money(r.failCost)+' <small>la '+Math.round(r.fail*100)+'&nbsp;%</small>';
+  $('oLabor').innerHTML=money(r.labor);
+  $('mHint').innerHTML='Efectiv <b>'+money(r.spoolPrice/Math.max(1,readNum('mSpoolW'))*1000)+'/kg</b> · '+(MATS[mSel.value]?MATS[mSel.value].note:'');
+  $('aHint').innerHTML='Uzură: <b>'+money(r.amortRate,2)+'</b> pe fiecare oră de imprimare.';
+
+  /* breakdown */
+  var parts=[r.mat,r.elec,r.amort,r.failCost,r.labor];
+  var maxP=Math.max.apply(null,parts.concat([1e-9]));
+  var h='';
+  var subs=[nf(r.grams,0)+' g + '+$('mWaste').value+'% pierderi',
+            nf(r.kwh,2)+' kWh × '+money(readNum('pKwh'),2),
+            money(r.amortRate,2)+' × '+nf(r.hours,1)+' h',
+            'rată '+Math.round(r.fail*100)+'%',
+            (readNum('lPrep')+readNum('lPost'))+' min × '+money(readNum('lRate'))+'/h'];
+  for(var i=0;i<5;i++)h+=bdRow(SEGC[i],SEGN[i],subs[i],na?'—':money(parts[i]),na?0:parts[i]/maxP);
+  h+=bdRow(null,'Cost producție','',na?'—':money(r.cost),undefined,'sum');
+  h+=bdRow(null,'Marjă +'+$('gMargin').value+'%','',na?'—':'+'+money(r.withMargin-r.cost));
+  if(r.vatOn)h+=bdRow(null,'TVA '+$('gVatPct').value+'%','',na?'—':'+'+money(r.vatAmt));
+  h+=bdRow(null,'Preț / piesă','',na?'—':money(r.piece),undefined,'total');
+  h+=bdRow(null,'Transport','o dată / comandă',na?'—':'+'+money(r.ship));
+  h+=bdRow(null,'Total comandă',na?'':r.qty+' buc + transport',na?'—':money(r.orderTotal),undefined,'total');
+  $('bdList').innerHTML=h;
+
+  /* donut */
+  var totalCost=parts.reduce(function(a,b){return a+b;},0)||1;
+  var Rr=54,Cc=2*Math.PI*Rr,off=0,segs='';
+  for(var j=0;j<5;j++){
+    var frac=na?0:parts[j]/totalCost;
+    if(frac>0.001){
+      segs+='<circle cx="75" cy="75" r="'+Rr+'" fill="none" stroke="'+SEGC[j]+'" stroke-width="14" '+
+        'stroke-dasharray="'+(frac*Cc-1.5).toFixed(2)+' '+Cc.toFixed(2)+'" stroke-dashoffset="'+(-off*Cc).toFixed(2)+'"></circle>';
+      off+=frac;
+    }
+  }
+  if(na)segs='<circle cx="75" cy="75" r="'+Rr+'" fill="none" stroke="rgba(242,240,236,.08)" stroke-width="14"></circle>';
+  $('dnSegs').innerHTML=segs;
+  $('dnCenter').textContent=na?'—':moneyS(r.cost);
+  var lg='';
+  for(var k=0;k<5;k++){
+    var pc=na?0:Math.round(parts[k]/totalCost*100);
+    lg+='<div><i style="background:'+SEGC[k]+'"></i>'+SEGN[k]+'<b>'+(na?'—':pc+'%')+'</b></div>';
+  }
+  $('dnLegend').innerHTML=lg;
+
+  /* payback */
+  $('pbHoursVal').innerHTML=$('pbHours').value+'<small>h</small>';
+  var pm=$('pbMonths');
+  if(na||!isFinite(r.months)){pm.textContent='—';$('pbUnit').textContent=na?'luni':'niciodată la profit ≤ 0';}
+  else{
+    pm.textContent=r.months<10?nf(r.months,1):nf(Math.ceil(r.months),0);
+    $('pbUnit').textContent=r.months<1.5?'lună':'luni';
+  }
+  var span=24; /* scala barei: 24 luni */
+  $('pbScaleEnd').textContent=span+' luni';
+  $('pbScaleMid').textContent=(span/2)+' luni';
+  $('pbFill').style.width=(na||!isFinite(r.months))?'0%':Math.min(100,r.months/span*100)+'%';
+  $('pbPieces').textContent=na?'—':nf(r.piecesMo,1)+' buc';
+  $('pbProfit').textContent=na?'—':money(r.profitMo);
+  if(na||!isFinite(r.months)){$('pbDate').textContent='—';$('pbBreakEven').textContent='—';}
+  else{
+    var d=new Date();d.setMonth(d.getMonth()+Math.round(r.months));
+    $('pbDate').textContent=d.toLocaleDateString('ro-RO',{month:'long',year:'numeric'});
+    $('pbBreakEven').textContent=nf(r.breakEvenPieces,0)+' piese vândute';
+  }
+
+  /* avertizari & erori */
+  var w=[];
+  if(na)w.push(['wrn','Lipsesc datele piesei: completează greutatea și timpul de imprimare — sau trage un G-code în zona de sus.']);
+  if(!na&&r.profit<=0)w.push(['err','Marjă negativă sau zero: la prețul curent vinzi în pierdere. Crește marja sau redu costurile.']);
+  if(r.fail>=.2)w.push(['wrn','Rată de eșec ≥ 20 % — înainte să o pui în preț, verifică aderența plăcii, calibrarea și filamentul (umezeală).']);
+  if(r.watts>500)w.push(['wrn','Putere medie peste 500 W e neobișnuită pentru FDM desktop. Măsoară cu un contor de priză.']);
+  if(readNum('mSpoolPrice')<=0)w.push(['wrn','Prețul rolei e 0 — costul de material va fi subestimat.']);
+  if(!na&&r.hours>72)w.push(['inf','Peste 72 h de imprimare pentru o piesă: ia în calcul împărțirea în segmente lipite — risc mai mic per imprimare.']);
+  if(!na&&r.margin<.3&&r.profit>0)w.push(['inf','Marjă sub 30 % — acoperă abia riscul unei singure reimprimări. Pentru lucru la comandă, recomandăm ≥ 100 %.']);
+  if(gcode&&gcode.partial)w.push(['wrn','Din G-code am citit doar parțial datele ('+(gcode.mins?'timpul':'gramele')+'). Completează manual restul.']);
+  $('warns').innerHTML=w.map(function(x){return '<div class="warn '+x[0]+'"><i></i><span>'+x[1]+'</span></div>';}).join('');
+
+  renderPrint(r);
+  saveState();
+}
+
+/* ============ SLIDERE: gradient pe progres ============ */
+function paintRange(el){
+  var p=(el.value-el.min)/(el.max-el.min)*100;
+  el.style.setProperty('--p',p+'%');
+}
+['mWaste','fRate','gMargin','pbHours'].forEach(function(id){paintRange($(id));});
+
+/* ============ G-CODE PARSER (universal) ============ */
+function parseGCode(txt){
+  var mins=0,grams=0,type='',slicer='',layer='';
+
+  var s1=txt.match(/generated (?:by|with)\s*([^\n,;]+)/i);
+  if(s1)slicer=s1[1].trim().split(/\s+on\s+/)[0].slice(0,40);
+  else if(/BambuStudio/i.test(txt))slicer='Bambu Studio';
+  else if(/OrcaSlicer/i.test(txt))slicer='OrcaSlicer';
+  else if(/PrusaSlicer/i.test(txt))slicer='PrusaSlicer';
+  else if(/Cura_SteamEngine|Cura/i.test(txt))slicer='Cura';
+
+  /* — timp — */
+  var t1=txt.match(/;[^\n]*?(?:print(?:ing)?\s*time|estimated)[^\n]*?=\s*((?:\d+\s*d\s*)?(?:\d+\s*h\s*)?(?:\d+\s*m\s*)?(?:\d+\s*s\s*)?)/i);
+  if(t1&&/\d/.test(t1[1]||'')){
+    var t=t1[1];
+    var td=+((t.match(/(\d+)\s*d/)||[,0])[1]),
+        th=+((t.match(/(\d+)\s*h/)||[,0])[1]),
+        tm=+((t.match(/(\d+)\s*m/)||[,0])[1]),
+        ts=+((t.match(/(\d+)\s*s/)||[,0])[1]);
+    mins=td*1440+th*60+tm+(ts>0&&!td&&!th&&!tm?1:0);
+  }
+  if(!mins){
+    var t2=txt.match(/(?:^;TIME:|;[^\n]*?(?:_seconds|time_normal_mode|print_time)[^\n]*?[=:]\s*)(\d{3,})\s*s?\s*(?:\n|$)/im);
+    if(t2)mins=Math.round(+t2[1]/60);
+  }
+  if(!mins){
+    var t3=txt.match(/;[^\n]*time[^\n]*[=:]\s*(\d{1,3}):(\d{2})(?::(\d{2}))?/i);
+    if(t3)mins=+t3[1]*60 + +t3[2];
+  }
+  if(!mins){
+    var t4=txt.match(/;[^\n]*?(\d+)\s*h(?:ours?)?[^\n\d]*?(\d+)\s*m(?:in(?:utes?)?)?/i);
+    if(t4)mins=+t4[1]*60 + +t4[2];
+  }
+  if(!mins){
+    var t5=txt.match(/;[^\n]*time[^\n]*?[=:\s](\d{4,})/i);
+    if(t5)mins=Math.round(+t5[1]/60);
+  }
+
+  /* — grame — (multi-filament: suma valorilor separate prin virgula) */
+  function sumList(str){return str.split(',').reduce(function(a,b){var v=parseFloat(b);return a+(isFinite(v)?v:0);},0);}
+  var g0=txt.match(/;[^\n]*total filament (?:used|weight)[^\n]*?[=:]\s*([\d.]+)/i);
+  if(g0)grams=+g0[1];
+  if(!grams){var g1=txt.match(/;[^\n]*(?:filament[_ ]*used[_ \[]*g[\]_ ]?|total[_ ]weight)[^\n]*?[=:]\s*([\d.,\s]+)/i);if(g1)grams=sumList(g1[1]);}
+  if(!grams){var g2=txt.match(/;[^\n]*(?:filament|weight)[^\n]*?[=:]\s*([\d.]+)\s*g(?:\s|;|$)/im);if(g2)grams=+g2[1];}
+  if(!grams){var g3=txt.match(/^;PRINT\.WEIGHT:([\d.]+)/m);if(g3)grams=+g3[1];}
+  var density=(MATS[mSel.value]||{}).density||1.05;
+  if(!grams){var g4=txt.match(/^;Filament used:\s*([\d.,m\s]+)/m);
+    if(g4){var meters=sumList(g4[1].replace(/m/g,''));grams=Math.PI*0.0875*0.0875*meters*100*density;}}
+  if(!grams){var g5=txt.match(/;[^\n]*filament[^\n]*?([\d.]+)\s*mm\b/i);if(g5)grams=Math.PI*0.0875*0.0875*+g5[1]/10*density;}
+
+  /* — tip filament + layer — */
+  var ty=txt.match(/;\s*filament_type\s*=\s*([A-Za-z0-9+\- ,;]+)/i)||txt.match(/;\s*FILAMENT_TYPE:\s*([A-Za-z0-9+\-]+)/i);
+  if(ty)type=ty[1].split(/[,;]/)[0].trim();
+  var ly=txt.match(/;\s*layer_height\s*[=:]\s*([\d.]+)/i)||txt.match(/^;Layer height:\s*([\d.]+)/mi);
+  if(ly)layer=ly[1];
+
+  return{mins:Math.round(mins),grams:Math.round(grams*10)/10,type:type,slicer:slicer,layer:layer};
+}
+function matchMaterial(type){
+  var m=(type||'').toLowerCase().replace(/[-_\s]/g,'');
+  if(!m)return null;
+  if(m.indexOf('abs')>-1&&(m.indexOf('cf')>-1||m.indexOf('carbon')>-1))return'abscf';
+  if(m.indexOf('asa')>-1&&(m.indexOf('cf')>-1||m.indexOf('carbon')>-1))return'asacf';
+  if(m.indexOf('pa')===0||m.indexOf('nylon')>-1)return'pa';
+  if(m.indexOf('petg')>-1||m.indexOf('pet')===0)return'petg';
+  if(m.indexOf('tpu')>-1||m.indexOf('tpe')>-1)return'tpu';
+  if(m.indexOf('pc')===0)return'pc';
+  if(m.indexOf('asa')>-1)return'asa';
+  if(m.indexOf('abs')>-1)return'abs';
+  if(m.indexOf('pla')>-1)return'pla';
+  return null;
+}
+
+var drop=$('drop');
+function resetDrop(){
+  gcode=null;
+  drop.classList.remove('loaded');
+  $('dropBody').innerHTML='<svg class="d-ico" viewBox="0 0 24 24" fill="none" stroke="#c6c4bf" stroke-width="1.2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>'+
+    '<div class="d-t">Trage G-code aici</div><div class="d-s">.gcode · orice slicer — Prusa, Orca, Bambu, Cura</div>';
+  render();
+}
+function handleFile(f){
+  if(!f)return;
+  var ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(ext==='bgcode'){
+    toast('Fișier .bgcode (binar). În PrusaSlicer: Print Settings → Output → dezactivează „Binary G-code", apoi exportă .gcode',1);
+    return;
+  }
+  if(['gcode','gco','gc','txt'].indexOf(ext)<0){toast('Format neacceptat — încarcă .gcode',1);return;}
+  if(f.size>120*1024*1024){toast('Fișier prea mare (max 120 MB)',1);return;}
+  var rd=new FileReader();
+  rd.onload=function(){
+    var txt=String(rd.result);
+    var p=parseGCode(txt);
+    if(!p.mins&&!p.grams){toast('Nu am găsit timp/greutate în G-code — verifică exportul din slicer',1);return;}
+    gcode={name:f.name,mins:p.mins,grams:p.grams,type:p.type,slicer:p.slicer,layer:p.layer,
+           partial:(!p.mins||!p.grams)};
+    if(p.mins){$('qHours').value=Math.floor(p.mins/60);$('qMins').value=p.mins%60;}
+    if(p.grams)$('qGrams').value=p.grams;
+    var mk=matchMaterial(p.type);
+    if(mk){mSel.value=mk;$('mSpoolPrice').value=MATS[mk].price;}
+    drop.classList.add('loaded');
+    var chips='<span class="ok">✓ '+f.name.slice(0,34)+'</span>';
+    if(p.slicer)chips+='<span>'+p.slicer+'</span>';
+    if(p.mins)chips+='<span>'+hhmm(p.mins)+'</span>';
+    if(p.grams)chips+='<span>'+nf(p.grams,1)+' g</span>';
+    if(p.type)chips+='<span>'+p.type+'</span>';
+    if(p.layer)chips+='<span>strat '+p.layer+' mm</span>';
+    $('dropBody').innerHTML='<div class="d-t" style="color:var(--green)">G-code citit — prețul e calculat exact</div>'+
+      '<div class="gchips">'+chips+'</div>'+
+      '<button class="g-clear" type="button" id="gClear">✕ Renunță la fișier</button>';
+    $('gClear').addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();resetDrop();});
+    render();
+    toast('G-code încărcat: '+(p.mins?hhmm(p.mins):'?')+' · '+(p.grams?nf(p.grams,1)+' g':'?'));
+  };
+  rd.readAsText(f);
+}
+$('gfile').addEventListener('change',function(){handleFile(this.files[0]);this.value='';});
+['dragenter','dragover'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('over');});});
+['dragleave','drop'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove('over');});});
+drop.addEventListener('drop',function(e){handleFile(e.dataTransfer.files[0]);});
+
+/* ============ EVENIMENTE ============ */
+mSel.addEventListener('change',function(){
+  var m=MATS[this.value];
+  if(m){$('mSpoolPrice').value=m.price;}
+  render();
+});
+pSel.addEventListener('change',function(){
+  var p=PRINTERS[this.value];
+  if(p&&p.w!==null){
+    $('pWatts').value=p.w;$('aPrice').value=p.price;$('aLife').value=p.life;
+    $('aMaint').value=p.maint;$('aUse').value=p.use;
+  }
+  render();
+});
+FIELDS.forEach(function(f){
+  var el=$(f);
+  var ev=el.type==='checkbox'||el.tagName==='SELECT'?'change':'input';
+  el.addEventListener(ev,function(){
+    if(el.type==='range'){paintRange(el);
+      if(f==='mWaste')$('mWasteVal').innerHTML=el.value+'<small>%</small>';
+      if(f==='fRate')$('fRateVal').innerHTML=el.value+'<small>%</small>';
+      if(f==='gMargin')$('gMarginVal').innerHTML=el.value+'<small>%</small>';
+    }
+    if(f!=='mSel'&&f!=='pSel')render();
+  });
+});
+
+/* moneda */
+function setCur(c){
+  CUR=c;localStorage.setItem('ac3d_calc_cur',c);
+  $('curRon').classList.toggle('on',c==='RON');
+  $('curEur').classList.toggle('on',c==='EUR');
+  bigShown=0;render();
+}
+$('curRon').addEventListener('click',function(){setCur('RON');});
+$('curEur').addEventListener('click',function(){setCur('EUR');});
+
+/* ============ RAPORT / EXPORT ============ */
+function report(){
+  var r=LAST;
+  if(!r||!r.valid)return null;
+  var L=[];
+  L.push('CALCUL PREȚ IMPRIMARE 3D — AUTOCORE3D');
+  L.push('──────────────────────────────');
+  L.push('Piesă: '+nf(r.grams,0)+' g · '+hhmm(r.hours*60)+(gcode?' · din '+gcode.name:''));
+  L.push('Material: '+MATS[mSel.value].n+' ('+money(r.spoolPrice)+'/rolă)');
+  L.push('');
+  L.push('Material:    '+money(r.mat));
+  L.push('Curent:      '+money(r.elec)+' ('+nf(r.kwh,2)+' kWh)');
+  L.push('Amortizare:  '+money(r.amort));
+  L.push('Eșecuri '+Math.round(r.fail*100)+'%:  '+money(r.failCost));
+  L.push('Manoperă:    '+money(r.labor));
+  L.push('COST REAL:   '+money(r.cost));
+  L.push('');
+  L.push('Marjă +'+$('gMargin').value+'%: '+money(r.withMargin-r.cost));
+  if(r.vatOn)L.push('TVA '+$('gVatPct').value+'%:     '+money(r.vatAmt));
+  L.push('PREȚ / PIESĂ: '+money(r.piece));
+  L.push('Comandă ('+r.qty+' buc + transport): '+money(r.orderTotal));
+  L.push('');
+  L.push('Profit/piesă: '+money(r.profit)+' · Profit/oră: '+money(r.profitH));
+  if(isFinite(r.months))L.push('Imprimanta ('+money(r.prPrice)+') se amortizează în ~'+nf(r.months,1)+' luni la '+r.pbH+' h/lună.');
+  L.push('');
+  L.push('Generat pe autocore3d.com/calculator.html');
+  return L.join('\n');
+}
+$('btnCopy').addEventListener('click',function(){
+  var t=report();
+  if(!t){toast('Completează întâi datele piesei',1);return;}
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(
+    function(){toast('Raport copiat în clipboard');},
+    function(){
+      var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);
+      ta.select();try{document.execCommand('copy');toast('Raport copiat în clipboard');}catch(e){toast('Nu am putut copia',1);}
+      document.body.removeChild(ta);
+    });
+});
+$('btnWa').addEventListener('click',function(){
+  var r=LAST;
+  var txt;
+  if(r&&r.valid){
+    txt='Bună ziua! Am folosit calculatorul avansat de pe autocore3d.com:\n\n'+
+      '📦 Piesă: '+nf(r.grams,0)+' g · '+hhmm(r.hours*60)+' imprimare'+(gcode?'\n📄 G-code: '+gcode.name:'')+'\n'+
+      '🧵 Material: '+MATS[mSel.value].n+'\n'+
+      '💰 Preț calculat: '+money(r.piece)+' / piesă ('+r.qty+' buc: '+money(r.orderTotal)+')\n\n'+
+      'Aș dori o ofertă fermă pentru piesa mea. Mulțumesc!';
+  }else{
+    txt='Bună ziua! Aș dori o ofertă pentru o piesă imprimată 3D. Mulțumesc!';
+  }
+  window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(txt),'_blank');
+});
+$('btnPrint').addEventListener('click',function(){
+  if(!LAST||!LAST.valid){toast('Completează întâi datele piesei',1);return;}
+  window.print();
+});
+$('btnReset').addEventListener('click',function(){
+  try{localStorage.removeItem(LS_KEY);}catch(e){}
+  location.reload();
+});
+
+function renderPrint(r){
+  if(!r.valid){$('printSheet').innerHTML='';return;}
+  var rows='';
+  var add=function(n,v){rows+='<tr><td>'+n+'</td><td>'+v+'</td></tr>';};
+  add('Material — '+MATS[mSel.value].n+' ('+nf(r.grams,0)+' g + pierderi)',money(r.mat));
+  add('Curent electric ('+nf(r.kwh,2)+' kWh)',money(r.elec));
+  add('Amortizare imprimantă ('+nf(r.hours,1)+' h)',money(r.amort));
+  add('Rata de eșec ('+Math.round(r.fail*100)+'%)',money(r.failCost));
+  add('Manoperă',money(r.labor));
+  add('<b>Cost de producție</b>','<b>'+money(r.cost)+'</b>');
+  add('Marjă (+'+$('gMargin').value+'%)','+'+money(r.withMargin-r.cost));
+  if(r.vatOn)add('TVA ('+$('gVatPct').value+'%)','+'+money(r.vatAmt));
+  add('Transport (o dată / comandă)','+'+money(r.ship));
+  $('printSheet').innerHTML=
+    '<div class="ph"><b>AUTOCORE3D</b><span>Estimare de preț · '+new Date().toLocaleDateString('ro-RO')+'</span></div>'+
+    '<h3>Piesă imprimată 3D — '+nf(r.grams,0)+' g · '+hhmm(r.hours*60)+' imprimare</h3>'+
+    '<table>'+rows+
+    '<tr class="tot"><td>Preț / piesă</td><td>'+money(r.piece)+'</td></tr>'+
+    '<tr class="tot"><td>Total comandă ('+r.qty+' buc)</td><td>'+money(r.orderTotal)+'</td></tr></table>'+
+    '<div class="pf">Estimare generată cu calculatorul AUTOCORE3D (autocore3d.com). Nu reprezintă ofertă fermă. '+
+    'Contact: WhatsApp 0771 119 423 · contact@autocore3d.com</div>';
+}
+
+/* ============ TOAST ============ */
+var toastT=null;
+function toast(msg,err){
+  var el=$('toast');
+  el.textContent=msg;
+  el.style.background=err?'#ef4444':'var(--ink)';
+  el.style.color=err?'#fff':'var(--bg)';
+  el.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(function(){el.classList.remove('show');},err?5200:2600);
+}
+
+/* ============ INIT ============ */
+loadState();
+['mWaste','fRate','gMargin','pbHours'].forEach(function(id){
+  paintRange($(id));
+  var v=$(id).value;
+  if(id==='mWaste')$('mWasteVal').innerHTML=v+'<small>%</small>';
+  if(id==='fRate')$('fRateVal').innerHTML=v+'<small>%</small>';
+  if(id==='gMargin')$('gMarginVal').innerHTML=v+'<small>%</small>';
+  if(id==='pbHours')$('pbHoursVal').innerHTML=v+'<small>h</small>';
+});
+setCur(CUR);
+})();
+</script>
+</body>
+</html>
