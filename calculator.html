@@ -291,13 +291,13 @@
       <div class="c-ghost">01</div>
       <div class="c-kick"><i></i>01 — Piesă</div>
       <h2>Timp și material consumat.</h2>
-      <p class="c-sub">Cel mai exact: trage aici G-code-ul din slicer — citim timpul, gramele și tipul de filament direct din fișier. Sau completează manual.</p>
+      <p class="c-sub">Cel mai exact: trage aici fișierul slice-uit — citim timpul, gramele și tipul de filament direct din el. Merge și <b style="color:var(--mut)">.gcode.3mf</b> exportat de Bambu Studio. Sau completează manual.</p>
       <div class="drop" id="drop">
-        <input type="file" id="gfile" accept=".gcode,.gco,.gc,.bgcode,.txt">
+        <input type="file" id="gfile" accept=".gcode,.gco,.gc,.bgcode,.txt,.3mf">
         <div id="dropBody">
           <svg class="d-ico" viewBox="0 0 24 24" fill="none" stroke="#c6c4bf" stroke-width="1.2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
           <div class="d-t">Trage G-code aici</div>
-          <div class="d-s">.gcode · orice slicer — Prusa, Orca, Bambu, Cura</div>
+          <div class="d-s">.gcode.3mf (Bambu) · .gcode — Prusa, Orca, Cura</div>
         </div>
       </div>
       <div class="grid3">
@@ -497,6 +497,7 @@
 
 <footer><div class="f">© 2026 AUTOCORE3D — autocore3d.com · Calculator de cost imprimare 3D</div></footer>
 
+<script src="assets/vendor/fflate.min.js"></script>
 <script>
 (function(){
 'use strict';
@@ -858,8 +859,83 @@ function resetDrop(){
   gcode=null;
   drop.classList.remove('loaded');
   $('dropBody').innerHTML='<svg class="d-ico" viewBox="0 0 24 24" fill="none" stroke="#c6c4bf" stroke-width="1.2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>'+
-    '<div class="d-t">Trage G-code aici</div><div class="d-s">.gcode · orice slicer — Prusa, Orca, Bambu, Cura</div>';
+    '<div class="d-t">Trage G-code aici</div><div class="d-s">.gcode.3mf (Bambu) · .gcode — Prusa, Orca, Cura</div>';
   render();
+}
+/* aplica rezultatul parsarii (din .gcode text sau din .gcode.3mf) pe campuri + UI */
+function applyParsed(fname,p){
+  if(!p.mins&&!p.grams){toast('Nu am găsit timp/greutate în fișier — verifică exportul din slicer',1);return;}
+  gcode={name:fname,mins:p.mins,grams:p.grams,type:p.type,slicer:p.slicer,layer:p.layer,
+         plates:p.plates||0,partial:(!p.mins||!p.grams)};
+  if(p.mins){$('qHours').value=Math.floor(p.mins/60);$('qMins').value=p.mins%60;}
+  if(p.grams)$('qGrams').value=p.grams;
+  var mk=matchMaterial(p.type);
+  if(mk){mSel.value=mk;$('mSpoolPrice').value=MATS[mk].price;}
+  drop.classList.add('loaded');
+  var chips='<span class="ok">✓ '+fname.slice(0,34)+'</span>';
+  if(p.slicer)chips+='<span>'+p.slicer+'</span>';
+  if(p.plates>1)chips+='<span>'+p.plates+' plăci</span>';
+  if(p.mins)chips+='<span>'+hhmm(p.mins)+'</span>';
+  if(p.grams)chips+='<span>'+nf(p.grams,1)+' g</span>';
+  if(p.type)chips+='<span>'+p.type+'</span>';
+  if(p.layer)chips+='<span>strat '+p.layer+' mm</span>';
+  $('dropBody').innerHTML='<div class="d-t" style="color:var(--green)">Fișier citit — prețul e calculat exact</div>'+
+    '<div class="gchips">'+chips+'</div>'+
+    '<button class="g-clear" type="button" id="gClear">✕ Renunță la fișier</button>';
+  $('gClear').addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();resetDrop();});
+  render();
+  toast('Fișier citit: '+(p.mins?hhmm(p.mins):'?')+' · '+(p.grams?nf(p.grams,1)+' g':'?'));
+}
+/* .gcode.3mf (Bambu Studio): arhiva ZIP cu G-code + Metadata/slice_info.config */
+function parse3MFSliced(buf,fname){
+  if(typeof fflate==='undefined'){toast('Nu am putut încărca decompresorul — reîncarcă pagina',1);return;}
+  var u8=new Uint8Array(buf);
+  var done=function(files){
+    try{
+      var dec=new TextDecoder();
+      var mins=0,grams=0,type='',layer='',plates=0;
+      var keys=Object.keys(files);
+      /* 1) slice_info.config — valorile exacte scrise de Bambu Studio (secunde + grame) */
+      var siKey=keys.filter(function(k){return /slice_info\.config$/i.test(k);})[0];
+      if(siKey){
+        var xml=dec.decode(files[siKey]);
+        var secs=0;
+        xml.replace(/<plate>[\s\S]*?<\/plate>/gi,function(pl){
+          var pr=pl.match(/key="prediction"\s+value="([\d.]+)"/i);
+          var wt=pl.match(/key="weight"\s+value="([\d.]+)"/i);
+          if(pr||wt){plates++;secs+=pr?+pr[1]:0;grams+=wt?+wt[1]:0;}
+          if(!type){var ft=pl.match(/<filament[^>]*\btype="([^"]+)"/i);if(ft)type=ft[1];}
+          return pl;
+        });
+        mins=Math.round(secs/60);
+      }
+      /* 2) completare din G-code-ul inclus (header Bambu + config block de la final) */
+      var gKeys=keys.filter(function(k){return /\.gcode$/i.test(k);});
+      if((!mins||!grams||!type||!layer)&&gKeys.length){
+        var g8=files[gKeys[0]];
+        var head=dec.decode(g8.subarray(0,262144));
+        var tail=g8.length>524288?dec.decode(g8.subarray(g8.length-262144)):'';
+        var p=parseGCode(head+'\n'+tail);
+        if(!mins)mins=p.mins;
+        if(!grams)grams=p.grams;
+        if(!type)type=p.type;
+        if(!layer)layer=p.layer;
+      }
+      if(!gKeys.length&&!siKey){
+        toast('Acest .3mf conține doar modelul 3D, nu și G-code. În Bambu Studio: Slice → „Export plate sliced file" → .gcode.3mf',1);
+        return;
+      }
+      applyParsed(fname,{mins:mins,grams:Math.round(grams*10)/10,type:type,
+        slicer:'Bambu Studio',layer:layer,plates:plates});
+    }catch(e){toast('Nu am putut citi arhiva .3mf',1);}
+  };
+  var fallbackSync=function(){
+    try{done(fflate.unzipSync(u8));}
+    catch(e){toast('Nu am putut dezarhiva fișierul .3mf',1);}
+  };
+  try{
+    fflate.unzip(u8,function(err,files){if(err)fallbackSync();else done(files);});
+  }catch(e){fallbackSync();}
 }
 function handleFile(f){
   if(!f)return;
@@ -868,32 +944,17 @@ function handleFile(f){
     toast('Fișier .bgcode (binar). În PrusaSlicer: Print Settings → Output → dezactivează „Binary G-code", apoi exportă .gcode',1);
     return;
   }
-  if(['gcode','gco','gc','txt'].indexOf(ext)<0){toast('Format neacceptat — încarcă .gcode',1);return;}
-  if(f.size>120*1024*1024){toast('Fișier prea mare (max 120 MB)',1);return;}
+  if(f.size>200*1024*1024){toast('Fișier prea mare (max 200 MB)',1);return;}
+  if(ext==='3mf'){
+    var rb=new FileReader();
+    rb.onload=function(){parse3MFSliced(rb.result,f.name);};
+    rb.readAsArrayBuffer(f);
+    return;
+  }
+  if(['gcode','gco','gc','txt'].indexOf(ext)<0){toast('Format neacceptat — încarcă .gcode sau .gcode.3mf',1);return;}
   var rd=new FileReader();
   rd.onload=function(){
-    var txt=String(rd.result);
-    var p=parseGCode(txt);
-    if(!p.mins&&!p.grams){toast('Nu am găsit timp/greutate în G-code — verifică exportul din slicer',1);return;}
-    gcode={name:f.name,mins:p.mins,grams:p.grams,type:p.type,slicer:p.slicer,layer:p.layer,
-           partial:(!p.mins||!p.grams)};
-    if(p.mins){$('qHours').value=Math.floor(p.mins/60);$('qMins').value=p.mins%60;}
-    if(p.grams)$('qGrams').value=p.grams;
-    var mk=matchMaterial(p.type);
-    if(mk){mSel.value=mk;$('mSpoolPrice').value=MATS[mk].price;}
-    drop.classList.add('loaded');
-    var chips='<span class="ok">✓ '+f.name.slice(0,34)+'</span>';
-    if(p.slicer)chips+='<span>'+p.slicer+'</span>';
-    if(p.mins)chips+='<span>'+hhmm(p.mins)+'</span>';
-    if(p.grams)chips+='<span>'+nf(p.grams,1)+' g</span>';
-    if(p.type)chips+='<span>'+p.type+'</span>';
-    if(p.layer)chips+='<span>strat '+p.layer+' mm</span>';
-    $('dropBody').innerHTML='<div class="d-t" style="color:var(--green)">G-code citit — prețul e calculat exact</div>'+
-      '<div class="gchips">'+chips+'</div>'+
-      '<button class="g-clear" type="button" id="gClear">✕ Renunță la fișier</button>';
-    $('gClear').addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();resetDrop();});
-    render();
-    toast('G-code încărcat: '+(p.mins?hhmm(p.mins):'?')+' · '+(p.grams?nf(p.grams,1)+' g':'?'));
+    applyParsed(f.name,parseGCode(String(rd.result)));
   };
   rd.readAsText(f);
 }
