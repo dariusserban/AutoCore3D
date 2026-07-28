@@ -237,6 +237,29 @@
   footer .f{font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
   @media(min-width:1021px){footer{padding-bottom:44px}}
 
+  /* ---- ecran de blocare (zona interna) ---- */
+  #lock{display:none}
+  body.locked .hero,body.locked .wrap,body.locked footer,body.locked #mbar{display:none!important}
+  body.locked #lock{display:flex;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;padding:22px;
+    background:radial-gradient(820px 420px at 78% -80px,rgba(255,92,26,.06),transparent 70%),var(--bg)}
+  .lk-card{width:min(400px,100%);background:var(--surf);border:1px solid var(--hair);padding:clamp(28px,5vw,40px);text-align:center;position:relative}
+  .lk-card::before{content:'';position:absolute;top:0;left:0;width:44px;height:1px;background:var(--amber)}
+  .lk-card img{height:40px;margin:0 auto 18px;display:block}
+  .lk-kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+  .lk-card h3{font-weight:300;font-size:clamp(22px,4vw,28px);letter-spacing:-.02em;margin-bottom:8px}
+  .lk-card p{font-size:13.5px;line-height:1.6;color:var(--mut);font-weight:300;margin-bottom:22px}
+  .lk-card input{width:100%;background:var(--well);border:1px solid var(--hair);color:var(--ink);font-family:var(--disp);
+    font-size:16px;font-weight:300;padding:13px 14px;outline:none;text-align:center;letter-spacing:.2em;transition:border-color .3s}
+  .lk-card input:focus{border-color:var(--amber)}
+  .lk-card button{width:100%;margin-top:12px;padding:14px;background:var(--ink);color:var(--bg);border:1px solid var(--ink);
+    font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;cursor:pointer;transition:background .3s,color .3s}
+  .lk-card button:hover{background:transparent;color:var(--ink)}
+  #lkErr{display:none;margin-top:14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+  .lk-back{display:inline-block;margin-top:20px;font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);text-decoration:none}
+  .lk-back:hover{color:var(--ink)}
+  .lk-card.shake{animation:lkshake .4s}
+  @keyframes lkshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
   /* ---- print: oferta alba ---- */
   #printSheet{display:none}
   @media print{
@@ -255,10 +278,26 @@
   }
 </style>
 </head>
-<body>
+<body class="locked">
 
 <div class="bg-aura"></div>
 <div id="grain"></div>
+
+<!-- ============ ZONĂ INTERNĂ — ECRAN DE BLOCARE ============ -->
+<div id="lock">
+  <div class="lk-card" id="lkCard">
+    <img src="assets/brand/autocore3d-mark.svg" alt="">
+    <div class="lk-kick">Zonă internă AUTOCORE3D</div>
+    <h3>Calculatorul de cost.</h3>
+    <p>Unealta internă de calcul al prețurilor. Introdu parola ca să continui.</p>
+    <form id="lkForm" novalidate>
+      <input type="password" id="lkPass" placeholder="••••••••" autocomplete="current-password" aria-label="Parola">
+      <button type="submit">Deblochează</button>
+    </form>
+    <div id="lkErr">Parolă greșită — mai încearcă</div>
+    <a class="lk-back" href="catalog.html">← Înapoi la piese</a>
+  </div>
+</div>
 
 <header>
   <a class="brand" href="index.html"><img src="assets/brand/autocore3d-logo.svg" alt="AUTOCORE3D"></a>
@@ -418,10 +457,10 @@
         <div class="fld"><label for="gShip">Transport / comandă</label>
           <div class="in-wrap"><input type="number" id="gShip" min="0" step="1" value="20"><span class="unit">RON</span></div></div>
         <div class="fld opt">
-          <label class="tgl"><input type="checkbox" id="gShipInc" checked><span class="sw"></span><span class="tl">Afișat «gratuit», inclus în preț</span></label>
+          <label class="tgl"><input type="checkbox" id="gShipInc" checked><span class="sw"></span><span class="tl">Inclus automat în preț · client: «gratuit»</span></label>
         </div>
       </div>
-      <div class="hint">Marjă 150&nbsp;% = preț de 2,5× costul — reglajul standard AUTOCORE3D.</div>
+      <div class="hint">Marjă 150&nbsp;% = preț de 2,5× costul — reglajul standard AUTOCORE3D. Cu bifa de transport activă, curierul e împărțit automat în prețul pe piesă: clientul vede «transport gratuit», tu nu pierzi nimic.</div>
     </section>
   </div>
 
@@ -502,6 +541,45 @@
 (function(){
 'use strict';
 var $=function(id){return document.getElementById(id);};
+
+/* ============ ACCES: zona interna, protejata cu parola ============ */
+/* parola nu apare in cod — doar amprenta ei SHA-256 (cu sare) */
+var LOCK_HASH='51c146bedfd06ace9b129346658e1a21d88d508294880e1b4ab10f1a08b67db8';
+var LOCK_KEY='ac3d_calc_key';
+function sha256hex(str){
+  return crypto.subtle.digest('SHA-256',new TextEncoder().encode(str)).then(function(buf){
+    return Array.prototype.map.call(new Uint8Array(buf),function(b){return b.toString(16).padStart(2,'0');}).join('');
+  });
+}
+function unlockPage(){
+  document.body.classList.remove('locked');
+  var el=$('lock');
+  if(el)el.parentNode.removeChild(el);
+}
+(function auth(){
+  var saved=null;
+  try{saved=localStorage.getItem(LOCK_KEY);}catch(e){}
+  if(saved===LOCK_HASH){unlockPage();return;}
+  $('lkForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var v=$('lkPass').value;
+    if(!v)return;
+    if(!window.crypto||!crypto.subtle){$('lkErr').textContent='Browser fără suport criptografic — deschide pagina pe HTTPS';$('lkErr').style.display='block';return;}
+    sha256hex('ac3d·'+v).then(function(h){
+      if(h===LOCK_HASH){
+        try{localStorage.setItem(LOCK_KEY,h);}catch(e){}
+        unlockPage();
+      }else{
+        $('lkErr').style.display='block';
+        $('lkPass').value='';
+        $('lkPass').focus();
+        var c=$('lkCard');
+        c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');
+      }
+    });
+  });
+  setTimeout(function(){var i=$('lkPass');if(i)i.focus();},250);
+})();
 
 /* ============ granulatie de film (ca pe prima pagina) ============ */
 (function(){
@@ -618,8 +696,11 @@ function compute(){
   var withMargin = cost*(1+margin);
   var profit = withMargin-cost;                        /* ce ramane, inainte de TVA */
   var vatAmt = vatOn ? withMargin*vat : 0;
-  var piece  = withMargin+vatAmt;                      /* pret final / piesa, fara transport */
-  var orderTotal = piece*qty + ship;                   /* transportul o singura data / comanda */
+  /* transport inclus (implicit): impartit automat in pretul pe piesa —
+     clientul vede "transport gratuit", banii de curier exista deja in pret */
+  var shipPerPiece = shipInc ? ship/qty : 0;
+  var piece  = withMargin+vatAmt+shipPerPiece;         /* pret final / piesa */
+  var orderTotal = piece*qty + (shipInc?0:ship);
 
   var profitH = hours>0 ? profit/hours : 0;
 
@@ -632,7 +713,7 @@ function compute(){
 
   LAST={valid:valid,hours:hours,grams:grams,qty:qty,mat:mat,kwh:kwh,elec:elec,amort:amort,amortRate:amortRate,
         fail:fail,failCost:failCost,labor:labor,cost:cost,margin:margin,withMargin:withMargin,profit:profit,
-        vatOn:vatOn,vat:vat,vatAmt:vatAmt,piece:piece,ship:ship,shipInc:shipInc,orderTotal:orderTotal,
+        vatOn:vatOn,vat:vat,vatAmt:vatAmt,piece:piece,ship:ship,shipInc:shipInc,shipPerPiece:shipPerPiece,orderTotal:orderTotal,
         profitH:profitH,pbH:pbH,piecesMo:piecesMo,profitMo:profitMo,months:months,breakEvenPieces:breakEvenPieces,
         watts:watts,spoolPrice:spoolPrice,prPrice:prPrice};
   return LAST;
@@ -642,11 +723,12 @@ function compute(){
 var SEGC=['#ff5c1a','#ff9d66','#8fa3b8','#eab308','#5c636e'];
 var SEGN=['Material','Curent','Amortizare','Eșecuri','Manoperă'];
 
-var bigShown=0;
+var bigShown=0,bigAnim=0;
 function animateBig(target,el,fmt){
-  var from=bigShown,t0=performance.now();
+  var from=bigShown,t0=performance.now(),my=++bigAnim; /* lantul vechi moare cand porneste unul nou */
   if(!isFinite(target)){el.textContent='—';bigShown=0;return;}
   function step(now){
+    if(my!==bigAnim)return;
     var t=Math.min(1,(now-t0)/380);t=t*t*(3-2*t);
     var v=from+(target-from)*t;
     el.innerHTML=fmt(v);
@@ -676,9 +758,9 @@ function render(){
     animateBig(r.piece,big,function(v){
       return CUR==='EUR'?nf(v/EUR_RATE,v/EUR_RATE<20?2:0)+'<small>€</small>':nf(v,v<20?2:0)+'<small>RON</small>';
     });
-    $('bigSub').innerHTML='<b>'+r.qty+' buc + transport = '+money(r.orderTotal)+'</b>'+
-      (r.shipInc?' · afișat «transport gratuit»':' · transport separat')+
-      (r.vatOn?' · TVA inclus':' · fără TVA');
+    $('bigSub').innerHTML=r.shipInc
+      ?'<b>'+r.qty+' buc = '+money(r.orderTotal)+'</b> · transport «gratuit» inclus în preț'+(r.vatOn?' · TVA inclus':' · fără TVA')
+      :'<b>'+r.qty+' buc + transport = '+money(r.orderTotal)+'</b> · transport facturat separat'+(r.vatOn?' · TVA inclus':' · fără TVA');
   }
   $('mbarPrice').textContent=na?'—':money(r.piece);
 
@@ -711,9 +793,16 @@ function render(){
   h+=bdRow(null,'Cost producție','',na?'—':money(r.cost),undefined,'sum');
   h+=bdRow(null,'Marjă +'+$('gMargin').value+'%','',na?'—':'+'+money(r.withMargin-r.cost));
   if(r.vatOn)h+=bdRow(null,'TVA '+$('gVatPct').value+'%','',na?'—':'+'+money(r.vatAmt));
-  h+=bdRow(null,'Preț / piesă','',na?'—':money(r.piece),undefined,'total');
-  h+=bdRow(null,'Transport','o dată / comandă',na?'—':'+'+money(r.ship));
-  h+=bdRow(null,'Total comandă',na?'':r.qty+' buc + transport',na?'—':money(r.orderTotal),undefined,'total');
+  if(r.shipInc){
+    /* doar tu vezi randul asta — clientul vede «transport gratuit» */
+    h+=bdRow(null,'Transport înglobat','client: «gratuit» · '+(na?'':money(r.ship)+' / comandă'),na?'—':'+'+money(r.shipPerPiece));
+    h+=bdRow(null,'Preț / piesă','transport inclus',na?'—':money(r.piece),undefined,'total');
+    h+=bdRow(null,'Total comandă',na?'':r.qty+' buc · transport gratuit',na?'—':money(r.orderTotal),undefined,'total');
+  }else{
+    h+=bdRow(null,'Preț / piesă','',na?'—':money(r.piece),undefined,'total');
+    h+=bdRow(null,'Transport','o dată / comandă',na?'—':'+'+money(r.ship));
+    h+=bdRow(null,'Total comandă',na?'':r.qty+' buc + transport',na?'—':money(r.orderTotal),undefined,'total');
+  }
   $('bdList').innerHTML=h;
 
   /* donut */
@@ -1019,8 +1108,14 @@ function report(){
   L.push('');
   L.push('Marjă +'+$('gMargin').value+'%: '+money(r.withMargin-r.cost));
   if(r.vatOn)L.push('TVA '+$('gVatPct').value+'%:     '+money(r.vatAmt));
-  L.push('PREȚ / PIESĂ: '+money(r.piece));
-  L.push('Comandă ('+r.qty+' buc + transport): '+money(r.orderTotal));
+  if(r.shipInc){
+    L.push('Transport înglobat ('+money(r.ship)+'/comandă): +'+money(r.shipPerPiece)+'/piesă');
+    L.push('PREȚ / PIESĂ: '+money(r.piece)+' (transport inclus — client: GRATUIT)');
+    L.push('Comandă ('+r.qty+' buc · transport gratuit): '+money(r.orderTotal));
+  }else{
+    L.push('PREȚ / PIESĂ: '+money(r.piece));
+    L.push('Comandă ('+r.qty+' buc + transport): '+money(r.orderTotal));
+  }
   L.push('');
   L.push('Profit/piesă: '+money(r.profit)+' · Profit/oră: '+money(r.profitH));
   if(isFinite(r.months))L.push('Imprimanta ('+money(r.prPrice)+') se amortizează în ~'+nf(r.months,1)+' luni la '+r.pbH+' h/lună.');
@@ -1046,7 +1141,8 @@ $('btnWa').addEventListener('click',function(){
     txt='Bună ziua! Am folosit calculatorul avansat de pe autocore3d.com:\n\n'+
       '📦 Piesă: '+nf(r.grams,0)+' g · '+hhmm(r.hours*60)+' imprimare'+(gcode?'\n📄 G-code: '+gcode.name:'')+'\n'+
       '🧵 Material: '+MATS[mSel.value].n+'\n'+
-      '💰 Preț calculat: '+money(r.piece)+' / piesă ('+r.qty+' buc: '+money(r.orderTotal)+')\n\n'+
+      '💰 Preț calculat: '+money(r.piece)+' / piesă ('+r.qty+' buc: '+money(r.orderTotal)+')'+
+      (r.shipInc?'\n🚚 Transport: GRATUIT (inclus în preț)':'')+'\n\n'+
       'Aș dori o ofertă fermă pentru piesa mea. Mulțumesc!';
   }else{
     txt='Bună ziua! Aș dori o ofertă pentru o piesă imprimată 3D. Mulțumesc!';
@@ -1064,24 +1160,20 @@ $('btnReset').addEventListener('click',function(){
 
 function renderPrint(r){
   if(!r.valid){$('printSheet').innerHTML='';return;}
+  /* document de OFERTAT clientului: fara costuri interne (marja, amortizare etc.) */
   var rows='';
   var add=function(n,v){rows+='<tr><td>'+n+'</td><td>'+v+'</td></tr>';};
-  add('Material — '+MATS[mSel.value].n+' ('+nf(r.grams,0)+' g + pierderi)',money(r.mat));
-  add('Curent electric ('+nf(r.kwh,2)+' kWh)',money(r.elec));
-  add('Amortizare imprimantă ('+nf(r.hours,1)+' h)',money(r.amort));
-  add('Rata de eșec ('+Math.round(r.fail*100)+'%)',money(r.failCost));
-  add('Manoperă',money(r.labor));
-  add('<b>Cost de producție</b>','<b>'+money(r.cost)+'</b>');
-  add('Marjă (+'+$('gMargin').value+'%)','+'+money(r.withMargin-r.cost));
-  if(r.vatOn)add('TVA ('+$('gVatPct').value+'%)','+'+money(r.vatAmt));
-  add('Transport (o dată / comandă)','+'+money(r.ship));
+  add('Piesă imprimată 3D — '+MATS[mSel.value].n,nf(r.grams,0)+' g · '+hhmm(r.hours*60));
+  add('Cantitate',r.qty+' buc');
+  add('Preț / piesă'+(r.vatOn?' (TVA inclus)':''),money(r.piece));
+  if(r.shipInc)add('Transport','<b>GRATUIT</b> — inclus');
+  else add('Transport (o dată / comandă)','+'+money(r.ship));
   $('printSheet').innerHTML=
-    '<div class="ph"><b>AUTOCORE3D</b><span>Estimare de preț · '+new Date().toLocaleDateString('ro-RO')+'</span></div>'+
-    '<h3>Piesă imprimată 3D — '+nf(r.grams,0)+' g · '+hhmm(r.hours*60)+' imprimare</h3>'+
+    '<div class="ph"><b>AUTOCORE3D</b><span>Ofertă de preț · '+new Date().toLocaleDateString('ro-RO')+'</span></div>'+
+    '<h3>Imprimare 3D la comandă — piese auto</h3>'+
     '<table>'+rows+
-    '<tr class="tot"><td>Preț / piesă</td><td>'+money(r.piece)+'</td></tr>'+
-    '<tr class="tot"><td>Total comandă ('+r.qty+' buc)</td><td>'+money(r.orderTotal)+'</td></tr></table>'+
-    '<div class="pf">Estimare generată cu calculatorul AUTOCORE3D (autocore3d.com). Nu reprezintă ofertă fermă. '+
+    '<tr class="tot"><td>Total comandă</td><td>'+money(r.orderTotal)+'</td></tr></table>'+
+    '<div class="pf">Ofertă generată de AUTOCORE3D (autocore3d.com) — valabilă 14 zile. '+
     'Contact: WhatsApp 0771 119 423 · contact@autocore3d.com</div>';
 }
 
