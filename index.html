@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AUTOCORE3D — Piese auto imprimate 3D · Grile VW T5 & Schimbător Ford</title>
-<meta name="description" content="AUTOCORE3D reproduce piese auto care nu se mai găsesc și le imprimă 3D. În tur: grile de ventilație VW Transporter T5 din ASA negru și maneta schimbătorului Ford din ABS Carbon Fiber, remodelate după piesele originale.">
+<title>AUTOCORE3D — Piese auto imprimate 3D · Manetă schimbător Ford în ABS Carbon Fiber</title>
+<meta name="description" content="AUTOCORE3D reproduce piese auto care nu se mai găsesc și le imprimă 3D. Exemplu: maneta schimbătorului de viteze Ford, reconstruită după piesa originală și imprimată din ABS ranforsat cu fibră de carbon.">
 <meta property="og:title" content="AUTOCORE3D — Piese auto imprimate 3D">
-<meta property="og:description" content="Două piese din atelier: grilele de ventilație VW T5 (ASA negru) și maneta schimbătorului Ford (ABS Carbon Fiber), remodelate după piesele originale și imprimate 3D. Orice piesă, la comandă.">
+<meta property="og:description" content="Maneta schimbătorului Ford, reconstruită după piesa originală și imprimată 3D din ABS Carbon Fiber — rigidă, stabilă termic, finisaj mat tehnic. Orice piesă, la comandă.">
 <link rel="icon" type="image/svg+xml" href="assets/brand/autocore3d-mark-badge.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
   ::selection{background:var(--ink);color:var(--bg)}
   a{color:inherit}
 
-  #space{height:1500vh}
+  #space{height:900vh}
 
   #gl{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1}
 
@@ -162,7 +162,7 @@
     <div class="ld-mark">AUTOCORE3D</div>
     <div class="ld-num" id="ldNum">0</div>
     <div class="ld-bar"><i id="ldBar"></i></div>
-    <div class="ld-sub">Se încarcă piesele</div>
+    <div class="ld-sub">Se încarcă piesa</div>
   </div>
 </div>
 
@@ -176,94 +176,32 @@
   </nav>
 </header>
 
-<div id="hud-ch"><b id="chNum">00</b><span class="sep"></span><span class="name" id="chName">Piesa</span></div>
+<div id="hud-ch"><b id="chNum">00</b><span class="sep"></span><span class="name" id="chName">Manetă Ford</span></div>
 <div id="hud-pr"><span id="prNum">000</span><div class="track"><i id="prBar"></i></div></div>
 <div id="hint"><span>Derulează</span><div class="line"></div></div>
 
-<!-- ============ OVERLAYS · ACTUL I — GRILELE T5 ============ -->
-<section class="ov center" data-a="-0.02" data-b="0.0425">
+<!-- ============ OVERLAYS — MANETA SCHIMBĂTORULUI FORD ============ -->
+<section class="ov center" data-a="-0.02" data-b="0.085">
   <div class="in wide">
     <div class="kick">AUTOCORE3D — Piese auto imprimate 3D</div>
-    <h1 class="sm">Grile de ventilație<br>VW Transporter&nbsp;T5.</h1>
-    <p>Prima din cele două piese ale turului: grilele T5, remodelate după piesa originală și imprimate 3D din ASA negru. Derulează ca să le dai ocol — la final te așteaptă schimbătorul Ford, din ABS-carbon.</p>
+    <h1 class="sm">Manetă schimbător<br>Ford.</h1>
+    <p>O piesă din atelierul nostru: maneta schimbătorului de viteze, reconstruită după piesa originală Ford și imprimată 3D din ABS ranforsat cu fibră de carbon. Derulează ca să îi dai ocol.</p>
   </div>
 </section>
 
-<section class="ov side" data-a="0.065" data-b="0.15">
+<section class="ov side" data-a="0.13" data-b="0.30">
   <div class="num-ghost">01</div>
   <div class="in">
     <div class="kick"><i></i>01 — Geometrie</div>
-    <h2>Fidelă la milimetru.</h2>
-    <p>Orice piesă începe cu geometria: modelăm digital piesa originală — fiecare fantă, muchie și rază de racord — până când copia nu se mai deosebește de ea.</p>
+    <h2>Reconstruită<br>de la zero.</h2>
+    <p>Orice piesă începe cu geometria: corpul manetei, gulerul de fixare, umărul de prindere și clemele de la vârf — toate ridicate digital după piesa originală, cotă cu cotă, până la ultimul clips.</p>
   </div>
 </section>
 
-<section class="ov side" data-a="0.1675" data-b="0.23">
+<section class="ov side" data-a="0.335" data-b="0.46">
   <div class="num-ghost">02</div>
   <div class="in">
     <div class="kick"><i></i>02 — Material</div>
-    <h2>ASA negru,<br>stabil în soare.</h2>
-    <p>Grilele sunt imprimate din ASA negru — un material făcut pentru exterior și habitaclu: rezistă la UV și la căldură prin compoziție, nu printr-un strat de vopsea. Finisaj negru mat, uniform, direct din imprimantă.</p>
-    <div class="mats"><span>ASA negru</span><span>Stabil UV</span><span>Finisaj mat</span></div>
-    <div class="note"><i></i>Așa arată ASA-ul brut — negru mat, doar straturile fine de imprimare</div>
-  </div>
-</section>
-
-<section class="ov side" data-a="0.25" data-b="0.3275">
-  <div class="num-ghost">03</div>
-  <div class="in">
-    <div class="kick"><i></i>03 — Fabricație</div>
-    <h2>Crescută<br>strat cu strat.</h2>
-    <p>Imprimăm 3D cu straturi fine, cu traseele de material aliniate pe direcția lamelelor — rezistență acolo unde contează. Fiecare piesă e fabricată la comandă — privește cum prinde formă.</p>
-  </div>
-</section>
-
-<section class="ov side" data-a="0.345" data-b="0.40">
-  <div class="num-ghost">04</div>
-  <div class="in">
-    <div class="kick"><i></i>04 — Detalii</div>
-    <h2>Montaj direct,<br>fără ajustări.</h2>
-    <p>Conturul și clemele de prindere urmează piesa originală: grilele se clipsează direct în locașul lor, fără găurit și fără lipit. Ăsta e standardul nostru, indiferent de piesă.</p>
-  </div>
-</section>
-
-<section class="ov side" data-a="0.4175" data-b="0.46">
-  <div class="num-ghost">05</div>
-  <div class="in">
-    <div class="kick"><i></i>05 — Fișa piesei</div>
-    <h2>Pe scurt.</h2>
-    <dl class="specs">
-      <div><dt>Piesă</dt><dd>Grile de ventilație</dd></div>
-      <div><dt>Compatibilitate</dt><dd>VW Transporter T5</dd></div>
-      <div><dt>Material</dt><dd>ASA negru · finisaj mat</dd></div>
-      <div><dt>Dimensiuni</dt><dd>Ø 116 × 23 mm</dd></div>
-      <div><dt>Fabricație</dt><dd>Imprimare 3D, la comandă</dd></div>
-    </dl>
-  </div>
-</section>
-
-<!-- ============ OVERLAYS · ACTUL II — SCHIMBĂTORUL FORD ============ -->
-<section class="ov center" data-a="0.545" data-b="0.635">
-  <div class="in wide">
-    <div class="kick">06 — Piesa 02 · ABS Carbon Fiber</div>
-    <h1 class="sm">Manetă schimbător<br>Ford.</h1>
-    <p>A doua piesă a turului: maneta schimbătorului de viteze, reconstruită după piesa originală Ford și imprimată din ABS ranforsat cu fibră de carbon. Privește-o cum crește, strat cu strat.</p>
-  </div>
-</section>
-
-<section class="ov side" data-a="0.655" data-b="0.72">
-  <div class="num-ghost">07</div>
-  <div class="in">
-    <div class="kick"><i></i>07 — Geometrie</div>
-    <h2>Reconstruită<br>de la zero.</h2>
-    <p>Corpul manetei, gulerul de fixare, umărul de prindere și clemele de la vârf — toate ridicate digital după piesa originală, cotă cu cotă, până la ultimul clips.</p>
-  </div>
-</section>
-
-<section class="ov side" data-a="0.735" data-b="0.80">
-  <div class="num-ghost">08</div>
-  <div class="in">
-    <div class="kick"><i></i>08 — Material</div>
     <h2>ABS cu fibră<br>de carbon.</h2>
     <p>Pentru o piesă împinsă și răsucită la fiecare schimbare de viteză, ABS-ul simplu nu ajunge. Fibrele de carbon tocate o fac mai rigidă și stabilă dimensional la căldură — cu un finisaj mat, tehnic, direct din imprimantă.</p>
     <div class="mats"><span>ABS-CF</span><span>Fibră de carbon</span><span>Rigid · stabil termic</span></div>
@@ -271,19 +209,28 @@
   </div>
 </section>
 
-<section class="ov side" data-a="0.815" data-b="0.875">
-  <div class="num-ghost">09</div>
+<section class="ov side" data-a="0.50" data-b="0.655">
+  <div class="num-ghost">03</div>
   <div class="in">
-    <div class="kick"><i></i>09 — Detalii</div>
+    <div class="kick"><i></i>03 — Fabricație</div>
+    <h2>Crescută<br>strat cu strat.</h2>
+    <p>Imprimăm 3D cu straturi fine, cu traseele de material aliniate pe direcția solicitării — rezistență acolo unde maneta lucrează. Fiecare piesă e fabricată la comandă — privește cum prinde formă.</p>
+  </div>
+</section>
+
+<section class="ov side" data-a="0.69" data-b="0.80">
+  <div class="num-ghost">04</div>
+  <div class="in">
+    <div class="kick"><i></i>04 — Detalii</div>
     <h2>Montaj direct,<br>ca originalul.</h2>
     <p>Nuca se clipsează pe vârful manetei exact ca pe piesa Ford: cleme elastice, guler de sprijin, umăr de ghidaj. Fără adaptoare, fără joc — piesa intră la locul ei.</p>
   </div>
 </section>
 
-<section class="ov side" data-a="0.885" data-b="0.945">
-  <div class="num-ghost">10</div>
+<section class="ov side" data-a="0.835" data-b="0.92">
+  <div class="num-ghost">05</div>
   <div class="in">
-    <div class="kick"><i></i>10 — Fișa piesei</div>
+    <div class="kick"><i></i>05 — Fișa piesei</div>
     <h2>Pe scurt.</h2>
     <dl class="specs">
       <div><dt>Piesă</dt><dd>Manetă schimbător viteze</dd></div>
@@ -295,11 +242,11 @@
   </div>
 </section>
 
-<section class="ov center" data-a="0.955" data-b="1.2">
+<section class="ov center" data-a="0.95" data-b="1.2">
   <div class="in wide">
-    <div class="kick">11 — Contact</div>
+    <div class="kick">06 — Contact</div>
     <h1>Ai o piesă?<br>Hai să vorbim.</h1>
-    <p>Grilele T5 și schimbătorul Ford sunt doar două dintre piesele pe care le putem reface. Trimite-ne piesa, o poză sau modelul 3D — AUTOCORE3D e punctul tău de contact pentru piese auto imprimate 3D.</p>
+    <p>Maneta Ford e doar una dintre piesele pe care le putem reface. Trimite-ne piesa, o poză sau modelul 3D — AUTOCORE3D e punctul tău de contact pentru piese auto imprimate 3D.</p>
     <div class="cta-row">
       <button class="cta" id="ctaContact" type="button">Contact
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -438,25 +385,6 @@ function filTex(){const c=document.createElement('canvas');c.width=256;c.height=
   }
   for(let i=0;i<90;i++){x.fillStyle='rgba(255,255,255,'+(.3+Math.random()*.4).toFixed(2)+')';x.fillRect(Math.random()*256,Math.random()*64,1.6,1);}
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,1);return t;}
-/* macro ABS negru simplu: doar straturi de printare, mat, FARA fibre/sclipici */
-function absMacroTex(){const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
-  x.fillStyle='#141416';x.fillRect(0,0,512,512);
-  for(let y=0;y<512;y+=34){
-    const g=x.createLinearGradient(0,y,0,y+34);
-    g.addColorStop(0,'rgba(255,255,255,.04)');g.addColorStop(.35,'rgba(255,255,255,0)');
-    g.addColorStop(.9,'rgba(0,0,0,.2)');g.addColorStop(1,'rgba(0,0,0,.32)');
-    x.fillStyle=g;x.fillRect(0,y,512,34);
-  }
-  /* granulatie mata fina, monocroma, fara sclipici de fibra */
-  for(let i=0;i<2200;i++){const v=Math.random()<.5?255:0;x.fillStyle='rgba('+v+','+v+','+v+','+(.015+Math.random()*.04).toFixed(3)+')';x.fillRect(Math.random()*512,Math.random()*512,1,1);}
-  return new THREE.CanvasTexture(c);}
-/* fir de filament ABS negru: dungi longitudinale discrete, FARA sclipici */
-function absFilTex(){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
-  x.fillStyle='#101012';x.fillRect(0,0,256,64);
-  for(let i=0;i<130;i++){const py=Math.random()*64,px=Math.random()*256,l=8+Math.random()*30;
-    x.strokeStyle='rgba(120,124,130,'+(.03+Math.random()*.06).toFixed(3)+')';x.lineWidth=1;
-    x.beginPath();x.moveTo(px,py);x.lineTo(px+l,py+(Math.random()-.5)*1.4);x.stroke();}
-  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,1);return t;}
 function labelTex(t,fs){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.font='500 '+(fs||30)+'px "IBM Plex Mono", monospace';x.textAlign='center';x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=8;x.fillStyle='rgba(0,0,0,.9)';for(let i=0;i<3;i++)x.fillText(t,128,34);x.shadowBlur=0;x.fillStyle='#eef2f6';x.fillText(t,128,34);const tx=new THREE.CanvasTexture(c);tx.anisotropy=8;return tx;}
 const GTEX=glowTex(),STEX=shadowTex(),CTEX=carbonTex(),LTEX=layerTex();
 CTEX.repeat.set(5,3);LTEX.repeat.set(6,26);
@@ -496,30 +424,19 @@ dg.setAttribute('position',new THREE.BufferAttribute(dpos,3));
 const dust=new THREE.Points(dg,new THREE.PointsMaterial({size:.045,map:GTEX,color:0x9a968e,transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false}));
 scene.add(dust);
 
-/* ============ INCARCAREA PIESELOR (STL binar) ============ */
-/* Actul I: grilele T5 (ASA negru) · Actul II: maneta schimbatorului Ford (ABS-CF) */
+/* ============ INCARCAREA PIESEI (STL binar) ============ */
+/* maneta schimbatorului Ford — ABS ranforsat cu fibra de carbon */
 const PY=3.6;                             /* centrul piesei */
 const PART=new THREE.Group();PART.position.set(0,PY,0);scene.add(PART);
-const PART2=new THREE.Group();PART2.position.set(0,PY,0);PART2.visible=false;scene.add(PART2);
 const clip=new THREE.Plane(new THREE.Vector3(0,-1,0),100);
-const clip2=new THREE.Plane(new THREE.Vector3(0,-1,0),100);
 
-let partReady=false,part2Ready=false;
-const fetchPcts={a:0,b:0};                /* progres pe fiecare model, ponderat cu marimea */
-const MODEL_BYTES={a:589084,b:1036384};
-let fetchPct=0;
-function updFetch(){
-  const tot=MODEL_BYTES.a+MODEL_BYTES.b;
-  fetchPct=(fetchPcts.a*MODEL_BYTES.a+fetchPcts.b*MODEL_BYTES.b)/tot;
-}
+let partReady=false,fetchPct=0;
+const MODEL_BYTES=1036384;
 let carbonMesh=null,wire=null,scanPlane=null,scanLight=null,buildSlab=null,dimGroup=null;
-let carbonMesh2=null,wire2=null,scanPlane2=null,scanLight2=null,buildSlab2=null,dimGroup2=null;
 let buildGlow=null;
-const dimMats=[],dimMats2=[];
-let BB={w:5.2,h:5,d:1.5,minY:1.1,maxY:6.1};
-let BB2={w:1.4,h:5.2,d:1.1,minY:1.0,maxY:6.2};
-let PART_MM={w:116,h:116,d:23};
-let PART2_MM={w:34,h:123,d:26};
+const dimMats=[];
+let BB={w:1.5,h:5.4,d:1.2,minY:.9,maxY:6.3};
+let PART_MM={w:34,h:123,d:26};
 
 function parseSTL(buf){
   const dv=new DataView(buf);
@@ -626,22 +543,21 @@ function makeDims(parent,bb,mm,mats){
   return grp;
 }
 
-/* ---- mostre de material extrase din piesa (cap. 02 — ASA · cap. 08 — ABS-CF) ---- */
+/* ---- mostra de material extrasa din piesa (capitolul 02 — ABS-CF) ---- */
 let sample=null,chip=null,fil=null,reticle=null,connLine=null,connGeo=null,sampleLight=null;
-let sample2=null,chip2=null,fil2=null,sampleLight2=null;
-const sampleMats=[],sampleMats2=[];
+const sampleMats=[];
 function makeSample(){
   sample=new THREE.Group();sample.visible=false;scene.add(sample);
-  /* ASA negru brut: mat, fara luciu — mostra materialului din care e imprimata piesa */
+  /* ABS-CF: matrice grafit + fibre de carbon tocate, sclipitoare */
   const cm=new THREE.MeshStandardMaterial({
-    color:0x161618,map:absMacroTex(),bumpMap:LTEX.clone(),bumpScale:.05,
-    metalness:.04,roughness:.72,envMap:ENV,envMapIntensity:.45,transparent:true,opacity:0
+    color:0x17181c,map:macroTex(),bumpMap:LTEX.clone(),bumpScale:.05,
+    metalness:.1,roughness:.58,envMap:ENV,envMapIntensity:.6,transparent:true,opacity:0
   });
   cm.bumpMap.repeat.set(2,7);cm.bumpMap.needsUpdate=true;
   chip=new THREE.Mesh(new THREE.BoxGeometry(1.15,.82,.26),cm);
   sample.add(chip);sampleMats.push(cm);
-  /* fir de filament ASA negru (1.75 mm), marit */
-  const fm=new THREE.MeshStandardMaterial({color:0x141416,map:absFilTex(),metalness:.04,roughness:.66,envMap:ENV,envMapIntensity:.4,transparent:true,opacity:0});
+  /* fir de filament ABS-CF (1.75 mm), marit */
+  const fm=new THREE.MeshStandardMaterial({color:0x15161a,map:filTex(),metalness:.08,roughness:.55,envMap:ENV,envMapIntensity:.55,transparent:true,opacity:0});
   const curve=new THREE.CatmullRomCurve3([
     new THREE.Vector3(-.72,-.03,0),new THREE.Vector3(-.25,.11,.1),
     new THREE.Vector3(.23,-.1,-.05),new THREE.Vector3(.72,.05,.02)
@@ -653,8 +569,8 @@ function makeSample(){
     const sp=new THREE.Sprite(m);sp.position.set(0,y,0);sp.scale.set(sx,sy,1);
     sample.add(sp);sampleMats.push(m);
   };
-  lab('ASA NEGRU · MACRO',24,.65,1.02,.22);
-  lab('FILAMENT ASA 1.75 MM',22,-1.12,.86,.2);
+  lab('ABS-CF · MACRO',24,.65,1.02,.22);
+  lab('FILAMENT ABS-CF 1.75 MM',22,-1.12,.86,.2);
   sampleLight=new THREE.PointLight(0xffffff,0,7);sampleLight.position.set(1.3,1.6,1.6);sample.add(sampleLight);
   /* reticul pe piesa + fir de legatura */
   reticle=new THREE.Mesh(new THREE.RingGeometry(.1,.15,32),
@@ -666,34 +582,6 @@ function makeSample(){
   connLine.visible=false;scene.add(connLine);
 }
 makeSample();
-
-/* mostra ABS-CF: matrice grafit + fibre de carbon tocate, sclipitoare (reticul partajat) */
-function makeSample2(){
-  sample2=new THREE.Group();sample2.visible=false;scene.add(sample2);
-  const cm=new THREE.MeshStandardMaterial({
-    color:0x17181c,map:macroTex(),bumpMap:LTEX.clone(),bumpScale:.05,
-    metalness:.1,roughness:.58,envMap:ENV,envMapIntensity:.6,transparent:true,opacity:0
-  });
-  cm.bumpMap.repeat.set(2,7);cm.bumpMap.needsUpdate=true;
-  chip2=new THREE.Mesh(new THREE.BoxGeometry(1.15,.82,.26),cm);
-  sample2.add(chip2);sampleMats2.push(cm);
-  const fm=new THREE.MeshStandardMaterial({color:0x15161a,map:filTex(),metalness:.08,roughness:.55,envMap:ENV,envMapIntensity:.55,transparent:true,opacity:0});
-  const curve=new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-.72,-.03,0),new THREE.Vector3(-.25,.11,.1),
-    new THREE.Vector3(.23,-.1,-.05),new THREE.Vector3(.72,.05,.02)
-  ]);
-  fil2=new THREE.Mesh(new THREE.TubeGeometry(curve,40,.05,10),fm);
-  fil2.position.y=-.82;sample2.add(fil2);sampleMats2.push(fm);
-  const lab=(t,fs,y,sx,sy)=>{
-    const m=new THREE.SpriteMaterial({map:labelTex(t,fs),transparent:true,opacity:0,depthWrite:false});
-    const sp=new THREE.Sprite(m);sp.position.set(0,y,0);sp.scale.set(sx,sy,1);
-    sample2.add(sp);sampleMats2.push(m);
-  };
-  lab('ABS-CF · MACRO',24,.65,1.02,.22);
-  lab('FILAMENT ABS-CF 1.75 MM',22,-1.12,.86,.2);
-  sampleLight2=new THREE.PointLight(0xffffff,0,7);sampleLight2.position.set(1.3,1.6,1.6);sample2.add(sampleLight2);
-}
-makeSample2();
 
 function bbOf(geo){
   const box=new THREE.Box3().setFromBufferAttribute(geo.getAttribute('position'));
@@ -725,14 +613,16 @@ function makeSlab(bb,margin){
 function initPart(geo){
   BB=bbOf(geo);
   PART_MM=geo.userData.mm;
-  /* ASA negru mat: satin discret — piesa ramane neagra, cu highlight-uri moi, fara luciu de lac */
-  const asa=new THREE.MeshPhysicalMaterial({
-    color:0x0a0a0c,metalness:0,roughness:.46,
-    clearcoat:.22,clearcoatRoughness:.5,reflectivity:.42,
-    envMap:ENV,envMapIntensity:.55,
+  /* ABS-CF: grafit mat cu sclipici fin de fibra, straturi de imprimare abia sugerate */
+  const lay=LTEX.clone();lay.repeat.set(2,14);lay.needsUpdate=true;
+  const abscf=new THREE.MeshPhysicalMaterial({
+    color:0x16181d,metalness:.1,roughness:.52,
+    map:CTEX,bumpMap:lay,bumpScale:.014,
+    clearcoat:.12,clearcoatRoughness:.6,reflectivity:.4,
+    envMap:ENV,envMapIntensity:.7,
     side:THREE.DoubleSide,clippingPlanes:[clip]
   });
-  carbonMesh=new THREE.Mesh(geo,asa);
+  carbonMesh=new THREE.Mesh(geo,abscf);
   PART.add(carbonMesh);
   /* sarma tehnica peste piesa (faza de scanare) */
   wire=new THREE.LineSegments(new THREE.EdgesGeometry(geo,15),
@@ -740,64 +630,32 @@ function initPart(geo){
   wire.scale.setScalar(1.002);
   PART.add(wire);
   const sc=makeScan(PART,BB);scanPlane=sc.plane;scanLight=sc.light;
-  buildSlab=makeSlab(BB,.44);
-  if(!buildGlow){buildGlow=new THREE.PointLight(0xff6a26,0,12);scene.add(buildGlow);}
+  buildSlab=makeSlab(BB,.16);
+  buildGlow=new THREE.PointLight(0xff6a26,0,12);scene.add(buildGlow);
   dimGroup=makeDims(PART,BB,PART_MM,dimMats);
   partReady=true;
 }
-/* Actul II: maneta schimbatorului Ford — ABS ranforsat cu fibra de carbon */
-function initPart2(geo){
-  BB2=bbOf(geo);
-  PART2_MM=geo.userData.mm;
-  const lay2=LTEX.clone();lay2.repeat.set(3,34);lay2.needsUpdate=true;
-  const abscf=new THREE.MeshPhysicalMaterial({
-    color:0x111216,metalness:.12,roughness:.5,
-    map:CTEX,bumpMap:lay2,bumpScale:.028,
-    clearcoat:.14,clearcoatRoughness:.6,reflectivity:.4,
-    envMap:ENV,envMapIntensity:.6,
-    side:THREE.DoubleSide,clippingPlanes:[clip2]
-  });
-  carbonMesh2=new THREE.Mesh(geo,abscf);
-  PART2.add(carbonMesh2);
-  wire2=new THREE.LineSegments(new THREE.EdgesGeometry(geo,15),
-    new THREE.LineBasicMaterial({color:0x7f93a8,transparent:true,opacity:0}));
-  wire2.scale.setScalar(1.002);
-  PART2.add(wire2);
-  const sc=makeScan(PART2,BB2);scanPlane2=sc.plane;scanLight2=sc.light;
-  buildSlab2=makeSlab(BB2,.16);
-  if(!buildGlow){buildGlow=new THREE.PointLight(0xff6a26,0,12);scene.add(buildGlow);}
-  dimGroup2=makeDims(PART2,BB2,PART2_MM,dimMats2);
-  part2Ready=true;
-}
 
-function loadSTL(url,key,fallbackBytes,done,fail){
-  fetch(url)
-    .then(r=>{
-      const total=+r.headers.get('Content-Length')||fallbackBytes;
-      const reader=r.body.getReader();
-      const chunks=[];let got=0;
-      return (function pump(){
-        return reader.read().then(({done:fin,value})=>{
-          if(fin){
-            const buf=new Uint8Array(got);let o=0;
-            for(const c of chunks){buf.set(c,o);o+=c.length;}
-            return buf.buffer;
-          }
-          chunks.push(value);got+=value.length;
-          fetchPcts[key]=Math.min(1,got/total);updFetch();
-          return pump();
-        });
-      })();
-    })
-    .then(done)
-    .catch(()=>{fetchPcts[key]=1;updFetch();fail();});
-}
-loadSTL('assets/models/grile-t5.stl','a',MODEL_BYTES.a,
-  buf=>{initPart(buildGeometry(parseSTL(buf),5.0));},
-  ()=>{partReady=true;});
-loadSTL('assets/models/schimbator-ford-v2.stl','b',MODEL_BYTES.b,
-  buf=>{initPart2(buildGeometry(parseSTL(buf),5.2));},
-  ()=>{part2Ready=true;});
+fetch('assets/models/schimbator-ford-v2.stl')
+  .then(r=>{
+    const total=+r.headers.get('Content-Length')||MODEL_BYTES;
+    const reader=r.body.getReader();
+    const chunks=[];let got=0;
+    return (function pump(){
+      return reader.read().then(({done,value})=>{
+        if(done){
+          const buf=new Uint8Array(got);let o=0;
+          for(const c of chunks){buf.set(c,o);o+=c.length;}
+          return buf.buffer;
+        }
+        chunks.push(value);got+=value.length;
+        fetchPct=Math.min(1,got/total);
+        return pump();
+      });
+    })();
+  })
+  .then(buf=>{initPart(buildGeometry(parseSTL(buf),5.2));})
+  .catch(()=>{fetchPct=1;partReady=true;});
 
 /* ============ piste scalare ============ */
 const sm2=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
@@ -807,33 +665,20 @@ function trk(T,P){
     if(P<=T[i+1][0])return T[i][1]+(T[i+1][1]-T[i][1])*sm2((P-T[i][0])/(T[i+1][0]-T[i][0]));
   return T[T.length-1][1];
 }
-/* ---- camera: doua orbite complete — Actul I in jurul grilei (P 0–.50, 0–360°),
-        Actul II in jurul manetei (P .52–1, 360–720°) ---- */
-const T_TH=[[0,0],[.0425,9],[.08,16],[.1175,24],[.15,40],[.1875,96],[.23,150],[.26,172],[.31,235],[.35,292],[.395,326],[.425,338],[.465,352],[.50,360],
-            [.52,364],[.56,378],[.60,392],[.655,414],[.72,438],[.76,492],[.80,556],[.84,608],[.875,634],[.91,660],[.945,682],[1,720]];
-const T_R =[[0,11.2],[.0425,10.2],[.08,9.4],[.1175,9.8],[.15,8.8],[.1875,5.2],[.23,5.2],[.26,6.6],[.31,6.2],[.35,4.6],[.395,4.9],[.425,6.6],[.465,9.6],[.50,10.8],
-            [.56,9.2],[.60,8.4],[.655,7.6],[.72,7.2],[.76,5.4],[.80,5.2],[.84,4.3],[.875,4.5],[.91,6.6],[.945,7.4],[1,11.6]];
-const T_H =[[0,3.6],[.0425,3.8],[.08,3.6],[.1175,3.7],[.15,3.4],[.1875,4.2],[.23,3.4],[.26,1.4],[.31,6.3],[.35,2.8],[.395,4.7],[.425,3.8],[.465,4.1],[.50,3.9],
-            [.56,4.5],[.60,4.1],[.655,3.6],[.72,3.7],[.76,3.9],[.80,3.4],[.84,6.2],[.875,5.9],[.91,4.3],[.945,4.0],[1,3.7]];
-const T_LY=[[0,3.6],[.065,3.6],[.1175,3.6],[.15,3.6],[.1875,3.8],[.26,2.2],[.31,4.9],[.35,3.0],[.395,4.1],[.425,3.6],[.50,3.65],
-            [.56,3.4],[.60,3.5],[.655,3.6],[.72,3.6],[.76,3.5],[.80,3.3],[.84,5.4],[.875,5.2],[.91,3.8],[1,3.65]];
-/* ---- piste efecte · Actul I (grila) ---- */
-const T_WIRE1=[[.06,0],[.0825,1],[.145,1],[.1725,0],[.245,0],[.2625,.85],[.30,.55],[.3325,0]];
-const T_DIMS1=[[.08,0],[.10,1],[.15,1],[.1675,0]];
-const T_SCAN1=[[.075,-1.15],[.15,1.15]];
-const SCAN1_A=.075,SCAN1_B=.15;
-/* grila: construita la inceput, se de-construieste la finalul actului (schimbul de piese) */
-const T_CLIP1=[[0,1],[.2325,1],[.25,0],[.2675,0],[.3325,1],[.455,1],[.515,0]];
-const T_BGLO1=[[.245,0],[.2675,1],[.32,1],[.3375,0],[.457,0],[.472,1],[.502,1],[.522,0]];
-const T_XTR1 =[[.1675,0],[.189,1],[.22,1],[.239,0]];
-/* ---- piste efecte · Actul II (maneta schimbatorului) ---- */
-const T_CLIP2=[[0,0],[.55,0],[.665,1],[1,1]];
-const T_BGLO2=[[.545,0],[.565,1],[.645,1],[.678,0]];
-const T_WIRE2=[[.645,0],[.672,1],[.715,1],[.744,.6],[.775,0]];
-const T_DIMS2=[[.658,0],[.682,1],[.715,1],[.744,0]];
-const T_SCAN2=[[.652,-1.15],[.752,1.15]];
-const SCAN2_A=.652,SCAN2_B=.752;
-const T_XTR2 =[[.735,0],[.762,1],[.797,1],[.825,0]];
+/* ---- camera: orbita completa de 360° in jurul manetei verticale ---- */
+/* 0.14–0.31 e mentinut aproape frontal si stabil ca sa se vada cotele */
+const T_TH=[[0,0],[.085,9],[.16,16],[.235,24],[.30,40],[.375,96],[.46,150],[.52,172],[.62,235],[.70,292],[.79,326],[.85,338],[.93,352],[1,360]];
+const T_R =[[0,10.6],[.085,9.4],[.16,8.2],[.235,7.6],[.30,7.2],[.375,5.2],[.46,5.4],[.52,7.2],[.62,6.8],[.70,4.2],[.79,4.6],[.85,6.6],[.93,8.8],[1,10.8]];
+const T_H =[[0,3.6],[.085,3.8],[.16,3.6],[.235,3.7],[.30,3.5],[.375,4.2],[.46,3.5],[.52,1.6],[.62,6.2],[.70,6.1],[.79,5.4],[.85,3.9],[.93,4.0],[1,3.7]];
+const T_LY=[[0,3.6],[.13,3.6],[.235,3.6],[.30,3.6],[.375,3.8],[.52,2.4],[.62,4.9],[.70,5.3],[.79,4.5],[.85,3.6],[1,3.65]];
+/* ---- piste efecte ---- */
+const T_WIRE=[[.12,0],[.165,1],[.29,1],[.345,0],[.49,0],[.525,.85],[.60,.55],[.665,0]];
+const T_DIMS=[[.16,0],[.20,1],[.30,1],[.335,0]];
+const T_SCAN=[[.15,-1.15],[.30,1.15]];
+const SCAN_A=.15,SCAN_B=.30;
+const T_CLIP=[[0,1],[.465,1],[.50,0],[.535,0],[.665,1],[1,1]];
+const T_BGLO=[[.49,0],[.535,1],[.64,1],[.675,0]];
+const T_XTR =[[.335,0],[.378,1],[.44,1],[.478,0]];
 const T_FIN =[[.90,0],[.965,1]];
 
 /* ============ SUNET (WebAudio, generat) ============ */
@@ -924,8 +769,7 @@ function playWhoosh(){
 
 /* ============ SCROLL + OVERLAYS + HUD ============ */
 const ovs=[...document.querySelectorAll('.ov')].map(el=>({el,a:parseFloat(el.dataset.a),b:parseFloat(el.dataset.b)}));
-const CH=[[0,'00','Piesa 01 · Grile T5'],[.065,'01','Geometrie'],[.1675,'02','Material · ASA'],[.25,'03','Fabricație'],[.345,'04','Detalii'],[.4175,'05','Fișă piesă'],
-          [.468,'—','Schimbăm piesa'],[.545,'06','Piesa 02 · Schimbător Ford'],[.655,'07','Geometrie'],[.735,'08','Material · ABS-CF'],[.815,'09','Detalii'],[.885,'10','Fișă piesă'],[.955,'11','Contact']];
+const CH=[[0,'00','Manetă Ford'],[.13,'01','Geometrie'],[.335,'02','Material · ABS-CF'],[.50,'03','Fabricație'],[.69,'04','Detalii'],[.835,'05','Fișă piesă'],[.95,'06','Contact']];
 const chNum=document.getElementById('chNum'),chName=document.getElementById('chName'),
       prNum=document.getElementById('prNum'),prBar=document.getElementById('prBar'),
       hint=document.getElementById('hint');
@@ -970,14 +814,10 @@ function frame(now){
   const t=now*.001;
   const vel=Math.abs(P-Pprev)/Math.max(dt,.001);Pprev=P;
 
-  /* piesa activa: doar respiratie discreta — turul il face camera */
-  const act2=P>=.52;
-  PART.visible=P<.545;
-  PART2.visible=part2Ready&&!!carbonMesh2&&P>.50;
-  const breathe=REDUCED?0:Math.sin(t*.7)*.035;
-  const breatheR=REDUCED?0:Math.sin(t*.3)*.02;
-  PART.rotation.y=breatheR;PART.position.y=PY+breathe;
-  PART2.rotation.y=breatheR;PART2.position.y=PY+breathe;
+  /* piesa: doar respiratie discreta — turul il face camera */
+  PART.rotation.y=REDUCED?0:Math.sin(t*.3)*.02;
+  PART.position.y=PY+(REDUCED?0:Math.sin(t*.7)*.035);
+  shadow.material.opacity=.7-(REDUCED?0:Math.sin(t*.7)*.08);
 
   if(!REDUCED){
     dust.rotation.y=Math.sin(t*.02)*.02;
@@ -986,60 +826,34 @@ function frame(now){
     dg.attributes.position.needsUpdate=true;
   }
 
-  let boNow=0,bestCy=0,shadowCt=1;
+  let boNow=0;
   if(partReady&&carbonMesh){
-    /* Actul I · faza 01: sarma + scan + cote */
-    const w=trk(T_WIRE1,P);
+    /* faza 01: sarma + scan + cote */
+    const w=trk(T_WIRE,P);
     wire.material.opacity=w*.55;
-    const sy=trk(T_SCAN1,P)*(BB.h/2+.55);
-    const scanOn=(P>SCAN1_A&&P<SCAN1_B)?1:0;
+    const sy=trk(T_SCAN,P)*(BB.h/2+.55);
+    const scanOn=(P>SCAN_A&&P<SCAN_B)?1:0;
     scanPlane.position.y=sy;
     scanPlane.material.opacity=scanOn*w*.22;
     scanLight.position.set(0,sy,BB.d/2+.7);
     scanLight.intensity=scanOn*w*1.0;
-    const dOp=trk(T_DIMS1,P);
+    const dOp=trk(T_DIMS,P);
     dimMats.forEach(m=>{m.opacity=dOp*(m.isSpriteMaterial?.95:.5);});
-    /* faza 03: grila se construieste strat cu strat; la schimbul de piese se de-construieste */
-    const ct=trk(T_CLIP1,P);
+    /* faza 03: piesa se construieste strat cu strat */
+    const ct=trk(T_CLIP,P);
     const cy=BB.minY-.03+ct*(BB.maxY-BB.minY+.1);
     clip.constant=cy;
-    const bo=trk(T_BGLO1,P)*(ct>.005&&ct<.985?1:0);
+    const bo=trk(T_BGLO,P)*(ct>.005&&ct<.985?1:0);
+    boNow=bo;
     buildSlab.position.set(0,cy,0);
     buildSlab.userData.mat.opacity=bo*(.7+Math.sin(t*8)*.25);
-    if(bo>boNow){boNow=bo;bestCy=cy;}
-    if(!act2)shadowCt=ct;
-  }
-  if(part2Ready&&carbonMesh2){
-    /* Actul II · maneta: aceeasi dramaturgie — scan, cote, crestere strat cu strat */
-    const w2=trk(T_WIRE2,P);
-    wire2.material.opacity=w2*.55;
-    const sy2=trk(T_SCAN2,P)*(BB2.h/2+.55);
-    const scanOn2=(P>SCAN2_A&&P<SCAN2_B)?1:0;
-    scanPlane2.position.y=sy2;
-    scanPlane2.material.opacity=scanOn2*w2*.22;
-    scanLight2.position.set(0,sy2,BB2.d/2+.7);
-    scanLight2.intensity=scanOn2*w2*1.0;
-    const dOp2=trk(T_DIMS2,P);
-    dimMats2.forEach(m=>{m.opacity=dOp2*(m.isSpriteMaterial?.95:.5);});
-    const ct2=trk(T_CLIP2,P);
-    const cy2=BB2.minY-.03+ct2*(BB2.maxY-BB2.minY+.1);
-    clip2.constant=cy2;
-    const bo2=trk(T_BGLO2,P)*(ct2>.005&&ct2<.985?1:0);
-    buildSlab2.position.set(0,cy2,0);
-    buildSlab2.userData.mat.opacity=bo2*(.7+Math.sin(t*8)*.25);
-    if(bo2>boNow){boNow=bo2;bestCy=cy2;}
-    if(act2)shadowCt=ct2;
-  }
-  if(buildGlow){
     const thB=trk(T_TH,P)*Math.PI/180;
-    buildGlow.position.set(Math.sin(thB)*2.2,bestCy+.12,Math.cos(thB)*2.2);
-    buildGlow.intensity=boNow*1.7;
+    buildGlow.position.set(Math.sin(thB)*2.2,cy+.12,Math.cos(thB)*2.2);
+    buildGlow.intensity=bo*1.7;
+    warm.intensity=.4+bo*.5;
+    /* final: lumina de contur creste */
+    finBack.intensity=trk(T_FIN,P)*1.15;
   }
-  warm.intensity=.4+boNow*.5;
-  /* final: lumina de contur creste */
-  finBack.intensity=trk(T_FIN,P)*1.15;
-  /* umbra urmeaza piesa activa: dispare cand piesa e de-construita */
-  shadow.material.opacity=(.7-(REDUCED?0:Math.sin(t*.7)*.08))*Math.min(1,shadowCt*1.4);
 
   /* camera: orbita cilindrica — 360° in jurul piesei */
   const th=trk(T_TH,P)*Math.PI/180;
@@ -1058,51 +872,39 @@ function frame(now){
   bgPlane.position.set(-Math.sin(th)*40,4.2,-Math.cos(th)*40);
   bgPlane.lookAt(camera.position);
 
-  /* capitolele de material (02 — ASA · 08 — ABS-CF): mostra extrasa din piesa activa */
-  const xr1=sample?trk(T_XTR1,P):0;
-  const xr2=sample2?trk(T_XTR2,P):0;
-  function updSample(grp,chipRef,filRef,mats,light,xr){
-    if(!grp)return;
+  /* capitolul 02: mostra de material extrasa din piesa, adusa in fata camerei */
+  const xr=trk(T_XTR,P);
+  if(sample){
     const vis=xr>.002;
-    grp.visible=vis;
-    if(!vis)return;
-    sDir.copy(vLook).sub(camera.position).normalize();
-    sRight.crossVectors(sDir,UP).normalize();
-    const narrow=camera.aspect<1;
-    grp.position.copy(camera.position)
-      .addScaledVector(sDir,narrow?6.2:4.6)
-      .addScaledVector(sRight,narrow?.35:1.75);
-    grp.position.y+=(narrow?1.3:0)+(REDUCED?0:Math.sin(t*.8)*.05);
-    grp.quaternion.copy(camera.quaternion);
-    chipRef.rotation.y=Math.sin(t*.35)*.55;chipRef.rotation.x=Math.sin(t*.27)*.22;
-    filRef.rotation.y=t*.4;
-    grp.scale.setScalar((.4+.6*sm2(xr))*(narrow?.72:1));
-    mats.forEach(m=>{m.opacity=xr*(m.isSpriteMaterial?.95:1);});
-    light.intensity=xr*1.3;
-  }
-  updSample(sample,chip,fil,sampleMats,sampleLight,xr1);
-  updSample(sample2,chip2,fil2,sampleMats2,sampleLight2,xr2);
-  const xrC=Math.max(xr1,xr2);
-  if(reticle){
-    const vis=xrC>.002;
-    reticle.visible=vis;connLine.visible=vis;
+    sample.visible=vis;reticle.visible=vis;connLine.visible=vis;
     if(vis){
-      const actS=xr1>=xr2?sample:sample2;
-      const actBB=xr1>=xr2?BB:BB2;
-      /* punctul de pe piesa din care e "scoasa" mostra */
+      sDir.copy(vLook).sub(camera.position).normalize();
+      sRight.crossVectors(sDir,UP).normalize();
+      const narrow=camera.aspect<1;
+      sample.position.copy(camera.position)
+        .addScaledVector(sDir,narrow?6.2:4.6)
+        .addScaledVector(sRight,narrow?.35:1.75);
+      sample.position.y+=(narrow?1.3:0)+(REDUCED?0:Math.sin(t*.8)*.05);
+      sample.quaternion.copy(camera.quaternion);
+      chip.rotation.y=Math.sin(t*.35)*.55;chip.rotation.x=Math.sin(t*.27)*.22;
+      fil.rotation.y=t*.4;
+      sample.scale.setScalar((.4+.6*sm2(xr))*(narrow?.72:1));
+      sampleMats.forEach(m=>{m.opacity=xr*(m.isSpriteMaterial?.95:1);});
+      sampleLight.intensity=xr*1.3;
+      /* punctul de pe piesa din care e "scoasa" mostra — pe corpul manetei */
       const thA=Math.atan2(camera.position.x,camera.position.z);
-      sAnchor.set(Math.sin(thA)*actBB.w*.3,PY+.7,Math.cos(thA)*actBB.d*.5);
+      sAnchor.set(Math.sin(thA)*BB.w*.3,PY+.7,Math.cos(thA)*BB.d*.5);
       reticle.position.copy(sAnchor);reticle.lookAt(camera.position);
-      reticle.material.opacity=xrC*.85;
+      reticle.material.opacity=xr*.85;
       const cp=connGeo.attributes.position.array;
       cp[0]=sAnchor.x;cp[1]=sAnchor.y;cp[2]=sAnchor.z;
-      cp[3]=actS.position.x;cp[4]=actS.position.y;cp[5]=actS.position.z;
+      cp[3]=sample.position.x;cp[4]=sample.position.y;cp[5]=sample.position.z;
       connGeo.attributes.position.needsUpdate=true;
-      connLine.material.opacity=xrC*.4;
+      connLine.material.opacity=xr*.4;
     }
   }
-  if(xrC>.05&&xrPrev<=.05)playWhoosh();
-  xrPrev=xrC;
+  if(xr>.05&&xrPrev<=.05)playWhoosh();
+  xrPrev=xr;
 
   /* sunet legat de miscare */
   if(SND.on&&SND.ready){
@@ -1121,11 +923,10 @@ const ldNum=document.getElementById('ldNum'),ldBar=document.getElementById('ldBa
 renderer.render(scene,camera);
 const ld0=performance.now();
 (function tickLoad(){
-  const ready=partReady&&part2Ready;
   const tPct=Math.min(1,(performance.now()-ld0)/1400);
-  const shown=Math.floor(Math.min(tPct,Math.max(fetchPct,ready?1:0)*.4+tPct*.6)*100);
+  const shown=Math.floor(Math.min(tPct,Math.max(fetchPct,partReady?1:0)*.4+tPct*.6)*100);
   ldNum.textContent=shown;ldBar.style.width=shown+'%';
-  if(shown<100||!ready){requestAnimationFrame(tickLoad);}
+  if(shown<100||!partReady){requestAnimationFrame(tickLoad);}
   else{
     renderer.render(scene,camera);
     loader.classList.add('done');document.body.classList.remove('loading');
