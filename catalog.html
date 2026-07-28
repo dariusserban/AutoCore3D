@@ -935,7 +935,6 @@ body::before{content:'';position:fixed;inset:0;z-index:6;pointer-events:none;opa
     </a>
     <nav>
       <a href="#" class="nav-link" data-tab="produse" data-i18n="nav_products">Proiecte</a>
-      <a href="#" class="nav-link" data-tab="configurator" data-i18n="nav_configurator">Configurator</a>
       <a href="calculator.html" class="nav-link" data-i18n="nav_calculator">Calculator</a>
       <button class="nav-cart" id="cartBtn" style="display:none">🛒<span class="cart-badge" id="cartBadge"></span></button>
       <button class="nav-admin" id="admBtn">⚙</button>
@@ -949,88 +948,10 @@ body::before{content:'';position:fixed;inset:0;z-index:6;pointer-events:none;opa
 
 <div class="tabs-bar" id="tabsBar">
   <button class="tab-btn active" data-tab="produse"><span class="tab-icon">🚗</span><span data-i18n="nav_products">Proiecte</span></button>
-  <button class="tab-btn" data-tab="configurator"><span class="tab-icon">⬡</span><span data-i18n="nav_configurator">Configurator</span></button>
   <a class="tab-btn" href="calculator.html" style="text-decoration:none"><span class="tab-icon">∑</span><span data-i18n="nav_calculator">Calculator</span></a>
 </div>
 
-<!-- ══ SECTION 1: CERERE PRINTARE 3D ══ -->
-<section id="configurator" class="conf-section tab-section">
-  <div class="conf-inner">
-    <div class="conf-eyebrow" data-i18n="conf_eyebrow">// 01 · CERERE PRINTARE 3D PERSONALIZATĂ</div>
-    <h2 class="conf-title" data-i18n="conf_title_html">Trimite <span>Fișierul Tău</span> 3D</h2>
-    <p class="conf-sub" data-i18n="conf_sub">Încarcă modelul STL/STEP, alege zona și nivelul de stres — primești prețul estimat instant. Dacă îți convine, trimiți comanda direct pe WhatsApp.</p>
-    <div class="conf-panels">
-      <!-- STÂNGA: upload + formulare -->
-      <div class="conf-panel-left">
-        <div class="upload-zone" id="uploadZone">
-          <input type="file" id="fileInput" accept=".stl,.step,.stp,.gcode,.gco,.gc" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;">
-          <div id="uploadContent">
-            <span class="upload-icon">📁</span>
-            <div class="upload-title">Trage fișierul 3D aici</div>
-            <div class="upload-sub">sau apasă pentru a selecta</div>
-            <div class="upload-hint">STL / STEP — ofertă personalizată pe WhatsApp &nbsp;·&nbsp; GCODE — preț calculat automat</div>
-          </div>
-        </div>
-        <div class="conf-form-grid">
-          <div class="conf-form-group">
-            <label class="conf-form-lbl" for="selZone" data-i18n="zone_label">// ZONA PIESEI</label>
-            <select class="conf-select" id="selZone">
-              <option value="motor" data-i18n="zone_motor">Compartiment Motor</option>
-              <option value="exterior" data-i18n="zone_exterior">Exterior Caroserie</option>
-              <option value="interior" data-i18n="zone_interior">Interior / Habitaclu</option>
-            </select>
-          </div>
-          <div class="conf-form-group">
-            <label class="conf-form-lbl" for="selStress" data-i18n="stress_label">// NIVEL STRES MECANIC</label>
-            <select class="conf-select" id="selStress">
-              <option value="low" data-i18n="stress_low">⬡ Scăzut — uz interior, decorativ</option>
-              <option value="mid" data-i18n="stress_mid">◈ Mediu — vibrații, temperaturi moderate</option>
-              <option value="crit" data-i18n="stress_crit">⚠ Critic — motor, impact, temp. ridicate</option>
-            </select>
-          </div>
-          <div class="conf-form-group">
-            <label class="conf-form-lbl" for="orderName" data-i18n="name_label">// NUMELE TĂU</label>
-            <input class="conf-input" id="orderName" type="text" placeholder="Cum te cheamă..." data-i18n-ph="name_ph">
-          </div>
-          <div class="conf-form-group">
-            <label class="conf-form-lbl" for="orderContact" data-i18n="contact_label">// TELEFON SAU EMAIL</label>
-            <input class="conf-input" id="orderContact" type="text" placeholder="07XX... sau email@..." data-i18n-ph="contact_ph">
-          </div>
-        </div>
-      </div>
-      <!-- DREAPTA: rezultat + CTA -->
-      <div class="conf-panel-right">
-        <div class="conf-result">
-          <div class="conf-result-inner">
-            <div class="conf-left">
-              <div class="conf-mat-eyebrow" id="matEyebrow">// MATERIAL RECOMANDAT</div>
-              <div class="conf-mat-name" id="matName">ABS / ASA</div>
-              <div class="conf-spec-badges" id="specBadges"></div>
-            </div>
-            <div class="conf-right">
-              <div class="conf-price-autocore">
-                <div class="conf-brand-badge" id="priceBadge">⬡ PREȚ ESTIMAT AUTOCORE3D</div>
-                <div class="price-breakdown" id="priceBreakdown" style="display:none"></div>
-                <div class="conf-price-main" id="priceMain">— RON</div>
-                <div class="conf-price-save" id="priceSave">✓ Transport GRATUIT inclus · Încarcă fișierul pentru preț</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="conf-cta-wrap">
-          <button class="conf-cta-btn" id="confCtaBtn" data-i18n="cta_btn">📲 Trimite pe WhatsApp</button>
-          <span class="conf-cta-sub" data-i18n="cta_sub">Cererea ajunge direct la noi · Confirmare în 24h · Transport GRATUIT</span>
-        </div>
-        <a class="conf-adv-link" href="calculator.html">
-          <span class="cal-ico">⬡</span>
-          <span class="cal-txt"><b data-i18n="adv_calc_title">Calculator avansat de preț</b>
-          <em data-i18n="adv_calc_sub">Material · curent · amortizare imprimantă · rata de eșec · recuperarea investiției — cu G-code, ca la Prusa</em></span>
-          <span class="cal-arrow">→</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
+<!-- ══ (configuratorul vechi a fost eliminat — calculatorul avansat e pe calculator.html) ══ -->
 
 <!-- ══ SECTION 2: CATALOG PIESE AUTO ══ -->
 <section id="produse" class="tab-section active">
@@ -1058,6 +979,12 @@ body::before{content:'';position:fixed;inset:0;z-index:6;pointer-events:none;opa
     </div>
   </div>
   <div class="products-wrap">
+    <a class="conf-adv-link" href="calculator.html" style="margin:0 0 1.25rem">
+      <span class="cal-ico">∑</span>
+      <span class="cal-txt"><b data-i18n="adv_calc_title">Calculator avansat de preț</b>
+      <em data-i18n="adv_calc_sub">Material · curent · amortizare imprimantă · rata de eșec · recuperarea investiției — cu G-code, ca la Prusa</em></span>
+      <span class="cal-arrow">→</span>
+    </a>
     <div class="prod-hdr"><span class="prod-count" id="prodCount">—</span><div class="prod-line"></div></div>
     <div class="grid" id="grid"></div>
   </div>
@@ -1387,28 +1314,6 @@ const TVA             = 1.21;  /* 21% impozit */
 const EUR_RATE        = 5.20;  /* RON per 1 EUR */
 function fmtPrice(ron){if(lang==='en')return`€${Math.ceil(+ron/EUR_RATE)}`;return`${Math.round(+ron)} RON`;}
 
-/* ══ CONFIGURATOR DATA ══ */
-const CONF_DATA = {
-  motor:{
-    name:'Compartiment Motor', name_en:'Engine Compartment',
-    low: {mat:'ABS/ASA',      color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'90°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],      specs_en:[{i:'🌡',l:'Thermal',v:'90°C'},{i:'☀',l:'UV',v:'Medium'},{i:'⬡',l:'Impact',v:'Good'}],      base:120},
-    mid: {mat:'ASA Premium',  color:'#f59e0b', specs:[{i:'🌡',l:'Termic',v:'110°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Excelent'}],specs_en:[{i:'🌡',l:'Thermal',v:'110°C'},{i:'☀',l:'UV',v:'High'},{i:'⬡',l:'Impact',v:'Excellent'}],base:185},
-    crit:{mat:'ABS Carbon Fiber',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'150°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Extrem'}],  specs_en:[{i:'🌡',l:'Thermal',v:'150°C'},{i:'☀',l:'UV',v:'High'},{i:'⬡',l:'Impact',v:'Extreme'}],   base:290}
-  },
-  exterior:{
-    name:'Exterior Caroserie', name_en:'Exterior Bodywork',
-    low: {mat:'ASA',          color:'#25D366', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Ridicat'},{i:'⬡',l:'Impact',v:'Bun'}],     specs_en:[{i:'🌡',l:'Thermal',v:'95°C'},{i:'☀',l:'UV',v:'High'},{i:'⬡',l:'Impact',v:'Good'}],      base:95},
-    mid: {mat:'ASA Carbon Fiber',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'105°C'},{i:'☀',l:'UV',v:'Excelent'},{i:'⬡',l:'Impact',v:'Ridicat'}],specs_en:[{i:'🌡',l:'Thermal',v:'105°C'},{i:'☀',l:'UV',v:'Excellent'},{i:'⬡',l:'Impact',v:'High'}],base:165},
-    crit:{mat:'ASA Carbon Fiber',color:'#a3a3a3',specs:[{i:'🌡',l:'Termic',v:'130°C'},{i:'☀',l:'UV',v:'Maxim'},{i:'⬡',l:'Impact',v:'Extrem'}],   specs_en:[{i:'🌡',l:'Thermal',v:'130°C'},{i:'☀',l:'UV',v:'Maximum'},{i:'⬡',l:'Impact',v:'Extreme'}],  base:265}
-  },
-  interior:{
-    name:'Interior / Habitaclu', name_en:'Interior / Cabin',
-    low: {mat:'PLA+ / ABS',  color:'#8b5cf6', specs:[{i:'🌡',l:'Termic',v:'70°C'},{i:'☀',l:'UV',v:'Scăzut'},{i:'⬡',l:'Impact',v:'Moderat'}], specs_en:[{i:'🌡',l:'Thermal',v:'70°C'},{i:'☀',l:'UV',v:'Low'},{i:'⬡',l:'Impact',v:'Moderate'}],  base:70},
-    mid: {mat:'ABS Premium', color:'#3b82f6', specs:[{i:'🌡',l:'Termic',v:'95°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Bun'}],       specs_en:[{i:'🌡',l:'Thermal',v:'95°C'},{i:'☀',l:'UV',v:'Medium'},{i:'⬡',l:'Impact',v:'Good'}],     base:130},
-    crit:{mat:'ABS / PA12',  color:'#ff5c1a', specs:[{i:'🌡',l:'Termic',v:'120°C'},{i:'☀',l:'UV',v:'Mediu'},{i:'⬡',l:'Impact',v:'Ridicat'}],  specs_en:[{i:'🌡',l:'Thermal',v:'120°C'},{i:'☀',l:'UV',v:'Medium'},{i:'⬡',l:'Impact',v:'High'}],    base:220}
-  }
-};
-
 const COLOR_MAP = {
   'white':'#F0F0F0','jade white':'#C8E6C9','beige':'#F5F0DC','light gray':'#C8C8C8',
   'yellow':'#FFF176','sunflower yellow':'#FFCA28','gold':'#FFD700','pumpkin orange':'#FF7043',
@@ -1540,7 +1445,6 @@ let filStockFilter     = 'all';
 let filSearchQ         = '';
 
 /* Configurator state */
-let orderFile = null;
 let cart = []; // [{uid, name, material, price, qty, image}]
 let cartPayMethod = 'RAMBURS';
 
@@ -1715,10 +1619,6 @@ function applyI18n(){
   });
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.placeholder=t(el.dataset.i18nPh);});
   document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('on',b.dataset.lang===lang));
-  if(!orderFile){
-    $('uploadContent').innerHTML=`<span class="upload-icon">📁</span><div class="upload-title">${t('upload_title')}</div><div class="upload-sub">${t('upload_sub')}</div><div class="upload-hint">${t('upload_hint')}</div>`;
-  }
-  updateEstimate();
   renderFilters();renderGrid();renderFilaments();renderPolicyCards();
 }
 $('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');if(!b)return;lang=b.dataset.lang;applyI18n();});
@@ -1726,196 +1626,7 @@ $('langBtn').addEventListener('click',e=>{const b=e.target.closest('.lang-opt');
 /* ══ TICKER ══ */
 function buildTicker(){const a=[...TICK_ITEMS,...TICK_ITEMS];$('ticker').innerHTML=a.map(ti=>`<span class="t-item"><b>▸</b>${ti}</span>`).join('');}
 
-/* ══ GCODE PARSER — universal, orice slicer ══ */
-function parseGCode(txt){
-  let mins=0,grams=0;
-
-  /* ── TIMP ── (5 fallback-uri în ordine de prioritate) */
-  // 1. "Xh Xm Xs" / "Xd Xh Xm" — Prusa, SuperSlicer, OrcaSlicer, Bambu string
-  const t1=txt.match(/;[^\n]*?(?:print(?:ing)?\s*time|estimated)[^\n]*?=\s*((?:\d+\s*d\s*)?(?:\d+\s*h\s*)?(?:\d+\s*m\s*)?(?:\d+\s*s\s*)?)/i);
-  if(t1&&/\d/.test(t1[1]||'')){
-    const t=t1[1];
-    mins=+(t.match(/(\d+)\s*d/)||[,0])[1]*1440
-        ++(t.match(/(\d+)\s*h/)||[,0])[1]*60
-        ++(t.match(/(\d+)\s*m/)||[,0])[1];
-  }
-  // 2. integer secunde — Bambu "; estimated_printing_seconds/time_normal_mode = N", Cura ";TIME:N", IdeaMaker
-  if(!mins){
-    const t2=txt.match(/(?:^;TIME:|;[^\n]*?(?:_seconds|time_normal_mode|print_time)[^\n]*?[=:]\s*)(\d{3,})\s*s?\s*(?:\n|$)/im);
-    if(t2)mins=Math.round(+t2[1]/60);
-  }
-  // 3. HH:MM sau HH:MM:SS — Cura, unele versiuni Simplify3D
-  if(!mins){
-    const t3=txt.match(/;[^\n]*time[^\n]*[=:]\s*(\d{1,3}):(\d{2})(?::(\d{2}))?/i);
-    if(t3)mins=+t3[1]*60 + +t3[2];
-  }
-  // 4. "X hours Y minutes" — Flashforge, IdeaMaker string
-  if(!mins){
-    const t4=txt.match(/;[^\n]*?(\d+)\s*h(?:ours?)?[^\n\d]*?(\d+)\s*m(?:in(?:utes?)?)?/i);
-    if(t4)mins=+t4[1]*60 + +t4[2];
-  }
-  // 5. orice comentariu cu "time" + număr mare (>999 → secunde)
-  if(!mins){
-    const t5=txt.match(/;[^\n]*time[^\n]*?[=:\s](\d{4,})/i);
-    if(t5)mins=Math.round(+t5[1]/60);
-  }
-
-  /* ── GRAME ── (5 fallback-uri) */
-  // 1. "[g] = X" sau "_g = X" sau "total_weight = X" — Prusa, Bambu
-  const g1=txt.match(/;[^\n]*(?:filament[_ ]*used[_ \[]*g[\]_ ]?|total[_ ]weight)[^\n]*?[=:]\s*([\d.]+)/i);
-  if(g1)grams=+g1[1];
-  // 2. "= Xg" sau ": Xg" cu unitate explicită — IdeaMaker, Flashforge
-  if(!grams){const g2=txt.match(/;[^\n]*(?:filament|weight)[^\n]*?[=:]\s*([\d.]+)\s*g(?:\s|;|$)/im);if(g2)grams=+g2[1];}
-  // 3. ";PRINT.WEIGHT:X" — Cura
-  if(!grams){const g3=txt.match(/^;PRINT\.WEIGHT:([\d.]+)/m);if(g3)grams=+g3[1];}
-  // 4. ";Filament used: Xm" — Cura (conversie metri → grame 1.75mm ABS)
-  if(!grams){const g4=txt.match(/^;Filament used:\s*([\d.]+)m(?:\s|$)/m);if(g4)grams=Math.PI*0.0875*0.0875*+g4[1]*100*1.04;}
-  // 5. "Filament length: Xmm" — Simplify3D (conversie mm → grame)
-  if(!grams){const g5=txt.match(/;[^\n]*filament[^\n]*?([\d.]+)\s*mm/i);if(g5)grams=Math.PI*0.0875*0.0875*+g5[1]/10*1.04;}
-
-  /* tip filament — nu mai extragem din GCode, vine din selectia utilizatorului */
-  return{mins,grams};
-}
-/* extrage cuvântul cheie de filament din numele materialului din CONF_DATA
-   ex: "ASA Carbon Fiber" → "ASA-CF", "ABS Premium" → "ABS", "PLA+ / ABS" → "PLA" */
-function matToFilType(matName){
-  const m=matName.toLowerCase();
-  if(m.includes('abs')&&m.includes('carbon'))return'ABS-CF';
-  if(m.includes('asa')&&m.includes('carbon'))return'ASA-CF';
-  if(m.includes('pa12')||m.includes('pa-cf')||m.includes('nylon'))return'PA12';
-  if(m.includes('petg'))return'PETG';
-  if(m.includes('tpu')||m.includes('tpe'))return'TPU';
-  if(m.includes('asa'))return'ASA';
-  if(m.includes('abs'))return'ABS';
-  if(m.includes('pla'))return'PLA';
-  return matName;
-}
-function findBambuFilament(matName){
-  if(!matName||!filaments.length)return null;
-  const filType=matToFilType(matName);
-  const norm=s=>s.toLowerCase().replace(/[-_\s]/g,'');
-  const ft=norm(filType);
-  const bambu=filaments.filter(f=>norm(f.brand||'').includes('bambu'));
-  return bambu.find(f=>norm(f.type||'')===ft)
-      ||bambu.find(f=>{const n=norm(f.type||'');return n.includes(ft)||ft.includes(n);})
-      ||null;
-}
-function calcGCodePrice(mins,grams,matName){
-  let filCost;
-  const fil=findBambuFilament(matName);
-  const filWeight=fil&&fil.weight>0?fil.weight:1000;
-  const filPrice=fil&&!isNaN(fil.price)?fil.price:FIL_RON_PER_KG+FILAMENT_MARKUP;
-  if(fil){
-    /* preț sheets (fără markup catalog) × 2 + 12 RON per rolă */
-    const rawPrice=Math.max(0,filPrice-FILAMENT_MARKUP);
-    const efectivPerRola=rawPrice*2+FILAMENT_MARKUP;
-    filCost=grams/filWeight*efectivPerRola;
-  } else {
-    filCost=grams/1000*FIL_RON_PER_KG;
-  }
-  if(isNaN(filCost))filCost=grams/1000*FIL_RON_PER_KG; /* gardă NaN */
-  const elecCost=mins/60*(PRINTER_WATTS/1000)*ELEC_RON_KWH;
-  const total=Math.ceil((filCost+elecCost)*MARKUP*TVA)+TRANSPORT_RON;
-  return{filCost,elecCost,total,h:Math.floor(mins/60),m:mins%60,grams};
-}
-function showGCodePrice(p){
-  $('priceBadge').textContent=t('price_badge_gcode');
-  $('priceBadge').style.color='var(--green)';
-  $('priceBreakdown').style.display='none';
-  $('priceMain').textContent=fmtPrice(p.total);
-  $('priceMain').style.fontSize='';
-  $('priceSave').textContent=t('price_save_gcode');
-}
-
-/* ══ CONFIGURATOR — UPLOAD + ESTIMATE ══ */
-function updateEstimate(){
-  const zone=$('selZone').value,stress=$('selStress').value;
-  if(!zone||!stress)return;
-  const zd=CONF_DATA[zone],sd=zd[stress];
-  const zoneName=lang==='en'?(zd.name_en||zd.name):zd.name;
-  $('matEyebrow').textContent=`${t('mat_eyebrow')} · ${zoneName.toUpperCase()}`;
-  $('matName').textContent=sd.mat;
-  $('matName').style.color='#ff5c1a';
-  const specs=lang==='en'?(sd.specs_en||sd.specs):sd.specs;
-  $('specBadges').innerHTML=specs.map(s=>`<div class="conf-spec-badge"><span class="conf-spec-icon">${s.i}</span><span class="conf-spec-lbl">${s.l}</span><span class="conf-spec-val">${s.v}</span></div>`).join('');
-  const isGcode=orderFile&&['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase());
-  if(!isGcode){
-    $('priceBadge').textContent=t('price_badge_manual');
-    $('priceBadge').style.color='var(--sub)';
-    $('priceBreakdown').style.display='none';
-    $('priceMain').textContent=t('price_empty');
-    $('priceMain').style.fontSize='1.2rem';
-    $('priceSave').innerHTML=t('price_save_manual');
-  }
-}
-function setUploadFile(f){
-  const ext=(f.name.split('.').pop()||'').toLowerCase();
-  const isGcode=['gcode','gco','gc'].includes(ext);
-  const isModel=['stl','step','stp'].includes(ext);
-  if(!isGcode&&!isModel){toast(lang==='en'?'Formats: .STL .STEP .STP .GCODE':'Formate: .STL .STEP .STP .GCODE',true);return;}
-  orderFile=f;
-  $('uploadZone').classList.add('has-file');
-  $('uploadContent').innerHTML=`<span class="upload-icon">${isGcode?'⚙️':'✅'}</span><div class="upload-title" style="color:var(--green)">${isGcode?t('gcode_loaded'):t('file_loaded')}</div><div class="upload-fname">${f.name}</div><div class="upload-sub" style="margin-top:.35rem">${(f.size/1024/1024).toFixed(2)} MB · ${t('file_change')}</div>`;
-  if(isGcode){
-    /* citim primii + ultimii 16KB — acolo sunt headerele Prusa/Cura */
-    const blob=f.size>131072?new Blob([f.slice(0,65536),f.slice(-65536)]):f;
-    const reader=new FileReader();
-    reader.onload=e=>{
-      const {mins,grams}=parseGCode(e.target.result);
-      if(mins>0||grams>0){
-        const matName=CONF_DATA[$('selZone').value][$('selStress').value].mat;
-        showGCodePrice(calcGCodePrice(mins,grams,matName));
-        $('uploadContent').querySelector('.upload-title').textContent='GCode încărcat ✓';
-      } else {
-        toast(t('gcode_err'),true);
-        updateEstimate();
-      }
-    };
-    reader.readAsText(blob);
-  } else {
-    updateEstimate();
-  }
-}
-(function initUpload(){
-  const uz=$('uploadZone'),fi=$('fileInput');
-  uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag');});
-  uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
-  uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f)setUploadFile(f);});
-  fi.addEventListener('change',e=>{if(e.target.files[0])setUploadFile(e.target.files[0]);});
-})();
-$('selZone').addEventListener('change',updateEstimate);
-$('selStress').addEventListener('change',updateEstimate);
-$('confCtaBtn').addEventListener('click',async()=>{
-  const zone=$('selZone').value,stress=$('selStress').value;
-  const zd=CONF_DATA[zone],sd=zd[stress];
-  const name=$('orderName').value.trim();
-  const contact=$('orderContact').value.trim();
-  if(!name||!contact){toast(lang==='en'?'Please fill in your name and contact':'Completează numele și contactul',true);return;}
-  const zoneName=lang==='en'?(zd.name_en||zd.name):zd.name;
-  const sLabel=t(`stress_${stress}_name`);
-  const priceShown=$('priceMain').textContent;
-  const isGcode=orderFile&&['gcode','gco','gc'].includes((orderFile.name.split('.').pop()||'').toLowerCase());
-  const fName=orderFile?orderFile.name:(lang==='en'?'No file attached':'Fără fișier atașat');
-  const priceLine=isGcode
-    ?`💰 ${t('wa_price_label')}: ${priceShown} (${t('wa_transport_note')})`
-    :`💰 ${t('wa_price_label')}: ${t('wa_to_calc')}`;
-  let fileUrl='';
-  if(orderFile){
-    const btn=$('confCtaBtn');
-    btn.disabled=true;
-    const oldLabel=btn.textContent;
-    btn.textContent=lang==='en'?'Uploading file...':'Se încarcă fișierul...';
-    try{
-      const ext=orderFile.name.split('.').pop(),path=`orders/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      fileUrl=await sb.uploadImage(orderFile,path);
-    }catch(e){toast(`Eroare upload fișier: ${e.message}`,true);}
-    btn.disabled=false;btn.textContent=oldLabel;
-  }
-  const fileLine=fileUrl?`📎 ${t('wa_file_lbl')}: ${fileUrl}`:`📁 ${t('wa_file_lbl')}: ${fName}`;
-  const msg=`${t('wa_greeting')}\n\n👤 ${t('wa_name_lbl')}: ${name}\n📞 ${t('wa_contact_lbl')}: ${contact}\n${fileLine}\n\n🚗 ${t('wa_zone_lbl')}: ${zoneName}\n⚡ ${t('wa_stress_lbl')}: ${sLabel}\n🔧 ${t('wa_mat_lbl')}: ${sd.mat}\n${priceLine}\n\n${t('wa_attach')}`;
-  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank');
-  sendNotifEmail(`[AUTOCORE3D] Cerere printare — ${name}`,`Nume: ${name}\nContact: ${contact}\nFișier: ${fileUrl||fName}\nZonă: ${zoneName}\nStres: ${sLabel}\nMaterial: ${sd.mat}\n${priceLine}`);
-});
+/* (configuratorul vechi a fost eliminat — vezi calculator.html) */
 
 /* ══ SVG ══ */
 function hexSVG(s=68){return`<svg width="${s}" height="${s}" viewBox="0 0 80 80" fill="none"><polygon points="40,8 72,28 72,52 40,72 8,52 8,28" stroke="#ff5c1a" stroke-width="1.5" fill="none" opacity=".4"/><polygon points="40,20 60,32 60,48 40,60 20,48 20,32" stroke="#ff5c1a" stroke-width="1" fill="none" opacity=".22"/><circle cx="40" cy="40" r="4" fill="#ff5c1a" opacity=".65"/></svg>`;}
@@ -3078,7 +2789,6 @@ function sendNotifEmail(subject, body){
 /* ══ INIT ══ */
 buildTicker();
 applyI18n();
-updateEstimate();
 loadAll();
 initScrollReveal();
 initCounters();
