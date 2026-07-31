@@ -429,6 +429,14 @@ textarea.inp{min-height:64px;resize:vertical}
 .conn-line.local .d{background:var(--gray-st)}
 .o-del{color:var(--muted-2)!important}
 .o-del:hover{color:var(--danger)!important;border-color:rgba(255,90,69,.5)!important}
+.diag-row{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:10px;margin-bottom:7px;font-size:12.5px;border:1px solid var(--line-2)}
+.diag-row b{font-weight:800;font-size:13px}
+.diag-row span{color:var(--muted-2);word-break:break-word}
+.diag-row.ok{background:rgba(62,207,110,.08);border-color:rgba(62,207,110,.35)}
+.diag-row.ok b{color:#8FE9AF}
+.diag-row.bad{background:rgba(255,90,69,.08);border-color:rgba(255,90,69,.4)}
+.diag-row.bad b{color:var(--danger)}
+.diag-fix{background:rgba(255,196,0,.08);border:1px solid rgba(255,196,0,.4);color:var(--gold-2);border-radius:10px;padding:11px 13px;font-size:12.5px;font-weight:600;margin-top:6px;line-height:1.5}
 
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
@@ -695,11 +703,39 @@ async function bootstrap(){
 }
 
 /* Oglindește modificările din admin în cloud (fără să blocheze UI-ul) */
-function cloudUpsertItem(it){ if(SB.on) SB.rest('POST', 'kb_items', itemToRow(it), 'resolution=merge-duplicates,return=minimal').catch(() => toast('⚠️ Sincronizare cloud eșuată')); }
+function cloudUpsertItem(it){ if(SB.on) SB.rest('POST', 'kb_items', itemToRow(it), 'resolution=merge-duplicates,return=minimal').catch(e => toast('⚠️ Sincronizare cloud eșuată: ' + e.message)); }
 function cloudDeleteItem(id){ if(SB.on) SB.rest('DELETE', 'kb_items?id=eq.' + encodeURIComponent(id)).catch(() => {}); }
 function cloudSyncCats(){ if(SB.on) SB.rest('POST', 'kb_categories', DB.categories.map((c, i) => ({ id: c.id, name: c.name, note: c.note || '', pos: i })), 'resolution=merge-duplicates,return=minimal').catch(() => {}); }
 function cloudDeleteCat(id){ if(SB.on) SB.rest('DELETE', 'kb_categories?id=eq.' + encodeURIComponent(id)).catch(() => {}); }
-function cloudSaveSettings(){ if(SB.on) SB.rest('POST', 'kb_settings', { id: 1, data: DB.settings }, 'resolution=merge-duplicates,return=minimal').catch(() => toast('⚠️ Sincronizare setări eșuată')); }
+function cloudSaveSettings(){ if(SB.on) SB.rest('POST', 'kb_settings', { id: 1, data: DB.settings }, 'resolution=merge-duplicates,return=minimal').catch(e => toast('⚠️ Sincronizare setări eșuată: ' + e.message)); }
+
+async function runDiagnostic(){
+  const out = $('#diagOut'); if(!out) return;
+  out.innerHTML = '<div class="hint">Se testează conexiunea… (durează câteva secunde)</div>';
+  const res = [];
+  const run = async (name, fn) => { try{ const m = await fn(); res.push({ name, ok: true, msg: m || 'OK' }); }catch(e){ res.push({ name, ok: false, msg: e.message }); } };
+
+  await run('1. Citire setări (kb_settings)', async () => { await SB.rest('GET', 'kb_settings?id=eq.1&select=id'); return 'tabelul există, citire OK'; });
+  await run('2. Citire meniu (kb_items)', async () => { const r = await SB.rest('GET', 'kb_items?select=id'); return (r ? r.length : 0) + ' produse în cloud'; });
+  await run('3. Scriere setări (upsert)', async () => { await SB.rest('POST', 'kb_settings', { id: 1, data: DB.settings }, 'resolution=merge-duplicates,return=minimal'); return 'scriere OK'; });
+  await run('4. Comenzi (funcție kb_orders_list)', async () => { const r = await SB.rpc('kb_orders_list', { pw: ADMIN_PASS }); return (r ? r.length : 0) + ' comenzi'; });
+  await run('5. Încărcare poză (bucket menu-photos)', async () => { await SB.uploadPhoto(new Blob([new Uint8Array([255, 216, 255, 217])], { type: 'image/jpeg' })); return 'upload OK'; });
+
+  // interpretare automată
+  const fail = res.filter(r => !r.ok);
+  let fix = '';
+  const missingTables = res[0] && !res[0].ok && /(404|does not exist|Not Found|relation)/i.test(res[0].msg);
+  const writeFails = res[2] && !res[2].ok;
+  const storageFails = res[4] && !res[4].ok;
+  if(missingTables) fix = '➜ Tabelele nu există în Supabase — SQL-ul nu s-a aplicat (probabil a dat eroare la partea de „storage" și s-a anulat tot). Rulează din nou fișierul supabase-setup.sql actualizat (partea de poze e acum separată).';
+  else if(writeFails && /(42501|violates row-level|permission|policy)/i.test(res[2].msg)) fix = '➜ Regula de scriere lipsește. Rulează în SQL Editor blocul „REPARARE SCRIERE" pe care ți-l dă Claude.';
+  else if(writeFails) fix = '➜ Scrierea eșuează. Trimite-i lui Claude textul de la testul 3.';
+  else if(storageFails) fix = '➜ Doar pozele nu merg (bucket-ul „menu-photos" lipsește sau nu permite încărcarea). Restul (comenzi, setări) funcționează. Se repară în 2 clicuri în Supabase → Storage.';
+  else if(!fail.length) fix = '✓ Totul funcționează! Setările și comenzile se salvează în cloud și ajung pe orice dispozitiv.';
+
+  out.innerHTML = res.map(r => `<div class="diag-row ${r.ok ? 'ok' : 'bad'}"><b>${r.ok ? '✓' : '✗'} ${esc(r.name)}</b><span>${esc(r.msg)}</span></div>`).join('')
+    + (fix ? `<div class="diag-fix">${esc(fix)}</div>` : '');
+}
 
 /* Comenzi din cloud (admin) */
 const getOrders = () => SB.on ? (cloudOrders || []) : DB.orders;
@@ -1330,6 +1366,8 @@ function renderSettingsTab(){
       <h3><svg class="ic" aria-hidden="true"><use href="#i-settings"/></svg> Comenzi &amp; poze în cloud</h3>
       ${connCard}
       <div class="hint">Aici comenzile clienților ajung la tine în timp real, iar pozele încărcate se văd de toată lumea. Cheile se pun o singură dată în cod (sunt publice, sigure).</div>
+      ${SB.on ? `<button class="btn btn-ghost btn-sm" id="diagBtn" style="margin-top:12px"><svg class="ic ic-s" aria-hidden="true"><use href="#i-info"/></svg> Testează conexiunea</button>
+      <div id="diagOut" style="margin-top:10px"></div>` : ''}
     </div>
     <div class="set-card">
       <h3><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg> Stare local</h3>
@@ -1383,6 +1421,7 @@ function renderSettingsTab(){
       <div class="hint">Spațiu local folosit: ~${used} KB din ~5.000 KB. ${SB.on ? 'Cu Supabase conectat, pozele și comenzile stau în cloud, nu în acest spațiu.' : 'Pozele mari ocupă cel mai mult — se optimizează automat la încărcare.'}</div>
     </div>
     <div class="save-fab"><button class="btn btn-gold btn-block" id="saveSettings" style="min-height:54px">💾 Salvează setările</button></div>`;
+  const diagBtn = $('#diagBtn'); if(diagBtn) diagBtn.onclick = runDiagnostic;
   $('#sOpen').onchange = e => { DB.settings.isOpen = e.target.checked; saveDB(); cloudSaveSettings(); renderSite(); renderAdmin(); toast(e.target.checked ? '🟢 Local marcat DESCHIS' : '🔴 Local marcat ÎNCHIS'); };
   $('#saveSettings').onclick = () => {
     const s2 = DB.settings;
