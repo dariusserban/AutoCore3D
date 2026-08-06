@@ -702,6 +702,7 @@ const STORIES=[
     match:/gril.*(bara fata|megane 2 rs)/,
     hud:'Mégane 2 RS',
     piesa:'Grilă bară față',
+    mat:'ASA negru',
     title:'Grilă de bară<br>față. Mégane 2 RS.',
     intro:'O piesă din atelierul nostru: grila de bară față pentru Renault Mégane 2 RS, desenată și imprimată 3D la comandă din ASA negru. Derulează ca să îi dai ocol.',
     geoTitle:'Desenată pentru<br>decupajul barei.',
@@ -721,9 +722,11 @@ function applyStory(p){
   if(!p)return;                       // fără proiect din bază rămân textele Peugeot din HTML
   const set=(id,html)=>{const e=document.getElementById(id);if(e&&html)e.innerHTML=html;};
   const name=(p.name||'').trim()||'Proiect nou';
-  const mat=((p.material||'').trim())||((p.materials_list||[])[0]||{}).name||'';
   const desc=(p.description||'').trim();
   const hand=STORIES.find(s=>s.match.test(slug(name)));
+  /* materialul din poveste acopera golul cand campul nu e completat in catalog —
+     altfel etichetele mostrei 3D si fisa piesei ar contrazice textul scris de mana */
+  const mat=((p.material||'').trim())||((p.materials_list||[])[0]||{}).name||(hand&&hand.mat)||'';
   const mi=matInfo(mat);
   const N=esc(name),M=esc(mat);
 
