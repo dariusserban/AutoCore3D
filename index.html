@@ -205,7 +205,7 @@
     <h2 id="ov2Title">ABS cu fibră<br>de carbon.</h2>
     <p id="ov2Text">Piesa originală din plastic e exact cea care cedează: trasă la fiecare cuplare a marșarierului, se tocește și maneta rămâne fără marșarier. Fibrele de carbon tocate fac ABS-ul mai rigid și stabil dimensional la căldură — cu un finisaj mat, tehnic, direct din imprimantă.</p>
     <div class="mats" id="ov2Mats"><span>ABS-CF</span><span>Fibră de carbon</span><span>Rigid · stabil termic</span></div>
-    <div class="note"><i></i>Mostra mărită: straturi fine + fibre de carbon sclipitoare în matrice</div>
+    <div class="note" id="ov2Note"><i></i>Mostra mărită: straturi fine + fibre de carbon sclipitoare în matrice</div>
   </div>
 </section>
 
@@ -388,7 +388,12 @@ function filTex(){const c=document.createElement('canvas');c.width=256;c.height=
   }
   for(let i=0;i<90;i++){x.fillStyle='rgba(255,255,255,'+(.3+Math.random()*.4).toFixed(2)+')';x.fillRect(Math.random()*256,Math.random()*64,1.6,1);}
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,1);return t;}
-function labelTex(t,fs){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.font='500 '+(fs||30)+'px "IBM Plex Mono", monospace';x.textAlign='center';x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=8;x.fillStyle='rgba(0,0,0,.9)';for(let i=0;i<3;i++)x.fillText(t,128,34);x.shadowBlur=0;x.fillStyle='#eef2f6';x.fillText(t,128,34);const tx=new THREE.CanvasTexture(c);tx.anisotropy=8;return tx;}
+function labelTex(t,fs){const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
+/* stramtam scrisul pana incape in textura: numele materialului vine din catalog
+   si poate fi mai lung decat cel scris initial, iar altfel eticheta iese taiata */
+let _fs=fs||30;const _set=s=>{x.font='500 '+s+'px "IBM Plex Mono", monospace';};_set(_fs);
+while(_fs>9&&x.measureText(t).width>238){_fs--;_set(_fs);}
+x.textAlign='center';x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=8;x.fillStyle='rgba(0,0,0,.9)';for(let i=0;i<3;i++)x.fillText(t,128,34);x.shadowBlur=0;x.fillStyle='#eef2f6';x.fillText(t,128,34);const tx=new THREE.CanvasTexture(c);tx.anisotropy=8;return tx;}
 const GTEX=glowTex(),STEX=shadowTex(),CTEX=carbonTex(),LTEX=layerTex();
 CTEX.repeat.set(5,3);LTEX.repeat.set(6,26);
 const MAXANI=renderer.capabilities.getMaxAnisotropy();
@@ -563,6 +568,17 @@ function makeDims(parent,bb,mm,mats){
 /* ---- mostra de material extrasa din piesa (capitolul 02 — ABS-CF) ---- */
 let sample=null,chip=null,fil=null,reticle=null,connLine=null,connGeo=null,sampleLight=null;
 const sampleMats=[];
+/* etichetele mostrei se rescriu dupa materialul piesei prezentate */
+const sampleLabels=[];
+function setSampleLabels(mat){
+  if(sampleLabels.length<2)return;
+  const M=(mat||'ABS-CF').toUpperCase();
+  const txt=[`${M} · MACRO`,`FILAMENT ${M} 1.75 MM`];
+  sampleLabels.forEach((l,i)=>{
+    if(l.m.map)l.m.map.dispose();
+    l.m.map=labelTex(txt[i],l.fs);l.m.needsUpdate=true;
+  });
+}
 function makeSample(){
   sample=new THREE.Group();sample.visible=false;scene.add(sample);
   /* ABS-CF: matrice grafit + fibre de carbon tocate, sclipitoare */
@@ -584,7 +600,7 @@ function makeSample(){
   const lab=(t,fs,y,sx,sy)=>{
     const m=new THREE.SpriteMaterial({map:labelTex(t,fs),transparent:true,opacity:0,depthWrite:false});
     const sp=new THREE.Sprite(m);sp.position.set(0,y,0);sp.scale.set(sx,sy,1);
-    sample.add(sp);sampleMats.push(m);
+    sample.add(sp);sampleMats.push(m);sampleLabels.push({m,fs});
   };
   lab('ABS-CF · MACRO',24,.65,1.02,.22);
   lab('FILAMENT ABS-CF 1.75 MM',22,-1.12,.86,.2);
@@ -663,24 +679,43 @@ const slug=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u03
 
 /* afirmații reale despre materiale, alese după materialul din proiect */
 const MAT_INFO=[
-  {k:['abs-cf','abs cf','carbon'],title:'ABS cu fibră<br>de carbon.',tags:['ABS-CF','Fibră de carbon','Rigid · stabil termic'],
+  {k:['abs-cf','abs cf','carbon'],title:'ABS cu fibră<br>de carbon.',tags:['ABS-CF','Fibră de carbon','Rigid · stabil termic'],note:'Mostra mărită: straturi fine + fibre de carbon sclipitoare în matrice',
    text:'Fibrele de carbon tocate fac ABS-ul mai rigid și mai stabil dimensional la căldură, cu un finisaj mat, tehnic, direct din imprimantă — pentru piese care lucrează sub sarcină.'},
-  {k:['asa'],title:'ASA, făcut<br>pentru exterior.',tags:['ASA','Rezistent UV','Stabil la intemperii'],
+  {k:['asa'],title:'ASA, făcut<br>pentru exterior.',tags:['ASA','Rezistent UV','Stabil la intemperii'],note:'Mostra mărită: straturile fine de ASA, mat, așa cum ies din imprimantă',
    text:'ASA e materialul potrivit pentru piesele montate în afara habitaclului: nu se îngălbenește și nu devine casant sub ultraviolete, cum pățește ABS-ul, și își ține culoarea și rigiditatea prin ploaie, îngheț și arșiță.'},
-  {k:['petg'],title:'PETG, tenace<br>și stabil.',tags:['PETG','Tenace','Stabil dimensional'],
+  {k:['petg'],title:'PETG, tenace<br>și stabil.',tags:['PETG','Tenace','Stabil dimensional'],note:'Mostra mărită: straturile fine de PETG, așa cum ies din imprimantă',
    text:'PETG încasează șocul fără să crape și rămâne stabil dimensional — potrivit pentru piese care trebuie să cedeze puțin în loc să se rupă.'},
-  {k:['pa','nylon','poliamid'],title:'Poliamidă,<br>rezistentă la uzură.',tags:['PA / Nylon','Rezistent la uzură','Tenace'],
+  {k:['pa','nylon','poliamid'],title:'Poliamidă,<br>rezistentă la uzură.',tags:['PA / Nylon','Rezistent la uzură','Tenace'],note:'Mostra mărită: straturile fine de poliamidă, așa cum ies din imprimantă',
    text:'Poliamida rezistă la frecare repetată și la șoc, de aceea e alegerea pentru piese care culisează sau lucrează una în alta.'},
-  {k:['abs'],title:'ABS, clasicul<br>de sub capotă.',tags:['ABS','Stabil termic','Rigid'],
+  {k:['abs'],title:'ABS, clasicul<br>de sub capotă.',tags:['ABS','Stabil termic','Rigid'],note:'Mostra mărită: straturile fine de ABS, așa cum ies din imprimantă',
    text:'ABS-ul ține la temperatură mai bine decât PLA și se prelucrează ușor după imprimare — potrivit pentru piese din habitaclu și din compartimentul motor.'},
-  {k:['pla'],title:'PLA, precis<br>la detaliu.',tags:['PLA','Precizie','Finisaj fin'],
+  {k:['pla'],title:'PLA, precis<br>la detaliu.',tags:['PLA','Precizie','Finisaj fin'],note:'Mostra mărită: straturile fine de PLA, așa cum ies din imprimantă',
    text:'PLA redă cel mai fidel detaliul fin și cotele, fiind potrivit pentru piese de interior care nu iau căldură directă.'}
 ];
 function matInfo(m){const s=slug(m);return MAT_INFO.find(x=>x.k.some(k=>s.includes(k)))||null;}
 
-/* Texte scrise de mână, pe proiect. Cheia e numele din catalog, fără
-   diacritice și majuscule. Ce nu e aici primește textele compuse automat. */
-const STORIES={};
+/* Texte scrise de mână, pe proiect. Potrivirea se face după tipar, nu după
+   numele exact, ca titlul din catalog să poată fi ajustat fără să se piardă
+   textele. Ce nu se potrivește primește textele compuse automat. */
+const STORIES=[
+  {
+    match:/gril.*(bara fata|megane 2 rs)/,
+    hud:'Mégane 2 RS',
+    piesa:'Grilă bară față',
+    title:'Grilă de bară<br>față. Mégane 2 RS.',
+    intro:'O piesă din atelierul nostru: grila de bară față pentru Renault Mégane 2 RS, desenată și imprimată 3D la comandă din ASA negru. Derulează ca să îi dai ocol.',
+    geoTitle:'Desenată pentru<br>decupajul barei.',
+    geoText:'Conturul urmează deschiderea din bara Mégane 2 RS, iar prinderile cad pe punctele ei, ca să intre în locaș fără ajustări. Nervurile sunt trasate în model, una câte una — nu decupate dintr-o plasă universală.',
+    matTitle:'ASA, făcut<br>pentru exterior.',
+    matText:'Grila stă în bara față: ia soare, ploaie, îngheț și pietriș. ASA nu se îngălbenește și nu devine casant sub ultraviolete, cum pățește ABS-ul, și își ține culoarea și rigiditatea an după an. De aceea e materialul corect pentru o piesă montată în afara habitaclului — negru mat, direct din imprimantă.',
+    matTags:'<span>ASA negru</span><span>Rezistent UV</span><span>Stabil la intemperii</span>',
+    fabTitle:'Crescută<br>strat cu strat.',
+    fabText:'Imprimăm 3D cu straturi fine, cu traseele de material aliniate pe direcția solicitării — rigiditate pe lungimea grilei, acolo unde o piesă lată tinde să cedeze. Fiecare bucată e fabricată la comandă.',
+    detTitle:'Montaj în bară,<br>fără adaptoare.',
+    detText:'Prinderile sunt parte din piesă, nu adăugate după: grila intră în decupajul barei și se fixează pe punctele ei, fără piese intermediare și fără joc.',
+    outro:'Grila de bară față pentru Mégane 2 RS e doar una dintre piesele pe care le putem face. Trimite-ne piesa, o poză sau modelul 3D — AUTOCORE3D e punctul tău de contact pentru piese auto imprimate 3D.'
+  }
+];
 
 function applyStory(p){
   if(!p)return;                       // fără proiect din bază rămân textele Peugeot din HTML
@@ -688,7 +723,7 @@ function applyStory(p){
   const name=(p.name||'').trim()||'Proiect nou';
   const mat=((p.material||'').trim())||((p.materials_list||[])[0]||{}).name||'';
   const desc=(p.description||'').trim();
-  const hand=STORIES[slug(name)];
+  const hand=STORIES.find(s=>s.match.test(slug(name)));
   const mi=matInfo(mat);
   const N=esc(name),M=esc(mat);
 
@@ -700,6 +735,7 @@ function applyStory(p){
     matTitle:mi?mi.title:(M?`${M}.`:'Materialul<br>potrivit.'),
     matText:mi?mi.text:(M?`Piesa e imprimată din ${M}, ales pentru felul în care lucrează piesa pe mașină.`:'Materialul e ales de fiecare dată după solicitarea reală a piesei pe mașină.'),
     matTags:(mi?mi.tags:[M||'Material la comandă']).map(t=>`<span>${esc(t)}</span>`).join(''),
+    note:mi?mi.note:'Mostra mărită: straturile fine, așa cum ies din imprimantă',
     fabTitle:'Crescută<br>strat cu strat.',
     fabText:'Imprimăm 3D cu straturi fine, cu traseele de material aliniate pe direcția solicitării — rezistență acolo unde piesa lucrează. Fiecare piesă e fabricată la comandă.',
     detTitle:'Montaj direct,<br>ca originalul.',
@@ -710,18 +746,20 @@ function applyStory(p){
   set('ov0Title',s.title);set('ov0Text',s.intro);
   set('ov1Title',s.geoTitle);set('ov1Text',s.geoText);
   set('ov2Title',s.matTitle);set('ov2Text',s.matText);set('ov2Mats',s.matTags);
+  if(s.note){const n=document.getElementById('ov2Note');if(n)n.innerHTML=`<i></i>${esc(s.note)}`;}
+  setSampleLabels(mat);            // etichetele mostrei 3D urmeaza materialul piesei
   set('ov3Title',s.fabTitle);set('ov3Text',s.fabText);
   set('ov4Title',s.detTitle);set('ov4Text',s.detText);
   set('ov6Text',s.outro);
 
   /* fișa piesei — cotele vin măsurate din STL, nu scrise de mână */
   const d=PART_MM,dim=d?`${Math.round(d.w)} × ${Math.round(d.h)} × ${Math.round(d.d)} mm`:'';
-  const rows=[['Piesă',name],p.category&&['Categorie',p.category],p.brand&&['Compatibilitate',p.brand],
+  const rows=[['Piesă',s.piesa||name],p.category&&['Categorie',p.category],p.brand&&['Compatibilitate',p.brand],
               mat&&['Material',mat],dim&&['Dimensiuni',dim],['Fabricație','Imprimare 3D, la comandă']].filter(Boolean);
   set('ov5Specs',rows.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join(''));
 
   /* indicatorul de capitol din colț */
-  CH[0][2]=name;
+  CH[0][2]=s.hud||name;
   if(mat)CH[2][2]=`Material · ${mat}`;
   lastCh='';                          // forțează reafișarea capitolului curent
   document.title=`${name} — AUTOCORE3D`;
