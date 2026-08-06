@@ -1412,7 +1412,13 @@ const sb = {
   savePolicies(data){return this.req('policies',{method:'POST',body:JSON.stringify({id:'main',data}),headers:{Prefer:'resolution=merge-duplicates,return=minimal'}});},
   async uploadImage(file,path){
     const r=await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':file.type||'application/octet-stream','x-upsert':'true'},body:file});
-    if(!r.ok) throw new Error(`Upload ${r.status}`);
+    /* Storage răspunde cu un JSON explicativ ({error,message}) — fără el rămâneam
+       doar cu „Upload 400”, care nu spune nimic despre cauza reală */
+    if(!r.ok){
+      let d='';
+      try{const t=(await r.text()||'').trim();try{const j=JSON.parse(t);d=j.message||j.error||t;}catch(_){d=t;}}catch(_){}
+      throw new Error(`Upload ${r.status}${d?` — ${d.slice(0,160)}`:''}`);
+    }
     return `${SB_URL}/storage/v1/object/public/${BUCKET}/${path}`;
   },
   getOrders(){ return this.req('orders?select=*&order=created_at.desc'); },
@@ -1660,7 +1666,7 @@ function attachCarousel(card){
 }
 
 /* ══ 3D MODEL HELPERS ══ */
-function isModelUrl(u){return typeof u==='string'&&/\.(stl|3mf)(\?|$)/i.test(u);}
+function isModelUrl(u){return typeof u==='string'&&/\.(stl|3mf)(\.gz)?(\?|$)/i.test(u);}
 function prodModel(p){return (p.images||[]).find(isModelUrl)||null;}
 function prodPhotos(p){return (p.images||[]).filter(u=>!isModelUrl(u));}
 
@@ -2071,20 +2077,186 @@ function renderModelCurrent(){
   el.innerHTML=`<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;border:1px solid rgba(255,92,26,.35);background:rgba(255,92,26,.06)"><span style="color:var(--red)">◈ 3D</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${formModel}">${name}</span><button class="img-row-btn" id="modelRmBtn">✕</button></div>`;
   const rm=$('modelRmBtn');if(rm)rm.onclick=()=>{formModel=null;renderModelCurrent();};
 }
+/* Limita de fișier a Supabase Storage. Pe planul Free e 50MB și nu poate fi
+   ridicată din bucket — de aceea un STL brut de ~100MB primea „Upload 400”. */
+const SB_SOFT_LIMIT=50*1024*1024;
+const fmtMB=b=>`${(b/1048576).toFixed(1)}MB`;
+/* un STL e binar doar dacă mărimea corespunde exact numărului de triunghiuri
+   din header; altfel e ASCII, format care ocupă de ~5× mai mult pentru
+   aceeași geometrie */
+function isBinarySTL(buf){
+  if(buf.byteLength<84)return false;
+  return 84+new DataView(buf).getUint32(80,true)*50===buf.byteLength;
+}
+/* Scrie un triunghi în format STL binar (50 octeți), cu normala pe față
+   recalculată din vertecși — cea din fișierul sursă e adesea greșită. */
+function writeSTLTri(dv,o,v,i){
+  const ax=v[i+3]-v[i],ay=v[i+4]-v[i+1],az=v[i+5]-v[i+2];
+  const bx=v[i+6]-v[i],by=v[i+7]-v[i+1],bz=v[i+8]-v[i+2];
+  let nx=ay*bz-az*by,ny=az*bx-ax*bz,nz=ax*by-ay*bx;
+  const len=Math.hypot(nx,ny,nz);
+  if(len>0){nx/=len;ny/=len;nz/=len;}else{nx=ny=nz=0;}
+  dv.setFloat32(o,nx,true);dv.setFloat32(o+4,ny,true);dv.setFloat32(o+8,nz,true);
+  for(let k=0;k<9;k++)dv.setFloat32(o+12+k*4,v[i+k],true);
+  dv.setUint16(o+48,0,true);
+}
+function newSTLBuffer(nTri){
+  const out=new ArrayBuffer(84+nTri*50),dv=new DataView(out);
+  // header text, dar NU începe cu „solid” — altfel unele parsere îl cred ASCII
+  const tag='AutoCore3D binary STL';
+  for(let i=0;i<tag.length;i++)dv.setUint8(i,tag.charCodeAt(i));
+  dv.setUint32(80,nTri,true);
+  return{out,dv};
+}
+/* Rescrie un STL ASCII ca STL binar. Conversia e fără pierderi — aceleași
+   triunghiuri, doar codificate compact (50 octeți/triunghi în loc de ~250). */
+function asciiSTLtoBinary(buf){
+  const txt=new TextDecoder().decode(buf);
+  const re=/vertex\s+([-+0-9.eE]+)\s+([-+0-9.eE]+)\s+([-+0-9.eE]+)/g;
+  const v=[];let m;
+  while((m=re.exec(txt))!==null)v.push(+m[1],+m[2],+m[3]);
+  const nTri=Math.floor(v.length/9);
+  if(!nTri)throw new Error('STL ASCII fără triunghiuri');
+  const {out,dv}=newSTLBuffer(nTri);
+  for(let t=0;t<nTri;t++)writeSTLTri(dv,84+t*50,v,t*9);
+  return out;
+}
+/* Modelul salvat e folosit exclusiv pentru previzualizarea care se rotește în
+   catalog (canvas ~300px) — acolo un mesh de 2M de triunghiuri arată identic
+   cu unul de 250k, dar decide dacă fișierul încape sau nu în Storage.
+   Simplificarea grupează vertecșii pe o grilă 3D și îi înlocuiește cu media
+   celulei (vertex clustering): păstrează silueta piesei, e liniară ca timp și
+   nu depinde de topologie, deci merge și pe scanări cu găuri. Fișierul
+   original de pe disc rămâne neatins — aici se simplifică doar previzualizarea. */
+const PREVIEW_TRIS=250000;
+const fmtTri=n=>n>=1e6?`${(n/1e6).toFixed(1)}M`:`${Math.round(n/1000)}k`;
+function decimateBinarySTL(buf,target){
+  const dv=new DataView(buf),n=dv.getUint32(80,true);
+  if(!n||n<=target)return{buf,from:n,to:n};
+  const p=new Float32Array(n*9);
+  for(let t=0;t<n;t++){const o=96+t*50;for(let k=0;k<9;k++)p[t*9+k]=dv.getFloat32(o+k*4,true);}
+  let mnx=1/0,mny=1/0,mnz=1/0,mxx=-1/0,mxy=-1/0,mxz=-1/0;
+  for(let i=0;i<p.length;i+=3){
+    const x=p[i],y=p[i+1],z=p[i+2];
+    if(!isFinite(x)||!isFinite(y)||!isFinite(z))continue;
+    if(x<mnx)mnx=x;if(x>mxx)mxx=x;
+    if(y<mny)mny=y;if(y>mxy)mxy=y;
+    if(z<mnz)mnz=z;if(z>mxz)mxz=z;
+  }
+  if(!isFinite(mnx))return{buf,from:n,to:n};
+  const ext=Math.max(mxx-mnx,mxy-mny,mxz-mnz)||1;
+  const clampR=r=>Math.max(8,Math.min(512,r));
+  /* o trecere de grupare la rezoluția R: întoarce celula fiecărui vertex,
+     media pe celulă și câte triunghiuri rămân nedegenerate */
+  const cluster=R=>{
+    const sc=(R-1)/ext,map=new Map(),cell=new Int32Array(n*3),sx=[],sy=[],sz=[],cc=[];
+    for(let v=0;v<n*3;v++){
+      const i=v*3,x=p[i],y=p[i+1],z=p[i+2];
+      let cx=(x-mnx)*sc|0,cy=(y-mny)*sc|0,cz=(z-mnz)*sc|0;
+      if(!(cx>=0))cx=0;else if(cx>=R)cx=R-1;
+      if(!(cy>=0))cy=0;else if(cy>=R)cy=R-1;
+      if(!(cz>=0))cz=0;else if(cz>=R)cz=R-1;
+      const key=cx+cy*R+cz*R*R;
+      let id=map.get(key);
+      if(id===undefined){id=cc.length;map.set(key,id);sx.push(0);sy.push(0);sz.push(0);cc.push(0);}
+      cell[v]=id;
+      if(isFinite(x)){sx[id]+=x;sy[id]+=y;sz[id]+=z;cc[id]++;}
+    }
+    let keep=0;
+    for(let t=0;t<n;t++){const a=cell[t*3],b=cell[t*3+1],c=cell[t*3+2];if(a!==b&&b!==c&&a!==c)keep++;}
+    return{cell,sx,sy,sz,cc,keep,R};
+  };
+  /* numărul de triunghiuri păstrate scade cu ~R², așa că ajustăm R după
+     legea asta — converge în 2-3 treceri */
+  /* ținta e un buget, nu o limită strictă — acceptăm ±5%, altfel am mai face
+     câteva treceri de câteva secunde fiecare pentru o diferență invizibilă */
+  const hi=target*1.05,lo=target*0.7;
+  let R=clampR(Math.round(Math.sqrt(target)*1.4)),best=null,last=null;
+  for(let it=0;it<6;it++){
+    last=cluster(R);
+    if(last.keep<=hi&&(!best||last.keep>best.keep))best=last;
+    if(best&&best.keep>=lo)break;
+    const nR=clampR(Math.round(R*Math.sqrt(target/Math.max(last.keep,1))));
+    if(nR===R)break;
+    R=nR;
+  }
+  const r=best||last;
+  if(!r||!r.keep||r.keep>=n)return{buf,from:n,to:n};
+  const {out,dv:odv}=newSTLBuffer(r.keep);
+  const {cell,sx,sy,sz,cc}=r,v=new Float64Array(9);
+  let o=84;
+  for(let t=0;t<n;t++){
+    const a=cell[t*3],b=cell[t*3+1],c=cell[t*3+2];
+    if(a===b||b===c||a===c)continue;
+    const ids=[a,b,c];
+    for(let k=0;k<3;k++){
+      const id=ids[k],w=cc[id]||1;
+      v[k*3]=sx[id]/w;v[k*3+1]=sy[id]/w;v[k*3+2]=sz[id]/w;
+    }
+    writeSTLTri(odv,o,v,0);
+    o+=50;
+  }
+  return{buf:out,from:n,to:r.keep};
+}
+/* Pregătește modelul pentru Storage: STL ASCII → STL binar, apoi gzip dacă
+   e încă mare. Vizualizatorul decomprimă singur .stl.gz la încărcare, deci
+   modelul rămâne complet — nu se pierde niciun triunghi. */
+async function shrinkModelFile(f,ext,setLabel){
+  if(ext!=='stl'||f.size<8*1024*1024)return{blob:f,ext,note:''};
+  let buf;
+  try{buf=await f.arrayBuffer();}catch(_){return{blob:f,ext,note:''};}
+  const orig=f.size;const steps=[];
+  if(!isBinarySTL(buf)){
+    setLabel('Se convertește STL ASCII → binar...');
+    await new Promise(r=>setTimeout(r,30));   // lasă UI-ul să picteze eticheta
+    try{buf=asciiSTLtoBinary(buf);steps.push('ASCII→binar');}catch(e){console.warn('STL ASCII:',e);}
+  }
+  /* abia dacă tot nu încape simplificăm — modelele mici rămân la rezoluția lor */
+  if(buf.byteLength>SB_SOFT_LIMIT*0.8&&isBinarySTL(buf)){
+    setLabel('Se simplifică modelul pentru previzualizare...');
+    await new Promise(r=>setTimeout(r,30));
+    try{
+      const d=decimateBinarySTL(buf,PREVIEW_TRIS);
+      if(d.to<d.from){buf=d.buf;steps.push(`${fmtTri(d.from)}→${fmtTri(d.to)} triunghiuri`);}
+    }catch(e){console.warn('simplificare model:',e);}
+  }
+  let outExt=ext;
+  if(buf.byteLength>SB_SOFT_LIMIT*0.6){
+    setLabel('Se comprimă modelul...');
+    await new Promise(r=>setTimeout(r,30));
+    try{
+      if(!window.fflate)await loadScript(MODEL_CDN.fflate);
+      buf=fflate.gzipSync(new Uint8Array(buf),{level:6}).buffer;
+      outExt=ext+'.gz';steps.push('gzip');
+    }catch(e){console.warn('gzip model:',e);}
+  }
+  if(!steps.length)return{blob:f,ext,note:''};
+  return{blob:new Blob([buf]),ext:outExt,note:` (${fmtMB(orig)} → ${fmtMB(buf.byteLength)}, ${steps.join(' + ')})`};
+}
 async function uploadModelFile(f){
   const ext=(f.name.split('.').pop()||'stl').toLowerCase();
   if(!['stl','3mf'].includes(ext)){toast('Doar fișiere STL sau 3MF',true);return;}
+  const setLabel=t=>{$('modelUploadLabel').textContent=t;};
   $('modelUploadProgress').style.display='block';$('modelUploadBar').style.width='15%';
-  $('modelUploadLabel').textContent=`Se încarcă ${f.name}...`;
+  setLabel(`Se pregătește ${f.name}...`);
   try{
-    const path=`models/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-    formModel=await sb.uploadImage(f,path);
+    const {blob,ext:upExt,note}=await shrinkModelFile(f,ext,setLabel);
+    $('modelUploadBar').style.width='45%';
+    setLabel(`Se încarcă ${f.name}${note}...`);
+    const path=`models/${Date.now()}_${Math.random().toString(36).slice(2)}.${upExt}`;
+    formModel=await sb.uploadImage(blob,path);
     $('modelUploadBar').style.width='100%';renderModelCurrent();
+    if(note)toast(`Model optimizat şi încărcat${note}`);
   }catch(e){
     console.error('Upload model:',e);
+    /* la depăşirea limitei, mesajul brut al Storage nu spune ce are de făcut */
+    const tooBig=/413|payload too large|maximum allowed size|exceeded/i.test(String(e.message||''))||f.size>SB_SOFT_LIMIT;
+    const hint=tooBig
+      ?`Fişierul (${fmtMB(f.size)}) depăşeşte limita Supabase Storage (50MB pe planul Free). Exportă modelul ca <b>3MF</b> din CAD/slicer — acelaşi model, de câteva ori mai mic — sau treci proiectul pe planul Pro.`
+      :'Modelul NU a fost ataşat — proiectul s-ar salva fără 3D. Reîncearcă sau verifică Supabase Storage.';
     toast(`Eroare upload model: ${e.message}`,true);
     // eroarea rămâne vizibilă în formular, nu doar în toast
-    $('modelCurrent').innerHTML=`<div style="padding:.4rem .6rem;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.06);color:var(--err)">✕ Upload eșuat: ${String(e.message||e).slice(0,120)}<br><span style="opacity:.7">Modelul NU a fost atașat — proiectul s-ar salva fără 3D. Reîncearcă sau verifică Supabase Storage.</span></div>`;
+    $('modelCurrent').innerHTML=`<div style="padding:.4rem .6rem;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.06);color:var(--err)">✕ Upload eșuat: ${String(e.message||e).slice(0,160)}<br><span style="opacity:.7">${hint}</span></div>`;
   }
   setTimeout(()=>{$('modelUploadProgress').style.display='none';$('modelUploadBar').style.width='0%';},900);
 }
@@ -2434,14 +2606,26 @@ async function buildModelPivot(url,color){
   /* toate piesele se randează negru (ASA/ABS negru), ca în realitate;
      culoarea poate fi suprascrisă per proiect prin model_color */
   const mat=new THREE.MeshStandardMaterial({color:color||0x34373d,metalness:.35,roughness:.5});
-  const ext=(url.split('?')[0].split('.').pop()||'').toLowerCase();
+  const ext=(url.split('?')[0].replace(/\.gz$/i,'').split('.').pop()||'').toLowerCase();
   /* descărcăm noi fișierul — erorile HTTP și de format primesc mesaje clare,
      iar fișierele redenumite greșit (3MF cu extensia .stl etc.) tot se deschid */
   let res;
   try{res=await fetch(url);}
   catch(e){throw new Error('descărcarea a eșuat (rețea)');}
   if(!res.ok)throw new Error(`HTTP ${res.status}${res.status===404?' — fișierul lipsește din Storage':''}`);
-  const buf=await res.arrayBuffer();
+  let buf=await res.arrayBuffer();
+  /* modelele mari sunt urcate comprimate (.stl.gz) ca să încapă în limita de
+     mărime a Storage — le decomprimăm după semnătura gzip, nu după extensie,
+     ca să meargă şi dacă CDN-ul a decomprimat deja */
+  if(buf.byteLength>2){
+    const gz=new Uint8Array(buf,0,2);
+    if(gz[0]===0x1f&&gz[1]===0x8b){
+      try{
+        const out=fflate.gunzipSync(new Uint8Array(buf));
+        buf=(out.byteOffset===0&&out.byteLength===out.buffer.byteLength)?out.buffer:out.slice().buffer;
+      }catch(e){throw new Error('arhiva modelului e coruptă');}
+    }
+  }
   if(buf.byteLength<84)throw new Error('fișier gol sau trunchiat');
   const hb=new Uint8Array(buf,0,Math.min(300,buf.byteLength));
   let head='';for(let i=0;i<hb.length;i++)head+=String.fromCharCode(hb[i]);
