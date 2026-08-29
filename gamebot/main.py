@@ -1,0 +1,345 @@
+"""Punctul de intrare. Ruleaza-l din radacina repo-ului:
+
+    python -m gamebot.main record   --profile gamebot/profiles/exemplu.yaml --name padure
+    python -m gamebot.main run      --profile gamebot/profiles/exemplu.yaml --route routes/padure
+    python -m gamebot.main check    --profile gamebot/profiles/exemplu.yaml
+    python -m gamebot.main calibrate region --name minimap
+"""
+
+from __future__ import annotations
+
+import argparse
+import logging
+import sys
+import time
+from pathlib import Path
+from typing import Optional
+
+from .behaviors import ALL_BEHAVIORS
+from .core.capture import ScreenCapture
+from .core.config import Profile
+from .core.engine import BehaviorEngine, BotContext
+from .core.input_ctl import InputController
+from .core.navigation import Localizer, RoutePlayer
+from .core.recorder import RouteRecorder
+from .core.route import Route
+from .core.safety import KillSwitch, SessionGuard, Watchdog, WatchdogConfig
+from .core.vision import TemplateLibrary
+
+PACKAGE_DIR = Path(__file__).resolve().parent
+DEFAULT_PROFILE = PACKAGE_DIR / "profiles" / "exemplu.yaml"
+DEFAULT_ROUTES = PACKAGE_DIR / "routes"
+DEFAULT_TEMPLATES = PACKAGE_DIR / "templates"
+
+log = logging.getLogger("gamebot")
+
+
+def setup_logging(verbose: bool) -> None:
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO,
+        format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
+        datefmt="%H:%M:%S",
+        handlers=[
+            logging.FileHandler(PACKAGE_DIR / "gamebot.log", encoding="utf-8"),
+            logging.StreamHandler(sys.stdout) if verbose else logging.NullHandler(),
+        ],
+    )
+
+
+def countdown(seconds: int, message: str = "Pornesc") -> None:
+    """Iti da timp sa comuti pe fereastra jocului."""
+    print(f"{message} in {seconds} secunde - comuta pe joc acum.")
+    for remaining in range(seconds, 0, -1):
+        print(f"  {remaining}...", end="\r", flush=True)
+        time.sleep(1)
+    print("  start!            ")
+
+
+# --------------------------------------------------------------- inregistrare
+
+
+def cmd_record(args: argparse.Namespace) -> int:
+    profile = Profile.load(args.profile) if Path(args.profile).exists() else Profile()
+    output = Path(args.output or (DEFAULT_ROUTES / args.name))
+
+    if output.exists() and not args.force:
+        print(f"Ruta '{output}' exista deja. Foloseste --force ca sa o rescrii.")
+        return 1
+
+    capture = None
+    anchor_region = profile.region("minimap")
+    try:
+        capture = ScreenCapture(profile.monitor)
+        if anchor_region is None:
+            print("Profilul nu defineste `regions.minimap`. Inregistrez fara ancore,")
+            print("deci botul nu va putea sa isi verifice pozitia pe traseu.")
+            print("Ruleaza intai: python -m gamebot.main calibrate region --name minimap\n")
+    except Exception as exc:
+        print(f"Fara captura de ecran ({exc}); inregistrez doar input-ul.")
+
+    recorder = RouteRecorder(
+        name=args.name,
+        output_dir=output,
+        capture=capture,
+        anchor_region=anchor_region,
+        record_mouse_moves=not args.no_mouse,
+    )
+    route = recorder.run()
+
+    if capture:
+        capture.close()
+    return 0 if route.waypoints else 1
+
+
+# ---------------------------------------------------------------------- rulare
+
+
+def build_context(args: argparse.Namespace, profile: Profile, capture, kill_switch: KillSwitch) -> BotContext:
+    """Asambleaza toate piesele intr-un context gata de rulat."""
+    controller = InputController(
+        dry_run=args.dry_run,
+        click_radius=int(profile.section("input").get("click_radius", 3)),
+        move_speed=float(profile.section("input").get("move_speed", 1.0)),
+    )
+    templates = TemplateLibrary(args.templates or DEFAULT_TEMPLATES)
+
+    safety = profile.safety
+    watchdog = Watchdog(
+        WatchdogConfig(
+            stuck_seconds=float(safety.get("stuck_seconds", 90)),
+            max_deaths=int(safety.get("max_deaths", 3)),
+        )
+    )
+    session = SessionGuard(
+        max_runtime_minutes=float(args.max_minutes if args.max_minutes is not None else safety.get("max_runtime_minutes", 0)),
+        take_breaks=bool(safety.get("breaks", True)),
+    )
+
+    player: Optional[RoutePlayer] = None
+    if args.route:
+        route = Route.load(args.route)
+        print(route.describe())
+        localizer = Localizer(
+            route, capture, profile.region("minimap"),
+            threshold=profile.threshold("anchor_match", 0.72),
+        )
+        player = RoutePlayer(
+            route,
+            controller,
+            localizer,
+            speed=args.speed,
+            should_continue=kill_switch.running,
+        )
+        monitor = capture.monitor
+        player.set_screen(monitor.width, monitor.height)
+
+    return BotContext(
+        profile=profile,
+        capture=capture,
+        controller=controller,
+        templates=templates,
+        kill_switch=kill_switch,
+        watchdog=watchdog,
+        session=session,
+        player=player,
+    )
+
+
+def cmd_run(args: argparse.Namespace) -> int:
+    profile = Profile.load(args.profile)
+    print(f"Profil: {profile.name}")
+
+    problems = profile.missing_pieces()
+    if problems:
+        print("\nAvertismente de configurare:")
+        for problem in problems:
+            print(f"  - {problem}")
+        print()
+
+    if args.dry_run:
+        print(">>> MOD DE PROBA: nu se trimite niciun input catre joc. <<<\n")
+
+    capture = ScreenCapture(profile.monitor)
+    kill_switch = KillSwitch(
+        key=str(profile.safety.get("kill_key", "f12")),
+    ).start(pause_key=str(profile.safety.get("pause_key", "f11")))
+
+    ctx = build_context(args, profile, capture, kill_switch)
+    # Kill switch-ul trebuie sa elibereze tastele imediat, nu dupa ce bucla
+    # principala apuca sa observe oprirea.
+    kill_switch.on_stop = ctx.controller.release_all
+
+    engine = BehaviorEngine(ctx, [cls() for cls in ALL_BEHAVIORS], tick=float(args.tick))
+
+    if ctx.player is not None and not args.from_start:
+        ctx.refresh()
+        ctx.player.jump_to_nearest()
+
+    countdown(args.delay)
+
+    reason = "necunoscut"
+    try:
+        reason = engine.run_forever()
+    except KeyboardInterrupt:
+        reason = "intrerupt de la tastatura (Ctrl+C)"
+    finally:
+        ctx.controller.release_all()
+        kill_switch.close()
+        capture.close()
+
+    print(f"\nOprit: {reason}")
+    print(ctx.stats.summary())
+    return 0
+
+
+# ----------------------------------------------------------------- diagnostic
+
+
+def cmd_check(args: argparse.Namespace) -> int:
+    """Citeste ecranul o data si arata ce intelege botul din el.
+
+    E cel mai rapid mod de a-ti da seama daca ai gresit o regiune sau o culoare:
+    daca aici scrie ca ai 0% viata cand tu ai bara plina, profilul e gresit, nu
+    botul.
+    """
+    profile = Profile.load(args.profile)
+    print(f"Profil: {profile.name}\n")
+
+    problems = profile.missing_pieces()
+    if problems:
+        print("Lipsuri in profil:")
+        for problem in problems:
+            print(f"  - {problem}")
+    else:
+        print("Profilul pare complet.")
+
+    print("\nRegiuni definite:")
+    for name, region in profile.regions.items():
+        print(f"  {name:<20} {region.width}x{region.height} la ({region.left}, {region.top})")
+
+    templates = TemplateLibrary(args.templates or DEFAULT_TEMPLATES)
+    print(f"\nSabloane disponibile: {', '.join(templates.available()) or 'niciunul'}")
+
+    countdown(args.delay, "Citesc ecranul")
+
+    capture = ScreenCapture(profile.monitor)
+    kill_switch = KillSwitch()
+    ctx = BotContext(
+        profile=profile,
+        capture=capture,
+        controller=InputController(dry_run=True),
+        templates=templates,
+        kill_switch=kill_switch,
+        watchdog=Watchdog(),
+        session=SessionGuard(),
+    )
+    ctx.refresh()
+
+    def as_percent(value: Optional[float]) -> str:
+        return "nedefinit" if value is None else f"{value*100:5.1f}%"
+
+    print("\nCe vede botul acum:")
+    print(f"  viata personajului : {as_percent(ctx.health)}")
+    print(f"  viata tintei       : {as_percent(ctx.target_health)}")
+    print(f"  tinta selectata    : {'da' if ctx.has_target() else 'nu'}")
+    print(f"  mob-uri detectate  : {len(ctx.find_blobs('enemy_nameplate', min_area=40))}")
+    print(f"  noduri detectate   : {len(ctx.find_blobs('resource_node', min_area=80))}")
+
+    snapshot = Path(args.templates or DEFAULT_TEMPLATES).parent / "check_snapshot.png"
+    capture.save(snapshot)
+    print(f"\nCaptura salvata pentru comparatie: {snapshot}")
+    capture.close()
+    return 0
+
+
+def cmd_routes(args: argparse.Namespace) -> int:
+    directory = Path(args.dir or DEFAULT_ROUTES)
+    if not directory.exists():
+        print(f"Nu exista {directory} - nu ai inregistrat inca nicio ruta.")
+        return 0
+    found = 0
+    for candidate in sorted(directory.iterdir()):
+        if (candidate / "route.json").exists():
+            print(f"  {candidate.name:<24} {Route.load(candidate).describe()}")
+            found += 1
+    if not found:
+        print(f"Niciun traseu in {directory}.")
+    return 0
+
+
+def cmd_calibrate(args: argparse.Namespace) -> int:
+    from .tools import calibrate
+
+    profile = Profile.load(args.profile) if Path(args.profile).exists() else Profile()
+    monitor = profile.monitor
+
+    if args.what == "region":
+        calibrate.calibrate_region(args.name, monitor)
+    elif args.what == "template":
+        calibrate.calibrate_template(args.name, args.templates or DEFAULT_TEMPLATES, monitor)
+    elif args.what == "color":
+        calibrate.calibrate_color(args.name, monitor)
+    return 0
+
+
+# ------------------------------------------------------------------ argumente
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="gamebot",
+        description="Bot de farmat prin vedere pe ecran si input simulat.",
+    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="loguri detaliate in consola")
+    parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="fisierul YAML de profil")
+    parser.add_argument("--templates", default=None, help="directorul cu sabloane PNG")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    rec = sub.add_parser("record", help="inregistreaza o ruta jucand tu")
+    rec.add_argument("--name", required=True, help="numele rutei")
+    rec.add_argument("--output", default=None, help="unde se salveaza (implicit gamebot/routes/<name>)")
+    rec.add_argument("--force", action="store_true", help="rescrie ruta daca exista")
+    rec.add_argument("--no-mouse", action="store_true", help="nu inregistra miscarile mouse-ului")
+    rec.set_defaults(func=cmd_record)
+
+    run = sub.add_parser("run", help="porneste botul")
+    run.add_argument("--route", default=None, help="directorul rutei inregistrate")
+    run.add_argument("--dry-run", action="store_true", help="decide, dar nu trimite input")
+    run.add_argument("--speed", type=float, default=1.0, help="viteza de redare a rutei (0.5-2.0)")
+    run.add_argument("--tick", type=float, default=0.25, help="pauza intre cicluri de decizie")
+    run.add_argument("--delay", type=int, default=5, help="secunde de asteptare inainte de start")
+    run.add_argument("--max-minutes", type=float, default=None, help="opreste dupa atatea minute")
+    run.add_argument("--from-start", action="store_true", help="incepe de la reperul 0, fara localizare")
+    run.set_defaults(func=cmd_run)
+
+    check = sub.add_parser("check", help="verifica profilul si arata ce vede botul")
+    check.add_argument("--delay", type=int, default=5)
+    check.set_defaults(func=cmd_check)
+
+    routes = sub.add_parser("routes", help="listeaza rutele inregistrate")
+    routes.add_argument("--dir", default=None)
+    routes.set_defaults(func=cmd_routes)
+
+    cal = sub.add_parser("calibrate", help="masoara regiuni, culori si sabloane")
+    cal.add_argument("what", choices=["region", "template", "color"])
+    cal.add_argument("--name", required=True, help="numele elementului calibrat")
+    cal.set_defaults(func=cmd_calibrate)
+
+    return parser
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    args = build_parser().parse_args(argv)
+    setup_logging(args.verbose)
+    try:
+        return args.func(args)
+    except FileNotFoundError as exc:
+        print(f"Eroare: {exc}")
+        return 1
+    except RuntimeError as exc:
+        print(f"Eroare: {exc}")
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

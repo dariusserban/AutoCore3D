@@ -1,0 +1,14 @@
+# Vedere pe ecran
+mss>=9.0.1
+opencv-python>=4.9.0
+numpy>=1.26.0
+
+# Input simulat (Windows: pydirectinput e obligatoriu pentru jocuri DirectX)
+pydirectinput>=1.0.4 ; sys_platform == "win32"
+pyautogui>=0.9.54
+
+# Ascultare tastatura/mouse pentru modul de inregistrare + kill switch
+pynput>=1.7.6
+
+# Configurare
+PyYAML>=6.0.1

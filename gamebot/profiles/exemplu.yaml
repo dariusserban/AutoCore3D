@@ -1,0 +1,169 @@
+# Profil de exemplu. Copiaza-l cu numele jocului tau si masoara valorile tale:
+#   python -m gamebot.main calibrate region   --name health_bar
+#   python -m gamebot.main calibrate color    --name health
+#   python -m gamebot.main calibrate template --name loot_bag
+#
+# Verifica apoi ce a inteles botul din ecran:
+#   python -m gamebot.main check --profile gamebot/profiles/profilul_meu.yaml
+#
+# ATENTIE: valorile de mai jos sunt inventate pentru un ecran 1920x1080. Daca
+# le lasi asa, botul va citi pixeli aiurea. Nimic nu functioneaza fara calibrare.
+
+name: exemplu
+monitor: 1          # 1 = ecranul principal; 2 = al doilea monitor
+
+# --------------------------------------------------------------------- regiuni
+# Dreptunghiuri in coordonate absolute de ecran.
+regions:
+  # Minimapa e ancora de navigatie: dupa ea isi da botul seama unde e pe traseu.
+  # Alege o zona care se schimba cand te misti, dar nu contine ceasul sau chat-ul.
+  minimap:
+    left: 1580
+    top: 30
+    width: 320
+    height: 320
+
+  health_bar:
+    left: 120
+    top: 60
+    width: 220
+    height: 14
+
+  mana_bar:
+    left: 120
+    top: 78
+    width: 220
+    height: 12
+
+  # Bara de viata a tintei. Din prezenta ei deducem daca avem tinta selectata.
+  target_health_bar:
+    left: 760
+    top: 60
+    width: 220
+    height: 14
+
+  # Optional: bara de cast/cules. Daca o definesti, botul stie sigur cand a
+  # terminat de cules, in loc sa astepte un numar fix de secunde.
+  cast_bar:
+    left: 830
+    top: 620
+    width: 260
+    height: 16
+
+# --------------------------------------------------------------------- culori
+# Intervale HSV (H: 0-179, S: 0-255, V: 0-255), asa cum le foloseste OpenCV.
+# Ia-le cu `calibrate color`, nu le ghici.
+colors:
+  health:                 # verde de bara de viata
+    low: [40, 80, 70]
+    high: [80, 255, 255]
+
+  mana:                   # albastru
+    low: [100, 90, 70]
+    high: [130, 255, 255]
+
+  enemy_nameplate:        # rosu de nume de mob ostil
+    low: [0, 140, 110]
+    high: [8, 255, 255]
+
+  resource_node:          # galben de sclipire pe noduri
+    low: [22, 130, 140]
+    high: [34, 255, 255]
+
+  cast_bar:
+    low: [15, 120, 140]
+    high: [30, 255, 255]
+
+# ---------------------------------------------------------------------- taste
+keys:
+  forward: w
+  back: s
+  left: a
+  right: d
+  jump: space
+  interact: f             # tasta de interactiune / cules
+  loot: g                 # ridicare loot; lasa gol daca jocul ia automat
+  target_next: tab        # selectarea urmatoarei tinte
+  heal: "5"               # potiune sau skill de vindecare
+  escape: ""              # skill de fuga; gol = nu exista
+  mount: y
+
+  # Rotatia de atac. Botul le apasa pe rand, cu variatie de temporizare.
+  attack_rotation: ["1", "2", "3", "4"]
+
+# -------------------------------------------------------------------- praguri
+thresholds:
+  heal_below: 0.55        # sub cat % din viata se vindeca
+  flee_below: 0.18        # sub cat % incearca sa fuga / opreste
+  template_match: 0.85    # cat de strict e matching-ul de sabloane
+  anchor_match: 0.72      # cat de strict e verificarea pozitiei pe traseu
+
+# ------------------------------------------------------------ comportamente
+# Ce e pornit. Ordinea de prioritate e fixa in cod: supravietuire > lupta >
+# cules > intretinere > click idle > mers pe traseu.
+behaviors:
+  survival: true
+  combat: true
+  gather: true
+  upkeep: false
+  idle_click: false
+  travel: true
+
+# ------------------------------------------------- reglaje pe comportamente
+survival:
+  heal_cooldown: 6.0      # secunde intre doua vindecari
+  stop_on_critical: true  # opreste botul daca viata e critica si n-ai scapare
+  # Secventa de dupa moarte (reinviere). Lasa gol ca sa se opreasca in loc sa
+  # incerce ceva ce poate iesi prost.
+  on_death: []
+  #  - {key: enter, wait: 2.0}
+
+combat:
+  anywhere: false         # true = lupta oriunde, nu doar la reperele 'combat'
+  approach_seconds: 0.0   # cat merge inainte dupa ce a luat tinta
+  global_cooldown: 1.4    # secunde intre doua skill-uri
+  max_fight_seconds: 45   # dupa atat renunta la tinta
+  loot_after_kill: true
+  loot_delay: 1.2
+  loot_presses: 2
+
+gather:
+  anywhere: false
+  min_area: 80            # cat de mare trebuie sa fie pata ca sa fie nod
+  cast_seconds: 3.0       # cat dureaza culesul
+  click_delay: 0.6
+  max_failures: 4         # dupa atatea rateuri pleaca mai departe
+  blacklist_seconds: 25   # cat timp ignora un nod pe care l-a incercat
+  # search_region: minimap   # restrange cautarea la o regiune, daca vrei
+
+upkeep:
+  every_minutes: 30
+  at_waypoint_only: true  # ruleaza doar la reperele 'vendor' / 'repair'
+  # Secventa e a ta: fiecare pas e o tasta, un click, sau un sablon de gasit.
+  steps: []
+  #  - {key: i, wait: 1.0}                      # deschide inventarul
+  #  - {template: buton_vinde, wait: 1.5}       # click pe butonul de vanzare
+  #  - {template: buton_repara, wait: 1.5, required: true}
+  #  - {key: escape, wait: 0.8}
+
+idle_click:
+  only_when_dwelling: true   # doar cand stationeaza la un reper
+  interval_seconds: 1.5
+  shuffle: false
+  actions: []
+  #  - {click: [960, 540], wait: 0.3}
+  #  - {key: "1", wait: 0.4}
+
+# ---------------------------------------------------------------------- input
+input:
+  click_radius: 3         # imprastierea clicurilor, in pixeli
+  move_speed: 1.0         # >1 = mouse mai rapid
+
+# ------------------------------------------------------------------ siguranta
+safety:
+  kill_key: f12           # oprire imediata, oriunde ai fi
+  pause_key: f11          # pauza / reluare
+  max_runtime_minutes: 180
+  breaks: true            # pauze scurte, la intervale neregulate
+  stuck_seconds: 90       # ecran neschimbat atat = blocat, opreste
+  max_deaths: 3

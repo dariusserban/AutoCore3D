@@ -1,2 +1,11 @@
 __pycache__/
 *.pyc
+
+# gamebot: date locale, specifice masinii si contului tau
+gamebot/routes/
+gamebot/gamebot.log
+gamebot/check_snapshot.png
+gamebot/templates/*.png
+gamebot/profiles/*.yaml
+!gamebot/profiles/exemplu.yaml
+.pytest_cache/
