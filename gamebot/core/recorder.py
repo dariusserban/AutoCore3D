@@ -4,24 +4,30 @@ Asculta tastatura si mouse-ul in timp ce parcurgi tu traseul si scrie fiecare
 eveniment cu decalajul lui real. Cand apesi o tasta de reper, taie stream-ul si
 salveaza o ancora vizuala (o poza cu minimapa) pentru locul in care esti.
 
-Rezultatul e un director de ruta pe care `player.py` il poate reda apoi la
-nesfarsit.
+Portalele sunt tratate separat, fiindca nu pot fi redate ca un click obisnuit:
+ecranul de incarcare dureaza de fiecare data altcat. Marchezi portalul, dai
+click pe el, iar recorder-ul asteapta sa se incarce harta noua si retine cum
+arata - ca botul sa poata confirma mai tarziu ca a ajuns unde trebuie.
 
 Taste implicite (se pot schimba in profil):
-  F5  reper de drum         F6  reper de lupta
-  F7  reper de resurse      F8  reper de vendor/reparat
-  F9  pauza / reluare       F10 opreste si salveaza
+  F4  portal (urmatorul click e pe portal)   F5  reper de drum
+  F6  reper de lupta                         F7  reper de resurse
+  F8  reper de vendor/reparat
+  F9  pauza / reluare                        F10 opreste si salveaza
 """
 
 from __future__ import annotations
 
 import logging
+import queue
+import threading
 import time
 from pathlib import Path
 from typing import Optional
 
+from . import vision
 from .capture import Region, ScreenCapture
-from .route import InputEvent, Route, Waypoint
+from .route import InputEvent, Portal, Route, Waypoint
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +37,7 @@ MOVE_MIN_INTERVAL = 0.03  # secunde
 MOVE_MIN_DISTANCE = 6  # pixeli
 
 DEFAULT_HOTKEYS = {
+    "f4": "portal",
     "f5": "travel",
     "f6": "combat",
     "f7": "gather",
@@ -41,7 +48,12 @@ STOP_KEY = "f10"
 
 
 class RouteRecorder:
-    """Inregistreaza o ruta. Blocheaza pana apesi tasta de oprire."""
+    """Inregistreaza o ruta. Blocheaza pana apesi tasta de oprire.
+
+    Ascultatorii pynput ruleaza pe firele lor, dar nu fac niciodata captura de
+    ecran: `mss` nu e sigur intre fire. Firele de input doar pun cereri intr-o
+    coada, iar firul principal - cel din `run()` - face toate capturile.
+    """
 
     def __init__(
         self,
@@ -61,12 +73,20 @@ class RouteRecorder:
 
         self.route = Route(name=name, waypoints=[])
         self._events: list[InputEvent] = []
+        self._lock = threading.Lock()
+        self._mark_queue: queue.Queue[str] = queue.Queue()
+
         self._last_event_at = 0.0
         self._last_move_at = 0.0
         self._last_move_pos = (0, 0)
         self._paused = False
         self._running = False
-        self._waypoint_marked_at = 0.0
+
+        # Starea tranzitiei prin portal.
+        self._awaiting_portal: Optional[Waypoint] = None
+        self._portal_click: Optional[tuple[int, int]] = None
+        self._suppress_mouse_up = False
+        self._loading_portal: Optional[Waypoint] = None
 
     # ------------------------------------------------------------ ajutatoare
 
@@ -96,7 +116,9 @@ class RouteRecorder:
         return None
 
     def _record(self, event: InputEvent) -> None:
-        if not self._paused and self._running:
+        if self._paused or not self._running:
+            return
+        with self._lock:
             self._events.append(event)
 
     # -------------------------------------------------------------- repere
@@ -104,35 +126,92 @@ class RouteRecorder:
     def mark_waypoint(self, kind: str, label: str = "") -> Waypoint:
         """Inchide segmentul curent si incepe unul nou.
 
+        Se apeleaza doar din firul principal: face captura de ecran.
         Evenimentele acumulate pana acum devin drumul *catre* acest reper, deci
-        le atasam reperului anterior. Primul reper porneste cu lista goala.
+        le atasam reperului anterior.
         """
         index = len(self.route.waypoints)
-        if self.route.waypoints:
-            self.route.waypoints[-1].events = self._events
-        self._events = []
+        with self._lock:
+            if self.route.waypoints:
+                self.route.waypoints[-1].events = self._events
+            self._events = []
 
-        anchor_name = self._save_anchor(index)
+        anchor_name = self._save_anchor(f"anchor_{index:03d}.png")
         waypoint = Waypoint(index=index, kind=kind, label=label, anchor=anchor_name)
         self.route.waypoints.append(waypoint)
-        self._waypoint_marked_at = time.monotonic()
+
+        if kind == "portal":
+            self._awaiting_portal = waypoint
+            print(f"  [{index:>3}] PORTAL marcat - da click pe portal acum")
+        else:
+            print(f"  [{index:>3}] reper '{kind}' salvat")
 
         log.info("Reper %d marcat (%s)%s", index, kind, f" - {label}" if label else "")
-        print(f"  [{index:>3}] reper '{kind}' salvat")
         return waypoint
 
-    def _save_anchor(self, index: int) -> Optional[str]:
-        """Poza de referinta pentru reperul curent (de obicei minimapa)."""
+    def _save_anchor(self, filename: str) -> Optional[str]:
+        """Poza de referinta (de obicei minimapa). Doar din firul principal."""
         if self.capture is None:
             return None
         try:
-            filename = f"anchor_{index:03d}.png"
             self.output_dir.mkdir(parents=True, exist_ok=True)
             self.capture.save(self.output_dir / filename, self.anchor_region)
             return filename
         except Exception as exc:  # o ancora lipsa nu trebuie sa strice ruta
-            log.warning("Nu am putut salva ancora pentru reperul %d: %s", index, exc)
+            log.warning("Nu am putut salva ancora '%s': %s", filename, exc)
             return None
+
+    # -------------------------------------------------------------- portal
+
+    def _finish_portal(self, waypoint: Waypoint) -> None:
+        """Asteapta incarcarea hartii noi si retine cum arata.
+
+        Doua faze: intai asteptam ca ecranul sa se schimbe masiv (a inceput
+        incarcarea), apoi ca doua cadre consecutive sa devina aproape identice
+        (s-a terminat). Daca nu prindem faza intai - portalele instantanee
+        exista - trecem oricum la stabilizare, ca sa nu blocam inregistrarea.
+        """
+        click = self._portal_click or (0, 0)
+        waypoint.portal = Portal(click=click)
+        self._loading_portal = None
+        self._portal_click = None
+
+        if self.capture is None:
+            print("      (fara captura: portalul se va reda dupa timp fix)")
+            self._last_event_at = time.monotonic()
+            return
+
+        print("      astept incarcarea hartii...")
+        started = time.monotonic()
+        baseline = self.capture.grab(self.anchor_region)
+
+        # Faza 1: a inceput incarcarea?
+        while time.monotonic() - started < 8.0:
+            time.sleep(0.25)
+            if vision.frames_differ(baseline, self.capture.grab(self.anchor_region), 12.0):
+                break
+
+        # Faza 2: s-a linistit ecranul?
+        stable_since = 0.0
+        previous = self.capture.grab(self.anchor_region)
+        while time.monotonic() - started < 45.0:
+            time.sleep(0.3)
+            current = self.capture.grab(self.anchor_region)
+            if vision.frames_differ(previous, current, 3.0):
+                stable_since = 0.0
+            elif stable_since == 0.0:
+                stable_since = time.monotonic()
+            elif time.monotonic() - stable_since > 1.5:
+                break
+            previous = current
+
+        elapsed = time.monotonic() - started
+        waypoint.portal.load_seconds = round(max(5.0, elapsed * 2.0), 1)
+        waypoint.portal.dest_anchor = self._save_anchor(f"portal_{waypoint.index:03d}_dest.png")
+
+        print(f"      harta noua incarcata in {elapsed:.1f}s - continua traseul")
+        # Timpul de incarcare nu trebuie sa devina o pauza in secventa redata.
+        self._last_event_at = time.monotonic()
 
     # ------------------------------------------------------------- rulare
 
@@ -175,10 +254,20 @@ class RouteRecorder:
             self._record(InputEvent("move", self._dt(), x=int(x), y=int(y)))
 
         def on_click(x, y, button, pressed):
+            # Clicul pe portal nu intra in secventa redata: de el se ocupa
+            # comportamentul de portal, care stie sa astepte incarcarea.
+            if pressed and self._awaiting_portal is not None:
+                self._portal_click = (int(x), int(y))
+                self._loading_portal = self._awaiting_portal
+                self._awaiting_portal = None
+                self._suppress_mouse_up = True
+                return
+            if not pressed and self._suppress_mouse_up:
+                self._suppress_mouse_up = False
+                return
+
             kind = "mouse_down" if pressed else "mouse_up"
-            self._record(
-                InputEvent(kind, self._dt(), x=int(x), y=int(y), button=button.name)
-            )
+            self._record(InputEvent(kind, self._dt(), x=int(x), y=int(y), button=button.name))
 
         def on_scroll(x, y, dx, dy):
             self._record(InputEvent("scroll", self._dt(), amount=int(dy)))
@@ -189,8 +278,7 @@ class RouteRecorder:
         ms.start()
 
         try:
-            while self._running:
-                time.sleep(0.1)
+            self._main_loop()
         except KeyboardInterrupt:
             print("\nOprit de la tastatura.")
         finally:
@@ -199,10 +287,23 @@ class RouteRecorder:
 
         return self._finalize()
 
+    def _main_loop(self) -> None:
+        """Firul principal: singurul care are voie sa faca captura de ecran."""
+        while self._running:
+            while not self._mark_queue.empty():
+                self.mark_waypoint(self._mark_queue.get())
+
+            if self._loading_portal is not None:
+                self._finish_portal(self._loading_portal)
+
+            time.sleep(0.05)
+
     def _handle_control_key(self, name: str) -> bool:
         """Trateaza tastele de comanda. Intoarce True daca a consumat tasta."""
         if name in self.hotkeys:
-            self.mark_waypoint(self.hotkeys[name])
+            # Marcarea face captura de ecran, deci o lasam pe seama firului
+            # principal; aici doar punem cererea la coada.
+            self._mark_queue.put(self.hotkeys[name])
             return True
         if name == PAUSE_KEY:
             self._paused = not self._paused
@@ -216,11 +317,12 @@ class RouteRecorder:
 
     def _finalize(self) -> Route:
         """Ataseaza ultimul segment, completeaza metadatele si salveaza."""
-        if self.route.waypoints:
-            self.route.waypoints[-1].events = self._events
-        else:
-            print("Nu ai marcat niciun reper - ruta e goala, nu salvez nimic.")
-            return self.route
+        with self._lock:
+            if self.route.waypoints:
+                self.route.waypoints[-1].events = self._events
+            elif not self.route.waypoints:
+                print("Nu ai marcat niciun reper - ruta e goala, nu salvez nimic.")
+                return self.route
 
         if self.capture is not None:
             monitor = self.capture.monitor
@@ -238,5 +340,6 @@ class RouteRecorder:
         print(f"Repere:  {keys}")
         print(f"Control: {PAUSE_KEY.upper()}=pauza  {STOP_KEY.upper()}=stop si salveaza")
         print("\nIntra in joc si mergi traseul. Marcheaza un reper la fiecare")
-        print("colt, la fiecare zona de farmat si la fiecare NPC important.")
+        print("colt si la fiecare zona in care vrei sa se bata.")
+        print("La portal: apasa F4 INAINTE de click, apoi da click pe portal.")
         print("Cu cat pui mai multe repere, cu atat botul se corecteaza mai bine.\n")

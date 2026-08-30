@@ -233,3 +233,82 @@ def test_oprirea_intrerupe_redarea_si_elibereaza_tastele(test_profile, tmp_path)
 
     assert player.play_segment(ruta_scurta().waypoints[0]) is False
     assert controller._held_keys == set()
+
+
+# ------------------------------------------------- rotatia cu cooldown-uri
+
+
+def test_abilitatile_invatate_respecta_cooldown_ul(test_profile, tmp_path):
+    """O abilitate cu cooldown mare nu se apasa de doua ori la rand."""
+    test_profile.raw["combat"] = {
+        "abilities": [{"key": "3", "cooldown": 30.0}, {"key": "1", "cooldown": 0.0}],
+    }
+    ctx = build_ctx(test_profile, make_frame(), tmp_path)
+    behavior = CombatBehavior()
+
+    alese = [behavior._next_ability(ctx) for _ in range(4)]
+
+    # Prima data e gata cea grea; apoi ea intra in cooldown si ramane cea scurta.
+    assert alese == ["3", "1", "1", "1"]
+
+
+def test_fara_abilitati_gata_nu_apasa_nimic(test_profile, tmp_path):
+    test_profile.raw["combat"] = {"abilities": [{"key": "3", "cooldown": 60.0}]}
+    ctx = build_ctx(test_profile, make_frame(), tmp_path)
+    behavior = CombatBehavior()
+
+    assert behavior._next_ability(ctx) == "3"
+    assert behavior._next_ability(ctx) is None
+
+
+def test_fara_lista_invatata_cade_pe_rotatia_simpla(test_profile, tmp_path):
+    test_profile.raw["combat"] = {}
+    ctx = build_ctx(test_profile, make_frame(), tmp_path)
+    behavior = CombatBehavior()
+
+    # Profilul de test are attack_rotation = ["1", "2"].
+    assert [behavior._next_ability(ctx) for _ in range(4)] == ["1", "2", "1", "2"]
+
+
+# ------------------------------------------- revenirea pe traseu dupa lupta
+
+
+def test_lupta_cere_resincronizarea_traseului(test_profile, tmp_path):
+    """Dupa o lupta pozitia nu mai e sigura, deci traseul trebuie sa verifice."""
+    test_profile.raw["combat"] = {"anywhere": True, "max_fight_seconds": 0.01,
+                                  "abilities": [{"key": "1", "cooldown": 0.0}]}
+    ctx = build_ctx(test_profile, make_frame(1.0, target=True), tmp_path)
+    ctx.refresh()
+
+    assert not ctx.needs_resync
+    CombatBehavior().run(ctx)
+    assert ctx.needs_resync
+
+
+def test_traseul_verifica_pozitia_inainte_sa_mearga_mai_departe(test_profile, tmp_path):
+    controller = InputController(dry_run=True)
+    player = RoutePlayer(ruta_scurta(), controller)
+    ctx = build_ctx(test_profile, make_frame(), tmp_path, player=player)
+    ctx.controller = controller
+    ctx.needs_resync = True
+
+    apeluri = []
+    player.resync = lambda: apeluri.append(True) or True
+
+    TravelBehavior().run(ctx)
+
+    assert apeluri == [True]
+    assert not ctx.needs_resync
+
+
+def test_daca_nu_se_poate_reorienta_dupa_lupta_opreste(test_profile, tmp_path):
+    controller = InputController(dry_run=True)
+    player = RoutePlayer(ruta_scurta(), controller)
+    ctx = build_ctx(test_profile, make_frame(), tmp_path, player=player)
+    ctx.controller = controller
+    ctx.needs_resync = True
+    player.resync = lambda: False
+
+    TravelBehavior().run(ctx)
+
+    assert ctx.kill_switch.stopped

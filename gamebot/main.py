@@ -129,6 +129,8 @@ def build_context(args: argparse.Namespace, profile: Profile, capture, kill_swit
             localizer,
             speed=args.speed,
             should_continue=kill_switch.running,
+            capture=capture,
+            templates=templates,
         )
         monitor = capture.monitor
         player.set_screen(monitor.width, monitor.height)
@@ -252,6 +254,65 @@ def cmd_check(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_learn(args: argparse.Namespace) -> int:
+    """Deduce rotatia de abilitati din luptele inregistrate pe o ruta."""
+    from .core import learning
+
+    profile = Profile.load(args.profile) if Path(args.profile).exists() else Profile()
+    route = Route.load(args.route)
+    print(route.describe())
+
+    # Tastele cu rost cunoscut apar si ele in lupta, dar nu sunt atacuri.
+    cunoscute = [
+        profile.key(name)
+        for name in ("heal", "loot", "interact", "target_next", "mount", "escape",
+                     "forward", "back", "left", "right", "jump")
+    ]
+    kinds = ("combat", "travel") if args.include_travel else ("combat",)
+    rotation = learning.analyze(route, kinds=kinds, exclude=cunoscute,
+                                min_presses=args.min_presses)
+
+    print()
+    print(rotation.describe())
+
+    if not rotation.abilities:
+        print("\nNu am ce invata. Marcheaza zonele de lupta cu F6 la inregistrare")
+        print("si bate-te acolo cateva minute, folosind abilitatile ca de obicei.")
+        return 1
+
+    print("\nAdauga in profil, sub `combat:`\n")
+    for ability in rotation.abilities:
+        print(f"    - {{key: \"{ability.key}\", cooldown: {ability.cooldown:.1f}}}")
+    print(f"\n  global_cooldown: {rotation.global_cooldown:.2f}\n")
+
+    if args.write:
+        _write_rotation(Path(args.profile), rotation)
+    else:
+        print("Copiaza blocul de mai sus in profil, sau ruleaza din nou cu --write.")
+    return 0
+
+
+def _write_rotation(profile_path: Path, rotation) -> None:
+    """Scrie rotatia invatata direct in profil, cu o copie de siguranta.
+
+    Scrierea trece prin PyYAML, care nu pastreaza comentariile din fisier. De
+    aceea salvam intai originalul ca `.bak` si spunem clar ce s-a pierdut -
+    daca tii la comentarii, copiaza blocul de mai sus de mana.
+    """
+    import yaml
+
+    data = yaml.safe_load(profile_path.read_text(encoding="utf-8")) or {}
+    data.setdefault("combat", {}).update(rotation.as_profile_section())
+
+    backup = profile_path.with_suffix(profile_path.suffix + ".bak")
+    backup.write_text(profile_path.read_text(encoding="utf-8"), encoding="utf-8")
+    profile_path.write_text(
+        yaml.safe_dump(data, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
+    print(f"Scris in {profile_path} (copie a originalului in {backup.name}).")
+    print("Atentie: comentariile din profil s-au pierdut la rescriere.")
+
+
 def cmd_routes(args: argparse.Namespace) -> int:
     directory = Path(args.dir or DEFAULT_ROUTES)
     if not directory.exists():
@@ -315,6 +376,15 @@ def build_parser() -> argparse.ArgumentParser:
     check = sub.add_parser("check", help="verifica profilul si arata ce vede botul")
     check.add_argument("--delay", type=int, default=5)
     check.set_defaults(func=cmd_check)
+
+    learn = sub.add_parser("learn", help="deduce rotatia de abilitati din luptele inregistrate")
+    learn.add_argument("--route", required=True, help="directorul rutei inregistrate")
+    learn.add_argument("--write", action="store_true", help="scrie rezultatul direct in profil")
+    learn.add_argument("--include-travel", action="store_true",
+                       help="analizeaza si segmentele de drum, nu doar cele de lupta")
+    learn.add_argument("--min-presses", type=int, default=3,
+                       help="cate apasari sunt necesare ca o tasta sa conteze")
+    learn.set_defaults(func=cmd_learn)
 
     routes = sub.add_parser("routes", help="listeaza rutele inregistrate")
     routes.add_argument("--dir", default=None)

@@ -88,7 +88,8 @@ keys:
   escape: ""              # skill de fuga; gol = nu exista
   mount: y
 
-  # Rotatia de atac. Botul le apasa pe rand, cu variatie de temporizare.
+  # Rezerva, folosita doar daca `combat.abilities` e gol: tastele astea se
+  # apasa pe rand, fara sa se tina cont de cooldown.
   attack_rotation: ["1", "2", "3", "4"]
 
 # -------------------------------------------------------------------- praguri
@@ -104,10 +105,10 @@ thresholds:
 behaviors:
   survival: true
   combat: true
-  gather: true
+  travel: true
+  gather: false      # culesul de resurse - lasa-l oprit daca nu-l folosesti
   upkeep: false
   idle_click: false
-  travel: true
 
 # ------------------------------------------------- reglaje pe comportamente
 survival:
@@ -121,11 +122,21 @@ survival:
 combat:
   anywhere: false         # true = lupta oriunde, nu doar la reperele 'combat'
   approach_seconds: 0.0   # cat merge inainte dupa ce a luat tinta
-  global_cooldown: 1.4    # secunde intre doua skill-uri
+  global_cooldown: 1.4    # secunde intre doua apasari de abilitate
   max_fight_seconds: 45   # dupa atat renunta la tinta
   loot_after_kill: true
   loot_delay: 1.2
   loot_presses: 2
+
+  # Rotatia de abilitati, cu cooldown-ul fiecareia. Nu o scrie de mana: bate-te
+  # cateva minute intr-o zona marcata cu F6 la inregistrare, apoi ruleaza
+  #   python -m gamebot.main learn --route gamebot/routes/<ruta>
+  # si copiaza aici ce iti da. Ordinea conteaza: prima abilitate gata de folosit
+  # e cea apasata, deci lovitura grea sta prima.
+  abilities: []
+  #  - {key: "3", cooldown: 12.0}
+  #  - {key: "2", cooldown: 6.0}
+  #  - {key: "1", cooldown: 1.5}
 
 gather:
   anywhere: false

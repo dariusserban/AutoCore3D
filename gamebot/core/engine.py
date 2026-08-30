@@ -91,6 +91,8 @@ class BotContext:
         self.frame: Optional[np.ndarray] = None
         # Cat timp mai stationam la reperul curent ca sa farmam pe loc.
         self.dwell_until: float = 0.0
+        # Ridicat de lupta: pozitia pe traseu nu mai e de incredere.
+        self.needs_resync: bool = False
 
     # ---------------------------------------------------------------- cadru
 

@@ -29,6 +29,7 @@ class CombatBehavior(Behavior):
     def __init__(self) -> None:
         self._rotation_index = 0
         self._last_target_attempt = 0.0
+        self._last_used: dict[str, float] = {}
 
     def should_run(self, ctx: BotContext) -> bool:
         if not ctx.zone_allows("combat"):
@@ -49,6 +50,11 @@ class CombatBehavior(Behavior):
 
         self._approach(ctx, float(section.get("approach_seconds", 0.0)))
         killed = self._fight(ctx, float(section.get("max_fight_seconds", 45.0)))
+
+        # Lupta ne-a mutat: am fugit dupa mob, ne-am rotit, ne-am oprit in alta
+        # parte. Traseul trebuie sa isi verifice pozitia inainte sa mearga mai
+        # departe, altfel reia secventa inregistrata din directia gresita.
+        ctx.needs_resync = True
 
         if killed:
             ctx.stats.kills += 1
@@ -100,18 +106,49 @@ class CombatBehavior(Behavior):
 
     # --------------------------------------------------------------- lupta
 
+    def _next_ability(self, ctx: BotContext) -> Optional[str]:
+        """Urmatoarea abilitate de apasat, dupa cooldown-urile invatate.
+
+        Daca profilul are `combat.abilities` (scris de comanda `learn`), mergem
+        pe prioritati: prima abilitate din lista care si-a terminat cooldown-ul.
+        Lista e ordonata cu cele grele primele, deci lovitura mare pleaca de
+        indata ce e gata, iar cele scurte umplu golurile.
+
+        Fara lista invatata, cadem pe `keys.attack_rotation`, apasata pe rand.
+        """
+        now = time.monotonic()
+        abilities = ctx.profile.section("combat").get("abilities") or []
+
+        if abilities:
+            for entry in abilities:
+                key = str(entry.get("key", ""))
+                if not key:
+                    continue
+                cooldown = float(entry.get("cooldown", 0.0))
+                if now - self._last_used.get(key, 0.0) >= cooldown:
+                    self._last_used[key] = now
+                    return key
+            return None  # toate sunt pe cooldown: asteptam o runda
+
+        rotation = [str(k) for k in (ctx.profile.key("attack_rotation") or [])]
+        if not rotation:
+            return None
+        key = rotation[self._rotation_index % len(rotation)]
+        self._rotation_index += 1
+        return key
+
     def _fight(self, ctx: BotContext, timeout: float) -> bool:
-        """Roteste skill-urile pana moare tinta sau expira timpul.
+        """Roteste abilitatile pana moare tinta sau expira timpul.
 
         Intoarce True daca tinta a disparut (presupunem ca a murit), False daca
         am renuntat - de obicei semn ca mob-ul e prea tare sau ne-a scapat.
         """
-        rotation = [str(k) for k in (ctx.profile.key("attack_rotation") or [])]
-        if not rotation:
-            log.warning("Nicio tasta in keys.attack_rotation; nu pot lupta.")
+        section = ctx.profile.section("combat")
+        if not section.get("abilities") and not ctx.profile.key("attack_rotation"):
+            log.warning("Nicio abilitate configurata; nu pot lupta. Ruleaza `learn`.")
             return False
 
-        gcd = float(ctx.profile.section("combat").get("global_cooldown", 1.4))
+        gcd = float(section.get("global_cooldown", 1.4))
         deadline = time.monotonic() + timeout
         saw_target = False
 
@@ -133,8 +170,9 @@ class CombatBehavior(Behavior):
                 # are prioritate mai mare, sa preia la ciclul urmator.
                 return False
 
-            ctx.controller.key(rotation[self._rotation_index % len(rotation)])
-            self._rotation_index += 1
+            key = self._next_ability(ctx)
+            if key:
+                ctx.controller.key(key)
             humanize.sleep(gcd, 0.18)
 
         log.info("Lupta a depasit timpul alocat; renunt la tinta.")

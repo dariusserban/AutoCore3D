@@ -56,6 +56,7 @@ class Localizer:
         self.anchor_region = anchor_region
         self.threshold = threshold
         self._anchors: dict[int, np.ndarray] = {}
+        self._portal_anchors: dict[int, np.ndarray] = {}
         self._load_anchors()
 
     def _load_anchors(self) -> None:
@@ -67,7 +68,17 @@ class Localizer:
                 image = cv2.imread(str(path))
                 if image is not None:
                     self._anchors[wp.index] = image
-        log.info("Ancore incarcate: %d din %d repere", len(self._anchors), len(self.route))
+
+            portal_path = self.route.portal_anchor_path(wp)
+            if portal_path and portal_path.exists():
+                image = cv2.imread(str(portal_path))
+                if image is not None:
+                    self._portal_anchors[wp.index] = image
+
+        log.info(
+            "Ancore incarcate: %d din %d repere (%d de portal)",
+            len(self._anchors), len(self.route), len(self._portal_anchors),
+        )
 
     @property
     def has_anchors(self) -> bool:
@@ -99,32 +110,70 @@ class Localizer:
         log.debug("Verificare reper %d: scor %.3f (prag %.2f) -> %s", index, score, self.threshold, ok)
         return ok
 
-    def relocate(self) -> Optional[Fix]:
-        """Cauta prin toate ancorele reperul care seamana cel mai bine.
+    def verify_portal(self, index: int) -> Optional[bool]:
+        """Am ajuns pe harta de dincolo de portalul reperului `index`?
 
-        Apelat doar cand ne-am pierdut: e o comparatie pe toata ruta, deci
-        costa, dar se intampla rar.
+        Intoarce None cand nu avem cu ce compara, ca sa poata fi deosebit de un
+        raspuns negativ ferm.
+        """
+        anchor = self._portal_anchors.get(index)
+        if anchor is None:
+            return None
+        view = self._current_view()
+        if view is None:
+            return None
+        score = vision.similarity(anchor, view)
+        log.debug("Verificare portal %d: scor %.3f", index, score)
+        return score >= self.threshold
+
+    def relocate(self, near: Optional[int] = None, window: int = 0) -> Optional[Fix]:
+        """Cauta reperul a carui ancora seamana cel mai bine cu ecranul.
+
+        Cand traseul trece prin portale, ruta acopera mai multe harti, iar o
+        cautare oarba pe tot traseul poate "gasi" un reper de pe alta harta doar
+        pentru ca minimapa are colturi asemanatoare. De aceea, cand stim
+        aproximativ unde suntem (`near`), cautam intai doar in vecinatate si
+        largim la toata ruta abia daca acolo nu iese nimic convingator.
         """
         view = self._current_view()
         if view is None or not self._anchors:
             return None
 
-        best_index, best_score = -1, 0.0
-        for index, anchor in self._anchors.items():
-            score = vision.similarity(anchor, view)
-            if score > best_score:
-                best_index, best_score = index, score
+        def best_among(indices) -> Optional[Fix]:
+            best_index, best_score = -1, 0.0
+            for index in indices:
+                anchor = self._anchors.get(index)
+                if anchor is None:
+                    continue
+                score = vision.similarity(anchor, view)
+                if score > best_score:
+                    best_index, best_score = index, score
+            if best_index < 0:
+                return None
+            return Fix(best_index, best_score, best_score >= self.threshold)
 
-        if best_index < 0:
-            return None
-        fix = Fix(best_index, best_score, best_score >= self.threshold)
-        log.info("Relocalizare: reper %d cu scor %.3f (%s)", fix.index, fix.score,
-                 "sigur" if fix.confident else "nesigur")
+        if near is not None and window > 0:
+            total = len(self.route)
+            vecini = [(near + offset) % total for offset in range(-window, window + 1)]
+            fix = best_among(vecini)
+            if fix and fix.confident:
+                log.info("Relocalizare in vecinatate: reper %d (scor %.3f)", fix.index, fix.score)
+                return fix
+
+        fix = best_among(self._anchors.keys())
+        if fix:
+            log.info("Relocalizare pe toata ruta: reper %d cu scor %.3f (%s)", fix.index,
+                     fix.score, "sigur" if fix.confident else "nesigur")
         return fix
 
 
 class RoutePlayer:
     """Reda secventele inregistrate, cu corectie la fiecare reper."""
+
+    # Cat timp trebuie sa stea ecranul neschimbat ca sa consideram incarcarea
+    # incheiata, si cat mai asteptam dupa aceea ca personajul sa fie jucabil.
+    LOAD_STABLE_SECONDS = 1.5
+    LOAD_SETTLE_SECONDS = 1.0
 
     def __init__(
         self,
@@ -134,10 +183,16 @@ class RoutePlayer:
         speed: float = 1.0,
         should_continue: Optional[Callable[[], bool]] = None,
         on_waypoint: Optional[Callable[[Waypoint], None]] = None,
+        capture=None,
+        templates=None,
     ) -> None:
         self.route = route
         self.controller = controller
         self.localizer = localizer
+        # Captura e folosita doar la portale, ca sa vedem cand s-a terminat
+        # ecranul de incarcare. Restul navigatiei trece prin localizer.
+        self.capture = capture if capture is not None else getattr(localizer, "capture", None)
+        self.templates = templates
         self.speed = max(0.5, min(speed, 2.0))
         self.should_continue = should_continue or (lambda: True)
         self.on_waypoint = on_waypoint
@@ -145,6 +200,7 @@ class RoutePlayer:
         self.current_index = 0
         self.laps = 0
         self.lost_count = 0
+        self.portals_taken = 0
         # 1:1 pana cand cineva ne spune rezolutia curenta prin set_screen().
         self._scale = (1.0, 1.0)
 
@@ -243,9 +299,135 @@ class RoutePlayer:
             else:
                 self.lost_count = 0
 
+        # Portalul se trece dupa ce am confirmat ca stam in fata lui.
+        if arrived.portal is not None and not self._enter_portal(arrived):
+            return None
+
         if self.on_waypoint:
             self.on_waypoint(arrived)
         return arrived
+
+    # -------------------------------------------------------------- portale
+
+    def _enter_portal(self, waypoint: Waypoint) -> bool:
+        """Da click pe portal si asteapta harta noua. False = nu am reusit.
+
+        Un portal nu poate fi redat ca un click oarecare: intre click si harta
+        noua e o incarcare a carei durata variaza de la o data la alta. Asa ca
+        dam click, asteptam sa se linisteasca ecranul, si confirmam cu ancora
+        de destinatie inregistrata atunci cand ai trecut tu.
+        """
+        portal = waypoint.portal
+        assert portal is not None
+
+        for attempt in range(1, 3):
+            if not self.should_continue():
+                return False
+
+            x, y = self._portal_click_point(portal)
+            print(f"  > intru in portal (reperul {waypoint.index})")
+            self.controller.click(x, y)
+
+            self._wait_for_load(portal.load_seconds)
+
+            arrived = self.localizer.verify_portal(waypoint.index) if self.localizer else None
+            if arrived is None:
+                # Fara ancora de destinatie nu avem cum confirma; mergem pe
+                # incredere, dar spunem asta o data, ca sa se stie de ce.
+                log.info("Portalul %d nu are ancora de destinatie; nu pot confirma trecerea.",
+                         waypoint.index)
+                self.portals_taken += 1
+                return True
+            if arrived:
+                self.portals_taken += 1
+                print("    ajuns pe harta noua")
+                return True
+
+            # Nu am ajuns. Daca inca suntem pe harta veche, clicul a ratat
+            # portalul si merita reincercat; altfel suntem in alta parte si o
+            # a doua apasare ar face lucrurile mai rele.
+            still_here = self.localizer.verify(waypoint.index) if self.localizer else False
+            if not still_here:
+                log.error("Dupa portal nu recunosc nici harta veche, nici pe cea noua.")
+                return False
+            log.warning("Clicul pe portal pare sa fi ratat (incercarea %d).", attempt)
+            humanize.sleep(1.5, 0.2)
+
+        print("  !! nu am reusit sa trec portalul")
+        return False
+
+    def _portal_click_point(self, portal) -> tuple[int, int]:
+        """Unde dam click: pe sablon daca il gasim, altfel unde ai dat tu.
+
+        Sablonul ajuta cand portalul nu e fix pe ecran (camera se roteste
+        putin, personajul se opreste cu un pas mai incolo).
+        """
+        if portal.template and self.templates is not None and self.capture is not None:
+            template = self.templates.get(portal.template)
+            if template is not None:
+                match = vision.find_template(self.capture.grab(), template, 0.8)
+                if match:
+                    return match.center
+                log.debug("Sablonul de portal '%s' nu a fost gasit; folosesc pozitia inregistrata.",
+                          portal.template)
+        return self._scaled(*portal.click)
+
+    def _wait_for_load(self, max_seconds: float) -> float:
+        """Asteapta pana cand ecranul se schimba si apoi se linisteste.
+
+        Intoarce cate secunde a durat. Fara captura, asteptam pur si simplu
+        jumatate din bugetul de timp - suficient in majoritatea cazurilor.
+        """
+        if self.capture is None:
+            humanize.sleep(max_seconds / 2, 0.15)
+            return max_seconds / 2
+
+        started = time.monotonic()
+        previous = self.capture.grab()
+        stable_since = 0.0
+
+        while time.monotonic() - started < max_seconds:
+            if not self.should_continue():
+                break
+            time.sleep(0.3)
+            current = self.capture.grab()
+            if vision.frames_differ(previous, current, 3.0):
+                stable_since = 0.0
+            elif stable_since == 0.0:
+                stable_since = time.monotonic()
+            elif time.monotonic() - stable_since > self.LOAD_STABLE_SECONDS:
+                break
+            previous = current
+
+        elapsed = time.monotonic() - started
+        log.debug("Incarcare terminata in %.1fs.", elapsed)
+        # Harta e afisata, dar personajul poate fi inca "inghetat" o clipa.
+        humanize.sleep(self.LOAD_SETTLE_SECONDS, 0.25)
+        return elapsed
+
+    # ------------------------------------------------------------ resincronizare
+
+    def resync(self) -> bool:
+        """Mai suntem unde credeam? Folosit dupa o lupta care ne-a tras din drum.
+
+        O lupta te scoate din traseu: fugi dupa mob, te intorci din alta parte,
+        cu camera rotita. Daca am relua secventa inregistrata de acolo, am
+        merge in cu totul alta directie. Verificam intai, si abia apoi mergem.
+        """
+        if not self.localizer or not self.localizer.has_anchors:
+            return True
+        if self.localizer.verify(self.current_index):
+            return True
+
+        fix = self.localizer.relocate(near=self.current_index, window=6)
+        if fix and fix.confident:
+            if fix.index != self.current_index:
+                print(f"  ~ dupa lupta sunt la reperul {fix.index}, continui de acolo")
+            self.current_index = fix.index
+            return True
+
+        log.warning("Dupa lupta nu recunosc pozitia.")
+        return False
 
     def _recover(self) -> bool:
         """Am iesit de pe traseu. Incercam sa ne dam seama unde suntem.
@@ -262,7 +444,7 @@ class RoutePlayer:
         if self.localizer is None:
             return False
 
-        fix = self.localizer.relocate()
+        fix = self.localizer.relocate(near=self.current_index, window=8)
         if fix and fix.confident:
             print(f"  ~ recuperat: continui de la reperul {fix.index}")
             self.current_index = fix.index

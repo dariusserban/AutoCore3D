@@ -33,6 +33,13 @@ class TravelBehavior(Behavior):
         player = ctx.player
         assert player is not None
 
+        if ctx.needs_resync:
+            ctx.needs_resync = False
+            if not player.resync():
+                print("  !! nu ma pot reorienta dupa lupta - opresc")
+                ctx.kill_switch.stop()
+                return
+
         before_laps = player.laps
         before_lost = player.lost_count
 
