@@ -1,13 +1,16 @@
-"""Lupta: gaseste tinta, apropie-te, roteste skill-urile, ia loot-ul.
+"""Lupta, in doua stiluri diferite, dupa cum e construit jocul.
 
-Selectia tintei se face in doua feluri, in functie de ce ai in profil:
-  - `keys.target_next` (de obicei Tab): cel mai fiabil, jocul alege tinta;
-  - nameplate-uri: cautam pete de o anumita culoare deasupra mob-urilor si
-    dam click pe cea mai apropiata de centrul ecranului.
+`combat.mode: target` - tiparul de MMO clasic: selectezi un mob (Tab sau click),
+il bati pana moare, treci la urmatorul. Ai o bara de viata a tintei din care
+stii cand s-a terminat.
 
-Rotatia de skill-uri nu e o secventa fixa apasata la infinit: alegem urmatoarea
-tasta din lista, cu mici variatii de ordine, ca sa nu iasa un tipar mecanic
-perfect identic la fiecare mob.
+`combat.mode: aim` - tiparul de ARPG izometric (Diablo, Drakensang Online): nu
+exista "tinta selectata". Duci cursorul peste gramada de mob-uri si dai skill-uri
+in directia aia, pe mai multi deodata. Aici nu avem bara de tinta din care sa
+citim, deci ne orientam dupa cate pete de dusman mai vedem pe ecran.
+
+In ambele cazuri, rotatia de abilitati vine din `combat.abilities`, invatata cu
+comanda `learn` din felul in care te-ai luptat tu.
 """
 
 from __future__ import annotations
@@ -15,6 +18,7 @@ from __future__ import annotations
 import logging
 import math
 import time
+from typing import Optional
 
 from ..core import humanize
 from ..core.engine import Behavior, BotContext
@@ -34,16 +38,40 @@ class CombatBehavior(Behavior):
     def should_run(self, ctx: BotContext) -> bool:
         if not ctx.zone_allows("combat"):
             return False
+
+        if self._mode(ctx) == "aim":
+            # Fara tinta selectata, singurul semn ca e ceva de batut sunt
+            # dusmanii vizibili pe ecran.
+            return bool(self._enemies(ctx))
+
         if ctx.has_target():
             return True
         # Fara tinta: intram doar daca vedem ceva de atacat sau daca avem o
         # tasta de selectie pe care sa o incercam.
         if ctx.profile.key("target_next"):
             return True
-        return bool(ctx.find_blobs("enemy_nameplate", min_area=40))
+        return bool(self._enemies(ctx))
+
+    @staticmethod
+    def _mode(ctx: BotContext) -> str:
+        return str(ctx.profile.section("combat").get("mode", "target")).lower()
+
+    @staticmethod
+    def _enemies(ctx: BotContext) -> list:
+        """Petele care reprezinta dusmani, dupa culoarea din profil."""
+        section = ctx.profile.section("combat")
+        return ctx.find_blobs(
+            section.get("enemy_color", "enemy_nameplate"),
+            region_name=section.get("search_region"),
+            min_area=int(section.get("enemy_min_area", 40)),
+        )
 
     def run(self, ctx: BotContext) -> None:
         section = ctx.profile.section("combat")
+
+        if self._mode(ctx) == "aim":
+            self._run_aim(ctx, section)
+            return
 
         if not ctx.has_target() and not self._acquire_target(ctx):
             return
@@ -81,7 +109,7 @@ class CombatBehavior(Behavior):
 
         # Varianta vizuala: click pe nameplate-ul cel mai apropiat de centru,
         # fiindca ala e cel mai probabil in raza si in fata personajului.
-        blobs = ctx.find_blobs("enemy_nameplate", min_area=40)
+        blobs = self._enemies(ctx)
         if not blobs:
             return False
 
@@ -93,16 +121,52 @@ class CombatBehavior(Behavior):
         ctx.refresh()
         return ctx.has_target()
 
-    def _approach(self, ctx: BotContext, seconds: float) -> None:
-        """Mers inainte cateva momente, ca tinta sa intre in raza.
+    def _approach(self, ctx: BotContext, seconds: float,
+                  target: Optional[tuple[int, int]] = None) -> None:
+        """Apropierea de tinta, in felul in care se misca jocul.
 
-        Fara acces la distanta reala, mergem o durata fixa din profil. Daca
-        jocul tau are auto-attack cu apropiere automata, lasa 0.
+        La jocurile cu WASD tinem tasta de inainte o durata fixa - fara acces
+        la distanta reala, atat putem face.
+
+        La cele cu click-to-move (ARPG-urile izometrice) nu exista "inainte":
+        personajul merge unde dai click. Dam click intre personaj (care e mereu
+        in centrul ecranului) si tinta, ca sa se apropie fara sa treaca de ea.
         """
         if seconds <= 0:
             return
-        forward = ctx.profile.key("forward", "w")
-        ctx.controller.hold(str(forward), humanize.delay(seconds, 0.2))
+
+        if self._movement(ctx) == "click":
+            if target is None:
+                return
+            self._walk_towards(ctx, target)
+            humanize.sleep(seconds, 0.2)
+            return
+
+        forward = str(ctx.profile.key("forward", "w") or "")
+        if not forward:
+            # Profilele de ARPG lasa tasta goala intentionat: acolo nu exista
+            # "inainte". Fara garda asta am trimite o apasare de tasta vida.
+            log.debug("Nicio tasta de mers definita; sar peste apropiere.")
+            return
+        ctx.controller.hold(forward, humanize.delay(seconds, 0.2))
+
+    @staticmethod
+    def _movement(ctx: BotContext) -> str:
+        return str(ctx.profile.section("input").get("movement", "keyboard")).lower()
+
+    def _walk_towards(self, ctx: BotContext, target: tuple[int, int],
+                      fraction: float = 0.6) -> None:
+        """Click pe drumul catre tinta, pentru jocurile cu click-to-move.
+
+        Nu dam click direct pe mob: in unele jocuri asta inseamna "ataca-l de
+        unde esti". Dam click pe o fractiune din distanta, ca personajul doar
+        sa se apropie.
+        """
+        cx, cy = ctx.screen_center()
+        tx, ty = target
+        px = int(cx + (tx - cx) * fraction)
+        py = int(cy + (ty - cy) * fraction)
+        ctx.controller.click(px, py)
 
     # --------------------------------------------------------------- lupta
 
@@ -177,6 +241,81 @@ class CombatBehavior(Behavior):
 
         log.info("Lupta a depasit timpul alocat; renunt la tinta.")
         return False
+
+    # ----------------------------------------------------------- modul aim
+
+    def _run_aim(self, ctx: BotContext, section: dict) -> None:
+        """Lupta de ARPG: cursorul pe gramada de mob-uri, abilitatile pe ele.
+
+        Nu avem bara de tinta, deci nu putem sti cand a murit un anume mob. Ne
+        uitam in schimb la cate pete de dusman erau la inceput si cate au ramas
+        la final; diferenta e o estimare a ucigerilor, nu o numaratoare exacta.
+        """
+        deadline = time.monotonic() + float(section.get("max_fight_seconds", 45.0))
+        gcd = float(section.get("global_cooldown", 1.4))
+        approach = float(section.get("approach_seconds", 0.0))
+
+        enemies = self._enemies(ctx)
+        la_inceput = len(enemies)
+        apropiat = False
+
+        while time.monotonic() < deadline and enemies:
+            if not ctx.running():
+                break
+
+            health = ctx.health
+            if health is not None and health <= ctx.profile.threshold("heal_below", 0.5):
+                break  # lasam supravietuirea, care are prioritate, sa preia
+
+            tinta = self._pick_cluster(ctx, enemies, float(section.get("cluster_radius", 160)))
+
+            # O singura apropiere per angajare: daca ne-am dus deja spre ei,
+            # nu are rost sa reluam clicul de mers la fiecare abilitate.
+            if approach > 0 and not apropiat:
+                self._approach(ctx, approach, target=tinta)
+                apropiat = True
+
+            ctx.controller.move(*tinta)
+            key = self._next_ability(ctx)
+            if key:
+                ctx.controller.key(key)
+            elif section.get("basic_attack_click", True):
+                # Toate abilitatile sunt pe cooldown: lovim cu atacul de baza.
+                ctx.controller.click(button="left")
+
+            humanize.sleep(gcd, 0.18)
+            ctx.refresh()
+            enemies = self._enemies(ctx)
+
+        ucisi = max(0, la_inceput - len(enemies))
+        if ucisi:
+            ctx.stats.kills += ucisi
+            print(f"  + {ucisi} mob(i) rapusi (total {ctx.stats.kills})")
+
+        ctx.needs_resync = True
+        if ucisi and section.get("loot_after_kill", True):
+            self._loot(ctx)
+
+    @staticmethod
+    def _pick_cluster(ctx: BotContext, enemies: list, radius: float) -> tuple[int, int]:
+        """Unde tintim: centrul gramezii celei mai apropiate de personaj.
+
+        Intr-un ARPG mob-urile vin in valuri, iar abilitatile lovesc in zona.
+        Tintind centrul unui grup, nu un singur mob, prindem mai multi deodata.
+        """
+        cx, cy = ctx.screen_center()
+        cel_mai_apropiat = min(
+            enemies, key=lambda b: math.hypot(b.center[0] - cx, b.center[1] - cy)
+        )
+        ax, ay = cel_mai_apropiat.center
+
+        vecini = [
+            b for b in enemies
+            if math.hypot(b.center[0] - ax, b.center[1] - ay) <= radius
+        ]
+        mx = sum(b.center[0] for b in vecini) // len(vecini)
+        my = sum(b.center[1] for b in vecini) // len(vecini)
+        return mx, my
 
     # ---------------------------------------------------------------- loot
 

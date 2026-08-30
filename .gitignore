@@ -8,4 +8,5 @@ gamebot/check_snapshot.png
 gamebot/templates/*.png
 gamebot/profiles/*.yaml
 !gamebot/profiles/exemplu.yaml
+!gamebot/profiles/drakensang.yaml
 .pytest_cache/

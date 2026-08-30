@@ -1,0 +1,137 @@
+# Drakensang Online - profil de pornire.
+#
+# DSO ruleaza in client nativ (Thin Client), nu in browser, deci fereastra e o
+# aplicatie obisnuita: fara offset de viewport, fara zoom de pagina.
+#
+# ---------------------------------------------------------------------------
+# TOATE CIFRELE DE MAI JOS SUNT PLACEHOLDERE. Nu sunt masurate pe ecranul tau
+# si aproape sigur sunt gresite. Inlocuieste-le cu:
+#   python -m gamebot.main calibrate region --name minimap
+#   python -m gamebot.main calibrate region --name health_bar
+#   python -m gamebot.main calibrate color  --name health
+#   python -m gamebot.main calibrate color  --name enemy_nameplate
+# si verifica rezultatul cu:
+#   python -m gamebot.main check --profile gamebot/profiles/drakensang.yaml
+# ---------------------------------------------------------------------------
+#
+# Ce e diferit fata de profilul generic, si de ce:
+#   - miscarea e click-to-move, nu WASD  ->  input.movement: click
+#   - nu exista "tinta selectata" ca in MMO-urile clasice, iar abilitatile
+#     lovesc in zona sub cursor         ->  combat.mode: aim
+
+name: drakensang
+monitor: 1
+
+regions:
+  # Minimapa: coltul din dreapta sus. Alege o bucata care se schimba cand te
+  # misti, dar fara ceas, fara numele hartii si fara iconitele de eveniment -
+  # alea se schimba singure si ar deruta verificarea de pozitie.
+  minimap:
+    left: 1600
+    top: 40
+    width: 300
+    height: 300
+
+  # Globul/bara de viata. La DSO e in stanga jos.
+  health_bar:
+    left: 90
+    top: 980
+    width: 200
+    height: 16
+
+  # Optional, dar util: bara de cast, daca vrei confirmarea actiunilor lungi.
+  # cast_bar:
+  #   left: 830
+  #   top: 620
+  #   width: 260
+  #   height: 16
+
+  # target_health_bar lipseste intentionat: in modul 'aim' nu e nevoie de ea.
+  # Daca vrei totusi lupta pe tinta selectata, calibreaza-o si pune mode: target.
+
+colors:
+  health:
+    low: [0, 120, 90]
+    high: [10, 255, 255]
+
+  # Culoarea barelor de viata de deasupra mob-urilor. Asta e detectorul de
+  # dusmani in modul 'aim' - calibreaz-o cu grija, e cea mai importanta din tot
+  # profilul. Selecteaza o bucata plina dintr-o bara de mob, nu conturul ei.
+  enemy_nameplate:
+    low: [0, 150, 120]
+    high: [8, 255, 255]
+
+keys:
+  # DSO se misca prin click, deci nu avem taste de directie. Le lasam goale ca
+  # sa nu apese nimic din greseala.
+  forward: ""
+  interact: ""
+  loot: ""            # DSO ridica loot-ul automat pentru majoritatea lucrurilor
+  target_next: ""     # nu exista selectie de tinta prin tasta
+  heal: "5"           # pune tasta reala a potiunii de viata
+  escape: ""
+
+  # Rezerva, folosita doar daca `combat.abilities` e gol.
+  attack_rotation: ["1", "2", "3", "4"]
+
+thresholds:
+  heal_below: 0.55
+  flee_below: 0.20
+  template_match: 0.85
+  anchor_match: 0.72
+
+behaviors:
+  survival: true
+  combat: true
+  travel: true
+  gather: false
+  upkeep: false
+  idle_click: false
+
+input:
+  movement: click       # click-to-move. Cu "keyboard" foloseste keys.forward.
+  click_radius: 3
+  move_speed: 1.0
+
+combat:
+  mode: aim             # ARPG: cursorul pe gramada, abilitatile in zona
+  anywhere: false       # true = se bate oriunde, nu doar la reperele 'combat'
+
+  enemy_color: enemy_nameplate
+  enemy_min_area: 40    # cat de mare trebuie sa fie pata ca sa fie mob
+  cluster_radius: 160   # mob-urile mai apropiate de atat se tintesc impreuna
+
+  approach_seconds: 1.2 # cat merge spre gramada inainte sa dea in ea
+  global_cooldown: 1.0
+  max_fight_seconds: 40
+  basic_attack_click: true   # cand toate abilitatile sunt pe cooldown
+  loot_after_kill: false     # DSO ridica singur; pune true daca vrei apasare
+
+  # Se completeaza cu:
+  #   python -m gamebot.main learn --route gamebot/routes/<ruta>
+  abilities: []
+
+survival:
+  heal_cooldown: 6.0
+  heal_wait: 1.0
+  stop_on_critical: true
+  on_death: []
+
+record:
+  # Tastele de marcare in timpul inregistrarii. Daca DSO foloseste vreuna
+  # dintre ele in joc, schimb-o aici - nu in cod.
+  hotkeys:
+    f4: portal
+    f5: travel
+    f6: combat
+    f8: vendor
+  pause_key: f9
+  stop_key: f10
+
+safety:
+  kill_key: f12
+  pause_key: f11
+  max_runtime_minutes: 120
+  breaks: true
+  stuck_seconds: 90
+  max_deaths: 3

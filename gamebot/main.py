@@ -77,13 +77,21 @@ def cmd_record(args: argparse.Namespace) -> int:
     except Exception as exc:
         print(f"Fara captura de ecran ({exc}); inregistrez doar input-ul.")
 
-    recorder = RouteRecorder(
-        name=args.name,
-        output_dir=output,
-        capture=capture,
-        anchor_region=anchor_region,
-        record_mouse_moves=not args.no_mouse,
-    )
+    setari = profile.section("record")
+    try:
+        recorder = RouteRecorder(
+            name=args.name,
+            output_dir=output,
+            capture=capture,
+            anchor_region=anchor_region,
+            hotkeys=setari.get("hotkeys"),
+            pause_key=str(setari.get("pause_key", "f9")),
+            stop_key=str(setari.get("stop_key", "f10")),
+            record_mouse_moves=not args.no_mouse,
+        )
+    except ValueError as exc:
+        print(f"Eroare in profil: {exc}")
+        return 1
     route = recorder.run()
 
     if capture:

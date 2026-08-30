@@ -9,7 +9,8 @@ ecranul de incarcare dureaza de fiecare data altcat. Marchezi portalul, dai
 click pe el, iar recorder-ul asteapta sa se incarce harta noua si retine cum
 arata - ca botul sa poata confirma mai tarziu ca a ajuns unde trebuie.
 
-Taste implicite (se pot schimba in profil):
+Taste implicite - toate se pot schimba in profil, sub `record:`, daca jocul
+foloseste deja tastele astea:
   F4  portal (urmatorul click e pe portal)   F5  reper de drum
   F6  reper de lupta                         F7  reper de resurse
   F8  reper de vendor/reparat
@@ -43,8 +44,8 @@ DEFAULT_HOTKEYS = {
     "f7": "gather",
     "f8": "vendor",
 }
-PAUSE_KEY = "f9"
-STOP_KEY = "f10"
+DEFAULT_PAUSE_KEY = "f9"
+DEFAULT_STOP_KEY = "f10"
 
 
 class RouteRecorder:
@@ -62,14 +63,25 @@ class RouteRecorder:
         capture: Optional[ScreenCapture] = None,
         anchor_region: Optional[Region] = None,
         hotkeys: Optional[dict[str, str]] = None,
+        pause_key: str = DEFAULT_PAUSE_KEY,
+        stop_key: str = DEFAULT_STOP_KEY,
         record_mouse_moves: bool = True,
     ) -> None:
         self.name = name
         self.output_dir = Path(output_dir)
         self.capture = capture
         self.anchor_region = anchor_region
-        self.hotkeys = {k.lower(): v for k, v in (hotkeys or DEFAULT_HOTKEYS).items()}
+        self.hotkeys = {str(k).lower(): v for k, v in (hotkeys or DEFAULT_HOTKEYS).items()}
+        self.pause_key = pause_key.lower()
+        self.stop_key = stop_key.lower()
         self.record_mouse_moves = record_mouse_moves
+
+        conflict = self.hotkeys.keys() & {self.pause_key, self.stop_key}
+        if conflict:
+            raise ValueError(
+                f"Tasta {', '.join(sorted(conflict))} e folosita si pentru reper, si pentru "
+                "control. Schimba una dintre ele in profil, sub `record:`."
+            )
 
         self.route = Route(name=name, waypoints=[])
         self._events: list[InputEvent] = []
@@ -238,7 +250,7 @@ class RouteRecorder:
 
         def on_release(key):
             name = self._key_name(key)
-            if name is None or name in self.hotkeys or name in (PAUSE_KEY, STOP_KEY):
+            if name is None or name in self.hotkeys or name in (self.pause_key, self.stop_key):
                 return
             self._record(InputEvent("key_up", self._dt(), key=name))
 
@@ -305,12 +317,12 @@ class RouteRecorder:
             # principal; aici doar punem cererea la coada.
             self._mark_queue.put(self.hotkeys[name])
             return True
-        if name == PAUSE_KEY:
+        if name == self.pause_key:
             self._paused = not self._paused
             print("  >> inregistrare in PAUZA" if self._paused else "  >> inregistrare reluata")
             self._last_event_at = time.monotonic()
             return True
-        if name == STOP_KEY:
+        if name == self.stop_key:
             self._running = False
             return True
         return False
@@ -338,7 +350,7 @@ class RouteRecorder:
         print("\n=== INREGISTRARE RUTA ===")
         print(f"Ruta: {self.name}")
         print(f"Repere:  {keys}")
-        print(f"Control: {PAUSE_KEY.upper()}=pauza  {STOP_KEY.upper()}=stop si salveaza")
+        print(f"Control: {self.pause_key.upper()}=pauza  {self.stop_key.upper()}=stop si salveaza")
         print("\nIntra in joc si mergi traseul. Marcheaza un reper la fiecare")
         print("colt si la fiecare zona in care vrei sa se bata.")
         print("La portal: apasa F4 INAINTE de click, apoi da click pe portal.")

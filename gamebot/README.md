@@ -31,6 +31,26 @@ se blocheze în tipare mecanice, nu ca să ascundă ceva de cineva.
 Culesul de resurse (`behaviors/gather.py`) există, dar e **oprit implicit** în profil. Dacă
 îți trebuie vreodată, pui `gather: true`.
 
+## Două stiluri de joc
+
+Jocurile se împart în două tipare, iar botul le tratează diferit. Se alege din profil.
+
+| | `combat.mode: target` | `combat.mode: aim` |
+|---|---|---|
+| Tipar | MMO clasic (WoW-like) | ARPG izometric (Diablo-like, **Drakensang Online**) |
+| Selectare | Tab sau click pe mob, ai bară de viață a țintei | nu există țintă; lovești în zona de sub cursor |
+| Mișcare | `input.movement: keyboard` (WASD) | `input.movement: click` (click-to-move) |
+| Cum știe că a murit | bara țintei a dispărut | au scăzut petele de dușman de pe ecran |
+| Ținteste | un mob | centrul grămezii, ca abilitățile în zonă să prindă mai mulți |
+
+Pentru Drakensang Online există un profil de pornire: `profiles/drakensang.yaml`.
+E configurat pe `aim` + `click`, dar **cifrele din el sunt placeholdere** — regiunile și
+culorile se măsoară pe ecranul tău, ca la orice profil.
+
+DSO rulează în client nativ (Thin Client), nu în browser, deci fereastra e o aplicație
+obișnuită: fără offset de viewport, fără zoom de pagină, iar tastele funcționale nu sunt
+furate de browser (`F5` = refresh, `F12` = devtools).
+
 ## Instalare
 
 ```bash
@@ -88,6 +108,17 @@ Mergi traseul normal. În timpul mersului:
 | `F8`  | reper de vendor/reparat |
 | `F9`  | pauză / reluare a înregistrării |
 | `F10` | oprește și salvează |
+
+Dacă jocul folosește deja vreuna dintre ele, se schimbă din profil — nu din cod:
+
+```yaml
+record:
+  hotkeys: {f1: portal, f2: travel, f3: combat}
+  pause_key: f9
+  stop_key: f10
+```
+
+O tastă pusă și pe marcare, și pe control, e respinsă la pornire cu un mesaj explicit.
 
 Două lucruri contează aici:
 
@@ -235,9 +266,11 @@ gamebot/
 │   ├── config.py         încărcarea profilului YAML
 │   └── engine.py         contextul comun și mașina de stări
 ├── behaviors/            supraviețuire, luptă, cules, întreținere, click, mers
-├── profiles/exemplu.yaml profil comentat, de copiat
+├── profiles/
+│   ├── exemplu.yaml      profil generic, comentat
+│   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                101 de teste, rulează fără joc și fără ecran
+└── tests/                118 teste, rulează fără joc și fără ecran
 ```
 
 ## Teste
@@ -265,6 +298,12 @@ Recalibrează `regions.minimap` pe o zonă care se schimbă doar când te miști
 **Ratează portalul.**
 Personajul se oprește cu un pas mai încolo decât la înregistrare, deci clicul cade alături.
 Salvează un sablon cu portalul și pune-l în `route.json` (vezi secțiunea Portalele).
+
+**În modul `aim` nu vede niciun mob.**
+`colors.enemy_nameplate` e cel mai important reglaj din profil. Calibrează-l pe o bucată
+plină dintr-o bară de viață de mob, nu pe conturul ei, și verifică numărul detectat cu
+`check`. Dacă vede mob-uri și pe ecran gol, strânge intervalul sau mărește
+`combat.enemy_min_area`.
 
 **Se oprește cu „ecranul nu s-a schimbat".**
 Personajul e blocat într-un obstacol. Mărește `safety.stuck_seconds` dacă ai zone cu așteptare
