@@ -365,32 +365,19 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 
 def _raporteaza_ce_vede(ctx: BotContext) -> None:
-    """Scrie in jurnal ce citeste botul, chiar inainte sa porneasca.
+    """Scrie in jurnal ce vede botul, chiar inainte sa porneasca.
 
-    E singurul lucru care poate fi stramb fara sa se vada: daca regiunea barei
-    de viata cade alaturi, botul ruleaza linistit si nu se vindeca niciodata.
-    Asa se vede din prima linie de jurnal, fara sa ruleze nimeni nimic separat.
+    Detectorul de dusmani e singurul lucru care poate fi stramb fara sa se
+    observe: daca nu vede niciodata pe nimeni, botul merge cuminte pe traseu si
+    nu se bate deloc, fara sa se planga de nimic.
     """
-    viata = ctx.health
-    if viata is None:
-        print("Bara de viata nu e definita in profil - nu se va vindeca singur.")
-    elif viata <= 0.02:
-        # Personajul tau e evident viu, altfel n-ai fi pornit botul. Deci
-        # regiunea din profil arata in alta parte. Oprim vindecarea pentru
-        # sesiunea asta si mergem mai departe: farmatul e ce conteaza acum.
-        print("")
-        print("ATENTIE: bara de viata se citeste 0%, ceea ce nu se poate.")
-        print("Regiunea `regions.health_bar` din profil arata in alta parte.")
-        print("Dezactivez vindecarea automata pentru sesiunea asta si continui -")
-        print("traseul si lupta merg oricum. Trimite un screenshot ca sa fie reglata.")
-        print("")
-        ctx.profile.behaviors["survival"] = False
-    else:
-        print(f"Viata citita acum: {viata*100:.0f}%")
-
     from .behaviors.combat import CombatBehavior
 
-    print(f"Dusmani vizibili acum: {len(CombatBehavior._enemies(ctx))}")
+    dusmani = len(CombatBehavior._enemies(ctx))
+    print(f"Dusmani vizibili acum: {dusmani}")
+    if dusmani == 0:
+        print("  (daca ai mob-uri pe ecran si scrie 0, culoarea "
+              "`colors.enemy_nameplate` trebuie recalibrata)")
 
 
 def cmd_check(args: argparse.Namespace) -> int:
@@ -435,15 +422,15 @@ def cmd_check(args: argparse.Namespace) -> int:
     ctx.refresh()
     warn_if_black(ctx.frame)
 
-    def as_percent(value: Optional[float]) -> str:
-        return "nedefinit" if value is None else f"{value*100:5.1f}%"
+    from .behaviors.combat import CombatBehavior
+
+    obiecte = 0
+    for nume in (profile.section("loot").get("colors") or []):
+        obiecte += len(ctx.find_blobs(nume, min_area=25))
 
     print("\nCe vede botul acum:")
-    print(f"  viata personajului : {as_percent(ctx.health)}")
-    print(f"  viata tintei       : {as_percent(ctx.target_health)}")
-    print(f"  tinta selectata    : {'da' if ctx.has_target() else 'nu'}")
-    print(f"  mob-uri detectate  : {len(ctx.find_blobs('enemy_nameplate', min_area=40))}")
-    print(f"  noduri detectate   : {len(ctx.find_blobs('resource_node', min_area=80))}")
+    print(f"  mob-uri detectate  : {len(CombatBehavior._enemies(ctx))}")
+    print(f"  obiecte pe jos     : {obiecte}")
 
     snapshot = Path(args.templates or DEFAULT_TEMPLATES).parent / "check_snapshot.png"
     capture.save(snapshot)

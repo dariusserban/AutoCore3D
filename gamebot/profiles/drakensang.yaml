@@ -1,13 +1,11 @@
 # Drakensang Online - profil care merge din prima, fara calibrare.
 #
 # Regiunile sunt scrise ca PROCENTE din fereastra jocului (`rel: [x, y, lat, inalt]`),
-# nu in pixeli. Botul isi gaseste singur fereastra dupa titlu, o masoara si
-# calculeaza coordonatele reale. Merge la orice rezolutie si daca muti fereastra.
+# nu in pixeli. Botul isi gaseste singur fereastra, o masoara si calculeaza
+# coordonatele reale. Merge la orice rezolutie si daca muti fereastra.
 #
-# Singurul lucru care poate avea nevoie de o corectie e bara de viata: pozitia ei
-# e o estimare. Porneste botul, uita-te in JURNAL ce viata citeste, si daca nu se
-# potriveste cu ce vezi pe ecran, corecteaza `regions.health_bar.rel` (sau trimite
-# un screenshot si se pune exact).
+# Bara de viata nu e urmarita deloc, la cerere: botul nu se vindeca singur si nu
+# se opreste din cauza ei. Vindecarea ramane treaba ta.
 
 name: drakensang
 monitor: 1
@@ -17,13 +15,6 @@ window:
   title: Drakensang
 
 regions:
-  # Bara rosie de viata, jos-centru, langa eticheta "Nivel". Masurata dintr-un
-  # screenshot real (arie de client 1906x1016). Daca `check` arata un procent
-  # care nu se potriveste cu ecranul tau, recalibreaz-o - e singurul numar din
-  # profil care depinde de cum ti-ai aranjat interfata.
-  health_bar:
-    rel: [0.388, 0.905, 0.102, 0.018]
-
   # Minimapa DSO e sus-STANGA (masurata dintr-un screenshot real, 1906x1016
   # arie de client). E semi-transparenta, deci se vede si terenul prin ea -
   # ceea ce o face o ancora buna: se schimba cand te misti.
@@ -36,10 +27,6 @@ regions:
 colors:
   # Rosul barelor de viata de deasupra mob-urilor - detectorul de dusmani.
   enemy_nameplate:
-    low: [0, 120, 90]
-    high: [10, 255, 255]
-
-  health:
     low: [0, 120, 90]
     high: [10, 255, 255]
 
@@ -63,20 +50,17 @@ keys:
   interact: ""
   loot: ""            # daca ai o tasta de ridicat, pune-o aici
   target_next: ""
-  heal: "5"           # tasta potiunii de viata
   escape: ""
   mount: ""           # tasta de montura; gol = nu urca
 
   attack_rotation: ["1", "2", "3", "4"]
 
 thresholds:
-  heal_below: 0.55
-  flee_below: 0.20
   template_match: 0.85
   anchor_match: 0.68   # putin mai permisiv: ancora e tot ecranul, care variaza
 
 behaviors:
-  survival: true
+  survival: false     # scos la cerere: nu se uita deloc la viata
   combat: true
   loot: true
   travel: true
@@ -136,12 +120,6 @@ mount:
   retry_seconds: 25
   cast_seconds: 2.0
 
-survival:
-  heal_cooldown: 6.0
-  heal_wait: 1.0
-  stop_on_critical: true
-  on_death: []
-
 record:
   hotkeys:
     f4: portal
@@ -157,4 +135,3 @@ safety:
   max_runtime_minutes: 120
   breaks: true
   stuck_seconds: 90
-  max_deaths: 3

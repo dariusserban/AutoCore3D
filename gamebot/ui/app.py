@@ -232,9 +232,7 @@ class GamebotApp:
         rand(3, "Raza gramezii", "cluster_radius", "combat", "cat de larg grupeaza mobii")
         rand(4, "Pauza intre abilitati", "global_cooldown", "combat", "secunde")
         rand(5, "Timp maxim pe lupta", "max_fight_seconds", "combat", "secunde")
-        rand(6, "Se vindeca sub", "heal_below", "thresholds", "0.55 = 55% viata")
-        rand(7, "Tasta vindecare", "heal", "keys", "")
-        rand(8, "Tasta montura", "mount", "keys", "gol = nu urca deloc")
+        rand(6, "Tasta montura", "mount", "keys", "gol = nu urca deloc")
 
         ttk.Separator(f, orient="horizontal").grid(row=9, column=0, columnspan=3,
                                                    sticky="ew", pady=14)
@@ -559,8 +557,6 @@ class GamebotApp:
             "cluster_radius": combat.get("cluster_radius", 160),
             "global_cooldown": combat.get("global_cooldown", 1.4),
             "max_fight_seconds": combat.get("max_fight_seconds", 45),
-            "heal_below": (date.get("thresholds") or {}).get("heal_below", 0.55),
-            "heal": (date.get("keys") or {}).get("heal", ""),
             "mount": (date.get("keys") or {}).get("mount", ""),
         }
         for cheie, valoare in implicite.items():

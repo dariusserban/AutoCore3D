@@ -102,3 +102,21 @@ def test_regiunea_converteste_coordonate():
 
 def test_regiunea_din_doua_puncte_normalizeaza_ordinea():
     assert Region.from_points(300, 200, 100, 50) == Region(100, 50, 200, 150)
+
+
+def test_profilul_de_dso_nu_urmareste_viata():
+    """Cerut explicit: nimic legat de viata in profilul de Drakensang.
+
+    Botul nu trebuie sa se uite la bara de viata, sa se vindece sau sa se
+    opreasca din cauza ei - a fost sursa a doua opriri false si nu aduce nimic
+    cand jucatorul isi gestioneaza singur potiunile.
+    """
+    profile = Profile.load(PROFIL_EXEMPLU.parent / "drakensang.yaml")
+
+    assert not profile.enabled("survival")
+    assert not profile.has_region("health_bar")
+    assert profile.color("health") is None
+    assert not profile.key("heal")
+    assert "heal_below" not in profile.thresholds
+    assert profile.section("survival") == {}
+    assert profile.missing_pieces() == []

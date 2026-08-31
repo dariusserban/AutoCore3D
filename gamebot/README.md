@@ -154,8 +154,11 @@ Bate-te de-adevăratelea în zonele marcate cu `F6` — de acolo se învață ro
 
 ### 3. Pornește
 
-**PORNEȘTE**. Prima linie din JURNAL îți spune ce viață citește și câți dușmani vede —
-dacă acolo scrie ceva care nu se potrivește cu ecranul tău, ăla e singurul lucru de corectat.
+**PORNEȘTE**. Prima linie din JURNAL îți spune câți dușmani vede. Dacă ai mob-uri pe ecran
+și scrie 0, culoarea `colors.enemy_nameplate` e singurul lucru de recalibrat.
+
+Profilul de DSO **nu urmărește bara de viață** — nu se vindecă singur și nu se oprește din
+cauza ei. Potiunile rămân treaba ta.
 
 `F12` oprește imediat, oriunde. `F11` pauză.
 
@@ -232,7 +235,7 @@ de făcut, îl face:
 
 | Prioritate | Comportament | Când intră |
 |-----------:|--------------|------------|
-| 100 | `survival`   | viața sub prag: se vindecă, fuge, sau oprește |
+| 100 | `survival`   | *(oprit în profilul DSO)* viața sub prag: se vindecă sau fuge |
 |  70 | `combat`     | e o țintă selectată sau se vede un mob, într-o zonă de luptă |
 |  65 | `loot`       | se văd etichete de obiect căzut pe jos |
 |  60 | `gather`     | *(oprit implicit)* se vede un nod de resurse |
@@ -343,7 +346,7 @@ gamebot/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                209 teste, rulează fără joc și fără ecran
+└── tests/                210 teste, rulează fără joc și fără ecran
 ```
 
 ## Teste
