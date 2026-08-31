@@ -3,6 +3,7 @@ __pycache__/
 
 # gamebot: date locale, specifice masinii si contului tau
 gamebot/routes/
+gamebot/.venv/
 gamebot/gamebot.log
 gamebot/check_snapshot.png
 gamebot/templates/*.png

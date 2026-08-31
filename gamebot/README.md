@@ -51,14 +51,50 @@ DSO rulează în client nativ (Thin Client), nu în browser, deci fereastra e o 
 obișnuită: fără offset de viewport, fără zoom de pagină, iar tastele funcționale nu sunt
 furate de browser (`F5` = refresh, `F12` = devtools).
 
-## Instalare
+## Instalare pe Windows
+
+**1. Python.** Dacă nu-l ai, ia-l de la [python.org/downloads](https://www.python.org/downloads/)
+și la instalare **bifează „Add python.exe to PATH"**. E nevoie de 3.10 sau mai nou.
+
+**2. Codul.** Îl iei din GitHub, într-un folder al tău:
+
+```
+git clone -b claude/game-farming-bot-oi4pi0 https://github.com/dariusserban/AutoCore3D.git
+```
+
+Fără git: pe pagina repo-ului alegi branch-ul `claude/game-farming-bot-oi4pi0`, apoi
+**Code → Download ZIP**, și dezarhivezi.
+
+**3. Instalarea.** Dublu-click pe `gamebot\instalare.bat`. Creează un mediu virtual
+și trage bibliotecile. Se rulează o singură dată.
+
+**4. Pornirea.** Click **dreapta** pe `gamebot\bot.bat` → **Run as administrator**.
+Ai un meniu cu toți pașii, în ordine.
+
+Administrator nu e moft: clientul DSO rulează elevat, iar Windows nu lasă un proces
+neprivilegiat să trimită input către unul privilegiat. Fără asta botul pare că merge, dar în
+joc nu se întâmplă nimic.
+
+### Două setări în joc, obligatorii
+
+**Fereastră sau „fullscreen fără margini", nu fullscreen exclusiv.** În fullscreen exclusiv
+DirectX preia ecranul și captura iese complet neagră. Botul detectează asta și îți spune, dar
+mai bine o eviți din start.
+
+**Aceeași rezoluție la înregistrare și la rulare.** Ruta reține coordonate; dacă schimbi
+rezoluția între timp, botul le scalează, dar interfața nu se scalează la fel și regiunile
+calibrate ies pe lângă.
+
+Scalarea Windows (125%, 150%) e tratată automat — procesul se declară DPI-aware la pornire.
+Fără asta, capturile ar veni la rezoluția fizică iar clicurile ar pleca în coordonate scalate,
+și ar cădea din ce în ce mai alături cu cât cobori pe ecran.
+
+### Din linia de comandă (dacă preferi)
 
 ```bash
 pip install -r gamebot/requirements.txt
+python -m gamebot.main check --profile gamebot/profiles/drakensang.yaml
 ```
-
-Pe Windows rulează terminalul **ca administrator**: fără asta, input-ul simulat nu ajunge în
-jocurile care rulează elevat.
 
 ## Cum îl pui pe picioare
 

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import platform
 import sys
 import time
 from pathlib import Path
@@ -32,6 +33,46 @@ DEFAULT_ROUTES = PACKAGE_DIR / "routes"
 DEFAULT_TEMPLATES = PACKAGE_DIR / "templates"
 
 log = logging.getLogger("gamebot")
+
+
+def enable_dpi_awareness() -> None:
+    """Spune Windows-ului ca stim de scalarea ecranului.
+
+    Fara asta, un proces Python pe un ecran cu scalare 125% primeste coordonate
+    "virtualizate": mss captureaza la rezolutia fizica, dar clicurile pleaca in
+    coordonate scalate. Rezultatul e ca botul vede corect si da click alaturi,
+    cu atat mai departe cu cat esti mai jos pe ecran - genul de defect care pare
+    ca "nu merge detectia", desi detectia e buna.
+
+    Pe alte sisteme decat Windows nu are ce face.
+    """
+    if platform.system() != "Windows":
+        return
+    try:
+        import ctypes
+
+        # 2 = PER_MONITOR_DPI_AWARE. Exista din Windows 8.1.
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+    except Exception:
+        try:
+            ctypes.windll.user32.SetProcessDPIAware()  # varianta veche
+        except Exception:
+            log.debug("Nu am putut seta constientizarea DPI; scalarea poate deranja.")
+
+
+def warn_if_black(frame, capture=None) -> bool:
+    """Avertizeaza daca ecranul capturat e negru.
+
+    Se intampla cand jocul ruleaza in fullscreen exclusiv: DirectX preia
+    ecranul si captura iese neagra. Solutia e sa pui jocul pe fereastra sau
+    fullscreen fara margini.
+    """
+    if frame is None or float(frame.mean()) > 2.0:
+        return False
+    print("\nATENTIE: captura de ecran e complet neagra.")
+    print("Aproape sigur jocul e in fullscreen EXCLUSIV. Treci-l pe 'fereastra'")
+    print("sau 'fullscreen fara margini' din setarile grafice si incearca iar.\n")
+    return True
 
 
 def setup_logging(verbose: bool) -> None:
@@ -181,8 +222,14 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     engine = BehaviorEngine(ctx, [cls() for cls in ALL_BEHAVIORS], tick=float(args.tick))
 
+    ctx.refresh()
+    if warn_if_black(ctx.frame):
+        ctx.controller.release_all()
+        kill_switch.close()
+        capture.close()
+        return 1
+
     if ctx.player is not None and not args.from_start:
-        ctx.refresh()
         ctx.player.jump_to_nearest()
 
     countdown(args.delay)
@@ -244,6 +291,7 @@ def cmd_check(args: argparse.Namespace) -> int:
         session=SessionGuard(),
     )
     ctx.refresh()
+    warn_if_black(ctx.frame)
 
     def as_percent(value: Optional[float]) -> str:
         return "nedefinit" if value is None else f"{value*100:5.1f}%"
@@ -409,6 +457,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Optional[list[str]] = None) -> int:
     args = build_parser().parse_args(argv)
     setup_logging(args.verbose)
+    enable_dpi_awareness()
     try:
         return args.func(args)
     except FileNotFoundError as exc:
