@@ -110,6 +110,15 @@ o tastă apăsată, iar personajul aleargă în perete după ce tu ai închis to
 Tabul LUPTĂ scrie direct în profil, **păstrând comentariile** — ele sunt documentația
 fiecărui reglaj, ar fi o pierdere să dispară la prima bifă apăsată.
 
+## Actualizare
+
+Dublu-click pe `gamebot\actualizeaza.bat`.
+
+Aplicația scrie în profil (titlul ferestrei, reglajele din tabul LUPTĂ), iar actualizările
+aduc și ele versiuni noi ale acelorași fișiere — deci `git pull` simplu se oprește cu
+*"local changes would be overwritten"*. Lansatorul face o copie a profilelor în
+`profiles/backup/`, apoi actualizează. Dacă aveai reglaje proprii, le iei de acolo.
+
 ### Din linia de comandă (dacă preferi)
 
 ```bash
