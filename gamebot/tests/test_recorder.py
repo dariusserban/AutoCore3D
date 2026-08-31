@@ -92,3 +92,29 @@ def test_pauza_de_gandire_nu_intra_in_ruta(tmp_path):
     import time
     recorder._last_event_at = time.monotonic() - 120
     assert recorder._dt() == 5.0
+
+
+# ------------------------------------------- oprirea din fereastra salveaza
+
+
+def test_butonul_de_oprire_salveaza_ruta(tmp_path):
+    """OPRESTE trebuie sa faca exact ce face F10, nu sa arunce tura.
+
+    Inainte, butonul doar omora procesul dupa opt secunde: tot ce inregistrasesi
+    se pierdea, fara niciun mesaj.
+    """
+    semnal = tmp_path / ".stop"
+    recorder = build(tmp_path / "ruta", stop_file=semnal)
+    recorder.start_recording()
+    recorder._events = [InputEvent("mouse_down", 0.4, x=100, y=200, button="left")]
+
+    assert recorder.stop_file == semnal
+
+    ruta = recorder._finalize()
+
+    assert len(ruta.waypoints) == 1
+    assert (tmp_path / "ruta" / "route.json").exists()
+
+
+def test_fara_fisier_semnal_nu_se_schimba_nimic(tmp_path):
+    assert build(tmp_path).stop_file is None

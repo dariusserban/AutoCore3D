@@ -134,6 +134,26 @@ def find_window(fragment: str) -> Optional[WindowInfo]:
     return ales
 
 
+def list_windows(min_width: int = 400, min_height: int = 300) -> list[WindowInfo]:
+    """Toate ferestrele vizibile destul de mari cat sa fie un joc.
+
+    Serveste la alegerea clientului dintr-o lista, in loc sa se ghiceasca dupa
+    titlu. Nu deschidem si nu atingem niciun proces - citim doar titlurile si
+    marimile ferestrelor, adica ce vede oricine se uita pe ecran.
+    """
+    if platform.system() != "Windows":
+        return []
+    try:
+        toate = _find_windows_ctypes("")
+    except Exception:
+        toate = _find_windows_pygetwindow("")
+
+    bune = [w for w in toate
+            if w.region.width >= min_width and w.region.height >= min_height]
+    bune.sort(key=lambda w: w.region.width * w.region.height, reverse=True)
+    return bune
+
+
 def relative_region(window: Region, rel: tuple[float, float, float, float]) -> Region:
     """Converteste (x, y, latime, inaltime) in procente la pixeli absoluti.
 

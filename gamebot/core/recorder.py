@@ -71,6 +71,7 @@ class RouteRecorder:
         pause_key: str = DEFAULT_PAUSE_KEY,
         stop_key: str = DEFAULT_STOP_KEY,
         record_mouse_moves: bool = True,
+        stop_file: Optional[str | Path] = None,
     ) -> None:
         self.name = name
         self.output_dir = Path(output_dir)
@@ -80,6 +81,10 @@ class RouteRecorder:
         self.pause_key = pause_key.lower()
         self.stop_key = stop_key.lower()
         self.record_mouse_moves = record_mouse_moves
+        # Butonul OPRESTE din fereastra lasa fisierul asta pe disc. Il tratam
+        # exact ca pe tasta de stop: inchidem si SALVAM. Inainte, butonul doar
+        # omora procesul, deci toata tura inregistrata se pierdea.
+        self.stop_file = Path(stop_file) if stop_file else None
 
         conflict = self.hotkeys.keys() & {self.pause_key, self.stop_key}
         if conflict:
@@ -341,6 +346,11 @@ class RouteRecorder:
 
             if self._loading_portal is not None:
                 self._finish_portal(self._loading_portal)
+
+            if self.stop_file is not None and self.stop_file.exists():
+                print("  oprire ceruta din fereastra - salvez ruta", flush=True)
+                self._running = False
+                break
 
             # Semn de viata: fara el, cine se uita la jurnal nu are cum sa stie
             # daca inregistrarea merge sau daca s-a blocat ceva.

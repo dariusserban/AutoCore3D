@@ -119,9 +119,13 @@ python -m gamebot.main check --profile gamebot/profiles/drakensang.yaml
 
 ## Cum îl pornești
 
-**Nu e nimic de calibrat.** Botul își găsește singur fereastra jocului (după titlu), o
-măsoară, și își calculează regiunile de interfață ca **procente din ea** — merge la orice
-rezoluție și dacă muți fereastra.
+**Nu e nimic de calibrat.** Botul își găsește singur fereastra jocului, o măsoară, și își
+calculează regiunile de interfață ca **procente din ea** — merge la orice rezoluție și dacă
+muți fereastra.
+
+Dacă nu o găsește singur, o alegi din lista **„Fereastra jocului"** din capul ferestrei
+(butonul *Caută ferestrele*) și se salvează în profil. Lista arată doar titlurile și
+dimensiunile ferestrelor deschise — nu deschide și nu atinge niciun proces.
 
 Singurul pas pe care îl faci tu e să-i arăți traseul o dată.
 
@@ -130,7 +134,8 @@ Singurul pas pe care îl faci tu e să-i arăți traseul o dată.
 Tabul **AUTOPILOT** → scrii un nume → **Înregistrează**. Din secunda aia se salvează tot:
 fiecare mișcare de mouse, fiecare click, fiecare tastă, cu temporizarea reală. Joci normal.
 
-`F10` când ai terminat tura. Atât — restul e opțional:
+**Ca să salvezi: `F10` în joc, sau butonul OPREȘTE din fereastră.** Amândouă închid și
+salvează ruta. Restul e opțional:
 
 | Tastă | Ce marchezi |
 |-------|-------------|
@@ -338,7 +343,7 @@ gamebot/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                201 de teste, rulează fără joc și fără ecran
+└── tests/                209 teste, rulează fără joc și fără ecran
 ```
 
 ## Teste

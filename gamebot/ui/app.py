@@ -66,7 +66,9 @@ class GamebotApp:
         self._taburi()
         self._bara_jos()
 
+        self._ferestre = []
         self._reincarca_liste()
+        self._reincarca_ferestre()
         self._citeste_profil_in_formular()
         self.root.after(120, self._pompeaza_jurnalul)
 
@@ -118,6 +120,15 @@ class GamebotApp:
 
         ttk.Button(rand, text="Reincarca", command=self._reincarca_liste).pack(side="left")
 
+        rand2 = ttk.Frame(self.root, padding=(14, 0, 14, 8))
+        rand2.pack(fill="x")
+        ttk.Label(rand2, text="Fereastra jocului:").pack(side="left")
+        self.fereastra = ttk.Combobox(rand2, width=46, state="readonly")
+        self.fereastra.pack(side="left", padx=(6, 8))
+        self.fereastra.bind("<<ComboboxSelected>>", lambda e: self._salveaza_fereastra())
+        ttk.Button(rand2, text="Cauta ferestrele",
+                   command=self._reincarca_ferestre).pack(side="left")
+
     def _taburi(self) -> None:
         self.taburi = ttk.Notebook(self.root)
         self.taburi.pack(fill="both", expand=True, padx=14, pady=(0, 8))
@@ -141,6 +152,8 @@ class GamebotApp:
         self.ruta_noua = ttk.Entry(f, width=24)
         self.ruta_noua.grid(row=2, column=1, sticky="w", padx=8)
         ttk.Button(f, text="Inregistreaza", command=self._inregistreaza).grid(row=2, column=2, sticky="w")
+        ttk.Label(f, text="Ca sa salvezi: apasa F10 in joc, sau butonul OPRESTE de jos.",
+                  style="Sec.TLabel").grid(row=18, column=0, columnspan=3, sticky="w")
 
         ttk.Label(f, text="F4 portal   F5 drum   F6 zona de lupta   F8 vendor   F10 stop",
                   style="Sec.TLabel").grid(row=3, column=0, columnspan=3, sticky="w", pady=(6, 16))
@@ -304,6 +317,57 @@ class GamebotApp:
         nume = self.ruta.get()
         return (self.repo / "gamebot" / "routes" / nume) if nume else None
 
+    def _reincarca_ferestre(self) -> None:
+        """Umple lista cu ferestrele deschise, ca sa alegi clientul din ea."""
+        from ..core.window import list_windows
+
+        ferestre = list_windows()
+        titluri = [f"{f.title}  [{f.region.width}x{f.region.height}]" for f in ferestre]
+        self._ferestre = ferestre
+        self.fereastra["values"] = titluri
+
+        if not titluri:
+            self._scrie("Nu am gasit ferestre destul de mari. E jocul pornit?\n")
+            return
+
+        # Preselectam pe cea care se potriveste cu titlul din profil.
+        cautat = self._titlu_din_profil().lower()
+        for i, f in enumerate(ferestre):
+            if cautat and cautat in f.title.lower():
+                self.fereastra.current(i)
+                return
+        self.fereastra.current(0)
+
+    def _titlu_din_profil(self) -> str:
+        try:
+            import yaml
+
+            date = yaml.safe_load(self._cale_profil().read_text(encoding="utf-8")) or {}
+            return str((date.get("window") or {}).get("title", "") or "")
+        except Exception:
+            return ""
+
+    def _salveaza_fereastra(self) -> None:
+        """Scrie in profil un fragment din titlul ferestrei alese.
+
+        Pastram doar primele cuvinte: titlurile de joc se schimba (numele hartii,
+        nivelul), iar un titlu memorat intreg n-ar mai fi gasit maine.
+        """
+        index = self.fereastra.current()
+        if index < 0 or index >= len(getattr(self, "_ferestre", [])):
+            return
+        titlu = self._ferestre[index].title
+        fragment = " ".join(titlu.split()[:2]).strip() or titlu
+
+        cale = self._cale_profil()
+        try:
+            text = cale.read_text(encoding="utf-8")
+            cale.write_text(yaml_edit.set_value(text, "window", "title", fragment),
+                            encoding="utf-8")
+            self._scrie(f"Fereastra aleasa: '{fragment}' (salvat in profil)\n")
+        except Exception as exc:
+            self._scrie(f"Nu am putut salva alegerea: {exc}\n")
+
     def _reincarca_liste(self) -> None:
         profile = sorted(p.name for p in (self.repo / "gamebot" / "profiles").glob("*.yaml"))
         self.profil["values"] = profile
@@ -418,7 +482,7 @@ class GamebotApp:
         """Cere oprirea prin fisier-semnal, ca botul sa elibereze tastele."""
         if self.proces is None:
             return
-        self._scrie("Cer oprirea...\n")
+        self._scrie("Cer oprirea (ruta se salveaza)...\n")
         self.stop_file.touch()
         self.buton_stop.configure(state="disabled")
         threading.Thread(target=self._forteaza_daca_nu_iese, daemon=True).start()
@@ -443,7 +507,8 @@ class GamebotApp:
             messagebox.showwarning("gamebot", "Da-i un nume rutei.")
             return
         self._ruleaza(["record", "--profile", str(self._cale_profil()),
-                       "--name", nume, "--force"], "Inregistrare")
+                       "--name", nume, "--force",
+                       "--stop-file", str(self.stop_file)], "Inregistrare")
 
     def _invata(self, scrie: bool = False) -> None:
         ruta = self._cale_ruta()

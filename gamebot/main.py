@@ -163,6 +163,7 @@ def cmd_record(args: argparse.Namespace) -> int:
             pause_key=str(setari.get("pause_key", "f9")),
             stop_key=str(setari.get("stop_key", "f10")),
             record_mouse_moves=not args.no_mouse,
+            stop_file=getattr(args, "stop_file", None),
         )
     except ValueError as exc:
         print(f"Eroare in profil: {exc}")
@@ -589,6 +590,8 @@ def build_parser() -> argparse.ArgumentParser:
     rec.add_argument("--output", default=None, help="unde se salveaza (implicit gamebot/routes/<name>)")
     rec.add_argument("--force", action="store_true", help="rescrie ruta daca exista")
     rec.add_argument("--no-mouse", action="store_true", help="nu inregistra miscarile mouse-ului")
+    rec.add_argument("--stop-file", default=None,
+                     help="opreste si SALVEAZA cand apare fisierul asta (folosit de fereastra)")
     rec.set_defaults(func=cmd_record)
 
     run = sub.add_parser("run", help="porneste botul")

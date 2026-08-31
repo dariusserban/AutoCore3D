@@ -17,9 +17,12 @@ window:
   title: Drakensang
 
 regions:
-  # Bara/globul de viata, jos-stanga. ESTIMARE - vezi nota de sus.
+  # Bara rosie de viata, jos-centru, langa eticheta "Nivel". Masurata dintr-un
+  # screenshot real (arie de client 1906x1016). Daca `check` arata un procent
+  # care nu se potriveste cu ecranul tau, recalibreaz-o - e singurul numar din
+  # profil care depinde de cum ti-ai aranjat interfata.
   health_bar:
-    rel: [0.055, 0.905, 0.115, 0.016]
+    rel: [0.388, 0.905, 0.102, 0.018]
 
   # Minimapa DSO e sus-STANGA (masurata dintr-un screenshot real, 1906x1016
   # arie de client). E semi-transparenta, deci se vede si terenul prin ea -
