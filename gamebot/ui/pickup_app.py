@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover
 from ..core.capture import ScreenCapture
 from ..core.config import Profile
 from ..core.input_ctl import InputController
-from ..core.pickup import Blacklist, culori_din_profil, find_loot
+from ..core.pickup import Blacklist, acoperire, culori_din_profil, find_loot
 from ..core.window import find_window
 from .overlay import CircleOverlay
 
@@ -172,6 +172,21 @@ def _citeste_culoarea_de_sub_cursor(runner: PickupRunner) -> None:
         high = np.clip(median + np.array([8, 40, 40]), [0, 0, 0], [179, 255, 255])
 
         runner.spune(f"\nCuloare la ({x}, {y}): HSV median {tuple(median)}")
+
+        # Verificam proba pe tot ecranul jocului inainte sa o dam mai departe.
+        fereastra = find_window(runner.profile.window_title)
+        zona = fereastra.region if fereastra else None
+        with ScreenCapture(runner.profile.monitor) as captura:
+            intreg = captura.grab(zona)
+        procent = acoperire(intreg, low, high) * 100
+
+        if procent > 5.0:
+            runner.spune(f"  ATENTIE: intervalul asta prinde {procent:.0f}% din ecran.")
+            runner.spune("  Ai nimerit langa obiect, nu pe el. Pune cursorul fix pe")
+            runner.spune("  mijlocul etichetei colorate si incearca din nou.\n")
+            return
+
+        runner.spune(f"  (prinde {procent:.2f}% din ecran - bine)")
         runner.spune("  De pus in profil, sub `colors:`")
         runner.spune(f"    low: [{low[0]}, {low[1]}, {low[2]}]")
         runner.spune(f"    high: [{high[0]}, {high[1]}, {high[2]}]\n")

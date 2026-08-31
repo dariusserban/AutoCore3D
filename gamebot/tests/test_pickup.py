@@ -161,11 +161,25 @@ def test_culoarea_masurata_gaseste_obiectele():
     assert len(gasite) == 2
 
 
-def test_proba_pe_fundal_nu_produce_un_interval_care_prinde_tot():
-    """Daca nimeresti langa obiect, intervalul nu trebuie sa cuprinda ecranul."""
+def test_o_proba_buna_prinde_o_bucatica_din_ecran():
+    """Eticheta unui obiect ocupa foarte putin; asa se recunoaste o proba buna."""
+    from gamebot.core.pickup import acoperire
+
     cadru = make_frame(nodes=2)
-    low, high = _masoara(cadru[50:59, 300:309])  # zona de fundal, cu zgomot
+    low, high = _masoara(cadru[211:220, 46:55])
 
-    gasite = find_loot(cadru, [(low, high)], CENTRU, min_area=100)
+    assert acoperire(cadru, low, high) < 0.05
 
-    assert len(gasite) <= 1, "un interval luat de pe fundal nu trebuie sa dea obiecte"
+
+def test_o_proba_luata_de_pe_fundal_e_recunoscuta():
+    """Arata la fel de "masurata" ca una buna, dar prinde jumatate din ecran.
+
+    Fara verificarea asta ar ajunge linistita in profil si botul n-ar gasi
+    niciodata nimic - genul de esec care pare al codului, nu al probei.
+    """
+    from gamebot.core.pickup import acoperire
+
+    cadru = make_frame(nodes=2)
+    low, high = _masoara(cadru[50:59, 300:309])
+
+    assert acoperire(cadru, low, high) > 0.05

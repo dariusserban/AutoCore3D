@@ -85,6 +85,21 @@ def find_loot(
     return rezultat
 
 
+def acoperire(image: np.ndarray, low: Iterable[int], high: Iterable[int]) -> float:
+    """Ce fractiune din imagine cade in intervalul de culoare dat.
+
+    Serveste la verificarea unei probe de culoare. Eticheta unui obiect ocupa o
+    parte foarte mica din ecran; daca intervalul masurat prinde 30% din imagine,
+    proba a fost luata de pe fundal si e inutilizabila - dar arata la fel de
+    "masurata" ca una buna, deci fara verificarea asta ar ajunge linistita in
+    profil si n-ar gasi nimic niciodata.
+    """
+    if image is None or image.size == 0:
+        return 0.0
+    masca = vision.hsv_mask(image, low, high)
+    return float((masca > 0).sum()) / float(masca.size)
+
+
 def culori_din_profil(profile, nume_culori: Iterable[str]) -> list[tuple[list[int], list[int]]]:
     """Traduce numele culorilor din profil in perechi de intervale HSV."""
     culori = []

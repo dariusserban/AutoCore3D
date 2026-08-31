@@ -204,9 +204,18 @@ Pentru culori nu trebuie ghicit: pune cursorul pe eticheta unui obiect căzut ș
 
 ```
 Culoare la (812, 447): HSV median (28, 201, 233)
+  (prinde 0.31% din ecran - bine)
   De pus in profil, sub `colors:`
     low: [20, 141, 173]
     high: [36, 241, 255]
+```
+
+Dacă ai nimerit lângă etichetă în loc de pe ea, îți spune — o probă luată de pe fundal arată
+la fel de „măsurată" ca una bună, dar prinde jumătate din ecran și n-ar găsi niciodată nimic:
+
+```
+  ATENTIE: intervalul asta prinde 43% din ecran.
+  Ai nimerit langa obiect, nu pe el.
 ```
 
 Ce vezi în cerc e exact ce se adună — raza desenată și raza căutării sunt același număr
@@ -383,7 +392,7 @@ gamebot/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                217 teste, rulează fără joc și fără ecran
+└── tests/                220 de teste, rulează fără joc și fără ecran
 ```
 
 ## Teste
