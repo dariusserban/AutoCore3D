@@ -132,7 +132,8 @@ class GamebotApp:
 
         ttk.Label(f, text="Invata traseul", font=("Segoe UI", 11, "bold")).grid(
             row=0, column=0, columnspan=3, sticky="w")
-        ttk.Label(f, text="Mergi tu drumul, marcheaza reperele, botul il reia dupa aceea.",
+        ttk.Label(f, text="Singurul pas pe care il faci tu: mergi drumul o data si marcheaza "
+                          "reperele.\nRestul - fereastra, regiunile, abilitatile - se configureaza singur.",
                   style="Sec.TLabel").grid(row=1, column=0, columnspan=3, sticky="w", pady=(0, 10))
 
         ttk.Label(f, text="Nume ruta noua:").grid(row=2, column=0, sticky="w")
@@ -211,12 +212,12 @@ class GamebotApp:
 
     def _tab_calibrare(self) -> None:
         f = ttk.Frame(self.taburi, padding=16)
-        self.taburi.add(f, text="CALIBRARE")
+        self.taburi.add(f, text="REGLAJ FIN")
 
-        ttk.Label(f, text="Fara pasul asta botul nu vede nimic.",
+        ttk.Label(f, text="Optional. Botul se configureaza singur.",
                   font=("Segoe UI", 11, "bold")).grid(row=0, column=0, columnspan=3, sticky="w")
-        ttk.Label(f, text="Fiecare buton face o poza dupa 4 secunde - comuta pe joc - "
-                          "apoi tragi un dreptunghi cu mouse-ul.",
+        ttk.Label(f, text="Isi gaseste fereastra jocului si isi calculeaza regiunile ca procente "
+                          "din ea.\nFoloseste butoanele de aici doar daca ceva anume citeste gresit.",
                   style="Sec.TLabel").grid(row=1, column=0, columnspan=3, sticky="w", pady=(0, 14))
 
         ttk.Label(f, text="Regiune:").grid(row=2, column=0, sticky="w", pady=4)
@@ -244,9 +245,9 @@ class GamebotApp:
 
         ttk.Separator(f, orient="horizontal").grid(row=5, column=0, columnspan=3,
                                                    sticky="ew", pady=18)
-        ttk.Button(f, text="Verifica ce vede botul", style="Accent.TButton",
+        ttk.Button(f, text="Verifica ce vede botul",
                    command=self._verifica).grid(row=6, column=0, sticky="w")
-        ttk.Label(f, text="Daca aici scrie 0% viata cand bara ta e plina, profilul e gresit.",
+        ttk.Label(f, text="La pornire scrie oricum in jurnal ce viata citeste.",
                   style="Sec.TLabel").grid(row=6, column=1, columnspan=2, sticky="w", padx=8)
 
     def _tab_jurnal(self) -> None:

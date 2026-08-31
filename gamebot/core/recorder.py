@@ -37,6 +37,11 @@ log = logging.getLogger(__name__)
 MOVE_MIN_INTERVAL = 0.03  # secunde
 MOVE_MIN_DISTANCE = 6  # pixeli
 
+# Latimea la care salvam ancorele. Cand `regions.minimap` lipseste, ancora e
+# tot ecranul jocului, iar la marimea reala ar insemna sute de megaocteti pe
+# ruta si o comparatie inutil de lenta.
+ANCHOR_WIDTH = 240
+
 DEFAULT_HOTKEYS = {
     "f4": "portal",
     "f5": "travel",
@@ -167,7 +172,8 @@ class RouteRecorder:
             return None
         try:
             self.output_dir.mkdir(parents=True, exist_ok=True)
-            self.capture.save(self.output_dir / filename, self.anchor_region)
+            self.capture.save(self.output_dir / filename, self.anchor_region,
+                              width=ANCHOR_WIDTH)
             return filename
         except Exception as exc:  # o ancora lipsa nu trebuie sa strice ruta
             log.warning("Nu am putut salva ancora '%s': %s", filename, exc)

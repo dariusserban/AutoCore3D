@@ -117,125 +117,60 @@ pip install -r gamebot/requirements.txt
 python -m gamebot.main check --profile gamebot/profiles/drakensang.yaml
 ```
 
-## Cum îl pui pe picioare
+## Cum îl pornești
 
-### 1. Copiază profilul de exemplu
+**Nu e nimic de calibrat.** Botul își găsește singur fereastra jocului (după titlu), o
+măsoară, și își calculează regiunile de interfață ca **procente din ea** — merge la orice
+rezoluție și dacă muți fereastra.
 
-```bash
-cp gamebot/profiles/exemplu.yaml gamebot/profiles/jocul_meu.yaml
-```
+Singurul pas pe care îl faci tu e să-i arăți traseul o dată.
 
-### 2. Măsoară regiunile și culorile
+### 1. Înregistrează traseul
 
-Valorile din exemplu sunt inventate. Fiecare comandă face o captură după 4 secunde (timp să
-comuți pe joc), tragi un dreptunghi cu mouse-ul și primești bucata de YAML gata de lipit.
+Tabul **AUTOPILOT** → scrii un nume → **Înregistrează**. Mergi drumul normal și marchezi:
 
-```bash
-python -m gamebot.main calibrate region --name minimap
-python -m gamebot.main calibrate region --name health_bar
-python -m gamebot.main calibrate region --name target_health_bar
-python -m gamebot.main calibrate color  --name health
-python -m gamebot.main calibrate color  --name enemy_nameplate
-```
-
-Verifică ce a înțeles:
-
-```bash
-python -m gamebot.main check --profile gamebot/profiles/jocul_meu.yaml
-```
-
-Îți spune ce citește chiar acum de pe ecran — câtă viață ai, dacă vede ținta, câte mob-uri
-detectează. Dacă scrie 0% viață când bara ta e plină, profilul e greșit; nu merge mai departe
-până nu se potrivesc cifrele.
-
-### 3. Înregistrează traseul — și luptă-te pe el
-
-```bash
-python -m gamebot.main record --profile gamebot/profiles/jocul_meu.yaml --name harta1
-```
-
-Mergi traseul normal. În timpul mersului:
-
-| Tastă | Ce face |
-|-------|---------|
-| `F4`  | **portal** — apeși F4, apoi dai click pe portal |
-| `F5`  | reper de drum (colț, cotitură, punct de trecere) |
-| `F6`  | reper de luptă — aici botul va căuta mob-uri |
-| `F7`  | reper de resurse (dacă folosești culesul) |
-| `F8`  | reper de vendor/reparat |
-| `F9`  | pauză / reluare a înregistrării |
+| Tastă | Ce marchezi |
+|-------|-------------|
+| `F4`  | portal — apeși F4, apoi dai click pe portal |
+| `F5`  | reper de drum (colț, cotitură) |
+| `F6`  | zonă de luptă — aici caută mob-uri |
+| `F8`  | vendor / reparat |
+| `F9`  | pauză / reluare |
 | `F10` | oprește și salvează |
 
-Dacă jocul folosește deja vreuna dintre ele, se schimbă din profil — nu din cod:
+Bate-te de-adevăratelea în zonele marcate cu `F6` — de acolo se învață rotația de abilități.
 
-```yaml
-record:
-  hotkeys: {f1: portal, f2: travel, f3: combat}
-  pause_key: f9
-  stop_key: f10
-```
+### 2. Învață abilitățile
 
-O tastă pusă și pe marcare, și pe control, e respinsă la pornire cu un mesaj explicit.
+**Învață din rută** → îți arată ce a dedus. **Scrie în profil** → le și salvează.
 
-Două lucruri contează aici:
+### 3. Pornește
 
-**Pune repere des.** Fiecare reper e un punct de control după care botul își verifică poziția.
-Cu cât sunt mai multe, cu atât se corectează mai bine când se abate.
+**PORNEȘTE**. Prima linie din JURNAL îți spune ce viață citește și câți dușmani vede —
+dacă acolo scrie ceva care nu se potrivește cu ecranul tău, ăla e singurul lucru de corectat.
 
-**Bate-te de-adevăratelea în zonele marcate cu `F6`.** Câteva minute de luptă normală, cu
-abilitățile pe care le folosești tu, sunt exact materialul din care se învață rotația la pasul
-următor. Cu cât te bați mai mult, cu atât estimarea cooldown-urilor e mai bună.
+`F12` oprește imediat, oriunde. `F11` pauză.
 
-### 4. Învață rotația de abilități
+### Ancorele de traseu, fără minimapă
 
-```bash
-python -m gamebot.main learn --route gamebot/routes/harta1
-```
+Profilul de DSO nu definește `regions.minimap`, intenționat. Fără ea, reperele se rețin ca
+**poze cu tot ecranul jocului**, micșorate la 240px. Forma terenului și așezarea clădirilor
+identifică locul la fel de bine ca o minimapă, iar micșorarea șterge jucătorii care trec prin
+cadru — devin câteva puncte, nu o diferență care strică potrivirea. Și nu trebuie calibrat
+nimic.
 
-Se uită la segmentele de luptă și îți dă ceva de forma:
+Dacă vrei totuși precizie maximă, calibrezi `minimap` din tabul REGLAJ FIN și de atunci se
+folosește doar ea.
 
-```
-Analizate 3 segmente de lupta, 6.2 minute.
-Timp intre doua abilitati (global cooldown): 1.63s
+### Adunarea obiectelor
 
-  tasta     apasari   cooldown   pondere
-  3              26      12.3s      9.6%
-  2              51       6.3s     18.9%
-  1             193       1.7s     71.5%
-```
+Comportamentul `loot` caută etichetele colorate ale obiectelor căzute (verde, albastru,
+violet, auriu — albul și griul lipsesc intenționat, ar prinde jumătate din textul interfeței)
+și dă click pe ele, sub etichetă, acolo unde e obiectul.
 
-Cum deduce cooldown-ul: nu-l poate citi din joc, dar are ceva aproape la fel de bun — **cel mai
-scurt interval la care ai reușit tu să reapeși tasta**. Dacă ai apăsat `3` de 26 de ori și cel
-mai devreme ai reușit după 12.3 secunde, ăla e cooldown-ul. Ia percentila 15 a intervalelor,
-nu minimul absolut, ca o apăsare dublă din greșeală să nu strice estimarea.
-
-Tastele de mers (`w`, `a`, `s`, `d`, `space`) și cele cu rost cunoscut din profil (vindecare,
-loot, selectare țintă) sunt excluse automat.
-
-Copiază blocul în profil, sub `combat:`, sau rulează cu `--write` (rescrie profilul și
-păstrează o copie `.bak` — dar pierde comentariile).
-
-Ordinea din listă e ordinea de prioritate: abilitățile cu cooldown mare stau primele, ca
-lovitura grea să plece imediat ce e disponibilă, iar cele scurte umplu golurile.
-
-### 5. Dă-i drumul
-
-Întâi în gol, ca să vezi deciziile fără ca personajul să se miște:
-
-```bash
-python -m gamebot.main run --profile gamebot/profiles/jocul_meu.yaml \
-                           --route gamebot/routes/harta1 --dry-run
-```
-
-Apoi pe bune:
-
-```bash
-python -m gamebot.main run --profile gamebot/profiles/jocul_meu.yaml \
-                           --route gamebot/routes/harta1 --max-minutes 120
-```
-
-**`F12` oprește tot, oricând. `F11` pune pauză.** Ambele funcționează chiar dacă jocul are
-focusul.
+Nu insistă pe același obiect: dacă unul e în spatele unui gard și clicul nu face nimic, îl
+ține minte și trece mai departe — altfel ar rămâne blocat acolo până la capătul sesiunii.
+`pickup_radius` îl împiedică să traverseze harta după un obiect din colțul ecranului.
 
 ## Cum decide botul ce să facă
 
@@ -246,6 +181,7 @@ de făcut, îl face:
 |-----------:|--------------|------------|
 | 100 | `survival`   | viața sub prag: se vindecă, fuge, sau oprește |
 |  70 | `combat`     | e o țintă selectată sau se vede un mob, într-o zonă de luptă |
+|  65 | `loot`       | se văd etichete de obiect căzut pe jos |
 |  60 | `gather`     | *(oprit implicit)* se vede un nod de resurse |
 |  40 | `upkeep`     | a trecut intervalul și ești la un reper de vendor |
 |  20 | `mount`      | ești pe drum, n-ai dușmani lângă, și nu pari călare |
@@ -342,6 +278,7 @@ gamebot/
 │   ├── navigation.py     localizare după ancore, redarea traseului, portale
 │   ├── safety.py         oprire de urgență, watchdog, limite de sesiune
 │   ├── config.py         încărcarea profilului YAML
+│   ├── window.py         găsirea ferestrei jocului, regiuni în procente
 │   └── engine.py         contextul comun și mașina de stări
 ├── ui/app.py             fereastra aplicației (tkinter)
 ├── behaviors/            supraviețuire, luptă, cules, întreținere, montură, click, mers
@@ -349,7 +286,7 @@ gamebot/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                153 de teste, rulează fără joc și fără ecran
+└── tests/                168 de teste, rulează fără joc și fără ecran
 ```
 
 ## Teste

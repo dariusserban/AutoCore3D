@@ -40,6 +40,8 @@ class Profile:
     raw: dict[str, Any] = field(default_factory=dict)
 
     regions: dict[str, Region] = field(default_factory=dict)
+    # Regiuni exprimate ca fractii din fereastra jocului, rezolvate la pornire.
+    relative: dict[str, tuple[float, float, float, float]] = field(default_factory=dict)
     colors: dict[str, ColorRange] = field(default_factory=dict)
     keys: dict[str, Any] = field(default_factory=dict)
     thresholds: dict[str, float] = field(default_factory=dict)
@@ -67,10 +69,16 @@ class Profile:
             monitor=int(data.get("monitor", 1)),
             raw=data,
         )
-        profile.regions = {
-            key: Region.from_dict(value)
-            for key, value in (data.get("regions") or {}).items()
-        }
+        for key, value in (data.get("regions") or {}).items():
+            # O regiune poate fi data in pixeli ficsi, sau ca procente din
+            # fereastra jocului. A doua forma e cea care scapa utilizatorul de
+            # calibrare: merge la orice rezolutie, fara sa masoare nimeni nimic.
+            if isinstance(value, dict) and "rel" in value:
+                rel = value["rel"]
+                profile.relative[key] = (float(rel[0]), float(rel[1]),
+                                         float(rel[2]), float(rel[3]))
+            else:
+                profile.regions[key] = Region.from_dict(value)
         profile.colors = {
             key: ColorRange.from_dict(value)
             for key, value in (data.get("colors") or {}).items()
@@ -83,8 +91,31 @@ class Profile:
 
     # --------------------------------------------------------------- acces
 
+    @property
+    def window_title(self) -> str:
+        """Fragmentul de titlu dupa care cautam fereastra jocului."""
+        return str((self.raw.get("window") or {}).get("title", "") or "")
+
+    def bind_window(self, window: Optional[Region]) -> None:
+        """Transforma regiunile procentuale in pixeli, dupa fereastra gasita.
+
+        Se apeleaza o data, la pornire. Daca fereastra nu a fost gasita, cadem
+        pe ecranul intreg - jocul e adesea maximizat, deci de multe ori iese
+        exact la fel.
+        """
+        from .window import relative_region
+
+        if window is None or not self.relative:
+            return
+        for name, rel in self.relative.items():
+            self.regions[name] = relative_region(window, rel)
+
     def region(self, name: str) -> Optional[Region]:
         return self.regions.get(name)
+
+    def has_region(self, name: str) -> bool:
+        """Regiunea e definita, fie in pixeli, fie ca procente nerezolvate inca."""
+        return name in self.regions or name in self.relative
 
     def color(self, name: str) -> Optional[ColorRange]:
         return self.colors.get(name)
@@ -109,7 +140,7 @@ class Profile:
         decat dupa ce personajul moare de trei ori.
         """
         problems: list[str] = []
-        if self.enabled("survival") and "health_bar" not in self.regions:
+        if self.enabled("survival") and not self.has_region("health_bar"):
             problems.append("regions.health_bar lipseste, dar comportamentul 'survival' e activ")
         if self.enabled("survival") and "health" not in self.colors:
             problems.append("colors.health lipseste (culoarea barei de viata)")
@@ -117,6 +148,6 @@ class Profile:
             problems.append("keys.attack_rotation lipseste (tastele de atac)")
         if self.enabled("gather") and "resource_node" not in self.colors:
             problems.append("colors.resource_node lipseste (culoarea nodurilor)")
-        if "minimap" not in self.regions:
-            problems.append("regions.minimap lipseste - localizarea pe ruta va fi dezactivata")
+        if self.enabled("loot") and not (self.section("loot").get("colors") or self.key("loot")):
+            problems.append("loot e activ, dar nu are nici culori de cautat, nici tasta de ridicare")
         return problems

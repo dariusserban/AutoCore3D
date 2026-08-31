@@ -1,89 +1,79 @@
-# Drakensang Online - profil de pornire.
+# Drakensang Online - profil care merge din prima, fara calibrare.
 #
-# DSO ruleaza in client nativ (Thin Client), nu in browser, deci fereastra e o
-# aplicatie obisnuita: fara offset de viewport, fara zoom de pagina.
+# Regiunile sunt scrise ca PROCENTE din fereastra jocului (`rel: [x, y, lat, inalt]`),
+# nu in pixeli. Botul isi gaseste singur fereastra dupa titlu, o masoara si
+# calculeaza coordonatele reale. Merge la orice rezolutie si daca muti fereastra.
 #
-# ---------------------------------------------------------------------------
-# TOATE CIFRELE DE MAI JOS SUNT PLACEHOLDERE. Nu sunt masurate pe ecranul tau
-# si aproape sigur sunt gresite. Inlocuieste-le cu:
-#   python -m gamebot.main calibrate region --name minimap
-#   python -m gamebot.main calibrate region --name health_bar
-#   python -m gamebot.main calibrate color  --name health
-#   python -m gamebot.main calibrate color  --name enemy_nameplate
-# si verifica rezultatul cu:
-#   python -m gamebot.main check --profile gamebot/profiles/drakensang.yaml
-# ---------------------------------------------------------------------------
-#
-# Ce e diferit fata de profilul generic, si de ce:
-#   - miscarea e click-to-move, nu WASD  ->  input.movement: click
-#   - nu exista "tinta selectata" ca in MMO-urile clasice, iar abilitatile
-#     lovesc in zona sub cursor         ->  combat.mode: aim
+# Singurul lucru care poate avea nevoie de o corectie e bara de viata: pozitia ei
+# e o estimare. Porneste botul, uita-te in JURNAL ce viata citeste, si daca nu se
+# potriveste cu ce vezi pe ecran, corecteaza `regions.health_bar.rel` (sau trimite
+# un screenshot si se pune exact).
 
 name: drakensang
 monitor: 1
 
+# Dupa ce fragment de titlu cautam fereastra jocului.
+window:
+  title: Drakensang
+
 regions:
-  # Minimapa: coltul din dreapta sus. Alege o bucata care se schimba cand te
-  # misti, dar fara ceas, fara numele hartii si fara iconitele de eveniment -
-  # alea se schimba singure si ar deruta verificarea de pozitie.
-  minimap:
-    left: 1600
-    top: 40
-    width: 300
-    height: 300
-
-  # Globul/bara de viata. La DSO e in stanga jos.
+  # Bara/globul de viata, jos-stanga. ESTIMARE - vezi nota de sus.
   health_bar:
-    left: 90
-    top: 980
-    width: 200
-    height: 16
+    rel: [0.055, 0.905, 0.115, 0.016]
 
-  # Optional, dar util: bara de cast, daca vrei confirmarea actiunilor lungi.
-  # cast_bar:
-  #   left: 830
-  #   top: 620
-  #   width: 260
-  #   height: 16
-
-  # target_health_bar lipseste intentionat: in modul 'aim' nu e nevoie de ea.
-  # Daca vrei totusi lupta pe tinta selectata, calibreaza-o si pune mode: target.
+  # `minimap` lipseste intentionat. Fara ea, ancorele de traseu se iau din tot
+  # ecranul jocului, micsorat. Forma terenului si asezarea cladirilor
+  # identifica locul la fel de bine ca o minimapa, micsorarea sterge jucatorii
+  # care trec prin cadru, si nu trebuie calibrat nimic.
+  # Daca vrei totusi precizie maxima, calibreaz-o si va fi folosita doar ea:
+  #   python -m gamebot.main calibrate region --name minimap
 
 colors:
+  # Rosul barelor de viata de deasupra mob-urilor - detectorul de dusmani.
+  enemy_nameplate:
+    low: [0, 120, 90]
+    high: [10, 255, 255]
+
   health:
     low: [0, 120, 90]
     high: [10, 255, 255]
 
-  # Culoarea barelor de viata de deasupra mob-urilor. Asta e detectorul de
-  # dusmani in modul 'aim' - calibreaz-o cu grija, e cea mai importanta din tot
-  # profilul. Selecteaza o bucata plina dintr-o bara de mob, nu conturul ei.
-  enemy_nameplate:
-    low: [0, 150, 120]
-    high: [8, 255, 255]
+  # Culorile etichetelor de obiect cazut, pe raritati. Albul si griul lipsesc
+  # intentionat: ar prinde jumatate din textul interfetei.
+  loot_verde:
+    low: [40, 90, 90]
+    high: [80, 255, 255]
+  loot_albastru:
+    low: [95, 90, 90]
+    high: [130, 255, 255]
+  loot_violet:
+    low: [130, 70, 90]
+    high: [160, 255, 255]
+  loot_auriu:
+    low: [18, 110, 120]
+    high: [32, 255, 255]
 
 keys:
-  # DSO se misca prin click, deci nu avem taste de directie. Le lasam goale ca
-  # sa nu apese nimic din greseala.
-  forward: ""
+  forward: ""         # DSO merge prin click, nu are taste de directie
   interact: ""
-  loot: ""            # DSO ridica loot-ul automat pentru majoritatea lucrurilor
-  target_next: ""     # nu exista selectie de tinta prin tasta
-  heal: "5"           # pune tasta reala a potiunii de viata
+  loot: ""            # daca ai o tasta de ridicat, pune-o aici
+  target_next: ""
+  heal: "5"           # tasta potiunii de viata
   escape: ""
-  mount: ""           # tasta de montura; lasa gol ca sa nu urce deloc
+  mount: ""           # tasta de montura; gol = nu urca
 
-  # Rezerva, folosita doar daca `combat.abilities` e gol.
   attack_rotation: ["1", "2", "3", "4"]
 
 thresholds:
   heal_below: 0.55
   flee_below: 0.20
   template_match: 0.85
-  anchor_match: 0.72
+  anchor_match: 0.68   # putin mai permisiv: ancora e tot ecranul, care variaza
 
 behaviors:
   survival: true
   combat: true
+  loot: true
   travel: true
   mount: true
   gather: false
@@ -91,40 +81,45 @@ behaviors:
   idle_click: false
 
 input:
-  movement: click       # click-to-move. Cu "keyboard" foloseste keys.forward.
+  movement: click       # click-to-move
   click_radius: 3
   move_speed: 1.0
 
 combat:
   mode: aim             # ARPG: cursorul pe gramada, abilitatile in zona
-  anywhere: false       # true = se bate oriunde, nu doar la reperele 'combat'
+  anywhere: false
 
   enemy_color: enemy_nameplate
-  enemy_min_area: 40    # cat de mare trebuie sa fie pata ca sa fie mob
-  cluster_radius: 160   # mob-urile mai apropiate de atat se tintesc impreuna
+  enemy_min_area: 40
+  cluster_radius: 160
 
-  # "Trece prin" - se bate doar cu ce-i iese in cale, nu se ia dupa tot ce
-  # misca pe ecran. Cu asta traseul conteaza si drumul se face, in loc sa
-  # alerge botul dupa primul mob zarit in colt.
+  # Trece prin: se bate doar cu ce-i iese in cale, nu vaneaza tot ecranul.
   only_when_blocking: true
-  engage_radius: 260    # pixeli de la personaj (care e in centrul ecranului)
+  engage_radius: 260
 
-  approach_seconds: 1.2 # cat merge spre gramada inainte sa dea in ea
+  approach_seconds: 1.2
   global_cooldown: 1.0
   max_fight_seconds: 40
-  basic_attack_click: true   # cand toate abilitatile sunt pe cooldown
-  loot_after_kill: false     # DSO ridica singur; pune true daca vrei apasare
+  basic_attack_click: true
+  loot_after_kill: false   # de adunat se ocupa comportamentul `loot`
 
-  # Se completeaza cu:
-  #   python -m gamebot.main learn --route gamebot/routes/<ruta>
+  # Se completeaza singur din luptele tale, cu butonul "Invata din ruta".
   abilities: []
 
+loot:
+  colors: [loot_verde, loot_albastru, loot_violet, loot_auriu]
+  min_area: 25          # etichetele sunt mici; sub atat e zgomot
+  pickup_radius: 420    # nu traversam harta dupa un obiect din colt
+  max_per_pass: 4
+  click_delay: 0.45
+  click_offset_y: 12    # eticheta e deasupra obiectului; dam click pe obiect
+  blacklist_seconds: 20
+  interval: 1.0
+  press_key_blindly: false
+
 mount:
-  retry_seconds: 25     # cat asteapta intre doua incercari de a urca
-  cast_seconds: 2.0     # durata animatiei de urcare
-  # Calibreaza sablonul `mounted` (o iconita care apare doar cand esti calare)
-  # ca botul sa stie sigur, in loc sa apese periodic:
-  #   python -m gamebot.main calibrate template --name mounted
+  retry_seconds: 25
+  cast_seconds: 2.0
 
 survival:
   heal_cooldown: 6.0
@@ -133,8 +128,6 @@ survival:
   on_death: []
 
 record:
-  # Tastele de marcare in timpul inregistrarii. Daca DSO foloseste vreuna
-  # dintre ele in joc, schimb-o aici - nu in cod.
   hotkeys:
     f4: portal
     f5: travel

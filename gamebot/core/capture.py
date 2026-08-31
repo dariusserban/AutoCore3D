@@ -115,13 +115,19 @@ class ScreenCapture:
             return self._last_frame  # type: ignore[return-value]
         return self.grab(region)
 
-    def save(self, path: str | Path, region: Optional[Region] = None) -> Path:
-        """Salveaza un cadru pe disc, pentru calibrare si depanare."""
+    def save(self, path: str | Path, region: Optional[Region] = None,
+             width: Optional[int] = None) -> Path:
+        """Salveaza un cadru pe disc, optional micsorat la o latime data."""
         if cv2 is None:
             raise RuntimeError("opencv-python nu e instalat.")
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
-        cv2.imwrite(str(target), self.grab(region))
+        imagine = self.grab(region)
+        if width:
+            from . import vision
+
+            imagine = vision.thumbnail(imagine, width)
+        cv2.imwrite(str(target), imagine)
         return target
 
     def close(self) -> None:

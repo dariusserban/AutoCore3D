@@ -26,6 +26,7 @@ from .core.recorder import RouteRecorder
 from .core.route import Route
 from .core.safety import KillSwitch, SessionGuard, StopFileWatcher, Watchdog, WatchdogConfig
 from .core.vision import TemplateLibrary
+from .core.window import WindowInfo, find_window
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 DEFAULT_PROFILE = PACKAGE_DIR / "profiles" / "exemplu.yaml"
@@ -87,6 +88,35 @@ def setup_logging(verbose: bool) -> None:
     )
 
 
+def pregateste_profil(profile: Profile, capture=None) -> Optional[WindowInfo]:
+    """Gaseste fereastra jocului si transforma procentele in pixeli.
+
+    Asta e pasul care scuteste utilizatorul de calibrare: regiunile scrise ca
+    fractii din fereastra devin coordonate reale, oricare ar fi rezolutia.
+    Daca fereastra nu e gasita, cadem pe ecranul intreg - jocul e de obicei
+    maximizat, deci de multe ori iese exact la fel.
+    """
+    titlu = profile.window_title
+    if not titlu:
+        return None
+
+    fereastra = find_window(titlu)
+    if fereastra is not None:
+        profile.bind_window(fereastra.region)
+        print(f"Fereastra jocului: {fereastra.region.width}x{fereastra.region.height} "
+              f"la ({fereastra.region.left}, {fereastra.region.top})")
+        return fereastra
+
+    if profile.relative:
+        ecran = capture.monitor if capture is not None else None
+        if ecran is not None:
+            profile.bind_window(ecran)
+            print(f"Nu gasesc fereastra '{titlu}'; folosesc ecranul intreg "
+                  f"({ecran.width}x{ecran.height}).")
+            print("Daca jocul nu e maximizat, pornestel si incearca din nou.")
+    return None
+
+
 def countdown(seconds: int, message: str = "Pornesc") -> None:
     """Iti da timp sa comuti pe fereastra jocului."""
     print(f"{message} in {seconds} secunde - comuta pe joc acum.")
@@ -108,15 +138,19 @@ def cmd_record(args: argparse.Namespace) -> int:
         return 1
 
     capture = None
-    anchor_region = profile.region("minimap")
     try:
         capture = ScreenCapture(profile.monitor)
-        if anchor_region is None:
-            print("Profilul nu defineste `regions.minimap`. Inregistrez fara ancore,")
-            print("deci botul nu va putea sa isi verifice pozitia pe traseu.")
-            print("Ruleaza intai: python -m gamebot.main calibrate region --name minimap\n")
+        pregateste_profil(profile, capture)
     except Exception as exc:
         print(f"Fara captura de ecran ({exc}); inregistrez doar input-ul.")
+
+    anchor_region = profile.region("minimap")
+    if capture is not None:
+        if anchor_region is None:
+            # Fara minimapa definita, ancora e tot ecranul jocului. Merge
+            # bine si scuteste calibrarea; cine vrea mai multa precizie poate
+            # calibra `minimap` si atunci se foloseste doar aia.
+            print("Ancorele se iau din tot ecranul jocului (fara minimapa definita).")
 
     setari = profile.section("record")
     try:
@@ -211,6 +245,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(">>> MOD DE PROBA: nu se trimite niciun input catre joc. <<<\n")
 
     capture = ScreenCapture(profile.monitor)
+    pregateste_profil(profile, capture)
+
     kill_switch = KillSwitch(
         key=str(profile.safety.get("kill_key", "f12")),
     ).start(pause_key=str(profile.safety.get("pause_key", "f11")))
@@ -228,6 +264,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     engine = BehaviorEngine(ctx, [cls() for cls in ALL_BEHAVIORS], tick=float(args.tick))
 
     ctx.refresh()
+    _raporteaza_ce_vede(ctx)
     if warn_if_black(ctx.frame):
         ctx.controller.release_all()
         kill_switch.close()
@@ -259,6 +296,25 @@ def cmd_run(args: argparse.Namespace) -> int:
 # ----------------------------------------------------------------- diagnostic
 
 
+def _raporteaza_ce_vede(ctx: BotContext) -> None:
+    """Scrie in jurnal ce citeste botul, chiar inainte sa porneasca.
+
+    E singurul lucru care poate fi stramb fara sa se vada: daca regiunea barei
+    de viata cade alaturi, botul ruleaza linistit si nu se vindeca niciodata.
+    Asa se vede din prima linie de jurnal, fara sa ruleze nimeni nimic separat.
+    """
+    viata = ctx.health
+    if viata is None:
+        print("Bara de viata nu e definita in profil - nu se va vindeca singur.")
+    else:
+        print(f"Viata citita acum: {viata*100:.0f}%  "
+              f"(daca nu se potriveste cu ecranul, corecteaza regions.health_bar)")
+
+    from .behaviors.combat import CombatBehavior
+
+    print(f"Dusmani vizibili acum: {len(CombatBehavior._enemies(ctx))}")
+
+
 def cmd_check(args: argparse.Namespace) -> int:
     """Citeste ecranul o data si arata ce intelege botul din el.
 
@@ -287,6 +343,7 @@ def cmd_check(args: argparse.Namespace) -> int:
     countdown(args.delay, "Citesc ecranul")
 
     capture = ScreenCapture(profile.monitor)
+    pregateste_profil(profile, capture)
     kill_switch = KillSwitch()
     ctx = BotContext(
         profile=profile,

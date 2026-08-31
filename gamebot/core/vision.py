@@ -192,6 +192,25 @@ def color_blobs(
     return blobs[:max_results]
 
 
+def thumbnail(image: np.ndarray, width: int = 240) -> np.ndarray:
+    """Micsoreaza o imagine pastrand proportiile.
+
+    Ancorele de traseu se compara intre ele, nu se privesc: la 240 px latime
+    raman toate detaliile care conteaza (forma terenului, asezarea cladirilor),
+    dar fisierele sunt mici si comparatia e de zeci de ori mai rapida. Tot
+    micsorarea sterge si detaliile care ne incurcau - un jucator care trece
+    prin cadru devine cateva puncte, nu o diferenta care strica potrivirea.
+    """
+    _require_cv2()
+    if image is None or image.size == 0:
+        return image
+    h, w = image.shape[:2]
+    if w <= width:
+        return image
+    inaltime = max(1, int(round(h * width / w)))
+    return cv2.resize(image, (width, inaltime), interpolation=cv2.INTER_AREA)
+
+
 def frames_differ(a: np.ndarray, b: np.ndarray, threshold: float = 2.0) -> bool:
     """Spune daca doua cadre difera vizibil.
 

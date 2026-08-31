@@ -50,11 +50,17 @@ class Fix:
 class Localizer:
     """Estimeaza reperul curent comparand ecranul cu ancorele rutei."""
 
-    def __init__(self, route: Route, capture, anchor_region: Optional[Region], threshold: float = 0.72) -> None:
+    def __init__(self, route: Route, capture, anchor_region: Optional[Region],
+                 threshold: float = 0.72, thumb_width: int = 240) -> None:
         self.route = route
         self.capture = capture
+        # Fara `regions.minimap` in profil, ancora e tot ecranul jocului. Merge
+        # surprinzator de bine: forma terenului si asezarea cladirilor
+        # identifica locul la fel de sigur ca o minimapa, iar micsorarea sterge
+        # jucatorii care trec prin cadru.
         self.anchor_region = anchor_region
         self.threshold = threshold
+        self.thumb_width = thumb_width
         self._anchors: dict[int, np.ndarray] = {}
         self._portal_anchors: dict[int, np.ndarray] = {}
         self._load_anchors()
@@ -85,8 +91,9 @@ class Localizer:
         return bool(self._anchors)
 
     def _current_view(self) -> Optional[np.ndarray]:
+        """Ecranul de acum, micsorat la fel ca ancorele cu care il comparam."""
         try:
-            return self.capture.grab(self.anchor_region)
+            return vision.thumbnail(self.capture.grab(self.anchor_region), self.thumb_width)
         except Exception as exc:
             log.warning("Captura pentru localizare a esuat: %s", exc)
             return None
