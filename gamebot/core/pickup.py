@@ -52,13 +52,25 @@ def find_loot(
     center: tuple[int, int],
     radius: float = 0.0,
     min_area: int = 25,
+    max_area: Optional[int] = None,
     blacklist: Optional[Blacklist] = None,
     offset: tuple[int, int] = (0, 0),
+    exclude_ring: Optional[tuple[float, float]] = None,
 ) -> list[vision.Match]:
     """Etichetele de obiect din imagine, filtrate dupa raza si lista neagra.
 
     `offset` muta rezultatele in coordonate de ecran, cand imaginea e decupajul
     unei ferestre si nu tot ecranul.
+
+    `max_area` arunca petele prea mari ca sa fie un obiect pe jos. Fara el, un
+    monstru verde e prins de intervalul pentru etichete verzi si botul se duce
+    sa-l "ridice" - detectia pe culoare nu are cum sa faca diferenta singura.
+
+    `exclude_ring` primeste (raza, toleranta) si arunca ce cade pe inelul ala.
+    Serveste la un singur lucru, dar esential: cercul desenat de noi peste joc
+    intra si el in captura de ecran, iar culoarea lui poate cadea in intervalul
+    cautat. Fara excluderea asta, botul isi vede propriul cerc drept obiecte si
+    alearga in cerc dupa el.
     """
     if image is None or image.size == 0:
         return []
@@ -74,8 +86,16 @@ def find_loot(
     rezultat = []
     for blob in gasite:
         bx, by = blob.center
-        if radius > 0 and math.hypot(bx - cx, by - cy) > radius:
+        distanta = math.hypot(bx - cx, by - cy)
+
+        if radius > 0 and distanta > radius:
             continue
+        if max_area is not None and blob.width * blob.height > max_area:
+            continue
+        if exclude_ring is not None:
+            raza_inel, toleranta = exclude_ring
+            if abs(distanta - raza_inel) <= toleranta:
+                continue
         if blacklist is not None and blacklist.contains(bx, by):
             continue
         rezultat.append(blob)

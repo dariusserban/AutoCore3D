@@ -183,3 +183,55 @@ def test_o_proba_luata_de_pe_fundal_e_recunoscuta():
     low, high = _masoara(cadru[50:59, 300:309])
 
     assert acoperire(cadru, low, high) > 0.05
+
+
+# ---------------------------------- filtre care evita obiectele inexistente
+
+
+def test_petele_prea_mari_nu_sunt_obiecte():
+    """Un monstru de culoarea potrivita nu e loot.
+
+    Detectia pe culoare nu poate face diferenta singura: intervalul pentru
+    etichete verzi prinde la fel de bine un monstru verde. Marimea o poate.
+    """
+    import numpy as np
+
+    cadru = make_frame(nodes=1)
+    # Un "monstru" galben, mult mai mare decat o eticheta.
+    cadru[60:160, 240:340] = (0, 220, 220)
+
+    fara_filtru = find_loot(cadru, GALBEN, CENTRU, min_area=100)
+    cu_filtru = find_loot(cadru, GALBEN, CENTRU, min_area=100, max_area=3000)
+
+    assert len(fara_filtru) == 2
+    assert len(cu_filtru) == 1, "pata mare trebuia ignorata"
+
+
+def test_cercul_desenat_de_noi_nu_e_cules():
+    """Captura de ecran include propriul nostru cerc.
+
+    Culoarea lui poate cadea in intervalul cautat, si atunci botul isi vede
+    cercul drept un inel de obiecte si alearga dupa el la nesfarsit. Exact asta
+    s-a intamplat in joc.
+    """
+    import numpy as np
+
+    cadru = make_frame(nodes=0)
+    # Un punct pe inel, la raza 100 de centru, si unul inauntru.
+    cadru[215:225, 295:305] = (0, 220, 220)   # (300, 220) -> la 122 de centru
+    cadru[145:155, 245:255] = (0, 220, 220)   # (250, 150) -> la 50 de centru
+
+    fara = find_loot(cadru, GALBEN, CENTRU, min_area=50)
+    cu = find_loot(cadru, GALBEN, CENTRU, min_area=50, exclude_ring=(122.0, 12.0))
+
+    assert len(fara) == 2
+    assert len(cu) == 1
+    assert abs(cu[0].center[0] - 250) < 6, "trebuia sa ramana cel dinauntru"
+
+
+def test_excluderea_inelului_nu_atinge_restul():
+    cadru = make_frame(nodes=3)
+    toate = find_loot(cadru, GALBEN, CENTRU, min_area=100)
+    cu_inel = find_loot(cadru, GALBEN, CENTRU, min_area=100, exclude_ring=(500.0, 12.0))
+
+    assert len(cu_inel) == len(toate)

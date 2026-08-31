@@ -43,6 +43,9 @@ class PickupRunner:
         self.interval = float(section.get("interval", 0.7))
         self.max_per_pass = int(section.get("max_per_pass", 6))
         self.click_offset_y = int(section.get("click_offset_y", 12))
+        # Peste marimea asta nu mai e un obiect pe jos, ci un monstru sau o
+        # bucata de decor care se nimereste sa aiba culoarea potrivita.
+        self.max_area = int(section.get("max_area", 3000))
 
         loot = profile.section("loot")
         self.min_area = int(section.get("min_area", loot.get("min_area", 25)))
@@ -106,7 +109,11 @@ def _bucla_de_lucru(runner: PickupRunner) -> None:
             obiecte = find_loot(
                 cadru, runner.culori, centru_local,
                 radius=runner.radius, min_area=runner.min_area,
-                blacklist=blacklist, offset=(zona.left, zona.top),
+                max_area=runner.max_area, blacklist=blacklist,
+                offset=(zona.left, zona.top),
+                # Cercul nostru e desenat exact pe raza asta si intra in
+                # captura; fara excluderea lui, botul l-ar culege pe el.
+                exclude_ring=(runner.radius, 12.0),
             )
 
             # Raportam ce a gasit fiecare culoare INAINTE de filtrul de raza.
@@ -117,7 +124,9 @@ def _bucla_de_lucru(runner: PickupRunner) -> None:
                 pe_culoare = []
                 for nume, (low, high) in zip(runner.nume_culori, runner.culori):
                     toate = find_loot(cadru, [(low, high)], centru_local,
-                                      min_area=runner.min_area)
+                                      min_area=runner.min_area,
+                                      max_area=runner.max_area,
+                                      exclude_ring=(runner.radius, 12.0))
                     pe_culoare.append(f"{nume}:{len(toate)}")
                 runner.spune(f"  [{zona.width}x{zona.height} @ {zona.left},{zona.top}] "
                              f"raza {runner.radius} | " + "  ".join(pe_culoare)

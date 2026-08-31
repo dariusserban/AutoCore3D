@@ -99,9 +99,13 @@ class LootBehavior(Behavior):
         cx, cy = ctx.screen_center()
         min_area = int(section.get("min_area", 25))
 
+        max_area = int(section.get("max_area", 3000))
         blobs = []
         for nume in culori:
-            blobs.extend(ctx.find_blobs(nume, min_area=min_area))
+            for b in ctx.find_blobs(nume, min_area=min_area):
+                # Un monstru de culoarea potrivita nu e un obiect pe jos.
+                if b.width * b.height <= max_area:
+                    blobs.append(b)
 
         self._incercate.seconds = float(section.get("blacklist_seconds", 20.0))
 

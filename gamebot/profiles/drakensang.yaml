@@ -98,6 +98,7 @@ combat:
 loot:
   colors: [loot_verde, loot_albastru, loot_violet, loot_auriu]
   min_area: 25          # etichetele sunt mici; sub atat e zgomot
+  max_area: 3000        # peste atat nu mai e obiect, ci monstru sau decor
   # Raza in care se aduna, masurata de la personaj (centrul ferestrei jocului).
   # Se verifica si in timpul mersului pe traseu, la fiecare `interval` secunde,
   # deci tot ce ramane pe langa drum se ridica din mers.
@@ -118,6 +119,7 @@ pickup:
   radius: 260           # raza cercului, in pixeli de ecran
   culoare: "#3fd977"    # culoarea conturului
   interval: 0.7         # secunde intre doua treceri
+  max_area: 3000        # peste atat nu mai e obiect, ci monstru sau decor
   max_per_pass: 6       # cate obiecte incearca intr-o trecere
   click_offset_y: 12    # eticheta e deasupra obiectului
   blacklist_seconds: 12 # cat ignora un obiect pe care l-a incercat

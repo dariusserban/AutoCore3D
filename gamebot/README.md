@@ -196,6 +196,19 @@ Joci tu normal; când vrei să aduni, apeși **`F7`**:
 - tot ce e în cerc se ridică, cel mai apropiat primul
 - `F7` din nou îl oprește, `F12` închide
 
+### Ce nu e loot
+
+Detecția pe culoare nu poate face singură diferența dintre eticheta unui obiect și orice
+altceva de aceeași culoare. Două filtre acoperă cazurile care chiar apar:
+
+**`max_area`** (3000 px² implicit) — un monstru verde intră perfect în intervalul pentru
+etichete verzi, dar e mult mai mare decât o etichetă. Fără filtrul ăsta botul se duce să
+„ridice" monstrul.
+
+**Cercul propriu** — captura de ecran include overlay-ul desenat de noi, iar culoarea lui
+poate cădea exact în intervalul căutat. Atunci botul își vede cercul ca pe un inel de obiecte
+și aleargă după el la nesfârșit. Banda de pe rază e exclusă din căutare.
+
 ### Dacă nu adună nimic
 
 La fiecare trecere scrie un rând ca ăsta, care spune exact unde e problema:
@@ -401,7 +414,7 @@ gamebot/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                220 de teste, rulează fără joc și fără ecran
+└── tests/                223 de teste, rulează fără joc și fără ecran
 ```
 
 ## Teste
