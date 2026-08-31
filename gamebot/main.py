@@ -410,7 +410,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-v", "--verbose", action="store_true", help="loguri detaliate in consola")
     parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="fisierul YAML de profil")
     parser.add_argument("--templates", default=None, help="directorul cu sabloane PNG")
-    sub = parser.add_subparsers(dest="command", required=True)
+
+    # Aceleasi optiuni, acceptate si DUPA comanda. Fara asta, argparse cere ca
+    # `--profile` sa vina neaparat inaintea subcomenzii, iar forma naturala
+    # (`check --profile X`) esueaza cu "unrecognized arguments" - exact felul
+    # in care le scrie orice om si in care le cheama si bot.bat.
+    #
+    # SUPPRESS e esential: fara el, subparserul ar pune la loc valoarea
+    # implicita peste ce ai dat inaintea comenzii, si optiunea s-ar pierde
+    # tacut in ordinea cealalta.
+    comune = argparse.ArgumentParser(add_help=False)
+    comune.add_argument("-v", "--verbose", action="store_true", default=argparse.SUPPRESS,
+                        help="loguri detaliate in consola")
+    comune.add_argument("--profile", default=argparse.SUPPRESS, help="fisierul YAML de profil")
+    comune.add_argument("--templates", default=argparse.SUPPRESS,
+                        help="directorul cu sabloane PNG")
+
+    sub = parser.add_subparsers(dest="command", required=True, parser_class=lambda **kw:
+                                argparse.ArgumentParser(parents=[comune], **kw))
 
     rec = sub.add_parser("record", help="inregistreaza o ruta jucand tu")
     rec.add_argument("--name", required=True, help="numele rutei")

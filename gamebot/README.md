@@ -306,7 +306,7 @@ gamebot/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                118 teste, rulează fără joc și fără ecran
+└── tests/                131 de teste, rulează fără joc și fără ecran
 ```
 
 ## Teste
