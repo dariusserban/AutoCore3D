@@ -105,3 +105,48 @@ def test_pauzele_pot_fi_dezactivate():
     guard = SessionGuard(take_breaks=False)
     guard._next_break_at = 0.0
     assert not guard.break_due()
+
+
+# ------------------------------------------------- oprirea prin fisier-semnal
+
+
+def test_fisierul_semnal_opreste_botul(tmp_path):
+    """Fereastra cere oprirea lasand un fisier; botul iese pe drumul normal."""
+    from gamebot.core.safety import StopFileWatcher
+
+    semnal = tmp_path / ".stop"
+    kill = KillSwitch()
+    watcher = StopFileWatcher(semnal, kill)
+
+    assert not watcher.check()
+    assert kill.running()
+
+    semnal.touch()
+
+    assert watcher.check()
+    assert kill.stopped
+
+
+def test_fara_fisier_nu_opreste_nimic(tmp_path):
+    from gamebot.core.safety import StopFileWatcher
+
+    kill = KillSwitch()
+    StopFileWatcher(tmp_path / "nu_exista", kill).check()
+    assert kill.running()
+
+
+def test_firul_de_supraveghere_reactioneaza(tmp_path):
+    from gamebot.core.safety import StopFileWatcher
+
+    semnal = tmp_path / ".stop"
+    kill = KillSwitch()
+    watcher = StopFileWatcher(semnal, kill, interval=0.05).start()
+    try:
+        semnal.touch()
+        for _ in range(40):
+            if kill.stopped:
+                break
+            time.sleep(0.05)
+        assert kill.stopped, "supraveghetorul n-a vazut fisierul"
+    finally:
+        watcher.close()

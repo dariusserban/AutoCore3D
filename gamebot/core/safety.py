@@ -15,6 +15,7 @@ import logging
 import threading
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Callable, Optional
 
 import numpy as np
@@ -98,6 +99,44 @@ class KillSwitch:
     def close(self) -> None:
         if self._listener is not None:
             self._listener.stop()
+
+
+class StopFileWatcher:
+    """Opreste botul cand apare un fisier anume pe disc.
+
+    Fereastra aplicatiei ruleaza botul ca proces separat si trebuie sa-l poata
+    opri. Nu-l omoara: un proces terminat brutal poate ramane cu o tasta
+    apasata, iar personajul continua sa alerge in perete dupa ce tu ai inchis
+    tot. Asa, botul vede semnalul si iese pe drumul normal, eliberand tastele.
+    """
+
+    def __init__(self, path, kill_switch: "KillSwitch", interval: float = 0.4) -> None:
+        self.path = Path(path)
+        self.kill_switch = kill_switch
+        self.interval = interval
+        self._thread: Optional[threading.Thread] = None
+        self._stop = threading.Event()
+
+    def check(self) -> bool:
+        """O singura verificare. Intoarce True daca a cerut oprirea."""
+        if self.kill_switch.stopped or not self.path.exists():
+            return False
+        log.info("Semnal de oprire primit prin %s.", self.path)
+        self.kill_switch.stop()
+        return True
+
+    def start(self) -> "StopFileWatcher":
+        def bucla():
+            while not self._stop.wait(self.interval):
+                if self.check():
+                    return
+
+        self._thread = threading.Thread(target=bucla, daemon=True)
+        self._thread.start()
+        return self
+
+    def close(self) -> None:
+        self._stop.set()
 
 
 @dataclass

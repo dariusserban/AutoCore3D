@@ -69,7 +69,10 @@ Fără git: pe pagina repo-ului alegi branch-ul `claude/game-farming-bot-oi4pi0`
 și trage bibliotecile. Se rulează o singură dată.
 
 **4. Pornirea.** Click **dreapta** pe `gamebot\bot.bat` → **Run as administrator**.
-Ai un meniu cu toți pașii, în ordine.
+Se deschide fereastra aplicației, cu taburi: AUTOPILOT, LUPTĂ, CALIBRARE, JURNAL.
+
+Dacă fereastra nu pornește (lipsește tkinter), `meniu.bat` face aceleași lucruri dintr-un
+meniu în consolă.
 
 Administrator nu e moft: clientul DSO rulează elevat, iar Windows nu lasă un proces
 neprivilegiat să trimită input către unul privilegiat. Fără asta botul pare că merge, dar în
@@ -88,6 +91,24 @@ calibrate ies pe lângă.
 Scalarea Windows (125%, 150%) e tratată automat — procesul se declară DPI-aware la pornire.
 Fără asta, capturile ar veni la rezoluția fizică iar clicurile ar pleca în coordonate scalate,
 și ar cădea din ce în ce mai alături cu cât cobori pe ecran.
+
+## Fereastra
+
+Aplicația nu conține logica botului. Fiecare buton pornește `gamebot.main` ca proces separat
+și îi arată ieșirea în tabul JURNAL — adică exact codul rulat și de linia de comandă, cu
+aceleași teste în spate. Motivul e practic: captura de ecran, ascultătorii de tastatură și
+ferestrele OpenCV de calibrare se poartă prost când împart firul de execuție cu bucla de
+evenimente Tk.
+
+**OPREȘTE nu omoară procesul.** Îi lasă un fișier-semnal (`gamebot/.stop`) pe care botul îl
+verifică și iese pe drumul normal, eliberând tastele. Un proces omorât brutal poate rămâne cu
+o tastă apăsată, iar personajul aleargă în perete după ce tu ai închis tot. Dacă nu răspunde
+în 8 secunde, abia atunci e închis forțat.
+
+`F12` oprește oricum, oriunde, fără să atingi fereastra.
+
+Tabul LUPTĂ scrie direct în profil, **păstrând comentariile** — ele sunt documentația
+fiecărui reglaj, ar fi o pierdere să dispară la prima bifă apăsată.
 
 ### Din linia de comandă (dacă preferi)
 
@@ -322,12 +343,13 @@ gamebot/
 │   ├── safety.py         oprire de urgență, watchdog, limite de sesiune
 │   ├── config.py         încărcarea profilului YAML
 │   └── engine.py         contextul comun și mașina de stări
+├── ui/app.py             fereastra aplicației (tkinter)
 ├── behaviors/            supraviețuire, luptă, cules, întreținere, montură, click, mers
 ├── profiles/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                139 de teste, rulează fără joc și fără ecran
+└── tests/                153 de teste, rulează fără joc și fără ecran
 ```
 
 ## Teste

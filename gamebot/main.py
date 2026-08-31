@@ -24,7 +24,7 @@ from .core.input_ctl import InputController
 from .core.navigation import Localizer, RoutePlayer
 from .core.recorder import RouteRecorder
 from .core.route import Route
-from .core.safety import KillSwitch, SessionGuard, Watchdog, WatchdogConfig
+from .core.safety import KillSwitch, SessionGuard, StopFileWatcher, Watchdog, WatchdogConfig
 from .core.vision import TemplateLibrary
 
 PACKAGE_DIR = Path(__file__).resolve().parent
@@ -215,6 +215,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         key=str(profile.safety.get("kill_key", "f12")),
     ).start(pause_key=str(profile.safety.get("pause_key", "f11")))
 
+    opritor: Optional[StopFileWatcher] = None
+    if getattr(args, "stop_file", None):
+        # Fereastra aplicatiei ne cere oprirea lasand fisierul asta pe disc.
+        opritor = StopFileWatcher(args.stop_file, kill_switch).start()
+
     ctx = build_context(args, profile, capture, kill_switch)
     # Kill switch-ul trebuie sa elibereze tastele imediat, nu dupa ce bucla
     # principala apuca sa observe oprirea.
@@ -242,6 +247,8 @@ def cmd_run(args: argparse.Namespace) -> int:
     finally:
         ctx.controller.release_all()
         kill_switch.close()
+        if opritor is not None:
+            opritor.close()
         capture.close()
 
     print(f"\nOprit: {reason}")
@@ -369,6 +376,13 @@ def _write_rotation(profile_path: Path, rotation) -> None:
     print("Atentie: comentariile din profil s-au pierdut la rescriere.")
 
 
+def cmd_gui(args: argparse.Namespace) -> int:
+    """Deschide fereastra. Toata logica ramane in comenzile de mai sus."""
+    from .ui.app import porneste
+
+    return porneste(PACKAGE_DIR.parent)
+
+
 def cmd_routes(args: argparse.Namespace) -> int:
     directory = Path(args.dir or DEFAULT_ROUTES)
     if not directory.exists():
@@ -444,7 +458,12 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--delay", type=int, default=5, help="secunde de asteptare inainte de start")
     run.add_argument("--max-minutes", type=float, default=None, help="opreste dupa atatea minute")
     run.add_argument("--from-start", action="store_true", help="incepe de la reperul 0, fara localizare")
+    run.add_argument("--stop-file", default=None,
+                     help="opreste-te elegant cand apare fisierul asta (folosit de fereastra)")
     run.set_defaults(func=cmd_run)
+
+    gui = sub.add_parser("gui", help="deschide fereastra aplicatiei")
+    gui.set_defaults(func=cmd_gui)
 
     check = sub.add_parser("check", help="verifica profilul si arata ce vede botul")
     check.add_argument("--delay", type=int, default=5)

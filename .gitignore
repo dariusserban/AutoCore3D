@@ -11,3 +11,5 @@ gamebot/profiles/*.yaml
 !gamebot/profiles/exemplu.yaml
 !gamebot/profiles/drakensang.yaml
 .pytest_cache/
+
+gamebot/.stop
