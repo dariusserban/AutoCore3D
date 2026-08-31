@@ -127,16 +127,19 @@ Singurul pas pe care îl faci tu e să-i arăți traseul o dată.
 
 ### 1. Înregistrează traseul
 
-Tabul **AUTOPILOT** → scrii un nume → **Înregistrează**. Mergi drumul normal și marchezi:
+Tabul **AUTOPILOT** → scrii un nume → **Înregistrează**. Din secunda aia se salvează tot:
+fiecare mișcare de mouse, fiecare click, fiecare tastă, cu temporizarea reală. Joci normal.
+
+`F10` când ai terminat tura. Atât — restul e opțional:
 
 | Tastă | Ce marchezi |
 |-------|-------------|
-| `F4`  | portal — apeși F4, apoi dai click pe portal |
-| `F5`  | reper de drum (colț, cotitură) |
-| `F6`  | zonă de luptă — aici caută mob-uri |
-| `F8`  | vendor / reparat |
-| `F9`  | pauză / reluare |
-| `F10` | oprește și salvează |
+| `F10` | **oprește și salvează** — singura obligatorie |
+| `F6`  | marchează zonă de luptă (aici caută mob-uri) |
+| `F4`  | marchează portal — apeși F4, apoi dai click pe portal |
+| `F5`  | marchează un colț important (ajută la corectarea poziției) |
+| `F8`  | marchează vendor / reparat |
+| `F9`  | pauză / reluare
 
 Bate-te de-adevăratelea în zonele marcate cu `F6` — de acolo se învață rotația de abilități.
 
@@ -161,6 +164,30 @@ nimic.
 
 Dacă vrei totuși precizie maximă, calibrezi `minimap` din tabul REGLAJ FIN și de atunci se
 folosește doar ea.
+
+## Modul de fundal — și de ce nu e garantat
+
+Bifa **„Rulează în fundal"** încearcă două lucruri: să citească fereastra jocului prin
+`PrintWindow` (în loc să fotografieze ecranul) și să trimită tastele și clicurile ca mesaje
+direct către fereastră (în loc să miște mouse-ul real).
+
+Când merge, poți lucra pe calculator în timp ce botul farmează.
+
+**Nu merge la toate jocurile, și motivul e tehnic, nu de configurare.** Jocurile 3D desenează
+adesea direct prin DirectX — atunci `PrintWindow` întoarce o imagine complet neagră — și își
+citesc input-ul prin DirectInput sau Raw Input, care ocolesc complet mesajele trimise de noi.
+
+Testează înainte: butonul **Testează modul de fundal** (sau `python -m gamebot.main bgtest`).
+Îți spune în câteva secunde dacă imaginea se poate citi. Partea de input **nu poate fi
+verificată automat** — n-avem cum ști ce ar trebui să se schimbe în joc după o apăsare — deci
+aia rămâne de văzut pe viu: pornești cu bifa pusă și te uiți dacă personajul chiar se mișcă.
+
+Dacă testul iese negativ, botul îți spune și continuă în modul obișnuit. Mai bine un bot care
+ocupă ecranul decât unul care apasă în gol și pare că merge.
+
+**Minimizat în bara de start nu funcționează în niciun caz.** O fereastră minimizată nu mai
+desenează nimic, deci nu are ce fi citit. Dacă vrei calculatorul complet liber, singura
+soluție care chiar merge e o mașină virtuală sau un al doilea calculator.
 
 ### Adunarea obiectelor
 
@@ -279,6 +306,7 @@ gamebot/
 │   ├── safety.py         oprire de urgență, watchdog, limite de sesiune
 │   ├── config.py         încărcarea profilului YAML
 │   ├── window.py         găsirea ferestrei jocului, regiuni în procente
+│   ├── background.py     captură și input țintite pe fereastră (experimental)
 │   └── engine.py         contextul comun și mașina de stări
 ├── ui/app.py             fereastra aplicației (tkinter)
 ├── behaviors/            supraviețuire, luptă, cules, întreținere, montură, click, mers
@@ -286,7 +314,7 @@ gamebot/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                168 de teste, rulează fără joc și fără ecran
+└── tests/                186 de teste, rulează fără joc și fără ecran
 ```
 
 ## Teste

@@ -163,6 +163,15 @@ class GamebotApp:
         ttk.Checkbutton(f, text="Proba (nu trimite input in joc)",
                         variable=self.proba).grid(row=9, column=0, columnspan=2, sticky="w")
 
+        self.fundal = tk.BooleanVar(value=False)
+        ttk.Checkbutton(f, text="Ruleaza in fundal - nu-mi folosi mouse-ul (experimental)",
+                        variable=self.fundal).grid(row=12, column=0, columnspan=3,
+                                                   sticky="w", pady=(10, 0))
+        ttk.Label(f, text="Nu merge la toate jocurile. Apasa butonul de test intai.",
+                  style="Sec.TLabel").grid(row=13, column=0, columnspan=2, sticky="w")
+        ttk.Button(f, text="Testeaza modul de fundal",
+                   command=self._testeaza_fundal).grid(row=13, column=2, sticky="w")
+
         self.de_la_inceput = tk.BooleanVar(value=False)
         ttk.Checkbutton(f, text="Incepe de la primul reper, fara sa se localizeze",
                         variable=self.de_la_inceput).grid(row=10, column=0, columnspan=2, sticky="w")
@@ -387,6 +396,8 @@ class GamebotApp:
             argumente.append("--dry-run")
         if self.de_la_inceput.get():
             argumente.append("--from-start")
+        if self.fundal.get():
+            argumente.append("--background")
         minute = self.minute.get().strip()
         if minute:
             argumente += ["--max-minutes", minute]
@@ -440,6 +451,10 @@ class GamebotApp:
             return
         self._ruleaza(["calibrate", ce, "--name", nume.strip(),
                        "--profile", str(self._cale_profil())], f"Calibrare {ce}")
+
+    def _testeaza_fundal(self) -> None:
+        self._ruleaza(["bgtest", "--profile", str(self._cale_profil())],
+                      "Test mod fundal")
 
     def _verifica(self) -> None:
         self._ruleaza(["check", "--profile", str(self._cale_profil())], "Verificare ecran")

@@ -177,9 +177,38 @@ def cmd_record(args: argparse.Namespace) -> int:
 # ---------------------------------------------------------------------- rulare
 
 
-def build_context(args: argparse.Namespace, profile: Profile, capture, kill_switch: KillSwitch) -> BotContext:
+def _porneste_modul_fundal(profile: Profile, fereastra, capture):
+    """Inlocuieste captura si input-ul cu variantele care tintesc fereastra.
+
+    Daca ceva nu e in regula - fereastra negasita, captura neagra - ne intoarcem
+    la modul obisnuit si spunem de ce. Mai bine un bot care ocupa ecranul decat
+    unul care apasa in gol si pare ca merge.
+    """
+    from .core.background import PostMessageBackend, WindowCapture, diagnostic
+
+    if fereastra is None or not fereastra.hwnd:
+        print("Modul de fundal cere fereastra jocului, si n-am gasit-o. "
+              "Continui in modul obisnuit.")
+        return capture, None
+
+    raport = diagnostic(fereastra.hwnd)
+    if not raport["captura"]:
+        print(f"Modul de fundal nu merge pe jocul asta: {raport['detaliu']}.")
+        print("Continui in modul obisnuit - jocul trebuie sa ramana vizibil.")
+        return capture, None
+
+    print("Mod de fundal ACTIV: nu iti folosesc mouse-ul si nu am nevoie de "
+          "fereastra jocului in fata.")
+    print("Daca personajul nu se misca deloc, jocul ignora input-ul trimis "
+          "asa; opreste si scoate bifa.")
+    return WindowCapture(fereastra.hwnd), PostMessageBackend(fereastra.hwnd)
+
+
+def build_context(args: argparse.Namespace, profile: Profile, capture,
+                  kill_switch: KillSwitch, backend=None) -> BotContext:
     """Asambleaza toate piesele intr-un context gata de rulat."""
     controller = InputController(
+        backend=backend,
         dry_run=args.dry_run,
         click_radius=int(profile.section("input").get("click_radius", 3)),
         move_speed=float(profile.section("input").get("move_speed", 1.0)),
@@ -230,6 +259,40 @@ def build_context(args: argparse.Namespace, profile: Profile, capture, kill_swit
     )
 
 
+def cmd_bgtest(args: argparse.Namespace) -> int:
+    """Spune daca modul de fundal are sanse sa mearga pe jocul tau."""
+    from .core.background import diagnostic
+
+    profile = Profile.load(args.profile)
+    titlu = profile.window_title
+    if not titlu:
+        print("Profilul nu spune dupa ce titlu sa caut fereastra (window.title).")
+        return 1
+
+    fereastra = find_window(titlu)
+    if fereastra is None:
+        print(f"Nu gasesc nicio fereastra cu '{titlu}' in titlu. Porneste jocul.")
+        return 1
+
+    print(f"Fereastra: '{fereastra.title}' ({fereastra.region.width}x{fereastra.region.height})")
+    print("Verific daca poate fi citita fara sa fie in fata...\n")
+
+    raport = diagnostic(fereastra.hwnd, fereastra.title)
+
+    if raport["captura"]:
+        print("CAPTURA IN FUNDAL: merge")
+        print(f"  {raport['detaliu']}")
+        print("\nInput-ul in fundal nu poate fi verificat automat - nu avem cum sti")
+        print("ce ar trebui sa se schimbe in joc dupa o apasare. Porneste botul cu")
+        print("modul de fundal bifat si uita-te daca personajul chiar se misca.")
+    else:
+        print("CAPTURA IN FUNDAL: nu merge")
+        print(f"  {raport['detaliu']}")
+        print("\nJocul trebuie sa ramana vizibil pe ecran. Poate sta in spatele")
+        print("altor ferestre doar daca scrie mai sus ca merge - aici nu e cazul.")
+    return 0
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     profile = Profile.load(args.profile)
     print(f"Profil: {profile.name}")
@@ -245,7 +308,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(">>> MOD DE PROBA: nu se trimite niciun input catre joc. <<<\n")
 
     capture = ScreenCapture(profile.monitor)
-    pregateste_profil(profile, capture)
+    fereastra = pregateste_profil(profile, capture)
+
+    backend_fundal = None
+    if getattr(args, "background", False):
+        capture, backend_fundal = _porneste_modul_fundal(profile, fereastra, capture)
 
     kill_switch = KillSwitch(
         key=str(profile.safety.get("kill_key", "f12")),
@@ -256,7 +323,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         # Fereastra aplicatiei ne cere oprirea lasand fisierul asta pe disc.
         opritor = StopFileWatcher(args.stop_file, kill_switch).start()
 
-    ctx = build_context(args, profile, capture, kill_switch)
+    ctx = build_context(args, profile, capture, kill_switch, backend=backend_fundal)
     # Kill switch-ul trebuie sa elibereze tastele imediat, nu dupa ce bucla
     # principala apuca sa observe oprirea.
     kill_switch.on_stop = ctx.controller.release_all
@@ -515,9 +582,15 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--delay", type=int, default=5, help="secunde de asteptare inainte de start")
     run.add_argument("--max-minutes", type=float, default=None, help="opreste dupa atatea minute")
     run.add_argument("--from-start", action="store_true", help="incepe de la reperul 0, fara localizare")
+    run.add_argument("--background", action="store_true",
+                     help="trimite input direct catre fereastra jocului, fara sa foloseasca "
+                          "mouse-ul real (nu merge la toate jocurile - vezi comanda bgtest)")
     run.add_argument("--stop-file", default=None,
                      help="opreste-te elegant cand apare fisierul asta (folosit de fereastra)")
     run.set_defaults(func=cmd_run)
+
+    bg = sub.add_parser("bgtest", help="verifica daca modul de fundal merge pe jocul tau")
+    bg.set_defaults(func=cmd_bgtest)
 
     gui = sub.add_parser("gui", help="deschide fereastra aplicatiei")
     gui.set_defaults(func=cmd_gui)

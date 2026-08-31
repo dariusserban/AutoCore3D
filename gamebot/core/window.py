@@ -30,6 +30,7 @@ class WindowInfo:
 
     title: str
     region: Region
+    hwnd: int = 0  # identificatorul ferestrei, necesar modului de fundal
 
     @property
     def is_reasonable(self) -> bool:
@@ -78,6 +79,7 @@ def _find_windows_ctypes(fragment: str) -> list[WindowInfo]:
         gasite.append(WindowInfo(
             title=titlu,
             region=Region(punct.x, punct.y, rect.right - rect.left, rect.bottom - rect.top),
+            hwnd=int(hwnd),
         ))
         return True
 

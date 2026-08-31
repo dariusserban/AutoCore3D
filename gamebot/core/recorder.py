@@ -104,6 +104,8 @@ class RouteRecorder:
         self._portal_click: Optional[tuple[int, int]] = None
         self._suppress_mouse_up = False
         self._loading_portal: Optional[Waypoint] = None
+        # Reperul care asteapta sa i se faca poza, la prima actiune din joc.
+        self._anchor_in_asteptare: Optional[Waypoint] = None
 
     # ------------------------------------------------------------ ajutatoare
 
@@ -131,6 +133,10 @@ class RouteRecorder:
         if isinstance(key, keyboard.Key):
             return key.name.lower()
         return None
+
+    def _are_actiuni(self) -> bool:
+        with self._lock:
+            return bool(self._events)
 
     def _record(self, event: InputEvent) -> None:
         if self._paused or not self._running:
@@ -167,14 +173,17 @@ class RouteRecorder:
         return waypoint
 
     def start_recording(self) -> Waypoint:
-        """Pune primul reper, acolo unde te afli cand incepe inregistrarea.
+        """Deschide reperul zero, in care intra tot ce faci de acum inainte.
 
-        Fara el, cine merge tot traseul fara sa apese vreo tasta de reper ajunge
-        la final cu o ruta goala si cu munca aruncata. Se apeleaza dupa ce ai
-        apucat sa comuti pe joc, altfel poza de referinta ar fi cu fereastra
-        aplicatiei, nu cu harta.
+        Poza de referinta a acestui reper NU se ia acum, ci la prima ta actiune
+        in joc. Daca am lua-o imediat, ar prinde fereastra aplicatiei - te uiti
+        inca la ea cand apesi butonul. Amanand-o pana misti tu ceva, stim ca
+        esti deja in joc, si nu mai e nevoie de nicio numaratoare inversa.
         """
-        return self.mark_waypoint("travel", label="start")
+        waypoint = Waypoint(index=0, kind="travel", label="start")
+        self.route.waypoints.append(waypoint)
+        self._anchor_in_asteptare = waypoint
+        return waypoint
 
     def _save_anchor(self, filename: str) -> Optional[str]:
         """Poza de referinta (de obicei minimapa). Doar din firul principal."""
@@ -324,6 +333,12 @@ class RouteRecorder:
             while not self._mark_queue.empty():
                 self.mark_waypoint(self._mark_queue.get())
 
+            if self._anchor_in_asteptare is not None and self._are_actiuni():
+                reper = self._anchor_in_asteptare
+                self._anchor_in_asteptare = None
+                reper.anchor = self._save_anchor(f"anchor_{reper.index:03d}.png")
+                print("  inregistrez... (F10 cand ai terminat tura)", flush=True)
+
             if self._loading_portal is not None:
                 self._finish_portal(self._loading_portal)
 
@@ -381,7 +396,9 @@ class RouteRecorder:
         print(f"Ruta: {self.name}")
         print(f"Repere:  {keys}")
         print(f"Control: {self.pause_key.upper()}=pauza  {self.stop_key.upper()}=stop si salveaza")
-        print("\nInregistrarea a PORNIT. Comuta pe joc si mergi traseul.")
-        print("Marcheaza un reper la fiecare colt si la fiecare zona de lupta.")
-        print("La portal: apasa F4 INAINTE de click, apoi da click pe portal.")
-        print("Cand ai terminat tura, apasa F10 ca sa salvezi.\n", flush=True)
+        print("\nINREGISTREZ DEJA. Comuta pe joc si joaca normal -")
+        print("fiecare miscare, click si tasta se salveaza automat.")
+        print(f"\nCand ai terminat tura: {self.stop_key.upper()}")
+        print("\nOptional, ca botul sa se descurce mai bine:")
+        print("  F6 unde vrei sa se bata   F4 inainte de click pe portal")
+        print("  F5 la cotituri importante\n", flush=True)
