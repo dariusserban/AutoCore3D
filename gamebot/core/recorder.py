@@ -166,6 +166,16 @@ class RouteRecorder:
         log.info("Reper %d marcat (%s)%s", index, kind, f" - {label}" if label else "")
         return waypoint
 
+    def start_recording(self) -> Waypoint:
+        """Pune primul reper, acolo unde te afli cand incepe inregistrarea.
+
+        Fara el, cine merge tot traseul fara sa apese vreo tasta de reper ajunge
+        la final cu o ruta goala si cu munca aruncata. Se apeleaza dupa ce ai
+        apucat sa comuti pe joc, altfel poza de referinta ar fi cu fereastra
+        aplicatiei, nu cu harta.
+        """
+        return self.mark_waypoint("travel", label="start")
+
     def _save_anchor(self, filename: str) -> Optional[str]:
         """Poza de referinta (de obicei minimapa). Doar din firul principal."""
         if self.capture is None:
@@ -245,6 +255,7 @@ class RouteRecorder:
         self._running = True
         self._last_event_at = time.monotonic()
         self._print_banner()
+        self.start_recording()
 
         def on_press(key):
             name = self._key_name(key)
@@ -307,12 +318,25 @@ class RouteRecorder:
 
     def _main_loop(self) -> None:
         """Firul principal: singurul care are voie sa faca captura de ecran."""
+        ultimul_semn = time.monotonic()
+
         while self._running:
             while not self._mark_queue.empty():
                 self.mark_waypoint(self._mark_queue.get())
 
             if self._loading_portal is not None:
                 self._finish_portal(self._loading_portal)
+
+            # Semn de viata: fara el, cine se uita la jurnal nu are cum sa stie
+            # daca inregistrarea merge sau daca s-a blocat ceva.
+            if time.monotonic() - ultimul_semn >= 5.0:
+                ultimul_semn = time.monotonic()
+                with self._lock:
+                    in_curs = len(self._events)
+                total = sum(len(w.events) for w in self.route.waypoints) + in_curs
+                stare = "PAUZA" if self._paused else "inregistrez"
+                print(f"  [{stare}] {len(self.route.waypoints)} repere, "
+                      f"{total} actiuni captate", flush=True)
 
             time.sleep(0.05)
 
@@ -357,7 +381,7 @@ class RouteRecorder:
         print(f"Ruta: {self.name}")
         print(f"Repere:  {keys}")
         print(f"Control: {self.pause_key.upper()}=pauza  {self.stop_key.upper()}=stop si salveaza")
-        print("\nIntra in joc si mergi traseul. Marcheaza un reper la fiecare")
-        print("colt si la fiecare zona in care vrei sa se bata.")
+        print("\nInregistrarea a PORNIT. Comuta pe joc si mergi traseul.")
+        print("Marcheaza un reper la fiecare colt si la fiecare zona de lupta.")
         print("La portal: apasa F4 INAINTE de click, apoi da click pe portal.")
-        print("Cu cat pui mai multe repere, cu atat botul se corecteaza mai bine.\n")
+        print("Cand ai terminat tura, apasa F10 ca sa salvezi.\n", flush=True)

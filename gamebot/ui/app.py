@@ -14,6 +14,7 @@ o tasta apasata, iar personajul alearga in perete dupa ce tu ai inchis totul.
 
 from __future__ import annotations
 
+import os
 import queue
 import subprocess
 import sys
@@ -326,13 +327,21 @@ class GamebotApp:
         if self.stop_file.exists():
             self.stop_file.unlink()
 
-        comanda = [sys.executable, "-m", "gamebot.main"] + argumente
+        # `-u` nu e optional: cand Python scrie intr-un pipe in loc de terminal,
+        # isi tine textul intr-un buffer de cativa kiloocteti si nu-l trimite
+        # pana nu se umple sau pana nu se termina procesul. Fara asta,
+        # inregistrarea ruleaza perfect si jurnalul ramane gol - pare ca nu
+        # merge nimic. `bufsize=1` de mai jos e doar pentru citirea din partea
+        # noastra si nu ajuta cu nimic la asta.
+        comanda = [sys.executable, "-u", "-m", "gamebot.main"] + argumente
+        mediu = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8")
+
         self._scrie(f"\n=== {titlu} ===\n")
         try:
             self.proces = subprocess.Popen(
                 comanda, cwd=str(self.repo), stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT, text=True, bufsize=1,
-                encoding="utf-8", errors="replace",
+                encoding="utf-8", errors="replace", env=mediu,
             )
         except Exception as exc:
             self._scrie(f"Nu am putut porni: {exc}\n")

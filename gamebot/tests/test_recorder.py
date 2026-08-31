@@ -45,6 +45,28 @@ def test_marcarea_taie_segmentul_si_il_ataseaza_reperului_anterior(tmp_path):
     assert recorder.route.waypoints[1].events == []
 
 
+def test_primul_reper_se_pune_singur(tmp_path):
+    """Cine merge traseul fara sa apese F5 trebuie sa ramana totusi cu ceva."""
+    recorder = build(tmp_path)
+
+    reper = recorder.start_recording()
+
+    assert len(recorder.route.waypoints) == 1
+    assert reper.kind == "travel" and reper.label == "start"
+
+
+def test_dupa_pornire_mersul_intra_in_primul_reper(tmp_path):
+    recorder = build(tmp_path)
+    recorder.start_recording()
+    recorder._events = [InputEvent("mouse_down", 0.3, x=500, y=400, button="left")]
+
+    ruta = recorder._finalize()
+
+    assert len(ruta.waypoints) == 1
+    assert len(ruta.waypoints[0].events) == 1
+    assert (tmp_path / "route.json").exists()
+
+
 def test_portalul_asteapta_clicul_urmator(tmp_path):
     recorder = build(tmp_path)
     waypoint = recorder.mark_waypoint("portal")
