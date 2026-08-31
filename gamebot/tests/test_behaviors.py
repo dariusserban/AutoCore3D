@@ -312,3 +312,42 @@ def test_daca_nu_se_poate_reorienta_dupa_lupta_opreste(test_profile, tmp_path):
     TravelBehavior().run(ctx)
 
     assert ctx.kill_switch.stopped
+
+
+# --------------------------------- o bara de viata citita gresit nu e o moarte
+
+
+def test_zero_de_la_inceput_nu_inseamna_moarte(test_profile, tmp_path):
+    """Regiune gresita in profil => 0% mereu. Botul nu trebuie sa se opreasca.
+
+    Asta a oprit botul in prima secunda, de fiecare data: citea 0%, conchidea
+    ca personajul e mort si inchidea tot, desi personajul era viu si nemiscat.
+    """
+    ctx = build_ctx(test_profile, make_frame(0.0), tmp_path)
+    ctx.refresh()
+    behavior = SurvivalBehavior()
+
+    assert not behavior.should_run(ctx)
+    assert not ctx.kill_switch.stopped
+    assert ctx.watchdog.deaths == 0
+
+
+def test_zero_dupa_ce_a_fost_viu_inseamna_moarte(test_profile, tmp_path):
+    """Daca l-am vazut viu si acum e la zero, atunci chiar a murit."""
+    viu = build_ctx(test_profile, make_frame(1.0), tmp_path)
+    viu.refresh()
+    behavior = SurvivalBehavior()
+    behavior.should_run(viu)  # aici retine ca personajul era viu
+
+    mort = build_ctx(test_profile, make_frame(0.0), tmp_path)
+    mort.refresh()
+
+    assert behavior.should_run(mort)
+    behavior.run(mort)
+    assert mort.watchdog.deaths == 1
+
+
+def test_oprirea_spune_de_ce(test_profile, tmp_path):
+    ctx = build_ctx(test_profile, make_frame(1.0), tmp_path)
+    ctx.kill_switch.stop("un motiv anume")
+    assert ctx.kill_switch.reason == "un motiv anume"

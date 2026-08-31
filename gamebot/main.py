@@ -373,9 +373,19 @@ def _raporteaza_ce_vede(ctx: BotContext) -> None:
     viata = ctx.health
     if viata is None:
         print("Bara de viata nu e definita in profil - nu se va vindeca singur.")
+    elif viata <= 0.02:
+        # Personajul tau e evident viu, altfel n-ai fi pornit botul. Deci
+        # regiunea din profil arata in alta parte. Oprim vindecarea pentru
+        # sesiunea asta si mergem mai departe: farmatul e ce conteaza acum.
+        print("")
+        print("ATENTIE: bara de viata se citeste 0%, ceea ce nu se poate.")
+        print("Regiunea `regions.health_bar` din profil arata in alta parte.")
+        print("Dezactivez vindecarea automata pentru sesiunea asta si continui -")
+        print("traseul si lupta merg oricum. Trimite un screenshot ca sa fie reglata.")
+        print("")
+        ctx.profile.behaviors["survival"] = False
     else:
-        print(f"Viata citita acum: {viata*100:.0f}%  "
-              f"(daca nu se potriveste cu ecranul, corecteaza regions.health_bar)")
+        print(f"Viata citita acum: {viata*100:.0f}%")
 
     from .behaviors.combat import CombatBehavior
 

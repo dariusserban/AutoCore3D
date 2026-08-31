@@ -37,7 +37,7 @@ class TravelBehavior(Behavior):
             ctx.needs_resync = False
             if not player.resync():
                 print("  !! nu ma pot reorienta dupa lupta - opresc")
-                ctx.kill_switch.stop()
+                ctx.kill_switch.stop("nu recunosc pozitia dupa lupta")
                 return
 
         before_laps = player.laps
@@ -47,7 +47,7 @@ class TravelBehavior(Behavior):
         if waypoint is None:
             if not ctx.kill_switch.stopped:
                 print("  !! nu ma mai pot orienta pe traseu - opresc")
-                ctx.kill_switch.stop()
+                ctx.kill_switch.stop("nu recunosc pozitia pe traseu")
             return
 
         ctx.current_waypoint = waypoint

@@ -28,6 +28,10 @@ class SurvivalBehavior(Behavior):
         self._last_heal_at = 0.0
         self._last_flee_at = 0.0
         self._death_reported_at = 0.0
+        # Am vazut vreodata viata peste zero? Cat timp nu, orice citire de 0%
+        # inseamna aproape sigur o regiune gresita in profil, nu un personaj
+        # mort - un personaj mort ar fi fost viu inainte.
+        self._a_fost_viu = False
 
     def enabled(self, ctx: BotContext) -> bool:
         # Fara bara de viata definita in profil nu avem cum sa judecam nimic.
@@ -36,6 +40,13 @@ class SurvivalBehavior(Behavior):
     def should_run(self, ctx: BotContext) -> bool:
         health = ctx.health
         if health is None:
+            return False
+        if health > 0.02:
+            self._a_fost_viu = True
+        elif not self._a_fost_viu:
+            # Zero de la bun inceput: bara e citita din alt loc decat trebuie.
+            # Daca am crede-o, botul s-ar opri in prima secunda, de fiecare data,
+            # anuntand o moarte care nu s-a intamplat.
             return False
         heal_below = ctx.profile.threshold("heal_below", 0.5)
         return health <= heal_below
@@ -86,7 +97,7 @@ class SurvivalBehavior(Behavior):
 
         if section.get("stop_on_critical", True):
             print("  !! viata critica si nicio scapare definita - opresc botul")
-            ctx.kill_switch.stop()
+            ctx.kill_switch.stop("viata critica, fara scapare definita")
 
     def _handle_death(self, ctx: BotContext, now: float) -> None:
         """Bara de viata la zero. Raportam o singura data per moarte."""
@@ -100,7 +111,7 @@ class SurvivalBehavior(Behavior):
         # secventa din profil daca exista, altfel oprim si te lasam pe tine.
         steps = ctx.profile.section("survival").get("on_death")
         if not steps:
-            ctx.kill_switch.stop()
+            ctx.kill_switch.stop("personajul a murit si nu stiu sa il reinviez")
             return
         for step in steps:
             if not ctx.running():

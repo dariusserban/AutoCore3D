@@ -238,7 +238,10 @@ class BehaviorEngine:
         ctx = self.ctx
         while True:
             if ctx.kill_switch.stopped:
-                return "oprit de la tastatura"
+                # Cine a cerut oprirea stie de ce; noi doar raportam ce ni s-a
+                # spus. "De la tastatura" era o presupunere care ascundea
+                # opririle venite din interior, de la un comportament.
+                return ctx.kill_switch.reason or "oprire ceruta"
             if ctx.kill_switch.paused:
                 time.sleep(0.3)
                 continue

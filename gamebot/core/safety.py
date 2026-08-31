@@ -39,6 +39,7 @@ class KillSwitch:
         self._stopped = threading.Event()
         self._paused = threading.Event()
         self._listener = None
+        self.reason: str = ""
 
     @property
     def stopped(self) -> bool:
@@ -52,10 +53,11 @@ class KillSwitch:
         """Predicat pentru `should_continue`: rulam si nu suntem in pauza."""
         return not self._stopped.is_set() and not self._paused.is_set()
 
-    def stop(self) -> None:
+    def stop(self, reason: str = "") -> None:
         if not self._stopped.is_set():
+            self.reason = reason
             self._stopped.set()
-            log.warning("OPRIRE ceruta.")
+            log.warning("OPRIRE ceruta%s.", f": {reason}" if reason else "")
             if self.on_stop:
                 try:
                     self.on_stop()
@@ -86,7 +88,7 @@ class KillSwitch:
             elif isinstance(key, keyboard.KeyCode) and key.char:
                 name = key.char.lower()
             if name == self.key:
-                self.stop()
+                self.stop("oprit de la tastatura")
             elif name == pause_key:
                 self.toggle_pause()
 
@@ -122,7 +124,7 @@ class StopFileWatcher:
         if self.kill_switch.stopped or not self.path.exists():
             return False
         log.info("Semnal de oprire primit prin %s.", self.path)
-        self.kill_switch.stop()
+        self.kill_switch.stop("oprit din fereastra")
         return True
 
     def start(self) -> "StopFileWatcher":
