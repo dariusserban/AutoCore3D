@@ -173,6 +173,23 @@ class InputController:
                 time.sleep(humanize.delay(0.07, 0.2))
         self.actions_sent += 1
 
+    def quick_click(self, x: int, y: int, button: str = "left") -> None:
+        """Click direct, fara traiectorie curbata.
+
+        Pentru actiunile pe care le ceri tu explicit, cu o tasta: acolo conteaza
+        sa se intample repede, iar un traseu de mouse desenat frumos ar face
+        adunarea a zece obiecte sa dureze cinci secunde in loc de una. Ramane
+        totusi imprastierea clicului si o tinere de tasta variabila.
+        """
+        tx, ty = humanize.jitter_point(int(x), int(y), self.click_radius)
+        self.backend.move_to(tx, ty)
+        if not self.dry_run:
+            time.sleep(humanize.delay(0.02, 0.3))
+        self.backend.mouse_down(button)
+        time.sleep(humanize.hold_time(0.045))
+        self.backend.mouse_up(button)
+        self.actions_sent += 1
+
     def drag(self, from_xy: tuple[int, int], to_xy: tuple[int, int], button: str = "left") -> None:
         """Tine apasat si trage. Folosit pentru rotirea camerei cu butonul drept."""
         self.move(*from_xy)

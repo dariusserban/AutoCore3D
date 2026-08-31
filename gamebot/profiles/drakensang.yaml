@@ -117,6 +117,16 @@ loot:
   interval: 1.0
   press_key_blindly: false
 
+pickup:
+  # Culesul pornit de tine, cu o tasta, cu cerc desenat peste joc.
+  hotkey: f7            # apesi o data = pornit, inca o data = oprit
+  radius: 260           # raza cercului, in pixeli de ecran
+  culoare: "#3fd977"    # culoarea conturului
+  interval: 0.7         # secunde intre doua treceri
+  max_per_pass: 6       # cate obiecte incearca intr-o trecere
+  click_offset_y: 12    # eticheta e deasupra obiectului
+  blacklist_seconds: 12 # cat ignora un obiect pe care l-a incercat
+
 mount:
   retry_seconds: 25
   cast_seconds: 2.0

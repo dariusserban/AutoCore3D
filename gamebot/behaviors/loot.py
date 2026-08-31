@@ -22,6 +22,7 @@ import time
 
 from ..core import humanize
 from ..core.engine import Behavior, BotContext
+from ..core.pickup import Blacklist
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class LootBehavior(Behavior):
     priority = 65  # dupa lupta, inaintea mersului si a culesului de resurse
 
     def __init__(self) -> None:
-        self._incercate: list[tuple[int, int, float]] = []
+        self._incercate = Blacklist()
         self._ultima_trecere = 0.0
 
     def enabled(self, ctx: BotContext) -> bool:
@@ -102,19 +103,17 @@ class LootBehavior(Behavior):
         for nume in culori:
             blobs.extend(ctx.find_blobs(nume, min_area=min_area))
 
-        acum = time.monotonic()
-        uita_dupa = float(section.get("blacklist_seconds", 20.0))
-        self._incercate = [i for i in self._incercate if acum - i[2] < uita_dupa]
+        self._incercate.seconds = float(section.get("blacklist_seconds", 20.0))
 
         rezultat = []
         for b in blobs:
             bx, by = b.center
             if raza > 0 and math.hypot(bx - cx, by - cy) > raza:
                 continue
-            if any(math.hypot(bx - x, by - y) < 30 for x, y, _ in self._incercate):
+            if self._incercate.contains(bx, by):
                 continue
             rezultat.append(b)
         return rezultat
 
     def _noteaza(self, x: int, y: int) -> None:
-        self._incercate.append((x, y, time.monotonic()))
+        self._incercate.add(x, y)

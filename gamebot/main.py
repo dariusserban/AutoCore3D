@@ -510,6 +510,13 @@ def _write_rotation(profile_path: Path, rotation) -> None:
     print("Atentie: comentariile din profil s-au pierdut la rescriere.")
 
 
+def cmd_pickup(args: argparse.Namespace) -> int:
+    """Culesul cu tasta, cu cercul desenat peste joc."""
+    from .ui.pickup_app import porneste
+
+    return porneste(args.profile)
+
+
 def cmd_gui(args: argparse.Namespace) -> int:
     """Deschide fereastra. Toata logica ramane in comenzile de mai sus."""
     from .ui.app import porneste
@@ -601,6 +608,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     bg = sub.add_parser("bgtest", help="verifica daca modul de fundal merge pe jocul tau")
     bg.set_defaults(func=cmd_bgtest)
+
+    pick = sub.add_parser("pickup", help="cules cu tasta, cu cerc desenat peste joc")
+    pick.set_defaults(func=cmd_pickup)
 
     gui = sub.add_parser("gui", help="deschide fereastra aplicatiei")
     gui.set_defaults(func=cmd_gui)

@@ -165,6 +165,27 @@ nimic.
 Dacă vrei totuși precizie maximă, calibrezi `minimap` din tabul REGLAJ FIN și de atunci se
 folosește doar ea.
 
+## Culesul cu tasta
+
+Butonul **Pornește culesul cu tasta** din AUTOPILOT (sau `python -m gamebot.main pickup`).
+Joci tu normal; când vrei să aduni, apeși **`F7`**:
+
+- apare un **cerc verde** în jurul personajului, desenat peste joc
+- tot ce e în cerc se ridică, cel mai apropiat primul
+- `F7` din nou îl oprește, `F12` închide
+
+Ce vezi în cerc e exact ce se adună — raza desenată și raza căutării sunt același număr
+(`pickup.radius`, în pixeli de ecran).
+
+**Cercul nu e desenat în joc.** E o fereastră proprie, transparentă, care stă deasupra —
+jocul nu știe că există și nu e atins în niciun fel. Ca să nu încurce, e făcută
+*click-through*: apăsările trec prin ea către joc. Fără asta ar înghiți exact clicurile pe
+care le trimitem ca să ridicăm obiectele.
+
+**Nu e instantaneu, și n-are cum să fie.** Botul dă click pe fiecare obiect, pe rând, ca
+tine — vreo 6 obiecte pe secundă. Ca să dispară tot dintr-odată în inventar ar trebui
+umblat în memoria jocului, iar asta nu se face aici.
+
 ## Modul de fundal — și de ce nu e garantat
 
 Bifa **„Rulează în fundal"** încearcă două lucruri: să citească fereastra jocului prin
@@ -308,13 +329,16 @@ gamebot/
 │   ├── window.py         găsirea ferestrei jocului, regiuni în procente
 │   ├── background.py     captură și input țintite pe fereastră (experimental)
 │   └── engine.py         contextul comun și mașina de stări
-├── ui/app.py             fereastra aplicației (tkinter)
+├── ui/
+│   ├── app.py            fereastra aplicației (tkinter)
+│   ├── overlay.py        cercul desenat peste joc (click-through)
+│   └── pickup_app.py     culesul cu tasta
 ├── behaviors/            supraviețuire, luptă, cules, întreținere, montură, click, mers
 ├── profiles/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                186 de teste, rulează fără joc și fără ecran
+└── tests/                201 de teste, rulează fără joc și fără ecran
 ```
 
 ## Teste

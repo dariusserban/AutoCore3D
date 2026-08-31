@@ -176,6 +176,16 @@ class GamebotApp:
         ttk.Checkbutton(f, text="Incepe de la primul reper, fara sa se localizeze",
                         variable=self.de_la_inceput).grid(row=10, column=0, columnspan=2, sticky="w")
 
+        ttk.Separator(f, orient="horizontal").grid(row=14, column=0, columnspan=3,
+                                                   sticky="ew", pady=16)
+        ttk.Label(f, text="Cules cu tasta", font=("Segoe UI", 11, "bold")).grid(
+            row=15, column=0, columnspan=3, sticky="w")
+        ttk.Label(f, text="Joci tu, dar apesi F7 si se aduna singur tot ce e in cerc.\n"
+                          "Cercul se vede peste joc. F7 din nou il opreste, F12 inchide.",
+                  style="Sec.TLabel").grid(row=16, column=0, columnspan=3, sticky="w", pady=(0, 8))
+        ttk.Button(f, text="Porneste culesul cu tasta",
+                   command=self._pickup).grid(row=17, column=0, sticky="w")
+
         ttk.Label(f, text="Minute (gol = cat scrie in profil):").grid(row=11, column=0,
                                                                      sticky="w", pady=(8, 0))
         self.minute = ttk.Entry(f, width=8)
@@ -451,6 +461,10 @@ class GamebotApp:
             return
         self._ruleaza(["calibrate", ce, "--name", nume.strip(),
                        "--profile", str(self._cale_profil())], f"Calibrare {ce}")
+
+    def _pickup(self) -> None:
+        self._ruleaza(["pickup", "--profile", str(self._cale_profil())],
+                      "Cules cu tasta")
 
     def _testeaza_fundal(self) -> None:
         self._ruleaza(["bgtest", "--profile", str(self._cale_profil())],
