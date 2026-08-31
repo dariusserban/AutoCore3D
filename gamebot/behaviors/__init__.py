@@ -4,6 +4,7 @@ from .survival import SurvivalBehavior
 from .combat import CombatBehavior
 from .gather import GatherBehavior
 from .upkeep import UpkeepBehavior
+from .mount import MountBehavior
 from .idle_click import IdleClickBehavior
 from .travel import TravelBehavior
 
@@ -12,6 +13,7 @@ ALL_BEHAVIORS = [
     CombatBehavior,
     GatherBehavior,
     UpkeepBehavior,
+    MountBehavior,
     IdleClickBehavior,
     TravelBehavior,
 ]

@@ -58,13 +58,30 @@ class CombatBehavior(Behavior):
 
     @staticmethod
     def _enemies(ctx: BotContext) -> list:
-        """Petele care reprezinta dusmani, dupa culoarea din profil."""
+        """Petele care reprezinta dusmani, dupa culoarea din profil.
+
+        Cu `only_when_blocking` pastram doar ce e aproape de personaj. Ideea e
+        sa nu ne oprim din drum pentru fiecare mob zarit in celalalt capat al
+        ecranului: traseul conteaza, iar ce iese in cale se rezolva pe loc.
+        Fara filtrul asta botul se ia dupa primul mob si nu mai ajunge nicaieri.
+        """
         section = ctx.profile.section("combat")
-        return ctx.find_blobs(
+        blobs = ctx.find_blobs(
             section.get("enemy_color", "enemy_nameplate"),
             region_name=section.get("search_region"),
             min_area=int(section.get("enemy_min_area", 40)),
         )
+        if not blobs or not section.get("only_when_blocking", False):
+            return blobs
+
+        # Personajul e mereu in centrul ecranului, deci distanta pe ecran pana
+        # la o pata e o aproximare rezonabila a distantei din joc.
+        raza = float(section.get("engage_radius", 260))
+        cx, cy = ctx.screen_center()
+        return [
+            b for b in blobs
+            if math.hypot(b.center[0] - cx, b.center[1] - cy) <= raza
+        ]
 
     def run(self, ctx: BotContext) -> None:
         section = ctx.profile.section("combat")

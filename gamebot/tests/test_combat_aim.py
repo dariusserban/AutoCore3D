@@ -147,3 +147,35 @@ def test_fara_taste_de_directie_apropierea_pe_tastatura_nu_apasa_nimic(profil_ar
     CombatBehavior()._approach(ctx, 0.01, target=(100, 260))
 
     assert evenimente(ctx, "key_down") == []
+
+
+# ------------------------------------------- "trece prin", nu vaneaza tot
+
+
+def test_ignora_mobii_departati_cand_doar_trece(profil_arpg, tmp_path):
+    """Cu only_when_blocking, un mob in colt nu opreste traseul."""
+    profil_arpg.raw["combat"]["only_when_blocking"] = True
+    profil_arpg.raw["combat"]["engage_radius"] = 60
+    ctx = build_ctx(profil_arpg, make_frame(1.0, nodes=3), tmp_path)
+    ctx.refresh()
+
+    # Mob-urile sunt la x=55, 115, 175 iar personajul in centru (x=200, y=150).
+    # Cu raza 60 niciunul nu e destul de aproape.
+    assert CombatBehavior._enemies(ctx) == []
+    assert not CombatBehavior().should_run(ctx)
+
+
+def test_se_bate_cu_ce_ii_iese_in_cale(profil_arpg, tmp_path):
+    profil_arpg.raw["combat"]["only_when_blocking"] = True
+    profil_arpg.raw["combat"]["engage_radius"] = 400
+    ctx = build_ctx(profil_arpg, make_frame(1.0, nodes=3), tmp_path)
+    ctx.refresh()
+
+    assert len(CombatBehavior._enemies(ctx)) == 3
+    assert CombatBehavior().should_run(ctx)
+
+
+def test_fara_filtru_vede_tot_ecranul(profil_arpg, tmp_path):
+    ctx = build_ctx(profil_arpg, make_frame(1.0, nodes=3), tmp_path)
+    ctx.refresh()
+    assert len(CombatBehavior._enemies(ctx)) == 3

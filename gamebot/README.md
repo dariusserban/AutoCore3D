@@ -227,6 +227,7 @@ de făcut, îl face:
 |  70 | `combat`     | e o țintă selectată sau se vede un mob, într-o zonă de luptă |
 |  60 | `gather`     | *(oprit implicit)* se vede un nod de resurse |
 |  40 | `upkeep`     | a trecut intervalul și ești la un reper de vendor |
+|  20 | `mount`      | ești pe drum, n-ai dușmani lângă, și nu pari călare |
 |  30 | `idle_click` | staționezi la un reper și ai o secvență de click definită |
 |  10 | `travel`     | nimic mai important de făcut: mergi mai departe pe traseu |
 
@@ -234,6 +235,26 @@ De aceea lupta întrerupe mersul, iar vindecarea întrerupe lupta.
 
 Un reper cu `dwell > 0` (secunde, se reglează în `route.json`) oprește mersul pe durata
 respectivă, iar `combat` are ecranul la dispoziție — așa se bate botul pe loc într-o zonă.
+
+### „Trece prin" — se bate doar cu ce-i iese în cale
+
+`combat.only_when_blocking: true` face botul să ignore dușmanii mai depărtați de
+`engage_radius` pixeli față de personaj (care e mereu în centrul ecranului). Fără filtrul
+ăsta se ia după primul mob zărit în colțul ecranului și nu mai termină traseul niciodată.
+Cu el, drumul contează și ce apare în cale se rezolvă pe loc.
+
+Pentru farmat pe loc într-o zonă, lași `only_when_blocking: false` și pui `dwell` pe reper.
+
+### Montura
+
+`mount: true` în `behaviors` plus `keys.mount` — apasă tasta când e pe drum, nu are dușmani
+lângă și nu staționează. Din pixeli nu se poate ști sigur dacă ești deja călare, așa că
+implicit reîncearcă din când în când (`mount.retry_seconds`). Dacă vrei să știe sigur,
+calibrează un sablon cu o iconiță care apare doar când ești călare:
+
+```bash
+python -m gamebot.main calibrate template --name mounted
+```
 
 ## Portalele
 
@@ -301,12 +322,12 @@ gamebot/
 │   ├── safety.py         oprire de urgență, watchdog, limite de sesiune
 │   ├── config.py         încărcarea profilului YAML
 │   └── engine.py         contextul comun și mașina de stări
-├── behaviors/            supraviețuire, luptă, cules, întreținere, click, mers
+├── behaviors/            supraviețuire, luptă, cules, întreținere, montură, click, mers
 ├── profiles/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                131 de teste, rulează fără joc și fără ecran
+└── tests/                139 de teste, rulează fără joc și fără ecran
 ```
 
 ## Teste
