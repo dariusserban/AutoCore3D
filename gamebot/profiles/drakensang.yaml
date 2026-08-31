@@ -111,7 +111,10 @@ loot:
 
 pickup:
   # Culesul pornit de tine, cu o tasta, cu cerc desenat peste joc.
+  # Se porneste singur, din cules.bat - nu are nevoie de restul botului.
   hotkey: f7            # apesi o data = pornit, inca o data = oprit
+  sample_key: f8        # citeste culoarea de sub cursor si o scrie in consola
+  diagnostic: true      # scrie la fiecare trecere ce a gasit fiecare culoare
   radius: 260           # raza cercului, in pixeli de ecran
   culoare: "#3fd977"    # culoarea conturului
   interval: 0.7         # secunde intre doua treceri

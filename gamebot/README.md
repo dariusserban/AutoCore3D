@@ -175,12 +175,39 @@ folosește doar ea.
 
 ## Culesul cu tasta
 
-Butonul **Pornește culesul cu tasta** din AUTOPILOT (sau `python -m gamebot.main pickup`).
+**Merge singur, fără restul botului.** Click dreapta pe `gamebot\cules.bat` → *Run as
+administrator*. Nu-i trebuie rută, nu-i trebuie profil complet, nu deschide fereastra mare.
+
+(Există și butonul **Pornește culesul cu tasta** din AUTOPILOT, dacă ai deja fereastra
+deschisă.)
+
 Joci tu normal; când vrei să aduni, apeși **`F7`**:
 
 - apare un **cerc verde** în jurul personajului, desenat peste joc
 - tot ce e în cerc se ridică, cel mai apropiat primul
 - `F7` din nou îl oprește, `F12` închide
+
+### Dacă nu adună nimic
+
+La fiecare trecere scrie un rând ca ăsta, care spune exact unde e problema:
+
+```
+  [890x640 @ 950,102] raza 260 | loot_verde:0  loot_albastru:0  loot_violet:0  loot_auriu:2 | in raza: 1
+```
+
+- dimensiunea și poziția greșite → nu a găsit fereastra jocului
+- toate culorile pe `0` → culorile din profil nu se potrivesc cu jocul tău
+- culori găsite dar `in raza: 0` → mărește `pickup.radius`
+
+Pentru culori nu trebuie ghicit: pune cursorul pe eticheta unui obiect căzut și apasă
+**`F8`**. Îți scrie în consolă intervalul HSV măsurat pe ecranul tău, gata de pus în profil:
+
+```
+Culoare la (812, 447): HSV median (28, 201, 233)
+  De pus in profil, sub `colors:`
+    low: [20, 141, 173]
+    high: [36, 241, 255]
+```
 
 Ce vezi în cerc e exact ce se adună — raza desenată și raza căutării sunt același număr
 (`pickup.radius`, în pixeli de ecran).

@@ -46,7 +46,10 @@ class PickupRunner:
 
         loot = profile.section("loot")
         self.min_area = int(section.get("min_area", loot.get("min_area", 25)))
-        self.culori = culori_din_profil(profile, loot.get("colors") or [])
+        self.nume_culori = list(loot.get("colors") or [])
+        self.culori = culori_din_profil(profile, self.nume_culori)
+        self.diagnostic = bool(section.get("diagnostic", True))
+        self.sample_key = str(section.get("sample_key", "f8")).lower()
 
         self.activ = threading.Event()
         self.oprit = threading.Event()
@@ -106,6 +109,20 @@ def _bucla_de_lucru(runner: PickupRunner) -> None:
                 blacklist=blacklist, offset=(zona.left, zona.top),
             )
 
+            # Raportam ce a gasit fiecare culoare INAINTE de filtrul de raza.
+            # "Nu functioneaza" poate insemna trei lucruri complet diferite:
+            # fereastra gresita, culori care nu se potrivesc, sau raza prea
+            # mica. Randul asta le deosebeste dintr-o privire.
+            if runner.diagnostic:
+                pe_culoare = []
+                for nume, (low, high) in zip(runner.nume_culori, runner.culori):
+                    toate = find_loot(cadru, [(low, high)], centru_local,
+                                      min_area=runner.min_area)
+                    pe_culoare.append(f"{nume}:{len(toate)}")
+                runner.spune(f"  [{zona.width}x{zona.height} @ {zona.left},{zona.top}] "
+                             f"raza {runner.radius} | " + "  ".join(pe_culoare)
+                             + f" | in raza: {len(obiecte)}")
+
             for blob in obiecte[:runner.max_per_pass]:
                 if not runner.activ.is_set() or runner.oprit.is_set():
                     break
@@ -128,6 +145,40 @@ def _bucla_de_lucru(runner: PickupRunner) -> None:
         capture.close()
 
 
+def _citeste_culoarea_de_sub_cursor(runner: PickupRunner) -> None:
+    """Spune ce culoare e sub mouse, gata de pus in profil.
+
+    Asta inlocuieste ghicitul. Pui cursorul pe eticheta unui obiect cazut,
+    apesi tasta, si primesti intervalul HSV care o acopera - masurat pe ecranul
+    tau, nu presupus de altcineva.
+    """
+    try:
+        import cv2
+        import numpy as np
+        import pyautogui
+
+        from ..core.capture import Region, ScreenCapture
+
+        x, y = pyautogui.position()
+        # Un patrat mic in jurul cursorului: un singur pixel ar prinde exact
+        # marginea antialiasata a unei litere si ar da o culoare inventata.
+        zona = Region(int(x) - 4, int(y) - 4, 9, 9)
+        with ScreenCapture(runner.profile.monitor) as captura:
+            bucata = captura.grab(zona)
+
+        hsv = cv2.cvtColor(bucata, cv2.COLOR_BGR2HSV).reshape(-1, 3)
+        median = np.median(hsv, axis=0).astype(int)
+        low = np.clip(median - np.array([8, 60, 60]), [0, 0, 0], [179, 255, 255])
+        high = np.clip(median + np.array([8, 40, 40]), [0, 0, 0], [179, 255, 255])
+
+        runner.spune(f"\nCuloare la ({x}, {y}): HSV median {tuple(median)}")
+        runner.spune("  De pus in profil, sub `colors:`")
+        runner.spune(f"    low: [{low[0]}, {low[1]}, {low[2]}]")
+        runner.spune(f"    high: [{high[0]}, {high[1]}, {high[2]}]\n")
+    except Exception as exc:
+        runner.spune(f"Nu am putut citi culoarea: {exc}")
+
+
 def _asculta_tasta(runner: PickupRunner) -> None:
     from pynput import keyboard
 
@@ -140,6 +191,8 @@ def _asculta_tasta(runner: PickupRunner) -> None:
 
         if nume == runner.hotkey:
             runner.comuta()
+        elif nume == runner.sample_key:
+            _citeste_culoarea_de_sub_cursor(runner)
         elif nume == "f12":
             runner.spune("Inchid culesul.")
             runner.activ.clear()
@@ -156,12 +209,18 @@ def porneste(profile_path: str | Path) -> int:
 
     if not runner.culori:
         print("Profilul nu are culori de obiect definite (loot.colors).")
-        print("Fara ele nu am ce cauta pe jos.")
-        return 1
+        print(f"Poti totusi porni si folosi {runner.sample_key.upper()} ca sa masori")
+        print("culorile de la tine, apoi le pui in profil.\n")
 
-    print(f"Cules cu tasta {runner.hotkey.upper()}  |  F12 inchide")
-    print(f"Raza cercului: {runner.radius} px (loot.pickup_radius / pickup.radius)")
-    print("Apasa tasta in joc: apare cercul si se aduna tot ce e inauntru.\n", flush=True)
+    print("=" * 62)
+    print(f"  {runner.hotkey.upper()}  porneste / opreste culesul (apare cercul)")
+    print(f"  {runner.sample_key.upper()}  citeste culoarea de sub cursor")
+    print("  F12 inchide")
+    print("=" * 62)
+    print(f"Raza cercului: {runner.radius} px   Culori cautate: "
+          f"{', '.join(runner.nume_culori) or 'niciuna'}")
+    print("\nDaca nu aduna nimic: pune cursorul pe eticheta unui obiect cazut")
+    print(f"si apasa {runner.sample_key.upper()}. Culoarea masurata apare aici.\n", flush=True)
 
     root = tk.Tk()
     root.withdraw()

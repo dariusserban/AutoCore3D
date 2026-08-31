@@ -125,3 +125,47 @@ def test_profilul_de_dso_are_setari_de_cules_cu_tasta():
 
     assert pickup["hotkey"] == "f7"
     assert pickup["radius"] > 0
+
+
+# ------------------------------------------------------ proba de culoare (F8)
+
+
+def _masoara(imagine):
+    """Ce face F8: mediana HSV a unui patrat mic, largita intr-un interval.
+
+    Mediana, nu media: pe marginea unei litere apar pixeli antialiasati de alta
+    culoare, iar media i-ar amesteca intr-o nuanta care nu exista pe ecran.
+    """
+    import cv2
+    import numpy as np
+
+    hsv = cv2.cvtColor(imagine, cv2.COLOR_BGR2HSV).reshape(-1, 3)
+    median = np.median(hsv, axis=0).astype(int)
+    low = np.clip(median - np.array([8, 60, 60]), [0, 0, 0], [179, 255, 255])
+    high = np.clip(median + np.array([8, 40, 40]), [0, 0, 0], [179, 255, 255])
+    return list(low), list(high)
+
+
+def test_culoarea_masurata_gaseste_obiectele():
+    """Cheia intregului mod: ce masori cu F8 trebuie sa si functioneze pus in profil.
+
+    Fara asta, utilizatorul pune in profil niste cifre care arata a masuratoare
+    dar nu prind nimic - exact felul de esec tacut pe care il evitam.
+    """
+    cadru = make_frame(nodes=2)
+    # Un patrat de 9x9 din mijlocul unei etichete, ca sub cursor.
+    low, high = _masoara(cadru[211:220, 46:55])
+
+    gasite = find_loot(cadru, [(low, high)], CENTRU, min_area=100)
+
+    assert len(gasite) == 2
+
+
+def test_proba_pe_fundal_nu_produce_un_interval_care_prinde_tot():
+    """Daca nimeresti langa obiect, intervalul nu trebuie sa cuprinda ecranul."""
+    cadru = make_frame(nodes=2)
+    low, high = _masoara(cadru[50:59, 300:309])  # zona de fundal, cu zgomot
+
+    gasite = find_loot(cadru, [(low, high)], CENTRU, min_area=100)
+
+    assert len(gasite) <= 1, "un interval luat de pe fundal nu trebuie sa dea obiecte"
