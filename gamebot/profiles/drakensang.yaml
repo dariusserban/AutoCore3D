@@ -21,12 +21,14 @@ regions:
   health_bar:
     rel: [0.055, 0.905, 0.115, 0.016]
 
-  # `minimap` lipseste intentionat. Fara ea, ancorele de traseu se iau din tot
-  # ecranul jocului, micsorat. Forma terenului si asezarea cladirilor
-  # identifica locul la fel de bine ca o minimapa, micsorarea sterge jucatorii
-  # care trec prin cadru, si nu trebuie calibrat nimic.
-  # Daca vrei totusi precizie maxima, calibreaz-o si va fi folosita doar ea:
-  #   python -m gamebot.main calibrate region --name minimap
+  # Minimapa DSO e sus-STANGA (masurata dintr-un screenshot real, 1906x1016
+  # arie de client). E semi-transparenta, deci se vede si terenul prin ea -
+  # ceea ce o face o ancora buna: se schimba cand te misti.
+  #
+  # Daca o ai inchisa in joc, sterge blocul asta: fara `minimap`, ancorele se
+  # iau din tot ecranul, micsorat, si merge si asa.
+  minimap:
+    rel: [0.031, 0.104, 0.226, 0.453]
 
 colors:
   # Rosul barelor de viata de deasupra mob-urilor - detectorul de dusmani.
