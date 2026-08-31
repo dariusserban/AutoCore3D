@@ -98,7 +98,10 @@ combat:
 loot:
   colors: [loot_verde, loot_albastru, loot_violet, loot_auriu]
   min_area: 25          # etichetele sunt mici; sub atat e zgomot
-  pickup_radius: 420    # nu traversam harta dupa un obiect din colt
+  # Raza in care se aduna, masurata de la personaj (centrul ferestrei jocului).
+  # Se verifica si in timpul mersului pe traseu, la fiecare `interval` secunde,
+  # deci tot ce ramane pe langa drum se ridica din mers.
+  pickup_radius: 420
   max_per_pass: 4
   click_delay: 0.45
   click_offset_y: 12    # eticheta e deasupra obiectului; dam click pe obiect

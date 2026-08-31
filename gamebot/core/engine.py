@@ -93,6 +93,11 @@ class BotContext:
         self.dwell_until: float = 0.0
         # Ridicat de lupta: pozitia pe traseu nu mai e de incredere.
         self.needs_resync: bool = False
+        # Aria de client a ferestrei jocului, cand o stim. Personajul sta in
+        # centrul ei, nu in centrul ecranului.
+        self.game_area: Optional[Region] = None
+        # Completat de motor la pornire: comportamentele, dupa nume.
+        self.behaviors: dict[str, "Behavior"] = {}
 
     # ---------------------------------------------------------------- cadru
 
@@ -157,7 +162,14 @@ class BotContext:
         ]
 
     def screen_center(self) -> tuple[int, int]:
-        region: Region = self.capture.monitor
+        """Unde e personajul pe ecran.
+
+        Toate razele din aplicatie pleaca de aici: cat de departe se aduna
+        obiectele, ce mob-uri sunt "in cale", unde tintesc abilitatile. Cand
+        jocul nu e maximizat, centrul ecranului e in cu totul alta parte decat
+        personajul, si toate razele cad alaturi fara ca nimic sa dea eroare.
+        """
+        region: Region = self.game_area or self.capture.monitor
         return region.center
 
     def running(self) -> bool:
@@ -215,6 +227,11 @@ class BehaviorEngine:
         self.behaviors = sorted(behaviors, key=lambda b: b.priority, reverse=True)
         self.tick = tick
         self.active: list[Behavior] = [b for b in self.behaviors if b.enabled(ctx)]
+        # Unele comportamente au nevoie unul de altul: mersul vrea sa cheme
+        # culesul cat timp reda un segment. Le tinem intr-un tabel dupa nume, ca
+        # sa se foloseasca aceeasi instanta - si deci aceeasi lista neagra si
+        # aceleasi intervale - nu o copie proaspata la fiecare apel.
+        ctx.behaviors = {b.name: b for b in self.behaviors}
         log.info("Comportamente active: %s", ", ".join(b.name for b in self.active) or "niciunul")
 
     def step(self) -> Optional[Behavior]:

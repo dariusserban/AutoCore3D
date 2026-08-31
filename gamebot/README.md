@@ -226,7 +226,17 @@ violet, auriu — albul și griul lipsesc intenționat, ar prinde jumătate din 
 
 Nu insistă pe același obiect: dacă unul e în spatele unui gard și clicul nu face nimic, îl
 ține minte și trece mai departe — altfel ar rămâne blocat acolo până la capătul sesiunii.
-`pickup_radius` îl împiedică să traverseze harta după un obiect din colțul ecranului.
+`pickup_radius` (420 px implicit) îl împiedică să traverseze harta după un obiect din colț.
+
+**Raza se măsoară de la personaj**, adică din centrul ferestrei jocului — nu din centrul
+ecranului. Cu jocul într-o fereastră mutată într-o parte, cele două sunt locuri complet
+diferite, și toate razele ar cădea alături fără ca nimic să dea eroare. Același lucru e
+valabil și pentru raza de angajare în luptă și pentru țintirea abilităților.
+
+**Adună și din mers.** Un segment de traseu se redă dintr-o bucată, iar o rută cu puține
+repere e un segment cât toată tura — fără nimic în plus, botul ar trece pe lângă tot ce e pe
+jos și ar aduna abia la capăt, când obiectele au dispărut demult. Așa că în timpul redării,
+la fiecare `loot.interval` secunde, se uită în jur și ridică ce prinde.
 
 ## Cum decide botul ce să facă
 
@@ -346,7 +356,7 @@ gamebot/
 │   ├── exemplu.yaml      profil generic, comentat
 │   └── drakensang.yaml   profil de pornire pentru DSO (aim + click-to-move)
 ├── templates/            sabloanele PNG salvate de calibrare
-└── tests/                210 teste, rulează fără joc și fără ecran
+└── tests/                217 teste, rulează fără joc și fără ecran
 ```
 
 ## Teste

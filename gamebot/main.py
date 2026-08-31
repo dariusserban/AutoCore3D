@@ -325,6 +325,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         opritor = StopFileWatcher(args.stop_file, kill_switch).start()
 
     ctx = build_context(args, profile, capture, kill_switch, backend=backend_fundal)
+    if fereastra is not None:
+        ctx.game_area = fereastra.region
     # Kill switch-ul trebuie sa elibereze tastele imediat, nu dupa ce bucla
     # principala apuca sa observe oprirea.
     kill_switch.on_stop = ctx.controller.release_all

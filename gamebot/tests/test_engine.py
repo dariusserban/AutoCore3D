@@ -148,3 +148,36 @@ def test_comportamentele_dezactivate_nu_intra_in_lista(test_profile, tmp_path):
     ctx = build_ctx(test_profile, make_frame(), tmp_path)
     engine = BehaviorEngine(ctx, [Dezactivat("nu", 50), Spion("da", 10)])
     assert [b.name for b in engine.active] == ["da"]
+
+
+# ------------------------------- personajul e in centrul ferestrei, nu al ecranului
+
+
+def test_centrul_e_al_ecranului_cand_nu_stim_fereastra(test_profile, tmp_path):
+    ctx = build_ctx(test_profile, make_frame(), tmp_path)
+    assert ctx.screen_center() == (200, 150)  # cadrul sintetic e 400x300
+
+
+def test_centrul_urmeaza_fereastra_jocului(test_profile, tmp_path):
+    """Toate razele pleaca de aici: cules, angajare in lupta, tintire.
+
+    Cu jocul intr-o fereastra mutata intr-o parte, centrul ecranului e in cu
+    totul alta parte decat personajul - si fiecare raza ar cadea alaturi fara
+    ca nimic sa dea eroare.
+    """
+    from gamebot.core.capture import Region
+
+    ctx = build_ctx(test_profile, make_frame(), tmp_path)
+    ctx.game_area = Region(950, 102, 890, 640)
+
+    assert ctx.screen_center() == (1395, 422)
+
+
+def test_motorul_face_comportamentele_accesibile_dupa_nume(test_profile, tmp_path):
+    ctx = build_ctx(test_profile, make_frame(), tmp_path)
+    unu, doi = Spion("unu", 10), Spion("doi", 20)
+
+    BehaviorEngine(ctx, [unu, doi])
+
+    assert ctx.behaviors["unu"] is unu
+    assert ctx.behaviors["doi"] is doi

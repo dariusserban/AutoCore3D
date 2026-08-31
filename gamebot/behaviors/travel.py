@@ -33,6 +33,8 @@ class TravelBehavior(Behavior):
         player = ctx.player
         assert player is not None
 
+        self._pregateste_culesul(ctx, player)
+
         if ctx.needs_resync:
             ctx.needs_resync = False
             if not player.resync():
@@ -67,3 +69,28 @@ class TravelBehavior(Behavior):
 
         if humanize.should_micro_pause(0.02):
             humanize.micro_pause()
+
+    # ------------------------------------------------- culesul din mers
+
+    def _pregateste_culesul(self, ctx: BotContext, player) -> None:
+        """Leaga culesul de redarea segmentului.
+
+        Un segment se reda dintr-o bucata, iar o ruta cu putine repere e un
+        segment cat toata tura. Fara asta, botul ar trece pe langa tot ce e pe
+        jos si ar aduna abia la capat, cand obiectele au disparut demult.
+        """
+        cules = ctx.behaviors.get("loot")
+        if cules is None:
+            player.on_tick = None
+            return
+
+        player.tick_interval = float(ctx.profile.section("loot").get("interval", 1.0))
+
+        def culege():
+            # Aceeasi instanta ca a motorului, deci aceeasi lista neagra: un
+            # obiect de neluat nu e reincercat la fiecare pas.
+            ctx.refresh()
+            if cules.should_run(ctx):
+                cules.run(ctx)
+
+        player.on_tick = culege

@@ -208,6 +208,14 @@ class RoutePlayer:
         self.laps = 0
         self.lost_count = 0
         self.portals_taken = 0
+
+        # Chemat periodic in timpul redarii unui segment. Fara el, cat timp se
+        # reda un segment lung nu se poate intampla nimic altceva - iar o ruta
+        # cu un singur reper e un segment cat toata tura, deci botul ar trece
+        # pe langa tot ce e pe jos fara sa ridice nimic.
+        self.on_tick: Optional[Callable[[], None]] = None
+        self.tick_interval: float = 1.0
+        self._last_tick = 0.0
         # 1:1 pana cand cineva ne spune rezolutia curenta prin set_screen().
         self._scale = (1.0, 1.0)
 
@@ -246,6 +254,16 @@ class RoutePlayer:
             if not self.should_continue():
                 self.controller.release_all()
                 return False
+
+            if self.on_tick is not None:
+                acum = time.monotonic()
+                if acum - self._last_tick >= self.tick_interval:
+                    self._last_tick = acum
+                    try:
+                        self.on_tick()
+                    except Exception:
+                        log.exception("Actiunea periodica din timpul mersului a esuat.")
+
             wait = event.dt / lap_speed
             if wait > 0.001:
                 time.sleep(wait)
